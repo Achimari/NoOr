@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title || "" %></title>
     <%- include("./loading-head") %>
-    <link rel="stylesheet" href="/styles/globals.css" />
-    <link rel="stylesheet" href="/styles/home.css" onload="window.NoOrStylesReady && window.NoOrStylesReady()" />
+    <% (assets.styles || []).forEach((href, index, styles) => { %>
+      <link rel="stylesheet" href="<%= href %>"<%= index === styles.length - 1 ? ' onload="window.NoOrStylesReady && window.NoOrStylesReady()"' : "" %> />
+    <% }) %>
   </head>
   <body data-page="<%= pageId %>">
     <%- body %>

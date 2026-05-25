@@ -10,7 +10,7 @@
     window.NoOrStylesReady = function () {
       window.requestAnimationFrame(hideLoading);
     };
-    window.setTimeout(hideLoading, 2500);
+    window.setTimeout(hideLoading, 900);
   })();
 </script>
 <noscript>
@@ -57,8 +57,8 @@
     left: 50%;
     top: 50%;
     z-index: 9999;
-    width: 58px;
-    height: 58px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     visibility: visible;
     transform: translate(-50%, -50%);
@@ -66,6 +66,6 @@
       radial-gradient(circle at center, #000 0 47%, transparent 48%),
       conic-gradient(from 18deg, #fff 0 70%, rgba(255, 255, 255, 0.18) 70% 82%, transparent 82% 100%);
     transform-origin: center;
-    animation: noor-loader-spin 0.78s linear infinite;
+    animation: noor-loader-spin 0.52s linear infinite;
   }
 </style>

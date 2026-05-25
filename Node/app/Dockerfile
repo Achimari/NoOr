@@ -17,8 +17,10 @@ RUN npx prisma generate
 
 COPY public ./public
 COPY src ./src
+COPY scripts ./scripts
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
+RUN npm run build:assets
 RUN chmod +x ./docker-entrypoint.sh
 
 EXPOSE 3000

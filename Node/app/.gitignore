@@ -20,3 +20,4 @@ pnpm-debug.log*
 dist/
 coverage/
 .prisma/
+public/assets/
