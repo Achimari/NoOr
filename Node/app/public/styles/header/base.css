@@ -104,26 +104,25 @@
   transition: color 0.28s ease;
 }
 
-.header a:link,
-.header a:visited {
-  color: var(--text-secondary);
-}
-
 .header .logo-link:link,
 .header .logo-link:visited {
   color: inherit;
 }
 
-.header-link:visited {
+.header-nav .header-link,
+.header-nav .header-link:link,
+.header-nav .header-link:visited {
   color: var(--text-secondary);
 }
 
-.header-link:hover {
+.header-nav .header-link:hover,
+.header-nav .header-link:focus-visible {
   color: var(--text);
 }
 
-.header-link.active,
-.header-link.active:visited {
+.header-nav .header-link.active,
+.header-nav .header-link.active:link,
+.header-nav .header-link.active:visited {
   color: var(--header-active);
 }
 
