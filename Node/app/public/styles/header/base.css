@@ -104,6 +104,16 @@
   transition: color 0.28s ease;
 }
 
+.header a:link,
+.header a:visited {
+  color: var(--text-secondary);
+}
+
+.header .logo-link:link,
+.header .logo-link:visited {
+  color: inherit;
+}
+
 .header-link:visited {
   color: var(--text-secondary);
 }
