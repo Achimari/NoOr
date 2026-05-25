@@ -484,7 +484,6 @@ if (prayerForm) {
 
 if (telegramConnectButton) {
   telegramConnectButton.addEventListener("click", async () => {
-    const telegramWindow = window.open("about:blank", "_blank", "noopener,noreferrer");
     telegramConnectButton.disabled = true;
     if (telegramStatus) telegramStatus.textContent = "";
     showToast("Preparing Telegram link");
@@ -497,14 +496,12 @@ if (telegramConnectButton) {
       });
 
       if (response.status === 401) {
-        telegramWindow?.close();
         window.location.href = "/login";
         return;
       }
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.link) {
-        telegramWindow?.close();
         if (telegramStatus) telegramStatus.textContent = "";
         showToast(data.error || "Could not create Telegram link", "error");
         telegramConnectButton.disabled = false;
@@ -513,14 +510,8 @@ if (telegramConnectButton) {
 
       if (telegramStatus) telegramStatus.textContent = "";
       showToast(data.botUsername ? `Telegram link ready: @${data.botUsername}` : "Telegram link ready");
-      if (telegramWindow) {
-        telegramWindow.location.href = data.link;
-      } else {
-        window.location.href = data.link;
-      }
-      telegramConnectButton.disabled = false;
+      window.location.href = data.link;
     } catch {
-      telegramWindow?.close();
       if (telegramStatus) telegramStatus.textContent = "";
       showToast("Could not create Telegram link", "error");
       telegramConnectButton.disabled = false;

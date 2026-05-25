@@ -51,6 +51,10 @@
   color: inherit;
 }
 
+.logo-link:visited {
+  color: inherit;
+}
+
 /* LOGO */
 .header-logo {
   width: 220px;
@@ -100,11 +104,16 @@
   transition: color 0.28s ease;
 }
 
+.header-link:visited {
+  color: var(--text-secondary);
+}
+
 .header-link:hover {
   color: var(--text);
 }
 
-.header-link.active {
+.header-link.active,
+.header-link.active:visited {
   color: var(--header-active);
 }
 
@@ -140,6 +149,10 @@
   cursor: pointer;
   padding: var(--space-1) 0 var(--space-2);
   transition: color 0.28s ease;
+}
+
+.header-auth-link:visited {
+  color: var(--text-secondary);
 }
 
 .header-auth-link:hover,
