@@ -5,6 +5,8 @@ const tableCount = document.querySelector("[data-table-count]");
 const yesButton = document.querySelector(".dashboard-action-yes");
 const noButton = document.querySelector(".dashboard-action-no");
 const checkInMessage = document.querySelector("[data-check-in-message]");
+const dashboardWeek = document.querySelector(".dashboard-week");
+const weekDayButtons = document.querySelectorAll("[data-week-day]");
 const prayerForm = document.querySelector("[data-prayer-form]");
 const prayersBody = document.querySelector("[data-prayers-body]");
 const prayerCount = document.querySelector("[data-prayer-count]");
@@ -51,6 +53,10 @@ function renderLeaderboard(leaderboard) {
   if (!leaderboardRoot || !leaderboard || !currentValue || !leaderboardBody) return;
 
   currentValue.textContent = leaderboard.current.value;
+  if (dashboardWeek && leaderboard.current.todayDateKey) {
+    dashboardWeek.dataset.currentDateKey = leaderboard.current.todayDateKey;
+  }
+  renderWeekDays(leaderboard.current.weekDays);
 
   if (tableCount) {
     tableCount.textContent = `${leaderboard.leaders.length} users`;
@@ -69,6 +75,29 @@ function renderLeaderboard(leaderboard) {
         )
         .join("")
     : '<tr><td colspan="3" class="leaderboard-empty">No streaks yet</td></tr>';
+}
+
+function renderWeekDays(weekDays) {
+  if (!weekDayButtons.length || !Array.isArray(weekDays)) return;
+
+  weekDayButtons.forEach((dayButton, index) => {
+    const day = weekDays[index];
+    const answer = day?.answer || "";
+    if (day?.dateKey) dayButton.dataset.weekDay = day.dateKey;
+    if (day?.label) dayButton.textContent = day.label;
+    dayButton.classList.toggle("active", Boolean(day?.successful));
+    dayButton.dataset.weekAnswer = answer;
+  });
+}
+
+function markTodayWeekDay(answer) {
+  const todayKey = dashboardWeek?.dataset.currentDateKey;
+  if (!todayKey) return;
+  const todayButton = [...weekDayButtons].find((dayButton) => dayButton.dataset.weekDay === todayKey);
+  if (!todayButton) return;
+
+  todayButton.classList.toggle("active", answer === "YES");
+  todayButton.dataset.weekAnswer = answer;
 }
 
 function userIcon() {
@@ -361,12 +390,24 @@ if (prayersBody?.dataset.prayerActions === "true") {
 
 async function updateLeaderboard(action) {
   const endpoint = action === "reset" ? "/api/leaderboard/reset" : "/api/leaderboard/increment";
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  yesButton?.classList.toggle("selected", action === "increment");
+  noButton?.classList.toggle("selected", action === "reset");
+  markTodayWeekDay(action === "increment" ? "YES" : "NO");
+
+  let response;
+
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+  } catch {
+    await loadCheckInStatus();
+    showToast("Could not save answer", "error");
+    return;
+  }
 
   if (response.status === 401) {
     window.location.href = "/login";
@@ -380,6 +421,7 @@ async function updateLeaderboard(action) {
   }
 
   if (!response.ok) {
+    await loadCheckInStatus();
     showToast("Could not save answer", "error");
     return;
   }
@@ -506,6 +548,10 @@ async function loadCheckInStatus() {
 function setAnswerState(status) {
   if (!yesButton || !noButton) return;
   window.clearInterval(resetTimerId);
+  if (dashboardWeek && status.dateKey) {
+    dashboardWeek.dataset.currentDateKey = status.dateKey;
+  }
+  renderWeekDays(status.weekDays);
 
   const isLocked = status.canAnswer === false;
   yesButton.disabled = isLocked;

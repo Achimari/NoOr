@@ -16,6 +16,7 @@ model Auth {
   sessions              Session[]
   leaderboard           Leaderboard?
   checkIn               CheckIn?
+  checkInHistory        CheckInHistory[]
   prayers               Prayer[]
   telegramConnection    TelegramConnection?
   telegramConnectTokens TelegramConnectToken[]
@@ -48,6 +49,19 @@ model CheckIn {
   user    Auth    @relation(fields: [id], references: [id], onDelete: Cascade)
 
   @@index([dateKey])
+}
+
+model CheckInHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  dateKey   String   @map("date_key")
+  answer    String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dateKey])
+  @@index([dateKey])
+  @@map("check_in_history")
 }
 
 model Prayer {

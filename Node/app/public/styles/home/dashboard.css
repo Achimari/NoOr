@@ -385,7 +385,7 @@
   gap: var(--space-4);
   align-items: stretch;
   height: var(--info-panel-height);
-  --info-panel-height: 430px;
+  --info-panel-height: 446px;
 }
 
 .info-column {
@@ -400,20 +400,33 @@
   overflow: hidden;
 }
 
+.info-grid .dashboard-card {
+  margin-bottom: 0;
+}
+
+.info-motivation {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .info-motivation blockquote {
-  margin: var(--space-4) 0 var(--space-3);
+  margin: 0;
   color: var(--white);
-  max-width: 16ch;
-  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  max-width: 20ch;
+  font-size: clamp(1.05rem, 1.45vw, 1.28rem);
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
 }
 
 .info-quote-source {
   margin: 0;
   color: var(--white-54);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .info-stat-grid {
@@ -585,6 +598,7 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 .prayer-filter-head {

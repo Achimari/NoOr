@@ -2,7 +2,8 @@ import {
   findLeaderboardValueById,
   findTopLeaderboardRows,
 } from "../repositories/leaderboardRepository.js";
-import { createDailyCheckIn } from "./checkInService.js";
+import { createDailyCheckIn, getWeeklyCheckInDays } from "./checkInService.js";
+import { getTodayDateKey } from "../utils/dateKey.js";
 
 function sanitizeLeaderboardEntry(row, index) {
   return {
@@ -14,15 +15,18 @@ function sanitizeLeaderboardEntry(row, index) {
 }
 
 export async function getLeaderboardSummary(userId) {
-  const [currentRow, topRows] = await Promise.all([
+  const [currentRow, topRows, weekDays] = await Promise.all([
     findLeaderboardValueById(userId),
     findTopLeaderboardRows(),
+    getWeeklyCheckInDays(userId),
   ]);
 
   return {
     current: {
       id: userId,
       value: currentRow?.value || 0,
+      todayDateKey: getTodayDateKey(),
+      weekDays,
     },
     leaders: topRows.map(sanitizeLeaderboardEntry),
   };

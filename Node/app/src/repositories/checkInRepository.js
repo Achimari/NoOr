@@ -6,29 +6,50 @@ export async function findCheckInById(id) {
   });
 }
 
+export async function findCheckInHistoryByDateKeys(userId, dateKeys) {
+  return prisma.checkInHistory.findMany({
+    where: {
+      userId,
+      dateKey: {
+        in: dateKeys,
+      },
+    },
+    select: {
+      dateKey: true,
+      answer: true,
+    },
+  });
+}
+
 export async function createCheckInAndUpdateLeaderboard({ userId, dateKey, answer }) {
   return prisma.$transaction(async (tx) => {
-    const checkIn = await tx.checkIn.updateMany({
+    const history = await tx.checkInHistory.createMany({
+      data: [{
+        userId,
+        dateKey,
+        answer,
+      }],
+      skipDuplicates: true,
+    });
+
+    if (history.count === 0) {
+      return null;
+    }
+
+    await tx.checkIn.upsert({
       where: {
         id: userId,
-        OR: [
-          { dateKey: null },
-          {
-            NOT: {
-              dateKey,
-            },
-          },
-        ],
       },
-      data: {
+      create: {
+        id: userId,
+        dateKey,
+        answer,
+      },
+      update: {
         dateKey,
         answer,
       },
     });
-
-    if (checkIn.count === 0) {
-      return null;
-    }
 
     if (answer === "YES") {
       await tx.leaderboard.upsert({

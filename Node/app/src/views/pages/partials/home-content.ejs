@@ -22,10 +22,9 @@
               <%= leaderboard.current.value %>
             </span> Days</p>
         </div>
-        <div class="dashboard-week" aria-hidden="true">
-          <% ["M", "T" , "W" , "T" , "F" , "S" , "S" ].forEach((day, index)=> { %>
-            <span class="dashboard-day<%= index < Math.min(7, leaderboard.current.value) ? " active" : "" %>"><%= day %>
-            </span>
+        <div class="dashboard-week" data-current-date-key="<%= leaderboard.current.todayDateKey %>" aria-hidden="true">
+          <% (leaderboard.current.weekDays || []).forEach((day)=> { %>
+            <span class="dashboard-day<%= day.successful ? " active" : "" %>" data-week-day="<%= day.dateKey %>" data-week-answer="<%= day.answer || "" %>"><%= day.label %></span>
             <% }) %>
         </div>
       </article>
