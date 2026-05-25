@@ -1,0 +1,36 @@
+{
+  "name": "noor-node-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "docker:start": "sh scripts/docker-start.sh",
+    "docker:prod:start": "sh scripts/docker-prod-start.sh",
+    "docker:db:clear": "sh scripts/docker-clear-db.sh",
+    "docker:reset": "sh scripts/docker-reset.sh",
+    "deploy:digitalocean": "sh scripts/digitalocean-install.sh"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.1.0",
+    "node-telegram-bot-api": "^0.67.0",
+    "pg": "^8.20.0",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "prisma": "^7.8.0",
+    "zod": "^4.4.3"
+  }
+}

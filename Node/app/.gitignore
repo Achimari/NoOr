@@ -1,0 +1,22 @@
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime environment and secrets
+.env
+.env.*
+!.env.example
+!.env.development.example
+!.env.production.example
+
+# Local OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+
+# Build and generated output
+dist/
+coverage/
+.prisma/

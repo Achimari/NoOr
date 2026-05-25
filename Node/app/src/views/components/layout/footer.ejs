@@ -1,0 +1,18 @@
+<section class="section footer-info">
+  <div class="container">
+    <div class="footer-row">
+      <% if (t("footer.copyright")) { %>
+        <p class="footer-text">&copy; <%= new Date().getFullYear() %> <%= t("footer.copyright") %></p>
+      <% } %>
+      <% if ((siteData.socialLinks || []).length) { %>
+        <nav class="footer-socials" aria-label="<%= t("footer.socialAria") %>">
+          <% (siteData.socialLinks || []).forEach((item) => { %>
+            <a href="<%= item.href %>" target="_blank" rel="noreferrer" class="footer-social" aria-label="<%= item.title %>">
+              <%- include("../ui/icon", { name: item.icon }) %>
+            </a>
+          <% }) %>
+        </nav>
+      <% } %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,10 @@
+<% const buttonVariant = typeof variant === "undefined" ? "primary" : variant; %>
+<% const buttonTag = typeof tag === "undefined" ? (typeof href === "undefined" ? "button" : "a") : tag; %>
+<% const buttonClassName = typeof className === "undefined" ? "" : className; %>
+<% const buttonClasses = ["btn", `btn-${buttonVariant}`, buttonClassName].filter(Boolean).join(" "); %>
+<% const buttonLabel = typeof label === "undefined" ? "" : label; %>
+<% if (buttonTag === "a") { %>
+  <a class="<%= buttonClasses %>" href="<%= href %>"><%= buttonLabel %></a>
+<% } else { %>
+  <button class="<%= buttonClasses %>" type="<%= typeof type === "undefined" ? "button" : type %>"><%= buttonLabel %></button>
+<% } %>

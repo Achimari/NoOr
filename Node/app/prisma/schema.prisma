@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Auth {
+  id                    Int                    @id @default(autoincrement())
+  name                  String                 @unique
+  passwordHash          String
+  isTelegramLinked      Boolean                @default(false) @map("is_telegram_linked")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  sessions              Session[]
+  leaderboard           Leaderboard?
+  checkIn               CheckIn?
+  prayers               Prayer[]
+  telegramConnection    TelegramConnection?
+  telegramConnectTokens TelegramConnectToken[]
+  telegramNotifications TelegramNotificationLog[]
+}
+
+model Session {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  sessionTokenHash String   @unique
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Leaderboard {
+  id    Int  @id
+  value Int  @default(0)
+  user  Auth @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model CheckIn {
+  id      Int     @id
+  dateKey String?
+  answer  String?
+  user    Auth    @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@index([dateKey])
+}
+
+model Prayer {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  prayer String
+  user   Auth   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model TelegramConnection {
+  id                Int      @id @default(autoincrement())
+  userId            Int      @unique @map("user_id")
+  telegramChatId    String   @unique @map("telegram_chat_id")
+  telegramUsername  String?  @map("telegram_username")
+  telegramFirstName String?  @map("telegram_first_name")
+  isActive          Boolean  @default(true) @map("is_active")
+  connectedAt       DateTime @default(now()) @map("connected_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  user              Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("telegram_connections")
+}
+
+model TelegramConnectToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      Auth      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("telegram_connect_tokens")
+}
+
+model TelegramNotificationLog {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id")
+  notificationType String   @map("notification_type")
+  dateKey          String   @map("date_key")
+  createdAt        DateTime @default(now()) @map("created_at")
+  user             Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationType, dateKey])
+  @@index([dateKey])
+  @@map("telegram_notification_logs")
+}

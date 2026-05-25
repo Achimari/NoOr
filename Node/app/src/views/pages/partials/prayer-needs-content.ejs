@@ -1,0 +1,27 @@
+<main class="dashboard-page prayer-page" data-prayer-page>
+  <section class="section dashboard-section">
+    <div class="container info-container">
+
+      <div class="info-grid prayer-grid">
+        <form class="dashboard-card prayer-form" data-prayer-form>
+          <div class="prayer-card-intro">
+            <h2>Add a request</h2>
+            <p>Write what you would like prayer for today.</p>
+          </div>
+          <label class="auth-field prayer-field">
+            <span>Prayer request</span>
+            <textarea name="prayer" rows="7" maxlength="500" placeholder="Share your request..." required></textarea>
+          </label>
+          <button class="btn btn-primary auth-submit" type="submit">Add prayer</button>
+          <p class="dashboard-answer-status prayer-form-status" data-prayer-status aria-live="polite"></p>
+        </form>
+
+        <section class="dashboard-card prayer-list-card">
+          <%- include("./prayers-table", { prayers, showActions: showPrayerActions }) %>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <%- include("../../components/layout/footer") %>
+</main>

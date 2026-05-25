@@ -1,0 +1,69 @@
+/* ================= HOME PAGE DENSITY ================= */
+.home-page .section {
+  padding: clamp(var(--space-5), 4.2vw, 46px) 0;
+}
+
+.home-page .section.section-compact {
+  padding: clamp(var(--space-3), 2.4vw, var(--space-5)) 0;
+}
+
+.home-page {
+  overflow-x: clip;
+}
+
+.home-verse-links-section {
+  padding-top: var(--space-4);
+}
+
+.home-verse-links-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-5);
+  max-width: 100%;
+}
+
+.home-links-inline {
+  padding-top: var(--space-5);
+  max-width: 100%;
+  width: 100%;
+}
+
+.home-info-section .section-title {
+  max-width: 24ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-visit-section .section-title {
+  max-width: none;
+}
+
+.visit-step-title-single {
+  white-space: nowrap;
+}
+
+.visit-roadmap-grid {
+  margin-top: var(--space-6);
+}
+
+.visit-roadmap-grid::before {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 38px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--roadmap-line);
+  opacity: var(--roadmap-line-opacity);
+  z-index: 0;
+}
+
+.visit-roadmap-grid::after {
+  display: none;
+}
+
+.visit-roadmap-grid .roadmap-step {
+  min-height: 250px;
+}

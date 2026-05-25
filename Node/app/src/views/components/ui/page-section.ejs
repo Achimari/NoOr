@@ -1,0 +1,8 @@
+<% const sectionClassName = typeof className === "undefined" ? "" : className; %>
+<% const sectionContainerClassName = typeof containerClassName === "undefined" ? "" : containerClassName; %>
+<% const sectionId = typeof id === "undefined" ? "" : id; %>
+<section class="section<%= compact ? " section-compact" : "" %><%= sectionClassName ? ` ${sectionClassName}` : "" %>"<%= sectionId ? ` id="${sectionId}"` : "" %>>
+  <div class="container<%= sectionContainerClassName ? ` ${sectionContainerClassName}` : "" %>">
+    <%- body %>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+<header class="header">
+  <div class="header-container">
+    <div class="header-left">
+      <a href="/" class="logo-block logo-link">
+        <img src="/Logo.png" alt="NoOr" class="header-logo" draggable="false" />
+
+      </a>
+    </div>
+
+    <% if (t("header.nav", []).length) { %>
+      <nav class="header-nav">
+        <% t("header.nav", []).forEach((link)=> { %>
+          <a href="<%= link.to %>" class="header-link<%= currentPath === link.to ? " active" : "" %>">
+            <%= link.label %>
+          </a>
+          <% }) %>
+      </nav>
+      <% } %>
+
+    <div class="header-actions">
+      <nav class="header-auth-actions" aria-label="Account">
+        <% if (auth) { %>
+          <form class="header-logout-form" action="/logout" method="post">
+            <button class="header-auth-link header-auth-button" type="submit">Logout</button>
+          </form>
+        <% } else { %>
+          <a class="header-auth-link" href="/login">Login</a>
+        <% } %>
+      </nav>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,17 @@
+<main>
+  <%- include("../../components/ui/page-section", {
+    className: "",
+    compact: false,
+    id: "",
+    containerClassName: "",
+    body: `
+      ${include("../../components/ui/page-header", {
+        heading: t("notFound.title"),
+        subtitle: t("notFound.text"),
+        intro: "",
+        className: ""
+      })}
+      <p class="not-found-action"><a href="/" class="btn">${t("notFound.home")}</a></p>
+    `
+  }) %>
+</main>

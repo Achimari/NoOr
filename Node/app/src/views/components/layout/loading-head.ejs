@@ -1,0 +1,71 @@
+<script>
+  (function () {
+    var root = document.documentElement;
+    var hideLoading = function () {
+      root.classList.remove("page-loading");
+    };
+
+    root.classList.add("page-loading");
+    window.NoOrHideLoading = hideLoading;
+    window.NoOrStylesReady = function () {
+      window.requestAnimationFrame(hideLoading);
+    };
+    window.setTimeout(hideLoading, 2500);
+  })();
+</script>
+<noscript>
+  <style>
+    html.page-loading {
+      visibility: visible;
+    }
+  </style>
+</noscript>
+<style>
+  @keyframes noor-loader-spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
+  html.page-loading,
+  html.page-loading body {
+    min-height: 100%;
+    margin: 0;
+    background: #000;
+  }
+
+  html.page-loading body > * {
+    visibility: hidden;
+  }
+
+  html.page-loading body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    visibility: visible;
+    background: #000;
+  }
+
+  html.page-loading body::after {
+    content: "";
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 9999;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    visibility: visible;
+    transform: translate(-50%, -50%);
+    background:
+      radial-gradient(circle at center, #000 0 47%, transparent 48%),
+      conic-gradient(from 18deg, #fff 0 70%, rgba(255, 255, 255, 0.18) 70% 82%, transparent 82% 100%);
+    transform-origin: center;
+    animation: noor-loader-spin 0.78s linear infinite;
+  }
+</style>

@@ -1,0 +1,79 @@
+<main class="dashboard-page info-page">
+  <section class="section dashboard-section">
+    <div class="container info-container">
+      <div class="info-grid">
+        <div class="info-column">
+          <article class="dashboard-card info-motivation">
+            <p class="dashboard-label">Daily motivation</p>
+            <blockquote>
+              <% (motivationPhrase.text || "").split("\n").forEach((line, index, lines) => { %>
+                <%= line %><% if (index < lines.length - 1) { %><br /><% } %>
+              <% }) %>
+            </blockquote>
+            <p class="info-quote-source"><%= motivationPhrase.source %></p>
+          </article>
+
+          <article class="dashboard-card info-stats">
+            <header class="dashboard-card-head">
+              <h2>Your stats</h2>
+            </header>
+            <div class="info-stat-grid">
+              <div>
+                <p class="dashboard-label">Name</p>
+                <p class="dashboard-value"><%= infoStats.name %></p>
+              </div>
+              <div>
+                <p class="dashboard-label">Current streak</p>
+                <p class="dashboard-value"><%= infoStats.currentStreak %> Days</p>
+              </div>
+              <div>
+                <p class="dashboard-label">Today</p>
+                <p class="dashboard-value"><%= infoStats.todayAnswer %></p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <section class="dashboard-card info-prayers">
+          <header class="dashboard-card-head prayer-filter-head">
+            <div class="prayer-panel-copy">
+              <h2>Community prayers</h2>
+              <p>Browse recent requests and filter by person.</p>
+            </div>
+            <button class="prayer-filter-button" type="button" data-prayer-filter-toggle aria-expanded="false" aria-controls="prayer-filter-panel" aria-label="Filter prayers">
+              <span class="prayer-filter-glyph" aria-hidden="true"></span>
+            </button>
+          </header>
+
+          <div class="prayer-filter-panel" id="prayer-filter-panel" data-prayer-filter-panel hidden>
+            <label class="prayer-filter-field">
+              <span>User</span>
+              <span class="prayer-filter-combo">
+                <input class="prayer-filter-control" type="search" placeholder="Search user" data-prayer-user-filter autocomplete="off" aria-autocomplete="list">
+                <span class="prayer-filter-menu" data-prayer-user-options hidden></span>
+              </span>
+            </label>
+            <div class="prayer-filter-field">
+              <span>Time</span>
+              <div class="prayer-select">
+                <button class="prayer-filter-control prayer-select-trigger" type="button" data-prayer-time-toggle aria-expanded="false">
+                  <span data-prayer-time-label>Newest first</span>
+                  <span class="prayer-select-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="prayer-filter-menu" data-prayer-time-menu hidden>
+                  <button type="button" data-prayer-time-option="newest">Newest first</button>
+                  <button type="button" data-prayer-time-option="oldest">Oldest first</button>
+                </div>
+              </div>
+            </div>
+            <button class="prayer-filter-clear" type="button" data-prayer-filter-clear>Clear</button>
+          </div>
+
+          <%- include("./prayers-table", { prayers, showActions: false }) %>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <%- include("../../components/layout/footer") %>
+</main>

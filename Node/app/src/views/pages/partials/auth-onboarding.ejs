@@ -1,0 +1,59 @@
+<main class="auth-page">
+  <section class="section auth-section">
+    <div class="container auth-container">
+      <div class="auth-brand" aria-label="NoOr">
+        <img src="/Logo.png" alt="NoOr" draggable="false" />
+      </div>
+
+      <form class="auth-card" action="/auth/register" method="post">
+        <header class="auth-head">
+          <h1 class="auth-title"><%= t("auth.onboarding.title") %></h1>
+          <% if (t("auth.onboarding.subtitle")) { %>
+            <p class="auth-subtitle"><%= t("auth.onboarding.subtitle") %></p>
+          <% } %>
+        </header>
+
+        <% if (typeof errors !== "undefined" && errors.length) { %>
+          <div class="auth-errors" role="alert">
+            <% errors.forEach((error) => { %>
+              <p><%= error %></p>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <label class="auth-field">
+          <span><%= t("auth.onboarding.nameLabel") %></span>
+          <input type="text" name="name" autocomplete="name" value="<%= typeof values !== "undefined" ? values.name || "" : "" %>" required />
+        </label>
+
+        <label class="auth-field">
+          <span><%= t("auth.onboarding.passwordLabel") %></span>
+          <input type="password" name="password" autocomplete="new-password" required />
+        </label>
+
+        <label class="auth-field">
+          <span><%= t("auth.onboarding.confirmPasswordLabel") %></span>
+          <input type="password" name="passwordConfirmation" autocomplete="new-password" required />
+        </label>
+
+        <div class="auth-actions">
+          <%- include("../../components/ui/button", {
+            tag: "button",
+            type: "submit",
+            variant: "primary",
+            className: "auth-submit",
+            label: t("auth.onboarding.submit")
+          }) %>
+
+          <%- include("../../components/ui/button", {
+            tag: "a",
+            href: "/login",
+            variant: "secondary",
+            className: "auth-secondary",
+            label: t("auth.onboarding.loginLink")
+          }) %>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,35 @@
+<div class="leaderboard-table-wrap prayer-table-wrap">
+  <% const canShowActions = typeof showActions !== "undefined" && showActions; %>
+  <table class="leaderboard-table prayer-table <%= canShowActions ? "prayer-table-actions" : "" %>">
+    <thead>
+      <tr>
+        <th scope="col">User</th>
+        <th scope="col">Prayer</th>
+        <% if (canShowActions) { %>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+        <% } %>
+      </tr>
+    </thead>
+    <tbody data-prayers-body data-prayer-actions="<%= canShowActions ? "true" : "false" %>">
+      <% if (prayers.length) { %>
+        <% prayers.forEach((item) => { %>
+          <tr data-prayer-row data-prayer-id="<%= item.id %>" data-prayer-user-id="<%= item.userId %>" data-prayer-user-name="<%= item.userName %>" data-prayer-text="<%= item.prayer %>" data-prayer-can-delete="<%= item.canDelete ? "true" : "false" %>">
+            <td><a class="leaderboard-user user-link" href="/customer/<%= item.userId %>"><%- include("../../components/ui/icon", { name: "user", className: "leaderboard-row-icon" }) %><%= item.userName %></a></td>
+            <td><%= item.prayer %></td>
+            <% if (canShowActions) { %>
+              <td>
+                <% if (item.canDelete) { %>
+                  <button class="prayer-remove-button" type="button" data-prayer-remove="<%= item.id %>" aria-label="Remove prayer">Close</button>
+                <% } %>
+              </td>
+            <% } %>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="<%= canShowActions ? 3 : 2 %>" class="leaderboard-empty">No prayers yet</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

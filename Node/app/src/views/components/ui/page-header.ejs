@@ -1,0 +1,12 @@
+<% const headerClassName = typeof className === "undefined" ? "" : className; %>
+<header class="page-header<%= headerClassName ? ` ${headerClassName}` : "" %>">
+  <% if (heading) { %>
+    <h1 class="section-title page-title"><%= heading %></h1>
+  <% } %>
+  <% if (subtitle) { %>
+    <p class="section-text page-subtitle"><%= subtitle %></p>
+  <% } %>
+  <% if (intro) { %>
+    <p class="page-intro-note"><%= intro %></p>
+  <% } %>
+</header>

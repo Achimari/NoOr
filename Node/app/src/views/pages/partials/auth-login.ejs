@@ -1,0 +1,54 @@
+<main class="auth-page">
+  <section class="section auth-section">
+    <div class="container auth-container">
+      <div class="auth-brand" aria-label="NoOr">
+        <img src="/Logo.png" alt="NoOr" draggable="false" />
+      </div>
+
+      <form class="auth-card" action="/login" method="post">
+        <header class="auth-head">
+          <h1 class="auth-title"><%= t("auth.login.title") %></h1>
+          <% if (t("auth.login.subtitle")) { %>
+            <p class="auth-subtitle"><%= t("auth.login.subtitle") %></p>
+          <% } %>
+        </header>
+
+        <% if (typeof errors !== "undefined" && errors.length) { %>
+          <div class="auth-errors" role="alert">
+            <% errors.forEach((error) => { %>
+              <p><%= error %></p>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <label class="auth-field">
+          <span><%= t("auth.login.loginLabel") %></span>
+          <input type="text" name="login" autocomplete="username" value="<%= typeof values !== "undefined" ? values.login || "" : "" %>" required />
+        </label>
+
+        <label class="auth-field">
+          <span><%= t("auth.login.passwordLabel") %></span>
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+
+        <div class="auth-actions">
+          <%- include("../../components/ui/button", {
+            tag: "button",
+            type: "submit",
+            variant: "primary",
+            className: "auth-submit",
+            label: t("auth.login.submit")
+          }) %>
+
+          <%- include("../../components/ui/button", {
+            tag: "a",
+            href: "/onboarding",
+            variant: "secondary",
+            className: "auth-secondary",
+            label: t("auth.login.onboardingLink")
+          }) %>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>

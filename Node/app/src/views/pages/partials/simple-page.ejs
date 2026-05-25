@@ -1,0 +1,21 @@
+<main>
+  <%- include("../../components/ui/page-section", {
+    className: sectionClass,
+    compact: false,
+    id: "",
+    containerClassName: "",
+    body: `
+      ${include("../../components/ui/page-header", { heading, subtitle, intro: "", className: headerClass })}
+      ${include("../../components/ui/roadmap-steps", {
+        steps: roadmap,
+        gridClass: "about-roadmap-grid",
+        stepClass: "roadmap-step hover-lift-card",
+        showIndex: true,
+        twoDigitIndex: true,
+        titleClass: "card-title",
+        textClass: "card-text"
+      })}
+    `
+  }) %>
+  <%- include("../../components/layout/footer") %>
+</main>

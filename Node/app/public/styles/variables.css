@@ -1,0 +1,66 @@
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --ink-92: rgba(0, 0, 0, 0.92);
+  --ink-72: rgba(0, 0, 0, 0.72);
+  --ink-54: rgba(0, 0, 0, 0.54);
+  --ink-18: rgba(0, 0, 0, 0.18);
+  --ink-10: rgba(0, 0, 0, 0.10);
+  --ink-06: rgba(0, 0, 0, 0.06);
+  --white-92: rgba(255, 255, 255, 0.92);
+  --white-72: rgba(255, 255, 255, 0.72);
+  --white-54: rgba(255, 255, 255, 0.54);
+  --white-18: rgba(255, 255, 255, 0.18);
+  --white-10: rgba(255, 255, 255, 0.10);
+  --white-06: rgba(255, 255, 255, 0.06);
+  --accent: var(--black);
+  --accent-hover: var(--ink-72);
+  --btn-text: var(--white);
+  --bg: var(--black);
+  --surface: var(--white);
+  --surface-elevated: var(--white);
+  --surface-soft: var(--ink-06);
+  --surface-muted: var(--ink-10);
+  --text: var(--black);
+  --text-secondary: var(--ink-54);
+  --border: var(--ink-18);
+  --header-bg: var(--black);
+  --header-active: var(--white);
+  --logo-title: var(--white);
+  --hero-bg: var(--white);
+  --icon-bg: var(--ink-06);
+  --icon-text: var(--black);
+  --link: var(--black);
+  --link-hover: var(--ink-72);
+  --track-thumb: var(--ink-18);
+  --link-card-text: var(--black);
+  --link-card-hover-border: var(--black);
+  --link-card-hover-shadow: var(--ink-10);
+  --favicon-chip-bg: var(--ink-06);
+  --favicon-chip-border: var(--ink-18);
+  --list-border: var(--ink-10);
+  --footer-bg: var(--black);
+  --footer-text: var(--white-72);
+  --footer-icon-hover: var(--white);
+  --shadow-soft: 0 12px 30px var(--ink-06);
+  --shadow-card-hover: 0 16px 40px var(--ink-10);
+  --focus-ring: var(--ink-18);
+
+  /* Spacing */
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 52px;
+  --space-9: 64px;
+  --radius: 14px;
+  --padding: clamp(var(--space-4), 2.2vw, var(--space-6));
+  --section-padding: clamp(var(--space-6), 5.2vw, var(--space-8));
+  --section-padding-compact: clamp(var(--space-4), 3.2vw, var(--space-6));
+
+  /* Font */
+  --font-main: "Inter", sans-serif;
+}

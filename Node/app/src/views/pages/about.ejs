@@ -1,0 +1,11 @@
+<%- include("../components/layout/document", {
+  title,
+  pageId,
+  body: include("./partials/simple-page", {
+    headerClass: "about-roadmap-head",
+    sectionClass: "about-roadmap",
+    heading: t("about.title"),
+    subtitle: t("about.subtitle"),
+    roadmap: t("about.roadmap", [])
+  })
+}) %>

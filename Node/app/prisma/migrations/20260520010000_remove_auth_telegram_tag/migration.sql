@@ -1,0 +1,2 @@
+ALTER TABLE "Auth"
+DROP COLUMN IF EXISTS "telegramTag";

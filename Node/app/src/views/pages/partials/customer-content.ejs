@@ -1,0 +1,84 @@
+<main class="dashboard-page customer-page">
+  <section class="section dashboard-section">
+    <div class="container customer-container">
+      <header class="dashboard-head customer-head">
+        <p class="dashboard-kicker">Customer details</p>
+        <h1 class="dashboard-title"><%= customer.name %></h1>
+      </header>
+
+      <div class="customer-grid">
+        <article class="dashboard-card customer-summary">
+          <header class="dashboard-card-head">
+            <h2>Basic information</h2>
+            <span>ID <%= customer.id %></span>
+          </header>
+          <dl class="customer-details-list">
+            <div>
+              <dt>Name</dt>
+              <dd><%= customer.name %></dd>
+            </div>
+            <div>
+              <dt>Created</dt>
+              <dd><%= customer.createdAt.toLocaleDateString("en-GB") %></dd>
+            </div>
+            <div>
+              <dt>Current streak</dt>
+              <dd><%= customer.currentStreak %> days</dd>
+            </div>
+            <div>
+              <dt>Today</dt>
+              <dd><%= customer.todayAnswer || "Pending" %></dd>
+            </div>
+          </dl>
+        </article>
+
+        <article class="dashboard-card customer-telegram">
+          <header class="dashboard-card-head">
+            <h2>Telegram</h2>
+            <span><%= customer.telegram.status %></span>
+          </header>
+          <dl class="customer-details-list">
+            <div>
+              <dt>Status</dt>
+              <dd><%= customer.telegram.isActive ? "Active" : "Inactive" %></dd>
+            </div>
+            <div>
+              <dt>Username</dt>
+              <dd><%= customer.telegram.username || "Not linked" %></dd>
+            </div>
+            <div>
+              <dt>First name</dt>
+              <dd><%= customer.telegram.firstName || "Not linked" %></dd>
+            </div>
+            <div>
+              <dt>Linked date</dt>
+              <dd><%= customer.telegram.connectedAt ? customer.telegram.connectedAt.toLocaleDateString("en-GB") : "Not linked" %></dd>
+            </div>
+          </dl>
+        </article>
+
+        <section class="dashboard-card customer-prayers">
+          <header class="dashboard-card-head">
+            <h2>Prayer needs</h2>
+            <span><%= customer.prayers.length %> items</span>
+          </header>
+
+          <% if (customer.prayers.length) { %>
+            <div class="customer-prayer-list">
+              <% customer.prayers.forEach((item) => { %>
+                <article class="customer-prayer-item">
+                  <span>#<%= item.id %></span>
+                  <p><%= item.prayer %></p>
+                </article>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="leaderboard-empty">No prayers yet</p>
+          <% } %>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <%- include("../../components/layout/footer") %>
+</main>

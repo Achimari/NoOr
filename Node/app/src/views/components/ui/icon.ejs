@@ -1,0 +1,14 @@
+<% const classes = ["ui-icon", typeof className === "undefined" ? "" : className].filter(Boolean).join(" "); %>
+<% if (name === "globe") { %>
+  <svg class="<%= classes %>" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+<% } else if (name === "chevron") { %>
+  <svg class="<%= classes %>" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+<% } else if (name === "trophy") { %>
+  <svg class="<%= classes %>" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M5 5H3v2a4 4 0 0 0 4 4"/><path d="M19 5h2v2a4 4 0 0 1-4 4"/></svg>
+<% } else if (name === "user") { %>
+  <svg class="<%= classes %>" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+<% } else if (name === "flame") { %>
+  <svg class="<%= classes %>" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A3.5 3.5 0 0 0 12 21a6 6 0 0 0 6-6c0-4-3-6.5-4.5-9.5-.5 2.5-2 4-4 5.5-.8.6-1 1.8-.5 3.5Z"/><path d="M12 21a3 3 0 0 0 3-3c0-1.5-1-2.5-2-4-.3 1.4-1.2 2.3-2.2 3.1A2.1 2.1 0 0 0 12 21Z"/></svg>
+<% } else { %>
+  <svg class="<%= classes %>" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+<% } %>

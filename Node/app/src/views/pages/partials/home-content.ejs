@@ -1,0 +1,95 @@
+<main class="home-page dashboard-page" data-leaderboard>
+  <section class="section dashboard-section">
+    <div class="container dashboard-container">
+      <header class="dashboard-head">
+        <p class="dashboard-kicker">One action. Stronger you.</p>
+        <h1 class="dashboard-title">Did you stay strong today?</h1>
+      </header>
+
+      <div class="dashboard-actions" aria-label="Daily action">
+        <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant: "primary" ,
+          className: "dashboard-action dashboard-action-yes" , label: "Yes, I did" }) %>
+
+          <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant: "secondary" ,
+            className: "dashboard-action dashboard-action-no" , label: "No, I didn't" }) %>
+      </div>
+      <p class="dashboard-answer-status" data-check-in-message aria-live="polite"></p>
+
+      <article class="dashboard-current" aria-live="polite">
+        <div>
+          <p class="dashboard-label">Current streak</p>
+          <p class="dashboard-value"><span data-current-value>
+              <%= leaderboard.current.value %>
+            </span> Days</p>
+        </div>
+        <div class="dashboard-week" aria-hidden="true">
+          <% ["M", "T" , "W" , "T" , "F" , "S" , "S" ].forEach((day, index)=> { %>
+            <span class="dashboard-day<%= index < Math.min(7, leaderboard.current.value) ? " active" : "" %>"><%= day %>
+            </span>
+            <% }) %>
+        </div>
+      </article>
+
+      <section class="dashboard-card">
+        <header class="dashboard-card-head">
+          <h2>Leaderboard</h2>
+          <span data-table-count>
+            <%= leaderboard.leaders.length %> users
+          </span>
+        </header>
+
+        <div class="leaderboard-table-wrap">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th scope="col"><span class="leaderboard-head-label"><%- include("../../components/ui/icon", {
+                      name: "trophy" , className: "leaderboard-icon" }) %></span></th>
+                <th scope="col"><span class="leaderboard-head-label"><%- include("../../components/ui/icon", {
+                      name: "user" , className: "leaderboard-icon" }) %>Name</span></th>
+                <th scope="col"><span class="leaderboard-head-label leaderboard-head-label-right">Streak</span></th>
+              </tr>
+            </thead>
+            <tbody data-leaderboard-body>
+              <% if (leaderboard.leaders.length) { %>
+                <% leaderboard.leaders.forEach((entry)=> { %>
+                  <tr>
+                    <td><span class="leaderboard-rank">
+                        <%= entry.rank %>
+                      </span></td>
+                    <td><a class="leaderboard-user user-link" href="/customer/<%= entry.id %>"><%-
+                          include("../../components/ui/icon", { name: "user" , className: "leaderboard-row-icon" }) %>
+                          <%= entry.name %></a></td>
+                    <td><span class="leaderboard-streak"><%= entry.value %> days</span></td>
+                  </tr>
+                  <% }) %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="3" class="leaderboard-empty">No streaks yet</td>
+                      </tr>
+                      <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <article class="dashboard-card telegram-card home-telegram-card" data-telegram-card>
+        <header class="dashboard-card-head">
+          <h2>Telegram</h2>
+          <span data-telegram-state>
+            <%= telegramState.isTelegramLinked ? "Linked" : "Not linked" %>
+          </span>
+        </header>
+        <p class="dashboard-label telegram-card-copy">
+          Connect the bot to receive reminders and prayer lists in Telegram.
+        </p>
+        <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant:
+          telegramState.isTelegramLinked ? "secondary" : "primary" , className: "telegram-connect-button" , label:
+          telegramState.isTelegramLinked ? "Reconnect bot" : "Link Telegram bot" }) %>
+          <p class="dashboard-answer-status prayer-form-status" data-telegram-status aria-live="polite"></p>
+      </article>
+
+    </div>
+  </section>
+
+  <%- include("../../components/layout/footer") %>
+</main>

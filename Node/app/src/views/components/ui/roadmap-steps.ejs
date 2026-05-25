@@ -1,0 +1,13 @@
+<% if (Array.isArray(steps) && steps.length) { %>
+  <div class="<%= gridClass || "about-roadmap-grid" %>">
+    <% steps.forEach((step, index) => { %>
+      <article class="card <%= stepClass || "roadmap-step" %>">
+        <% if (showIndex !== false) { %>
+          <span class="roadmap-step-index"><%= twoDigitIndex ? String(index + 1).padStart(2, "0") : index + 1 %></span>
+        <% } %>
+        <h3 class="<%= titleClass || "card-title" %>"><%= step.title %></h3>
+        <p class="<%= textClass || "card-text" %>"><%= step.text || step.description || "" %></p>
+      </article>
+    <% }) %>
+  </div>
+<% } %>

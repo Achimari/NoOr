@@ -1,0 +1,1008 @@
+.dashboard-page {
+  background: var(--black);
+  color: var(--white);
+}
+
+.dashboard-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 74px);
+  background:
+    radial-gradient(circle at 50% 0%, var(--white-10), transparent 30%),
+    var(--black);
+}
+
+.dashboard-container {
+  width: min(100%, 680px);
+}
+
+.dashboard-head {
+  text-align: center;
+  margin-bottom: var(--space-5);
+}
+
+.dashboard-kicker {
+  margin: 0 0 var(--space-2);
+  color: var(--white-54);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+.dashboard-title {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.dashboard-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.dashboard-action {
+  min-height: 62px;
+  border-radius: 12px;
+  font-size: clamp(0.95rem, 1.6vw, 1.08rem);
+  text-transform: uppercase;
+  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.dashboard-action-yes {
+  background: var(--white);
+  color: var(--black);
+  box-shadow: none;
+}
+
+.dashboard-action-yes:hover,
+.dashboard-action-yes:focus-visible {
+  background: var(--white-92);
+  transform: translateY(-1px);
+}
+
+.dashboard-action-no {
+  background: var(--white-06);
+  border-color: var(--white-10);
+  color: var(--white);
+}
+
+.dashboard-action-no:hover,
+.dashboard-action-no:focus-visible {
+  background: var(--white-10);
+  border-color: var(--white-18);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.dashboard-page .btn-primary {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+.dashboard-page .btn-primary:hover,
+.dashboard-page .btn-primary:focus-visible {
+  background: var(--white-92);
+  color: var(--black);
+  border-color: var(--white-92);
+  transform: translateY(-1px);
+}
+
+.dashboard-page .btn-secondary {
+  background: var(--white-06);
+  border-color: var(--white-10);
+  color: var(--white);
+}
+
+.dashboard-page .btn-secondary:hover,
+.dashboard-page .btn-secondary:focus-visible {
+  background: var(--white-10);
+  border-color: var(--white-18);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.dashboard-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+}
+
+.dashboard-action.selected {
+  opacity: 1;
+  border-color: var(--white);
+}
+
+.dashboard-answer-status {
+  min-height: 0;
+  margin: 0 0 var(--space-4);
+  color: var(--white-54);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dashboard-answer-status:empty {
+  display: none;
+}
+
+.dashboard-timer-label,
+.dashboard-timer-value {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 62px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--white-10);
+  border-radius: 12px;
+  background: var(--white-06);
+}
+
+.dashboard-timer-label {
+  color: var(--white-54);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.dashboard-timer-value {
+  justify-content: center;
+  min-width: 112px;
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--black);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.app-toast {
+  position: fixed;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 100;
+  max-width: min(360px, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--white-18);
+  border-radius: 12px;
+  background: rgba(15, 15, 15, 0.96);
+  color: var(--white);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.app-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.app-toast[data-variant="error"] {
+  border-color: var(--white-54);
+}
+
+.dashboard-current,
+.dashboard-card {
+  border: 1px solid var(--white-10);
+  border-radius: 14px;
+  background: var(--white-06);
+  box-shadow: none;
+  margin-bottom: var(--space-4);
+}
+
+.dashboard-current {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.dashboard-label {
+  margin: 0 0 var(--space-1);
+  color: var(--white-54);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dashboard-value {
+  margin: 0;
+  color: var(--white);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.dashboard-week {
+  display: grid;
+  grid-template-columns: repeat(7, 26px);
+  gap: var(--space-2);
+}
+
+.dashboard-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--white-10);
+  border-radius: 50%;
+  color: var(--white-54);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.dashboard-day.active {
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
+}
+
+.dashboard-card {
+  padding: var(--space-4);
+}
+
+.dashboard-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.dashboard-card-head h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.dashboard-card-head span {
+  color: var(--white-54);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.leaderboard-table-wrap {
+  overflow-x: auto;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--white);
+  font-size: 0.92rem;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 13px var(--space-2);
+  text-align: left;
+}
+
+.leaderboard-table thead th {
+  border-bottom: 1px solid var(--white-10);
+}
+
+.leaderboard-table th {
+  color: var(--white-54);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.leaderboard-table td {
+  font-weight: 600;
+}
+
+.leaderboard-table th:first-child,
+.leaderboard-table td:first-child {
+  width: 48px;
+  color: var(--white-54);
+}
+
+.leaderboard-table th:last-child,
+.leaderboard-table td:last-child {
+  text-align: right;
+}
+
+.leaderboard-empty {
+  color: var(--white-54);
+  text-align: center !important;
+}
+
+.leaderboard-head-label,
+.leaderboard-user,
+.leaderboard-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.leaderboard-head-label-right,
+.leaderboard-streak {
+  justify-content: flex-end;
+}
+
+.leaderboard-icon,
+.leaderboard-row-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.leaderboard-icon {
+  color: var(--white-54);
+}
+
+.leaderboard-row-icon {
+  color: var(--white-72);
+}
+
+.leaderboard-rank {
+  color: var(--white-54);
+}
+
+.user-link {
+  width: fit-content;
+  color: var(--white);
+  text-decoration: none;
+  transition: color 180ms ease, opacity 180ms ease;
+}
+
+.user-link:hover,
+.user-link:focus-visible {
+  color: var(--white-72);
+}
+
+.info-container {
+  width: min(100%, 980px);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
+  gap: var(--space-4);
+  align-items: stretch;
+  height: var(--info-panel-height);
+  --info-panel-height: 430px;
+}
+
+.info-column {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-rows: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  min-height: 0;
+}
+
+.info-column .dashboard-card {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.info-motivation blockquote {
+  margin: var(--space-4) 0 var(--space-3);
+  color: var(--white);
+  max-width: 16ch;
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.08;
+}
+
+.info-quote-source {
+  margin: 0;
+  color: var(--white-54);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.info-stat-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.info-stat-grid .dashboard-value {
+  font-size: 1.08rem;
+  line-height: 1.15;
+}
+
+.info-stat-grid .dashboard-label {
+  margin-bottom: 4px;
+}
+
+.telegram-card-copy {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.telegram-connect-button {
+  width: 100%;
+}
+
+.home-telegram-card {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: 0;
+}
+
+.prayer-table-actions th:last-child,
+.prayer-table-actions td:last-child {
+  width: 96px;
+  text-align: right;
+}
+
+.prayer-remove-button {
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--white-18);
+  border-radius: 999px;
+  background: var(--white-06);
+  color: var(--white-72);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.prayer-remove-button:hover,
+.prayer-remove-button:focus-visible {
+  background: var(--white-10);
+  border-color: var(--white-18);
+  color: var(--white);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.prayer-remove-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.prayer-grid {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: var(--space-5);
+  --prayer-panel-height: 390px;
+}
+
+.prayer-form {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  height: var(--prayer-panel-height);
+}
+
+.prayer-card-intro {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.prayer-card-intro h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prayer-card-intro p {
+  margin: 0;
+  color: var(--white-54);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.prayer-field {
+  margin-bottom: 0;
+  color: var(--white);
+}
+
+.prayer-field>span {
+  color: var(--white);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prayer-field textarea {
+  width: 100%;
+  resize: none;
+  height: 178px;
+  min-height: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--white-10);
+  border-radius: 12px;
+  background: var(--white-06);
+  color: var(--white);
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.prayer-field textarea::placeholder {
+  color: var(--white-54);
+}
+
+.prayer-field textarea:focus {
+  border-color: var(--white-54);
+}
+
+.prayer-form-status {
+  display: none;
+}
+
+.prayer-list-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: var(--prayer-panel-height);
+}
+
+.prayer-list-card .dashboard-card-head {
+  flex: 0 0 auto;
+  align-items: flex-start;
+  margin-bottom: var(--space-4);
+}
+
+.prayer-list-card .dashboard-card-head div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.info-prayers .dashboard-card-head {
+  align-items: flex-start;
+}
+
+.info-prayers .dashboard-card-head div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.info-prayers {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.prayer-filter-head {
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.prayer-panel-copy {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.prayer-panel-copy h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prayer-panel-copy p {
+  margin: 0;
+  color: var(--white-54);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.info-prayers.filter-open .prayer-filter-head {
+  display: none;
+}
+
+.prayer-filter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--white-10);
+  border-radius: 10px;
+  background: var(--white-06);
+  color: var(--white-72);
+  cursor: pointer;
+  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.prayer-filter-button:hover,
+.prayer-filter-button:focus-visible,
+.prayer-filter-button[aria-expanded="true"] {
+  background: var(--white-10);
+  border-color: var(--white-18);
+  color: var(--white);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.prayer-filter-glyph,
+.prayer-filter-glyph::before,
+.prayer-filter-glyph::after {
+  display: block;
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.prayer-filter-glyph {
+  position: relative;
+}
+
+.prayer-filter-glyph::before,
+.prayer-filter-glyph::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+}
+
+.prayer-filter-glyph::before {
+  top: -5px;
+  width: 17px;
+  left: 0;
+}
+
+.prayer-filter-glyph::after {
+  top: 5px;
+  width: 9px;
+}
+
+.prayer-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) minmax(150px, 0.62fr) auto;
+  gap: var(--space-3);
+  align-items: end;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--white-10);
+  border-radius: 14px;
+  background: var(--white-06);
+}
+
+.prayer-filter-panel[hidden] {
+  display: none;
+}
+
+.prayer-filter-field {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  color: var(--white-54);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.prayer-filter-combo,
+.prayer-select {
+  position: relative;
+  display: block;
+}
+
+.prayer-filter-control {
+  min-height: 42px;
+  width: 100%;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--white-10);
+  border-radius: 10px;
+  background: var(--black);
+  color: var(--white);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  outline: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.prayer-filter-control::placeholder {
+  color: var(--white-54);
+}
+
+.prayer-filter-control:hover,
+.prayer-filter-control:focus,
+.prayer-select-trigger[aria-expanded="true"] {
+  background: var(--white-06);
+  border-color: var(--white-54);
+}
+
+.prayer-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.prayer-select-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  opacity: 0.72;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 0.18s ease;
+}
+
+.prayer-select-trigger[aria-expanded="true"] .prayer-select-chevron {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+.prayer-filter-menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  z-index: 5;
+  max-height: 190px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  border: 1px solid var(--white-18);
+  border-radius: 10px;
+  background: var(--black);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.36);
+}
+
+.prayer-filter-menu[hidden] {
+  display: none;
+}
+
+.prayer-filter-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--white-72);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.prayer-filter-menu button+button {
+  margin-top: var(--space-1);
+}
+
+.prayer-filter-menu button:hover,
+.prayer-filter-menu button:focus-visible,
+.prayer-filter-menu button.selected {
+  background: var(--white-10);
+  color: var(--white);
+  outline: none;
+}
+
+.prayer-filter-empty {
+  display: block;
+  padding: var(--space-2);
+  color: var(--white-54);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.prayer-filter-clear {
+  min-height: 42px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--white-10);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--white-72);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.prayer-table-wrap {
+  border: 1px solid var(--white-06);
+  border-radius: 14px;
+  background: var(--white-06);
+}
+
+.prayer-page .prayer-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.info-prayers .prayer-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.prayer-page .prayer-table thead th,
+.info-prayers .prayer-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #111111;
+}
+
+.prayer-page .prayer-table thead,
+.info-prayers .prayer-table thead {
+  display: none;
+}
+
+.prayer-table th,
+.prayer-table td {
+  padding: var(--space-3) var(--space-4);
+  vertical-align: top;
+}
+
+.prayer-page .prayer-table td {
+  padding: var(--space-3) var(--space-2);
+}
+
+.info-prayers .prayer-table td {
+  padding: var(--space-3) var(--space-2);
+}
+
+.prayer-page .prayer-table td:first-child {
+  width: 150px;
+}
+
+.info-prayers .prayer-table td:first-child {
+  width: 150px;
+}
+
+.prayer-table td:nth-child(2) {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.customer-container {
+  width: min(100%, 980px);
+}
+
+.customer-head {
+  margin-bottom: var(--space-4);
+}
+
+.customer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.customer-prayers {
+  grid-column: 1 / -1;
+}
+
+.customer-details-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.customer-details-list div {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.7fr) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.customer-details-list dt {
+  color: var(--white-54);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.customer-details-list dd {
+  margin: 0;
+  color: var(--white);
+  font-weight: 700;
+}
+
+.customer-prayer-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.customer-prayer-item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--white-10);
+  border-radius: 12px;
+  background: var(--white-06);
+}
+
+.customer-prayer-item span {
+  color: var(--white-54);
+  font-weight: 700;
+}
+
+.customer-prayer-item p {
+  margin: 0;
+  color: var(--white);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+@media (max-width: 680px) {
+
+  .dashboard-actions,
+  .dashboard-current {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-week {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .dashboard-day {
+    width: 100%;
+  }
+
+  .info-grid,
+  .prayer-grid,
+  .customer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid {
+    height: auto;
+  }
+
+  .info-column {
+    height: auto;
+    grid-template-rows: none;
+  }
+
+  .info-prayers {
+    height: min(440px, 70vh);
+  }
+
+  .prayer-filter-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .customer-details-list div,
+  .customer-prayer-item {
+    grid-template-columns: 1fr;
+  }
+}
