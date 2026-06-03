@@ -1,34 +1,44 @@
 import { prisma } from "../prisma/client.js";
 
+const prayerInclude = {
+  user: {
+    select: {
+      name: true,
+    },
+  },
+  reactions: {
+    orderBy: [
+      {
+        createdAt: "asc",
+      },
+      {
+        id: "asc",
+      },
+    ],
+    select: {
+      emoji: true,
+      userId: true,
+    },
+  },
+};
+
 export async function createPrayer({ userId, prayer }) {
   return prisma.prayer.create({
     data: {
       userId,
       prayer,
     },
-    include: {
-      user: {
-        select: {
-          name: true,
-        },
-      },
-    },
+    include: prayerInclude,
   });
 }
 
 export async function findPrayers(limit = 20) {
   return prisma.prayer.findMany({
     orderBy: {
-      id: "asc",
+      id: "desc",
     },
     take: limit,
-    include: {
-      user: {
-        select: {
-          name: true,
-        },
-      },
-    },
+    include: prayerInclude,
   });
 }
 
@@ -41,12 +51,43 @@ export async function findPrayersByUserId(userId, limit = 20) {
       id: "asc",
     },
     take: limit,
-    include: {
-      user: {
-        select: {
-          name: true,
-        },
+    include: prayerInclude,
+  });
+}
+
+export async function findPrayerById(id) {
+  return prisma.prayer.findUnique({
+    where: {
+      id,
+    },
+    include: prayerInclude,
+  });
+}
+
+export async function upsertPrayerReaction({ prayerId, userId, emoji }) {
+  return prisma.prayerReaction.upsert({
+    where: {
+      prayerId_userId: {
+        prayerId,
+        userId,
       },
+    },
+    update: {
+      emoji,
+    },
+    create: {
+      prayerId,
+      userId,
+      emoji,
+    },
+  });
+}
+
+export async function deletePrayerReaction({ prayerId, userId }) {
+  return prisma.prayerReaction.deleteMany({
+    where: {
+      prayerId,
+      userId,
     },
   });
 }

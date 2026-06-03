@@ -28,7 +28,7 @@ export function renderPage({ view, pageId, titleKey }) {
       const [leaderboard, checkIn, prayers] = await Promise.all([
         getLeaderboardSummary(req.user.id),
         getCheckInStatus(req.user.id),
-        getPrayers(),
+        getPrayers(req.user.id),
       ]);
 
       viewData.infoStats = {

@@ -18,6 +18,7 @@ model Auth {
   checkIn               CheckIn?
   checkInHistory        CheckInHistory[]
   prayers               Prayer[]
+  prayerReactions       PrayerReaction[]
   telegramConnection    TelegramConnection?
   telegramConnectTokens TelegramConnectToken[]
   telegramNotifications TelegramNotificationLog[]
@@ -65,12 +66,28 @@ model CheckInHistory {
 }
 
 model Prayer {
-  id     Int    @id @default(autoincrement())
-  userId Int
-  prayer String
-  user   Auth   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  prayer    String
+  user      Auth             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions PrayerReaction[]
 
   @@index([userId])
+}
+
+model PrayerReaction {
+  id        Int      @id @default(autoincrement())
+  prayerId  Int      @map("prayer_id")
+  userId    Int      @map("user_id")
+  emoji     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  prayer    Prayer   @relation(fields: [prayerId], references: [id], onDelete: Cascade)
+  user      Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([prayerId, userId])
+  @@index([userId])
+  @@map("prayer_reactions")
 }
 
 model TelegramConnection {

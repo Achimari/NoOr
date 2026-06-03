@@ -21,10 +21,12 @@ const prayerTimeLabel = document.querySelector("[data-prayer-time-label]");
 const prayerFilterClear = document.querySelector("[data-prayer-filter-clear]");
 const telegramConnectButton = document.querySelector(".telegram-connect-button");
 const telegramStatus = document.querySelector("[data-telegram-status]");
+const prayerReactionEmoji = ["🙏", "❤️", "🙌", "🕊️", "💪", "🤍"];
 let resetTimerId;
 let allPrayers = [];
 let prayerTimeOrder = "newest";
 let toastTimerId;
+let reactionChooserPrayerId = null;
 
 function showToast(message, variant = "default") {
   if (!message) return;
@@ -116,6 +118,108 @@ function escapeHtml(value) {
 
     return replacements[character];
   });
+}
+
+function readPrayerReactionCounts(row) {
+  try {
+    const reactions = JSON.parse(decodeURIComponent(row.dataset.prayerReactionCounts || "%5B%5D"));
+    return Array.isArray(reactions) ? reactions : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizePrayerReactions(reactions = []) {
+  const counts = new Map();
+  reactions.forEach((reaction) => {
+    if (prayerReactionEmoji.includes(reaction.emoji)) {
+      counts.set(reaction.emoji, Number(reaction.count) || 0);
+    }
+  });
+
+  prayerReactionEmoji.forEach((emoji) => {
+    if (!counts.has(emoji)) {
+      counts.set(emoji, 0);
+    }
+  });
+
+  return [...counts.entries()].map(([emoji, count]) => ({ emoji, count }));
+}
+
+function renderPrayerReactions(item) {
+  const reactions = normalizePrayerReactions(item.reactions).filter((reaction) => reaction.count > 0);
+  if (!reactions.length) return "";
+
+  return `
+    <div class="prayer-reactions" data-prayer-reaction-group="${item.id}" aria-label="Prayer reactions">
+      ${reactions
+        .map((reaction) => {
+          const isSelected = item.currentReaction === reaction.emoji;
+          return `
+            <span class="prayer-reaction-button ${isSelected ? "selected" : ""}" aria-label="${isSelected ? "Your reaction" : "Reaction"}">
+              <span aria-hidden="true">${escapeHtml(reaction.emoji)}</span>
+              <span>${reaction.count}</span>
+            </span>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function getReactionChooser() {
+  let chooser = document.querySelector("[data-prayer-reaction-chooser]");
+  if (chooser) return chooser;
+
+  chooser = document.createElement("div");
+  chooser.className = "prayer-reaction-modal";
+  chooser.setAttribute("data-prayer-reaction-chooser", "");
+  chooser.hidden = true;
+  chooser.innerHTML = `
+    <div class="prayer-reaction-backdrop" data-prayer-reaction-close></div>
+    <div class="prayer-reaction-dialog" role="dialog" aria-modal="true" aria-label="Choose reaction">
+      ${prayerReactionEmoji
+        .map(
+          (emoji) => `
+            <button class="prayer-reaction-choice" type="button" data-prayer-reaction="${escapeHtml(emoji)}" aria-label="React ${escapeHtml(emoji)}">
+              <span aria-hidden="true">${escapeHtml(emoji)}</span>
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+  document.body.append(chooser);
+  return chooser;
+}
+
+function openReactionChooser(prayerId) {
+  if (!prayerId) return;
+  reactionChooserPrayerId = Number(prayerId);
+  const chooser = getReactionChooser();
+  const prayer = allPrayers.find((item) => item.id === reactionChooserPrayerId);
+  chooser.querySelectorAll("[data-prayer-reaction]").forEach((button) => {
+    button.disabled = false;
+    const isSelected = prayer?.currentReaction === button.dataset.prayerReaction;
+    button.classList.toggle("selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+    button.setAttribute("aria-label", isSelected ? `Remove ${button.dataset.prayerReaction} reaction` : `React ${button.dataset.prayerReaction}`);
+  });
+  chooser.hidden = false;
+  document.body.classList.add("prayer-reaction-modal-open");
+  chooser.querySelector("[data-prayer-reaction]")?.focus();
+}
+
+function closeReactionChooser() {
+  const chooser = document.querySelector("[data-prayer-reaction-chooser]");
+  if (chooser) {
+    chooser.hidden = true;
+    chooser.querySelectorAll("[data-prayer-reaction]").forEach((button) => {
+      button.disabled = false;
+    });
+  }
+  reactionChooserPrayerId = null;
+  document.body.classList.remove("prayer-reaction-modal-open");
 }
 
 function formatItemCount(count) {
@@ -272,6 +376,8 @@ function readInitialPrayers() {
     userName: row.dataset.prayerUserName || "",
     prayer: row.dataset.prayerText || "",
     canDelete: row.dataset.prayerCanDelete === "true",
+    reactions: readPrayerReactionCounts(row),
+    currentReaction: row.dataset.prayerCurrentReaction || null,
   }));
 }
 
@@ -288,6 +394,7 @@ function getFilteredPrayers() {
 function renderPrayers(prayers) {
   if (!prayersBody) return;
   const showActions = prayersBody.dataset.prayerActions === "true";
+  const showReactions = prayersBody.dataset.prayerReactions === "true";
 
   if (prayerCount) {
     prayerCount.textContent = formatItemCount(prayers.length);
@@ -299,13 +406,18 @@ function renderPrayers(prayers) {
           (item) => `
             <tr>
               <td><a class="leaderboard-user user-link" href="/customer/${item.userId}">${userIcon()}${escapeHtml(item.userName)}</a></td>
-              <td>${escapeHtml(item.prayer)}</td>
+              <td>
+                <div class="${showReactions ? "prayer-message" : ""}" ${showReactions ? `data-prayer-react-open="${item.id}" tabindex="0" role="button" aria-label="Choose prayer reaction"` : ""}>
+                  <span class="prayer-message-text">${escapeHtml(item.prayer)}</span>
+                  ${showReactions ? renderPrayerReactions(item) : ""}
+                </div>
+              </td>
               ${showActions ? `<td>${item.canDelete ? `<button class="prayer-remove-button" type="button" data-prayer-remove="${item.id}" aria-label="Remove prayer">Close</button>` : ""}</td>` : ""}
             </tr>
           `,
         )
         .join("")
-    : `<tr><td colspan="${showActions ? 3 : 2}" class="leaderboard-empty">No prayers yet</td></tr>`;
+    : `<tr><td colspan="${2 + (showActions ? 1 : 0)}" class="leaderboard-empty">No prayers yet</td></tr>`;
 }
 
 function applyPrayerFilters() {
@@ -388,6 +500,81 @@ if (prayersBody?.dataset.prayerActions === "true") {
   });
 }
 
+if (prayersBody?.dataset.prayerReactions === "true") {
+  prayersBody.addEventListener("click", (event) => {
+    const opener = event.target.closest("[data-prayer-react-open]");
+    if (!opener) return;
+
+    event.preventDefault();
+    openReactionChooser(opener.dataset.prayerReactOpen);
+  });
+
+  prayersBody.addEventListener("keydown", (event) => {
+    const opener = event.target.closest("[data-prayer-react-open]");
+    if (!opener || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    openReactionChooser(opener.dataset.prayerReactOpen);
+  });
+}
+
+document.addEventListener("click", async (event) => {
+  const closeButton = event.target.closest("[data-prayer-reaction-close]");
+  if (closeButton) {
+    closeReactionChooser();
+    return;
+  }
+
+  const button = event.target.closest("[data-prayer-reaction]");
+  if (!button || !reactionChooserPrayerId) return;
+
+  const chooser = button.closest("[data-prayer-reaction-chooser]");
+  if (!chooser) return;
+
+  const prayerId = reactionChooserPrayerId;
+  const emoji = button.dataset.prayerReaction;
+  if (!prayerId || !emoji) return;
+  const prayer = allPrayers.find((item) => item.id === prayerId);
+  const isRemoving = prayer?.currentReaction === emoji;
+
+  chooser.querySelectorAll("[data-prayer-reaction]").forEach((reactionButton) => {
+    reactionButton.disabled = true;
+  });
+
+  const response = await fetch(`/api/prayers/${prayerId}/reaction`, {
+    method: isRemoving ? "DELETE" : "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: isRemoving ? undefined : JSON.stringify({ emoji }),
+  });
+
+  if (response.status === 401) {
+    window.location.href = "/login";
+    return;
+  }
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.prayer) {
+    chooser.querySelectorAll("[data-prayer-reaction]").forEach((reactionButton) => {
+      reactionButton.disabled = false;
+    });
+    showToast(data.error || "Could not add reaction", "error");
+    return;
+  }
+
+  allPrayers = allPrayers.map((item) => (item.id === data.prayer.id ? data.prayer : item));
+  closeReactionChooser();
+  applyPrayerFilters();
+  showToast(isRemoving ? "Reaction removed" : "Reaction saved");
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeReactionChooser();
+  }
+});
+
 async function updateLeaderboard(action) {
   const endpoint = action === "reset" ? "/api/leaderboard/reset" : "/api/leaderboard/increment";
   yesButton?.classList.toggle("selected", action === "increment");
@@ -445,6 +632,7 @@ if (prayersBody?.dataset.prayerActions === "true") {
   updatePrayerUserOptions(allPrayers);
   updatePrayerTimeState();
   bindPrayerFilterControls();
+  applyPrayerFilters();
 }
 
 if (prayerForm) {

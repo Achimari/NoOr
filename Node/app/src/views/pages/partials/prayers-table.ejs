@@ -1,6 +1,7 @@
 <div class="leaderboard-table-wrap prayer-table-wrap">
   <% const canShowActions = typeof showActions !== "undefined" && showActions; %>
-  <table class="leaderboard-table prayer-table <%= canShowActions ? "prayer-table-actions" : "" %>">
+  <% const canShowReactions = typeof showReactions !== "undefined" && showReactions; %>
+  <table class="leaderboard-table prayer-table <%= canShowActions ? "prayer-table-actions" : "" %> <%= canShowReactions ? "prayer-table-reactions" : "" %>">
     <thead>
       <tr>
         <th scope="col">User</th>
@@ -10,12 +11,25 @@
         <% } %>
       </tr>
     </thead>
-    <tbody data-prayers-body data-prayer-actions="<%= canShowActions ? "true" : "false" %>">
+    <tbody data-prayers-body data-prayer-actions="<%= canShowActions ? "true" : "false" %>" data-prayer-reactions="<%= canShowReactions ? "true" : "false" %>">
       <% if (prayers.length) { %>
         <% prayers.forEach((item) => { %>
-          <tr data-prayer-row data-prayer-id="<%= item.id %>" data-prayer-user-id="<%= item.userId %>" data-prayer-user-name="<%= item.userName %>" data-prayer-text="<%= item.prayer %>" data-prayer-can-delete="<%= item.canDelete ? "true" : "false" %>">
+          <tr data-prayer-row data-prayer-id="<%= item.id %>" data-prayer-user-id="<%= item.userId %>" data-prayer-user-name="<%= item.userName %>" data-prayer-text="<%= item.prayer %>" data-prayer-can-delete="<%= item.canDelete ? "true" : "false" %>" data-prayer-reaction-counts="<%= encodeURIComponent(JSON.stringify(item.reactions || [])) %>" data-prayer-current-reaction="<%= item.currentReaction || "" %>">
             <td><a class="leaderboard-user user-link" href="/customer/<%= item.userId %>"><%- include("../../components/ui/icon", { name: "user", className: "leaderboard-row-icon" }) %><%= item.userName %></a></td>
-            <td><%= item.prayer %></td>
+            <td>
+              <div class="<%= canShowReactions ? "prayer-message" : "" %>"<% if (canShowReactions) { %> data-prayer-react-open="<%= item.id %>" tabindex="0" role="button" aria-label="Choose prayer reaction"<% } %>>
+                <span class="prayer-message-text"><%= item.prayer %></span>
+                <% if (canShowReactions) { %>
+                <div class="prayer-reactions" data-prayer-reaction-group="<%= item.id %>" aria-label="Prayer reactions">
+                  <% (item.reactions || []).filter((reaction) => reaction.count > 0).forEach((reaction) => { %>
+                    <span class="prayer-reaction-button <%= item.currentReaction === reaction.emoji ? "selected" : "" %>" aria-label="<%= item.currentReaction === reaction.emoji ? "Your reaction" : "Reaction" %>">
+                      <span aria-hidden="true"><%= reaction.emoji %></span><span><%= reaction.count %></span>
+                    </span>
+                  <% }) %>
+                </div>
+                <% } %>
+              </div>
+            </td>
             <% if (canShowActions) { %>
               <td>
                 <% if (item.canDelete) { %>
@@ -27,7 +41,7 @@
         <% }) %>
       <% } else { %>
         <tr>
-          <td colspan="<%= canShowActions ? 3 : 2 %>" class="leaderboard-empty">No prayers yet</td>
+          <td colspan="<%= 2 + (canShowActions ? 1 : 0) %>" class="leaderboard-empty">No prayers yet</td>
         </tr>
       <% } %>
     </tbody>

@@ -3,12 +3,12 @@ import { getCurrentUser } from "../controllers/apiController.js";
 import { getCurrentCheckInStatus } from "../controllers/checkInController.js";
 import { getCustomerDetailsApi } from "../controllers/customerController.js";
 import { getLeaderboard, incrementLeaderboard, resetLeaderboard } from "../controllers/leaderboardController.js";
-import { deletePrayer, listPrayers, postPrayer } from "../controllers/prayerController.js";
+import { deletePrayer, deletePrayerReaction, listPrayers, postPrayer, postPrayerReaction } from "../controllers/prayerController.js";
 import { getTelegramConnectLink, sendTelegramTestNotification } from "../controllers/telegramController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import { validateBody } from "../middleware/validateRequest.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { prayerSchema } from "../validators/prayerValidators.js";
+import { prayerReactionSchema, prayerSchema } from "../validators/prayerValidators.js";
 
 const router = Router();
 
@@ -20,6 +20,8 @@ router.post("/api/leaderboard/increment", requireAuth, asyncHandler(incrementLea
 router.post("/api/leaderboard/reset", requireAuth, asyncHandler(resetLeaderboard));
 router.get("/api/prayers", requireAuth, asyncHandler(listPrayers));
 router.post("/api/prayers", requireAuth, validateBody(prayerSchema), asyncHandler(postPrayer));
+router.post("/api/prayers/:id/reaction", requireAuth, validateBody(prayerReactionSchema), asyncHandler(postPrayerReaction));
+router.delete("/api/prayers/:id/reaction", requireAuth, asyncHandler(deletePrayerReaction));
 router.delete("/api/prayers/:id", requireAuth, asyncHandler(deletePrayer));
 router.get("/api/telegram/connect-link", requireAuth, asyncHandler(getTelegramConnectLink));
 router.post("/api/telegram/test-notification", requireAuth, asyncHandler(sendTelegramTestNotification));
