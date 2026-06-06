@@ -43,8 +43,8 @@ function getMissedDateKeys(lastDateKey, todayDateKey, { includeLastDate = false 
   return dateKeys;
 }
 
-function getCurrentWeekDateKeys() {
-  const todayDate = new Date(`${getTodayDateKey()}T12:00:00.000Z`);
+function getCurrentWeekDateKeys(timezone) {
+  const todayDate = new Date(`${getTodayDateKey(new Date(), timezone)}T12:00:00.000Z`);
   const mondayOffset = (todayDate.getUTCDay() + 6) % 7;
   const monday = new Date(todayDate);
   monday.setUTCDate(todayDate.getUTCDate() - mondayOffset);
@@ -60,8 +60,8 @@ function getCurrentWeekDateKeys() {
   });
 }
 
-export async function getWeeklyCheckInDays(userId) {
-  const weekDays = getCurrentWeekDateKeys();
+export async function getWeeklyCheckInDays(userId, timezone) {
+  const weekDays = getCurrentWeekDateKeys(timezone);
   const dateKeys = weekDays.map((day) => day.dateKey);
   const [rows, missedDays] = await Promise.all([
     findCheckInHistoryByDateKeys(userId, dateKeys),
@@ -78,10 +78,10 @@ export async function getWeeklyCheckInDays(userId) {
   }));
 }
 
-export async function markMissedDaysAsNo(userId) {
-  const dateKey = getTodayDateKey();
+export async function markMissedDaysAsNo(userId, timezone) {
+  const dateKey = getTodayDateKey(new Date(), timezone);
   const checkIn = await findCheckInById(userId);
-  const lastDateKey = checkIn?.dateKey || (checkIn?.user?.createdAt ? getTodayDateKey(checkIn.user.createdAt) : null);
+  const lastDateKey = checkIn?.dateKey || (checkIn?.user?.createdAt ? getTodayDateKey(checkIn.user.createdAt, timezone) : null);
   const missedDateKeys = getMissedDateKeys(lastDateKey, dateKey, {
     includeLastDate: !checkIn?.dateKey,
   });
@@ -89,14 +89,14 @@ export async function markMissedDaysAsNo(userId) {
   await addMissedCheckInDates({ userId, dateKeys: missedDateKeys });
 }
 
-export async function getCheckInStatus(userId) {
-  await markMissedDaysAsNo(userId);
+export async function getCheckInStatus(userId, timezone) {
+  await markMissedDaysAsNo(userId, timezone);
 
-  const dateKey = getTodayDateKey();
-  const nextResetAt = getNextResetAt().toISOString();
+  const dateKey = getTodayDateKey(new Date(), timezone);
+  const nextResetAt = getNextResetAt(new Date(), timezone).toISOString();
   const [checkIn, weekDays] = await Promise.all([
     findCheckInById(userId),
-    getWeeklyCheckInDays(userId),
+    getWeeklyCheckInDays(userId, timezone),
   ]);
 
   if (!checkIn || checkIn.dateKey !== dateKey || !checkIn.answer) {
@@ -120,10 +120,10 @@ export async function getCheckInStatus(userId) {
   };
 }
 
-export async function createDailyCheckIn(userId, answer) {
-  await markMissedDaysAsNo(userId);
+export async function createDailyCheckIn(userId, answer, timezone) {
+  await markMissedDaysAsNo(userId, timezone);
 
-  const dateKey = getTodayDateKey();
+  const dateKey = getTodayDateKey(new Date(), timezone);
   const checkIn = await createCheckInAndUpdateLeaderboard({ userId, dateKey, answer });
 
   if (!checkIn) {
@@ -131,8 +131,8 @@ export async function createDailyCheckIn(userId, answer) {
   }
 }
 
-export async function answerMissedDay(userId, { dateKey, answer }) {
-  await markMissedDaysAsNo(userId);
+export async function answerMissedDay(userId, { dateKey, answer, timezone }) {
+  await markMissedDaysAsNo(userId, timezone);
 
   if (!dateKey || !["YES", "NO"].includes(answer)) {
     throw new AppError("Choose a missed day answer", 400);

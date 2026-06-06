@@ -34,12 +34,26 @@ export async function markTelegramConnectTokenUsed(id) {
 export async function findTelegramConnectionByUserId(userId) {
   return prisma.telegramConnection.findUnique({
     where: { userId },
+    include: {
+      user: {
+        select: {
+          timezone: true,
+        },
+      },
+    },
   });
 }
 
 export async function findTelegramConnectionByChatId(telegramChatId) {
   return prisma.telegramConnection.findUnique({
     where: { telegramChatId },
+    include: {
+      user: {
+        select: {
+          timezone: true,
+        },
+      },
+    },
   });
 }
 
@@ -53,6 +67,7 @@ export async function findActiveTelegramConnections() {
         select: {
           id: true,
           name: true,
+          timezone: true,
           checkIn: {
             select: {
               dateKey: true,

@@ -5,14 +5,17 @@ import { getCustomerDetailsApi } from "../controllers/customerController.js";
 import { getLeaderboard, incrementLeaderboard, resetLeaderboard } from "../controllers/leaderboardController.js";
 import { answerPrayer, deletePrayerReaction, listPrayers, postPrayer, postPrayerReaction } from "../controllers/prayerController.js";
 import { getTelegramConnectLink, sendTelegramTestNotification } from "../controllers/telegramController.js";
+import { updateCurrentUserTimezone } from "../controllers/userSettingsController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import { validateBody } from "../middleware/validateRequest.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { prayerReactionSchema, prayerSchema } from "../validators/prayerValidators.js";
+import { timezoneSchema } from "../validators/timezoneValidators.js";
 
 const router = Router();
 
 router.get("/api/me", requireAuth, asyncHandler(getCurrentUser));
+router.patch("/api/me/timezone", requireAuth, validateBody(timezoneSchema), asyncHandler(updateCurrentUserTimezone));
 router.get("/api/customers/:id", requireAuth, asyncHandler(getCustomerDetailsApi));
 router.get("/api/check-in/status", requireAuth, asyncHandler(getCurrentCheckInStatus));
 router.post("/api/check-in/missed", requireAuth, asyncHandler(answerCurrentMissedDay));

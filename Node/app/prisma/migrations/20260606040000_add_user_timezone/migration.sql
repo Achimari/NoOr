@@ -1,0 +1,1 @@
+ALTER TABLE "Auth" ADD COLUMN "timezone" TEXT NOT NULL DEFAULT 'Europe/Riga';

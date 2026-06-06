@@ -34,6 +34,13 @@ export async function findAuthUserById(id) {
   });
 }
 
+export async function updateAuthUserTimezone({ id, timezone }) {
+  return prisma.auth.update({
+    where: { id },
+    data: { timezone },
+  });
+}
+
 export async function createSession({ userId, sessionTokenHash, expiresAt }) {
   return prisma.session.create({
     data: {

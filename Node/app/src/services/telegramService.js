@@ -16,6 +16,7 @@ import { getTelegramBot, getTelegramBotUsername } from "./telegramBotService.js"
 import { getCheckInStatus } from "./checkInService.js";
 import { addPrayer } from "./prayerService.js";
 import { incrementUserLeaderboard, resetUserLeaderboard } from "./leaderboardService.js";
+import { getTodayDateKey } from "../utils/dateKey.js";
 
 const CONNECT_TOKEN_TTL_MS = 10 * 60 * 1000;
 const pendingPrayerChats = new Map();
@@ -94,7 +95,8 @@ async function sendTelegramAnswerMenu(chatId, userId) {
   const activeBot = getTelegramBot();
   if (!activeBot) return;
 
-  const status = await getCheckInStatus(userId);
+  const connection = await findTelegramConnectionByUserId(userId);
+  const status = await getCheckInStatus(userId, connection?.user?.timezone);
   if (!status.canAnswer) {
     await activeBot.sendMessage(
       chatId,
@@ -256,13 +258,13 @@ export async function handleTelegramAction(query) {
 
       try {
         if (answer === "YES") {
-          await incrementUserLeaderboard(connection.userId);
+          await incrementUserLeaderboard(connection.userId, connection.user.timezone);
         } else {
-          await resetUserLeaderboard(connection.userId);
+          await resetUserLeaderboard(connection.userId, connection.user.timezone);
         }
       } catch (error) {
         if (error instanceof AppError && error.statusCode === 409) {
-          const status = await getCheckInStatus(connection.userId);
+          const status = await getCheckInStatus(connection.userId, connection.user.timezone);
           await activeBot.sendMessage(chatId, `Already answered today: ${status.answer}.`, {
             reply_markup: menuKeyboard(),
           });
@@ -349,13 +351,14 @@ export async function sendDailyAnswerReminders(dateKey) {
   let sent = 0;
 
   for (const connection of connections) {
-    const answeredToday = connection.user.checkIn?.dateKey === dateKey && connection.user.checkIn?.answer;
+    const userDateKey = getTodayDateKey(new Date(), connection.user.timezone) || dateKey;
+    const answeredToday = connection.user.checkIn?.dateKey === userDateKey && connection.user.checkIn?.answer;
     if (answeredToday) continue;
 
     const claimed = await claimTelegramNotification({
       userId: connection.userId,
       notificationType: notificationTypes.answerReminder,
-      dateKey,
+      dateKey: userDateKey,
     });
     if (!claimed) continue;
 
@@ -384,10 +387,11 @@ export async function sendDailyPrayerDigest(dateKey) {
   let sent = 0;
 
   for (const connection of connections) {
+    const userDateKey = getTodayDateKey(new Date(), connection.user.timezone) || dateKey;
     const claimed = await claimTelegramNotification({
       userId: connection.userId,
       notificationType: notificationTypes.prayerDigest,
-      dateKey,
+      dateKey: userDateKey,
     });
     if (!claimed) continue;
 

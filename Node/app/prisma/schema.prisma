@@ -10,6 +10,7 @@ model Auth {
   id                    Int                    @id @default(autoincrement())
   name                  String                 @unique
   passwordHash          String
+  timezone              String                 @default("Europe/Riga")
   isTelegramLinked      Boolean                @default(false) @map("is_telegram_linked")
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt

@@ -26,6 +26,12 @@ const telegramConnectButton = document.querySelector(".telegram-connect-button")
 const telegramStatus = document.querySelector("[data-telegram-status]");
 const header = document.querySelector(".header");
 const headerMenuToggle = document.querySelector("[data-header-menu-toggle]");
+const timezoneMenu = document.querySelector("[data-timezone-menu]");
+const timezoneToggle = document.querySelector("[data-timezone-toggle]");
+const timezoneOptions = document.querySelector("[data-timezone-options]");
+const timezoneCurrent = document.querySelector("[data-timezone-current]");
+const timezoneSearch = document.querySelector("[data-timezone-search]");
+const timezoneEmpty = document.querySelector("[data-timezone-empty]");
 const prayerReactionEmoji = ["🙏", "❤️", "🙌", "🕊️", "💪", "🤍"];
 const currentUserId = Number(leaderboardRoot?.dataset.currentUserId || 0);
 let resetTimerId;
@@ -53,6 +59,81 @@ header?.querySelectorAll(".header-link").forEach((link) => {
 
 window.addEventListener("resize", () => {
   if (window.innerWidth > 760) setHeaderMenuOpen(false);
+});
+
+function setTimezoneMenuOpen(isOpen) {
+  if (!timezoneToggle || !timezoneOptions) return;
+  timezoneOptions.hidden = !isOpen;
+  timezoneToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  if (isOpen) {
+    timezoneSearch?.focus();
+  } else if (timezoneSearch) {
+    timezoneSearch.value = "";
+    filterTimezoneOptions();
+  }
+}
+
+function filterTimezoneOptions() {
+  const query = String(timezoneSearch?.value || "").trim().toLowerCase();
+  let visibleCount = 0;
+
+  timezoneOptions?.querySelectorAll("[data-timezone-option]").forEach((button) => {
+    const matches = !query || button.dataset.timezoneLabel?.includes(query) || button.dataset.timezoneValue?.includes(query);
+    button.hidden = !matches;
+    if (matches) visibleCount += 1;
+  });
+
+  if (timezoneEmpty) {
+    timezoneEmpty.hidden = visibleCount > 0;
+  }
+}
+
+timezoneToggle?.addEventListener("click", () => {
+  setTimezoneMenuOpen(Boolean(timezoneOptions?.hidden));
+});
+
+timezoneSearch?.addEventListener("input", filterTimezoneOptions);
+
+timezoneOptions?.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-timezone-option]");
+  if (!button) return;
+
+  const timezone = button.dataset.timezoneOption;
+  button.disabled = true;
+
+  const response = await fetch("/api/me/timezone", {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ timezone }),
+  });
+
+  if (response.status === 401) {
+    window.location.href = "/login";
+    return;
+  }
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    button.disabled = false;
+    showToast(data.error || data.errors?.[0] || "Could not save timezone", "error");
+    return;
+  }
+
+  if (timezoneCurrent && data.timezone?.label) {
+    timezoneCurrent.textContent = data.timezone.label;
+  }
+  setTimezoneMenuOpen(false);
+  showToast("Timezone updated");
+  window.setTimeout(() => window.location.reload(), 400);
+});
+
+document.addEventListener("click", (event) => {
+  if (timezoneMenu && !timezoneMenu.contains(event.target)) {
+    setTimezoneMenuOpen(false);
+  }
 });
 
 function showToast(message, variant = "default") {
@@ -753,6 +834,7 @@ document.addEventListener("click", async (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     setHeaderMenuOpen(false);
+    setTimezoneMenuOpen(false);
     closeReactionChooser();
     closeMissedAnswerModal();
   }

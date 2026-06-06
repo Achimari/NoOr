@@ -3,6 +3,7 @@ import path from "node:path";
 import { createViewLocals } from "../i18n/index.js";
 import { siteData } from "../data/siteData.js";
 import { paths } from "../config/paths.js";
+import { getTimezoneLabel, getTimezoneOptions } from "../utils/timezones.js";
 
 const sourceStyles = [
   "/styles/globals.css",
@@ -43,6 +44,8 @@ export function viewLocals(req, res, next) {
     siteData,
     assets,
     auth: req.user || null,
+    timezoneOptions: getTimezoneOptions(),
+    getTimezoneLabel,
   };
   next();
 }

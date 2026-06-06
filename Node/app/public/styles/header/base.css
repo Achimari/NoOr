@@ -194,6 +194,123 @@ body.header-menu-open {
   gap: var(--space-3);
 }
 
+.header-timezone {
+  position: relative;
+}
+
+.header-timezone-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--white-18);
+  border-radius: 12px;
+  background: var(--white-06);
+  color: var(--white-72);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.header-timezone-button:hover,
+.header-timezone-button:focus-visible,
+.header-timezone-button[aria-expanded="true"] {
+  background: var(--white-10);
+  border-color: var(--white-18);
+  color: var(--white);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.header-timezone-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  display: grid;
+  width: min(260px, calc(100vw - 24px));
+  max-height: min(360px, 70vh);
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--white-10);
+  border-radius: 12px;
+  background: #111111;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+}
+
+.header-timezone-menu[hidden] {
+  display: none;
+}
+
+.header-timezone-search {
+  width: 100%;
+  min-height: 38px;
+  margin-bottom: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--white-10);
+  border-radius: 9px;
+  background: var(--white-06);
+  color: var(--white);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+}
+
+.header-timezone-search::placeholder {
+  color: var(--white-54);
+}
+
+.header-timezone-search:focus {
+  border-color: var(--white-54);
+}
+
+.header-timezone-list {
+  display: grid;
+  gap: 2px;
+}
+
+.header-timezone-option {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--white-72);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+
+.header-timezone-empty {
+  padding: 8px 10px;
+  color: var(--white-54);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.header-timezone-empty[hidden] {
+  display: none;
+}
+
+.header-timezone-option:hover,
+.header-timezone-option:focus-visible,
+.header-timezone-option.selected {
+  background: var(--white-10);
+  color: var(--white);
+  outline: none;
+}
+
 .header-logout-form {
   display: inline;
   margin: 0;

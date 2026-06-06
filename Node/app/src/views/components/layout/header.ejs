@@ -20,6 +20,22 @@
     <div class="header-actions">
       <nav class="header-auth-actions" aria-label="Account">
         <% if (auth) { %>
+          <div class="header-timezone" data-timezone-menu>
+            <button class="header-timezone-button" type="button" data-timezone-toggle aria-expanded="false" aria-label="Change timezone">
+              <span data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
+            </button>
+            <div class="header-timezone-menu" data-timezone-options hidden>
+              <input class="header-timezone-search" type="search" placeholder="Search timezone" data-timezone-search autocomplete="off" />
+              <div class="header-timezone-list" data-timezone-list>
+                <% timezoneOptions.forEach((timezone) => { %>
+                  <button class="header-timezone-option<%= timezone.value === auth.timezone ? " selected" : "" %>" type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
+                    <%= timezone.label %>
+                  </button>
+                <% }) %>
+              </div>
+              <span class="header-timezone-empty" data-timezone-empty hidden>No timezones found</span>
+            </div>
+          </div>
           <form class="header-logout-form" action="/logout" method="post">
             <button class="header-auth-link header-auth-button" type="submit">Logout</button>
           </form>

@@ -18,13 +18,13 @@ export function renderPage({ view, pageId, titleKey }) {
     const viewData = {};
 
     if (pageId === "daily-check-in") {
-      viewData.leaderboard = await getLeaderboardSummary(req.user.id);
+      viewData.leaderboard = await getLeaderboardSummary(req.user.id, req.user.timezone);
     }
 
     if (pageId === "community") {
       const [leaderboard, checkIn, prayers] = await Promise.all([
-        getLeaderboardSummary(req.user.id),
-        getCheckInStatus(req.user.id),
+        getLeaderboardSummary(req.user.id, req.user.timezone),
+        getCheckInStatus(req.user.id, req.user.timezone),
         getPrayers(req.user.id),
       ]);
 

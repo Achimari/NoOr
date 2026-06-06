@@ -27,13 +27,13 @@ function sanitizeLeaderboardEntry(row, index, missedDaysByUserId) {
   };
 }
 
-export async function getLeaderboardSummary(userId) {
-  await markMissedDaysAsNo(userId);
+export async function getLeaderboardSummary(userId, timezone) {
+  await markMissedDaysAsNo(userId, timezone);
 
   const [currentRow, topRows, weekDays] = await Promise.all([
     findLeaderboardValueById(userId),
     findTopLeaderboardRows(),
-    getWeeklyCheckInDays(userId),
+    getWeeklyCheckInDays(userId, timezone),
   ]);
   const userIds = [...new Set([userId, ...topRows.map((row) => row.id)])];
   const missedRows = await findMissedDaysByUserIds(userIds);
@@ -44,7 +44,7 @@ export async function getLeaderboardSummary(userId) {
       id: userId,
       value: currentRow?.value || 0,
       maxStreak: currentRow?.maxStreak || 0,
-      todayDateKey: getTodayDateKey(),
+      todayDateKey: getTodayDateKey(new Date(), timezone),
       weekDays,
       missedDays: sanitizeMissedDays(missedDaysByUserId.get(userId)),
     },
@@ -52,12 +52,12 @@ export async function getLeaderboardSummary(userId) {
   };
 }
 
-export async function incrementUserLeaderboard(userId) {
-  await createDailyCheckIn(userId, "YES");
-  return getLeaderboardSummary(userId);
+export async function incrementUserLeaderboard(userId, timezone) {
+  await createDailyCheckIn(userId, "YES", timezone);
+  return getLeaderboardSummary(userId, timezone);
 }
 
-export async function resetUserLeaderboard(userId) {
-  await createDailyCheckIn(userId, "NO");
-  return getLeaderboardSummary(userId);
+export async function resetUserLeaderboard(userId, timezone) {
+  await createDailyCheckIn(userId, "NO", timezone);
+  return getLeaderboardSummary(userId, timezone);
 }

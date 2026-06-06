@@ -10,7 +10,9 @@ import {
   findActiveSessionByHash,
   findAuthUserById,
   findAuthUserByName,
+  updateAuthUserTimezone,
 } from "../repositories/authRepository.js";
+import { getSafeTimezone, isSupportedTimezone } from "../utils/timezones.js";
 
 const SALT_ROUNDS = 12;
 
@@ -19,6 +21,7 @@ export function sanitizeUser(user) {
     id: user.id,
     name: user.name,
     isTelegramLinked: user.isTelegramLinked,
+    timezone: getSafeTimezone(user.timezone),
     createdAt: user.createdAt,
   };
 }
@@ -95,6 +98,15 @@ export async function getUserById(id) {
     throw new AppError("User not found", 404);
   }
 
+  return sanitizeUser(user);
+}
+
+export async function updateUserTimezone({ userId, timezone }) {
+  if (!isSupportedTimezone(timezone)) {
+    throw new AppError("Choose a valid timezone", 400);
+  }
+
+  const user = await updateAuthUserTimezone({ id: userId, timezone });
   return sanitizeUser(user);
 }
 
