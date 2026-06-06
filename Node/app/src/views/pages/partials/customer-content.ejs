@@ -26,6 +26,10 @@
               <dd><%= customer.currentStreak %> days</dd>
             </div>
             <div>
+              <dt>Best streak</dt>
+              <dd><%= customer.maxStreak %> days</dd>
+            </div>
+            <div>
               <dt>Today</dt>
               <dd><%= customer.todayAnswer || "Pending" %></dd>
             </div>
@@ -59,7 +63,7 @@
 
         <section class="dashboard-card customer-prayers">
           <header class="dashboard-card-head">
-            <h2>Prayer needs</h2>
+            <h2>Prayer requests</h2>
             <span><%= customer.prayers.length %> items</span>
           </header>
 

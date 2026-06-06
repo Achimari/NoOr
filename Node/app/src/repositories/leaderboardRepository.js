@@ -6,6 +6,7 @@ export async function incrementLeaderboardValue(id) {
     create: {
       id,
       value: 1,
+      maxStreak: 1,
     },
     update: {
       value: {
@@ -21,6 +22,7 @@ export async function resetLeaderboardValue(id) {
     create: {
       id,
       value: 0,
+      maxStreak: 0,
     },
     update: {
       value: 0,

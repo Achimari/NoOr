@@ -1,9 +1,9 @@
-import { addPrayer, getUserPrayers, reactToPrayer, removePrayer, removePrayerReaction } from "../services/prayerService.js";
+import { addPrayer, getUserPrayers, markPrayerAnswered, reactToPrayer, removePrayerReaction } from "../services/prayerService.js";
 import { AppError } from "../utils/appError.js";
 
 export async function listPrayers(req, res) {
-  const prayers = await getUserPrayers(req.user.id);
-  return res.json({ prayers });
+  const prayerLists = await getUserPrayers(req.user.id);
+  return res.json({ prayerLists });
 }
 
 export async function postPrayer(req, res) {
@@ -19,9 +19,9 @@ export async function postPrayer(req, res) {
   return res.status(201).json({ prayer });
 }
 
-export async function deletePrayer(req, res) {
+export async function answerPrayer(req, res) {
   try {
-    await removePrayer({
+    await markPrayerAnswered({
       id: req.params.id,
       userId: req.user.id,
     });

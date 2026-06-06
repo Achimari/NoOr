@@ -17,6 +17,7 @@ model Auth {
   leaderboard           Leaderboard?
   checkIn               CheckIn?
   checkInHistory        CheckInHistory[]
+  missedDays            MissedDays?
   prayers               Prayer[]
   prayerReactions       PrayerReaction[]
   telegramConnection    TelegramConnection?
@@ -38,9 +39,10 @@ model Session {
 }
 
 model Leaderboard {
-  id    Int  @id
-  value Int  @default(0)
-  user  Auth @relation(fields: [id], references: [id], onDelete: Cascade)
+  id        Int  @id
+  value     Int  @default(0)
+  maxStreak Int  @default(0) @map("max_streak")
+  user      Auth @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model CheckIn {
@@ -65,14 +67,25 @@ model CheckInHistory {
   @@map("check_in_history")
 }
 
+model MissedDays {
+  id    Int      @id
+  count Int      @default(0)
+  dates String[] @default([])
+  user  Auth     @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@map("missed_days")
+}
+
 model Prayer {
   id        Int              @id @default(autoincrement())
   userId    Int
   prayer    String
+  answeredAt DateTime?       @map("answered_at")
   user      Auth             @relation(fields: [userId], references: [id], onDelete: Cascade)
   reactions PrayerReaction[]
 
   @@index([userId])
+  @@index([answeredAt])
 }
 
 model PrayerReaction {

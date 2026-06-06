@@ -1,10 +1,10 @@
 import {
   createPrayer,
   deletePrayerReaction,
-  deletePrayerByOwner,
   findPrayerById,
   findPrayers,
   findPrayersByUserId,
+  markPrayerAnsweredByOwner,
   upsertPrayerReaction,
 } from "../repositories/prayerRepository.js";
 import { AppError } from "../utils/appError.js";
@@ -38,7 +38,9 @@ function sanitizePrayer(row, currentUserId = null) {
     userId: row.userId,
     userName: row.user.name,
     prayer: row.prayer,
-    canDelete: currentUserId === row.userId,
+    answeredAt: row.answeredAt || null,
+    isAnswered: Boolean(row.answeredAt),
+    canMarkAnswered: currentUserId === row.userId && !row.answeredAt,
     reactions: summarizeReactions(row.reactions),
     currentReaction: row.reactions?.find((reaction) => reaction.userId === currentUserId)?.emoji || null,
   };
@@ -56,16 +58,20 @@ export async function getPrayers(currentUserId = null) {
 
 export async function getUserPrayers(userId) {
   const rows = await findPrayersByUserId(userId);
-  return rows.map((row) => sanitizePrayer(row, userId));
+  const prayers = rows.map((row) => sanitizePrayer(row, userId));
+
+  return {
+    active: prayers,
+  };
 }
 
-export async function removePrayer({ id, userId }) {
+export async function markPrayerAnswered({ id, userId }) {
   const prayerId = Number(id);
   if (!Number.isInteger(prayerId) || prayerId <= 0) {
     throw new AppError("Prayer not found", 404);
   }
 
-  const result = await deletePrayerByOwner({ id: prayerId, userId });
+  const result = await markPrayerAnsweredByOwner({ id: prayerId, userId });
   if (result.count === 0) {
     throw new AppError("Prayer not found", 404);
   }

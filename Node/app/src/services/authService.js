@@ -35,6 +35,25 @@ export function getSessionMaxAgeMs() {
   return env.SESSION_DAYS * 24 * 60 * 60 * 1000;
 }
 
+async function createUserSession(userId) {
+  await deleteExpiredSessions();
+
+  const sessionToken = createPlainSessionToken();
+  const sessionTokenHash = hashSessionToken(sessionToken);
+  const expiresAt = new Date(Date.now() + getSessionMaxAgeMs());
+
+  await createSession({
+    userId,
+    sessionTokenHash,
+    expiresAt,
+  });
+
+  return {
+    sessionToken,
+    expiresAt,
+  };
+}
+
 export async function registerUser({ name, password }) {
   const existingUser = await findAuthUserByName(name);
   if (existingUser) {
@@ -43,7 +62,12 @@ export async function registerUser({ name, password }) {
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await createAuthUser({ name, passwordHash });
-  return sanitizeUser(user);
+  const session = await createUserSession(user.id);
+
+  return {
+    user: sanitizeUser(user),
+    ...session,
+  };
 }
 
 export async function loginUser({ name, password }) {
@@ -57,22 +81,11 @@ export async function loginUser({ name, password }) {
     throw new AppError("Invalid name or password", 401);
   }
 
-  await deleteExpiredSessions();
-
-  const sessionToken = createPlainSessionToken();
-  const sessionTokenHash = hashSessionToken(sessionToken);
-  const expiresAt = new Date(Date.now() + getSessionMaxAgeMs());
-
-  await createSession({
-    userId: user.id,
-    sessionTokenHash,
-    expiresAt,
-  });
+  const session = await createUserSession(user.id);
 
   return {
     user: sanitizeUser(user),
-    sessionToken,
-    expiresAt,
+    ...session,
   };
 }
 

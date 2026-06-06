@@ -34,6 +34,9 @@ export async function createPrayer({ userId, prayer }) {
 
 export async function findPrayers(limit = 20) {
   return prisma.prayer.findMany({
+    where: {
+      answeredAt: null,
+    },
     orderBy: {
       id: "desc",
     },
@@ -46,9 +49,10 @@ export async function findPrayersByUserId(userId, limit = 20) {
   return prisma.prayer.findMany({
     where: {
       userId,
+      answeredAt: null,
     },
     orderBy: {
-      id: "asc",
+      id: "desc",
     },
     take: limit,
     include: prayerInclude,
@@ -92,7 +96,7 @@ export async function deletePrayerReaction({ prayerId, userId }) {
   });
 }
 
-export async function deletePrayerByOwner({ id, userId }) {
+export async function markPrayerAnsweredByOwner({ id, userId }) {
   return prisma.prayer.deleteMany({
     where: {
       id,

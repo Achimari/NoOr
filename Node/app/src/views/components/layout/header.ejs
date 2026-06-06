@@ -1,7 +1,7 @@
 <header class="header">
   <div class="header-container">
     <div class="header-left">
-      <a href="/" class="logo-block logo-link">
+      <a href="/daily-check-in" class="logo-block logo-link">
         <img src="/Logo.png" alt="NoOr" class="header-logo" draggable="false" />
 
       </a>
@@ -27,6 +27,12 @@
           <a class="header-auth-link" href="/login">Login</a>
         <% } %>
       </nav>
+      <% if (t("header.nav", []).length) { %>
+        <button class="header-menu-button" type="button" data-header-menu-toggle aria-label="Open navigation menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+        </button>
+      <% } %>
     </div>
   </div>
 </header>

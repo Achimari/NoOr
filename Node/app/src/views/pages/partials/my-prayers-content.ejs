@@ -5,19 +5,23 @@
       <div class="info-grid prayer-grid">
         <form class="dashboard-card prayer-form" data-prayer-form>
           <div class="prayer-card-intro">
-            <h2>Add a request</h2>
-            <p>Write what you would like prayer for today.</p>
+            <h2>Add a prayer request</h2>
+            <p>Share a prayer request and update it when God answers.</p>
           </div>
           <label class="auth-field prayer-field">
             <span>Prayer request</span>
             <textarea name="prayer" rows="7" maxlength="500" placeholder="Share your request..." required></textarea>
           </label>
-          <button class="btn btn-primary auth-submit" type="submit">Add prayer</button>
+          <button class="btn btn-primary auth-submit" type="submit">Add prayer request</button>
           <p class="dashboard-answer-status prayer-form-status" data-prayer-status aria-live="polite"></p>
         </form>
 
         <section class="dashboard-card prayer-list-card">
-          <%- include("./prayers-table", { prayers, showActions: showPrayerActions }) %>
+          <header class="dashboard-card-head">
+            <h2>Active prayer requests</h2>
+            <span data-active-prayer-count><%= prayerLists.active.length %> items</span>
+          </header>
+          <%- include("./prayers-table", { prayers: prayerLists.active, showActions: showPrayerActions, listType: "active" }) %>
         </section>
       </div>
     </div>

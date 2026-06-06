@@ -5,9 +5,9 @@ export default {
     languageLabel: "Language",
     languages: { ru: "RU", en: "EN" },
     nav: [
-      { label: "Home", to: "/" },
-      { label: "Prayer needs", to: "/prayer-needs" },
-      { label: "Info", to: "/info" }
+      { label: "Daily Check-in", to: "/daily-check-in" },
+      { label: "My Prayers", to: "/my-prayers" },
+      { label: "Community", to: "/community" }
     ]
   },
   footer: {
@@ -30,15 +30,16 @@ export default {
     useful: { title: "", subtitle: "", links: [] }
   },
   about: { title: "", subtitle: "", roadmap: [] },
-  prayerNeeds: { title: "Prayer needs", subtitle: "", items: [] },
-  info: { title: "Info", subtitle: "", items: [] },
+  dailyCheckIn: { title: "Daily Check-in", subtitle: "", items: [] },
+  myPrayers: { title: "My Prayer Requests", subtitle: "", items: [] },
+  community: { title: "Community", subtitle: "", items: [] },
   auth: {
     login: {
       title: "Login",
       subtitle: "",
       loginLabel: "Login",
       passwordLabel: "Password",
-      submit: "Sign in",
+      submit: "Log in",
       onboardingLink: "Create account"
     },
     onboarding: {
@@ -48,7 +49,7 @@ export default {
       passwordLabel: "Password",
       confirmPasswordLabel: "Confirm password",
       submit: "Create account",
-      loginLink: "Sign in"
+      loginLink: "Log in"
     }
   },
   notFound: { title: "404", text: "", home: "" }

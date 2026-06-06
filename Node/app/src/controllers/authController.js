@@ -40,7 +40,7 @@ export async function postLogin(req, res) {
   try {
     const { sessionToken } = await loginUser(req.validatedBody);
     res.cookie(authCookieName, sessionToken, getAuthCookieOptions());
-    return res.redirect("/");
+    return res.redirect("/daily-check-in");
   } catch (error) {
     if (error instanceof AppError) {
       return renderLogin(res, error.statusCode, { errors: [error.message], values: req.body });
@@ -65,10 +65,11 @@ export async function registerApi(req, res) {
   }
 
   try {
-    const user = await registerUser(req.validatedBody);
+    const { user, sessionToken } = await registerUser(req.validatedBody);
+    res.cookie(authCookieName, sessionToken, getAuthCookieOptions());
 
     if (wantsHtml(req)) {
-      return res.redirect("/login");
+      return res.redirect("/daily-check-in");
     }
 
     return res.status(201).json({ user });

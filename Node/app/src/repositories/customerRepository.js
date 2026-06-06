@@ -12,6 +12,7 @@ export async function findCustomerDetailsById(id) {
       leaderboard: {
         select: {
           value: true,
+          maxStreak: true,
         },
       },
       checkIn: {

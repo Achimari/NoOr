@@ -1,8 +1,10 @@
 import {
+  addMissedCheckInDates,
   createCheckInAndUpdateLeaderboard,
   findCheckInHistoryByDateKeys,
   findCheckInById,
-  markMissedCheckInsAsNo,
+  findMissedDaysByUserId,
+  resolveMissedCheckIn,
 } from "../repositories/checkInRepository.js";
 import { AppError } from "../utils/appError.js";
 import { getNextResetAt, getTodayDateKey } from "../utils/dateKey.js";
@@ -60,15 +62,18 @@ function getCurrentWeekDateKeys() {
 
 export async function getWeeklyCheckInDays(userId) {
   const weekDays = getCurrentWeekDateKeys();
-  const rows = await findCheckInHistoryByDateKeys(
-    userId,
-    weekDays.map((day) => day.dateKey),
-  );
+  const dateKeys = weekDays.map((day) => day.dateKey);
+  const [rows, missedDays] = await Promise.all([
+    findCheckInHistoryByDateKeys(userId, dateKeys),
+    findMissedDaysByUserId(userId),
+  ]);
   const rowsByDateKey = new Map(rows.map((row) => [row.dateKey, row.answer]));
+  const missedDateKeys = new Set(missedDays?.dates || []);
 
   return weekDays.map((day) => ({
     ...day,
     answer: rowsByDateKey.get(day.dateKey) || null,
+    missed: missedDateKeys.has(day.dateKey),
     successful: rowsByDateKey.get(day.dateKey) === "YES",
   }));
 }
@@ -81,7 +86,7 @@ export async function markMissedDaysAsNo(userId) {
     includeLastDate: !checkIn?.dateKey,
   });
 
-  await markMissedCheckInsAsNo({ userId, dateKeys: missedDateKeys });
+  await addMissedCheckInDates({ userId, dateKeys: missedDateKeys });
 }
 
 export async function getCheckInStatus(userId) {
@@ -124,4 +129,19 @@ export async function createDailyCheckIn(userId, answer) {
   if (!checkIn) {
     throw new AppError("Already answered today", 409);
   }
+}
+
+export async function answerMissedDay(userId, { dateKey, answer }) {
+  await markMissedDaysAsNo(userId);
+
+  if (!dateKey || !["YES", "NO"].includes(answer)) {
+    throw new AppError("Choose a missed day answer", 400);
+  }
+
+  const missedDays = await findMissedDaysByUserId(userId);
+  if (!missedDays?.dates?.includes(dateKey)) {
+    throw new AppError("Missed day not found", 404);
+  }
+
+  await resolveMissedCheckIn({ userId, dateKey, answer });
 }

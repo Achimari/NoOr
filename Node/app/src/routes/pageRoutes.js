@@ -7,11 +7,14 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 const router = Router();
 
 router.get("/customer/:id", requireAuth, asyncHandler(renderCustomerDetails));
+router.get("/", requireAuth, (req, res) => res.redirect("/daily-check-in"));
+router.get("/prayer-needs", requireAuth, (req, res) => res.redirect("/my-prayers"));
+router.get("/info", requireAuth, (req, res) => res.redirect("/community"));
 
 const pages = [
-  { path: "/", view: "home", pageId: "home", titleKey: "home.hero.title" },
-  { path: "/prayer-needs", view: "prayer-needs", pageId: "prayer-needs", titleKey: "prayerNeeds.title" },
-  { path: "/info", view: "info", pageId: "info", titleKey: "info.title" },
+  { path: "/daily-check-in", view: "home", pageId: "daily-check-in", titleKey: "dailyCheckIn.title" },
+  { path: "/my-prayers", view: "my-prayers", pageId: "my-prayers", titleKey: "myPrayers.title" },
+  { path: "/community", view: "community", pageId: "community", titleKey: "community.title" },
   { path: "/about", view: "about", pageId: "about", titleKey: "about.title" },
 ];
 

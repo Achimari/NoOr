@@ -1,4 +1,4 @@
-<main class="home-page dashboard-page" data-leaderboard>
+<main class="home-page dashboard-page" data-leaderboard data-current-user-id="<%= leaderboard.current.id %>">
   <section class="section dashboard-section">
     <div class="container dashboard-container">
       <header class="dashboard-head">
@@ -20,11 +20,17 @@
           <p class="dashboard-label">Current streak</p>
           <p class="dashboard-value"><span data-current-value>
               <%= leaderboard.current.value %>
-            </span> Days</p>
+            </span><span class="dashboard-value-unit"> Days</span></p>
+        </div>
+        <div>
+          <p class="dashboard-label">Best streak</p>
+          <p class="dashboard-value"><span data-max-value>
+              <%= leaderboard.current.maxStreak %>
+            </span><span class="dashboard-value-unit"> Days</span></p>
         </div>
         <div class="dashboard-week" data-current-date-key="<%= leaderboard.current.todayDateKey %>" aria-hidden="true">
           <% (leaderboard.current.weekDays || []).forEach((day)=> { %>
-            <span class="dashboard-day<%= day.successful ? " active" : "" %>" data-week-day="<%= day.dateKey %>" data-week-answer="<%= day.answer || "" %>"><%= day.label %></span>
+            <span class="dashboard-day<%= day.successful ? " active" : "" %><%= day.missed ? " missed" : "" %>" data-week-day="<%= day.dateKey %>" data-week-answer="<%= day.answer || "" %>" data-week-missed="<%= day.missed ? "true" : "false" %>"><%= day.label %></span>
             <% }) %>
         </div>
       </article>
@@ -58,7 +64,20 @@
                     <td><a class="leaderboard-user user-link" href="/customer/<%= entry.id %>"><%-
                           include("../../components/ui/icon", { name: "user" , className: "leaderboard-row-icon" }) %>
                           <%= entry.name %></a></td>
-                    <td><span class="leaderboard-streak"><%= entry.value %> days</span></td>
+                    <td>
+                      <span class="leaderboard-streak">
+                        <% if (entry.missedDays && entry.missedDays.count > 0) { %>
+                          <% if (entry.id === leaderboard.current.id) { %>
+                            <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="<%= entry.missedDays.nextDateKey %>" data-missed-count="<%= entry.missedDays.count %>">
+                              Missed days <%= entry.missedDays.count %>
+                            </button>
+                          <% } else { %>
+                            <span class="leaderboard-missed-tag is-static">Missed days <%= entry.missedDays.count %></span>
+                          <% } %>
+                        <% } %>
+                        <span><%= entry.value %> days</span>
+                      </span>
+                    </td>
                   </tr>
                   <% }) %>
                     <% } else { %>
@@ -70,22 +89,6 @@
           </table>
         </div>
       </section>
-
-      <article class="dashboard-card telegram-card home-telegram-card" data-telegram-card>
-        <header class="dashboard-card-head">
-          <h2>Telegram</h2>
-          <span data-telegram-state>
-            <%= telegramState.isTelegramLinked ? "Linked" : "Not linked" %>
-          </span>
-        </header>
-        <p class="dashboard-label telegram-card-copy">
-          Connect the bot to receive reminders and prayer lists in Telegram.
-        </p>
-        <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant:
-          telegramState.isTelegramLinked ? "secondary" : "primary" , className: "telegram-connect-button" , label:
-          telegramState.isTelegramLinked ? "Reconnect bot" : "Link Telegram bot" }) %>
-          <p class="dashboard-answer-status prayer-form-status" data-telegram-status aria-live="polite"></p>
-      </article>
 
     </div>
   </section>

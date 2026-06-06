@@ -1,4 +1,4 @@
-<main class="dashboard-page info-page">
+<main class="dashboard-page community-page">
   <section class="section dashboard-section">
     <div class="container info-container">
       <div class="info-grid">
@@ -15,7 +15,7 @@
 
           <article class="dashboard-card info-stats">
             <header class="dashboard-card-head">
-              <h2>Your stats</h2>
+              <h2>Your progress</h2>
             </header>
             <div class="info-stat-grid">
               <div>
@@ -27,10 +27,30 @@
                 <p class="dashboard-value"><%= infoStats.currentStreak %> Days</p>
               </div>
               <div>
-                <p class="dashboard-label">Today</p>
+                <p class="dashboard-label">Best streak</p>
+                <p class="dashboard-value"><%= infoStats.maxStreak %> Days</p>
+              </div>
+              <div>
+                <p class="dashboard-label">Today's status</p>
                 <p class="dashboard-value"><%= infoStats.todayAnswer %></p>
               </div>
             </div>
+          </article>
+
+          <article class="dashboard-card telegram-card info-telegram-card" data-telegram-card>
+            <header class="dashboard-card-head">
+              <h2>Telegram</h2>
+              <span data-telegram-state>
+                <%= telegramState.isTelegramLinked ? "Linked" : "Not linked" %>
+              </span>
+            </header>
+            <p class="dashboard-label telegram-card-copy">
+              Connect the bot to receive reminders and prayer lists in Telegram.
+            </p>
+            <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant:
+              telegramState.isTelegramLinked ? "secondary" : "primary" , className: "telegram-connect-button" , label:
+              telegramState.isTelegramLinked ? "Reconnect bot" : "Link Telegram bot" }) %>
+            <p class="dashboard-answer-status prayer-form-status" data-telegram-status aria-live="polite"></p>
           </article>
         </div>
 
@@ -38,7 +58,7 @@
           <header class="dashboard-card-head prayer-filter-head">
             <div class="prayer-panel-copy">
               <h2>Community prayers</h2>
-              <p>Browse recent requests and filter by person.</p>
+              <p>Browse prayer requests from the community and support others through prayer.</p>
             </div>
             <button class="prayer-filter-button" type="button" data-prayer-filter-toggle aria-expanded="false" aria-controls="prayer-filter-panel" aria-label="Filter prayers">
               <span class="prayer-filter-glyph" aria-hidden="true"></span>
@@ -69,7 +89,7 @@
             <button class="prayer-filter-clear" type="button" data-prayer-filter-clear>Clear</button>
           </div>
 
-          <%- include("./prayers-table", { prayers, showActions: false, showReactions: true }) %>
+          <%- include("./prayers-table", { prayers, showActions: false, showReactions: true, listType: "community" }) %>
         </section>
       </div>
     </div>

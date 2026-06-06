@@ -17,14 +17,11 @@ export function renderPage({ view, pageId, titleKey }) {
   return async (req, res) => {
     const viewData = {};
 
-    if (pageId === "home") {
+    if (pageId === "daily-check-in") {
       viewData.leaderboard = await getLeaderboardSummary(req.user.id);
-      viewData.telegramState = {
-        isTelegramLinked: Boolean(req.user.isTelegramLinked),
-      };
     }
 
-    if (pageId === "info") {
+    if (pageId === "community") {
       const [leaderboard, checkIn, prayers] = await Promise.all([
         getLeaderboardSummary(req.user.id),
         getCheckInStatus(req.user.id),
@@ -34,7 +31,10 @@ export function renderPage({ view, pageId, titleKey }) {
       viewData.infoStats = {
         name: req.user.name,
         currentStreak: leaderboard.current.value,
+        maxStreak: leaderboard.current.maxStreak,
         todayAnswer: checkIn.answer || "Pending",
+      };
+      viewData.telegramState = {
         isTelegramLinked: Boolean(req.user.isTelegramLinked),
       };
       viewData.prayers = prayers;
@@ -46,8 +46,8 @@ export function renderPage({ view, pageId, titleKey }) {
       });
     }
 
-    if (pageId === "prayer-needs") {
-      viewData.prayers = await getUserPrayers(req.user.id);
+    if (pageId === "my-prayers") {
+      viewData.prayerLists = await getUserPrayers(req.user.id);
       viewData.showPrayerActions = true;
     }
 

@@ -168,7 +168,7 @@ export async function handleTelegramStart({ chat, from, token }) {
         return;
       }
 
-      await activeBot.sendMessage(chat.id, "Open NoOr → Info → Link Telegram bot, then press Start from that link.");
+      await activeBot.sendMessage(chat.id, "Open NoOr → Community → Link Telegram bot, then press Start from that link.");
       return;
     }
 
@@ -221,7 +221,7 @@ export async function handleTelegramAction(query) {
 
     const connection = await findLinkedUserByChat(chatId);
     if (!connection) {
-      await activeBot.sendMessage(chatId, "Telegram is not linked yet. Open NoOr → Info → Link Telegram bot.");
+      await activeBot.sendMessage(chatId, "Telegram is not linked yet. Open NoOr → Community → Link Telegram bot.");
       return;
     }
 
@@ -305,7 +305,7 @@ export async function handleTelegramMessage(message) {
     const connection = await findLinkedUserByChat(chatId);
     if (!connection || connection.userId !== pendingUserId) {
       pendingPrayerChats.delete(chatIdFrom(chatId));
-      await activeBot.sendMessage(chatId, "Telegram is not linked anymore. Open NoOr → Info → Link Telegram bot.");
+      await activeBot.sendMessage(chatId, "Telegram is not linked anymore. Open NoOr → Community → Link Telegram bot.");
       return;
     }
 

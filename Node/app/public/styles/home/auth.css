@@ -99,7 +99,6 @@
 
 .auth-field input:focus {
   border-color: var(--black);
-  box-shadow: 0 0 0 4px var(--ink-10);
 }
 
 .auth-field input::placeholder {
@@ -118,12 +117,14 @@
 
 .auth-secondary {
   min-height: 44px;
-  background: transparent;
-  color: var(--text-secondary);
+  border-color: var(--ink-54);
+  background: var(--white);
+  color: var(--ink);
 }
 
 .auth-secondary:hover,
 .auth-secondary:focus-visible {
+  border-color: var(--ink);
   background: var(--ink-06);
-  color: var(--text);
+  color: var(--ink);
 }

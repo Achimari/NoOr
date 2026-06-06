@@ -18,9 +18,12 @@ export async function createAuthUser({ name, passwordHash }) {
 }
 
 export async function findAuthUserByName(name) {
-  return prisma.auth.findUnique({
+  return prisma.auth.findFirst({
     where: {
-      name,
+      name: {
+        equals: name,
+        mode: "insensitive",
+      },
     },
   });
 }

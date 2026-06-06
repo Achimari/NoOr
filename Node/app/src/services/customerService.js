@@ -12,6 +12,7 @@ function sanitizeCustomer(row) {
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
     currentStreak: row.leaderboard?.value || 0,
+    maxStreak: row.leaderboard?.maxStreak || 0,
     todayAnswer: row.checkIn?.answer || null,
     todayDateKey: row.checkIn?.dateKey || null,
     prayers: row.prayers.map((item) => ({
