@@ -14,7 +14,18 @@
 }
 
 .dashboard-container {
-  width: min(100%, 680px);
+  width: min(100%, 1160px);
+}
+
+.home-page .dashboard-head,
+.home-page .dashboard-answer-status {
+  width: min(100%, 760px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-page .dashboard-current {
+  width: 100%;
 }
 
 .dashboard-head {
@@ -41,44 +52,182 @@
 }
 
 .dashboard-actions {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
+  gap: 0;
+  width: 100%;
   margin-bottom: var(--space-4);
+  overflow: hidden;
+  border: 0;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 36%),
+    rgba(255, 255, 255, 0.045);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
 }
 
 .dashboard-action {
-  min-height: 62px;
-  border-radius: 12px;
-  font-size: clamp(0.95rem, 1.6vw, 1.08rem);
-  text-transform: uppercase;
-  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  position: relative;
+  --action-glow-x: 50%;
+  --action-glow-y: 50%;
+  --action-accent: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 178px;
+  padding: var(--space-6);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: background 180ms ease, box-shadow 180ms ease, transform 160ms ease, color 180ms ease;
+}
+
+.dashboard-action+.dashboard-action {
+  border-left: 0;
+}
+
+.dashboard-action::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle 260px at var(--action-glow-x) var(--action-glow-y), var(--action-accent), transparent 62%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.065), transparent 54%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.dashboard-action-copy {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 0 auto;
+}
+
+.dashboard-action-label {
+  color: var(--white);
+  font-size: clamp(3.8rem, 6.4vw, 5.9rem);
+  font-weight: 850;
+  line-height: 0.95;
+  letter-spacing: 0;
+  transition: transform 180ms ease, font-weight 180ms ease;
+}
+
+.dashboard-action-subtitle {
+  color: var(--white-54);
+  font-size: clamp(1.2rem, 1.9vw, 1.52rem);
+  font-weight: 750;
+  line-height: 1.2;
+  transition: color 180ms ease;
+}
+
+.dashboard-action-selected-icon {
+  display: none;
 }
 
 .dashboard-action-yes {
-  background: var(--white);
-  color: var(--black);
-  box-shadow: none;
+  --action-accent: rgba(192, 248, 222, 0.2);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(192, 248, 222, 0.075), transparent 58%),
+    rgba(192, 248, 222, 0.035);
+}
+
+.dashboard-action-yes {
+  color: var(--white);
+}
+
+.dashboard-action-no {
+  --action-accent: rgba(255, 196, 196, 0.2);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 196, 196, 0.075), transparent 58%),
+    rgba(255, 196, 196, 0.035);
+}
+
+.dashboard-action-no {
+  color: var(--white);
+}
+
+.dashboard-action:hover,
+.dashboard-action:focus-visible {
+  box-shadow: inset 0 0 42px rgba(255, 255, 255, 0.035);
+  outline: none;
 }
 
 .dashboard-action-yes:hover,
 .dashboard-action-yes:focus-visible {
-  background: var(--white-92);
-  transform: translateY(-1px);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(192, 248, 222, 0.105), transparent 58%),
+    rgba(192, 248, 222, 0.055);
 }
 
-.dashboard-action-no {
-  background: var(--white-06);
-  border-color: var(--white-10);
+.dashboard-action-no:hover,
+.dashboard-action-no:focus-visible {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 196, 196, 0.105), transparent 58%),
+    rgba(255, 196, 196, 0.055);
+}
+
+.dashboard-action:hover::before,
+.dashboard-action:focus-visible::before,
+.dashboard-action.selected::before {
+  opacity: 1;
+}
+
+.dashboard-action:hover .dashboard-action-label,
+.dashboard-action:focus-visible .dashboard-action-label {
+  transform: scale(1.035);
+  font-weight: 900;
+}
+
+.dashboard-action:hover .dashboard-action-subtitle,
+.dashboard-action:focus-visible .dashboard-action-subtitle {
+  color: var(--white-72);
+}
+
+.dashboard-action:active {
+  transform: scale(0.992);
+}
+
+.dashboard-action-yes.selected {
+  background:
+    linear-gradient(90deg, rgba(128, 218, 172, 0.76), rgba(190, 246, 218, 0.86));
+  color: var(--black);
+  box-shadow:
+    inset 0 0 0 1px rgba(238, 255, 247, 0.12),
+    0 0 34px rgba(128, 218, 172, 0.12);
+}
+
+.dashboard-action-no.selected {
+  background:
+    linear-gradient(90deg, rgba(218, 128, 128, 0.76), rgba(244, 188, 188, 0.86));
+  color: var(--black);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 246, 246, 0.12),
+    0 0 34px rgba(218, 128, 128, 0.12);
+}
+
+.dashboard-action.selected .dashboard-action-label,
+.dashboard-action.selected .dashboard-action-subtitle {
+  color: var(--black);
+}
+
+.dashboard-action-yes:hover,
+.dashboard-action-yes:focus-visible {
   color: var(--white);
 }
 
 .dashboard-action-no:hover,
 .dashboard-action-no:focus-visible {
-  background: var(--white-10);
-  border-color: var(--white-18);
   color: var(--white);
-  transform: translateY(-1px);
 }
 
 .dashboard-page .btn-primary {
@@ -111,13 +260,8 @@
 
 .dashboard-action:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.46;
   transform: none;
-}
-
-.dashboard-action.selected {
-  opacity: 1;
-  border-color: var(--white);
 }
 
 .dashboard-answer-status {
@@ -127,6 +271,11 @@
   font-size: 0.88rem;
   font-weight: 700;
   text-align: center;
+}
+
+.dashboard-current .dashboard-answer-status {
+  margin: 0;
+  text-align: left;
 }
 
 .dashboard-answer-status:empty {
@@ -141,31 +290,33 @@
 
 .dashboard-timer {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 62px;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
-  background: var(--white-06);
+  gap: var(--space-1);
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .dashboard-timer-label {
   color: var(--white-54);
-  font-size: 0.78rem;
-  text-transform: uppercase;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-transform: none;
 }
 
 .dashboard-timer-value {
-  justify-content: center;
-  min-width: 112px;
-  min-height: 38px;
-  padding: 0 var(--space-3);
-  border-radius: 999px;
-  background: var(--white);
-  color: var(--black);
+  justify-content: flex-start;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--white);
+  font-size: 1.72rem;
+  font-weight: 800;
+  line-height: 1.08;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
@@ -211,11 +362,15 @@
 
 .dashboard-current {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  grid-template-columns: minmax(150px, 0.86fr) minmax(150px, 0.86fr) minmax(380px, 1.35fr) minmax(170px, 0.72fr);
   gap: var(--space-4);
   align-items: center;
-  padding: var(--space-4);
+  padding: var(--space-5);
   margin-bottom: var(--space-4);
+}
+
+.dashboard-current>div {
+  min-width: 0;
 }
 
 .dashboard-label {
@@ -233,22 +388,36 @@
   line-height: 1.1;
 }
 
+.home-page .dashboard-current .dashboard-label {
+  font-size: 0.92rem;
+}
+
+.home-page .dashboard-current .dashboard-value {
+  font-size: 2rem;
+}
+
 .dashboard-week {
   display: grid;
-  grid-template-columns: repeat(7, 26px);
-  gap: var(--space-2);
+  grid-template-columns: repeat(7, 38px);
+  gap: var(--space-3);
+  justify-content: start;
+}
+
+.dashboard-current-timer {
+  justify-self: end;
+  min-width: 150px;
 }
 
 .dashboard-day {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 38px;
+  height: 38px;
   border: 1px solid var(--white-10);
   border-radius: 50%;
   color: var(--white-54);
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
@@ -289,20 +458,37 @@
   font-weight: 700;
 }
 
+.home-page .dashboard-card-head h2 {
+  font-size: 1.48rem;
+}
+
+.home-page .dashboard-card-head span {
+  font-size: 1.08rem;
+}
+
+.home-page .dashboard-card .dashboard-card-head {
+  margin-bottom: var(--space-3);
+}
+
+.home-page .dashboard-card {
+  padding: var(--space-5);
+}
+
 .leaderboard-table-wrap {
   overflow-x: auto;
 }
 
 .leaderboard-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   color: var(--white);
-  font-size: 0.92rem;
+  font-size: 1.24rem;
 }
 
 .leaderboard-table th,
 .leaderboard-table td {
-  padding: 13px var(--space-2);
+  padding: 18px var(--space-5);
   text-align: left;
 }
 
@@ -312,24 +498,56 @@
 
 .leaderboard-table th {
   color: var(--white-54);
-  font-size: 0.78rem;
+  font-size: 0.94rem;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .leaderboard-table td {
   font-weight: 600;
+  border-top: 1px solid var(--white-06);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.leaderboard-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+.leaderboard-table tbody tr:first-child td:first-child {
+  border-top-left-radius: 0;
+}
+
+.leaderboard-table tbody tr:first-child td:last-child {
+  border-top-right-radius: 0;
+}
+
+.leaderboard-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0;
+}
+
+.leaderboard-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0;
+}
+
+.leaderboard-table:not(.prayer-table) tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.045);
 }
 
 .leaderboard-table th:first-child,
 .leaderboard-table td:first-child {
-  width: 48px;
+  width: 74px;
   color: var(--white-54);
 }
 
 .leaderboard-table th:last-child,
 .leaderboard-table td:last-child {
   text-align: right;
+  width: 360px;
+}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2) {
+  width: auto;
 }
 
 .leaderboard-empty {
@@ -342,7 +560,30 @@
 .leaderboard-streak {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-4);
+}
+
+.leaderboard-rank {
+  font-weight: 800;
+  color: var(--white-54);
+  transition: color 160ms ease;
+}
+
+.leaderboard-table:not(.prayer-table) tbody tr:hover .leaderboard-rank {
+  color: var(--white-92);
+}
+
+.leaderboard-table:not(.prayer-table) tbody tr:hover .leaderboard-user {
+  color: var(--white);
+}
+
+.leaderboard-row-icon {
+  color: var(--white-72);
+  transition: color 160ms ease;
+}
+
+.leaderboard-table:not(.prayer-table) tbody tr:hover .leaderboard-row-icon {
+  color: var(--white-92);
 }
 
 .leaderboard-head-label-right,
@@ -352,22 +593,24 @@
 
 .leaderboard-streak {
   width: 100%;
-  gap: var(--space-3);
+  gap: var(--space-4);
+  font-size: 1.24rem;
+  font-weight: 800;
 }
 
 .leaderboard-missed-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 30px;
+  min-height: 40px;
   max-width: 100%;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
   border: 1px solid var(--white-18);
   border-radius: 12px;
   background: var(--white-06);
   color: var(--white-92);
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.86rem;
   font-weight: 800;
   line-height: 1;
   text-transform: uppercase;
@@ -397,8 +640,8 @@
 
 .leaderboard-icon,
 .leaderboard-row-icon {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
 }
 
@@ -408,10 +651,13 @@
 
 .leaderboard-row-icon {
   color: var(--white-72);
+  transition: color 160ms ease;
 }
 
 .leaderboard-rank {
   color: var(--white-54);
+  font-weight: 800;
+  transition: color 160ms ease;
 }
 
 .user-link {
@@ -426,8 +672,14 @@
   color: var(--white-72);
 }
 
+.leaderboard-table .user-link:hover,
+.leaderboard-table .user-link:focus-visible,
+.leaderboard-table:not(.prayer-table) tbody tr:hover .user-link {
+  color: var(--white);
+}
+
 .info-container {
-  width: min(100%, 980px);
+  width: min(100%, 1160px);
 }
 
 .info-grid {
@@ -519,14 +771,14 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 22px;
-  padding: 2px 6px;
+  min-height: 30px;
+  padding: 4px 10px;
   border: 1px solid var(--white-10);
-  border-radius: 9px;
+  border-radius: 12px;
   background: var(--white-06);
   color: var(--white-92);
   font: inherit;
-  font-size: 0.68rem;
+  font-size: 0.82rem;
   font-weight: 800;
   line-height: 1;
   margin-left: 6px;
@@ -952,48 +1204,79 @@
   display: block;
 }
 
-.prayer-page .prayer-table tr {
-  display: grid;
-  grid-template-columns: minmax(88px, max-content) minmax(0, 1fr);
-  column-gap: var(--space-3);
-  align-items: start;
-}
-
-.prayer-page .prayer-table tr + tr {
-  border-top: 1px solid var(--white-06);
-}
-
-.prayer-page .prayer-table td {
-  display: block;
-}
-
 .info-prayers .prayer-table td {
   padding: var(--space-3) var(--space-2);
 }
 
+.prayer-page .prayer-table,
+.prayer-page .prayer-table tbody,
+.prayer-page .prayer-table tr,
 .info-prayers .prayer-table,
 .info-prayers .prayer-table tbody,
 .info-prayers .prayer-table tr {
   display: block;
 }
 
+.prayer-page .prayer-table tr,
 .info-prayers .prayer-table tr {
   display: grid;
-  grid-template-columns: minmax(88px, max-content) minmax(0, 1fr);
-  column-gap: var(--space-3);
-  align-items: start;
+  grid-template-columns: fit-content(160px) 1fr;
+  column-gap: 40px;
+  align-items: center;
+  min-height: 56px;
+  padding: 6px var(--space-3);
+  border-radius: 0;
+  transition: background 160ms ease, border-color 160ms ease;
 }
 
-.info-prayers .prayer-table tr + tr {
+.prayer-page .prayer-table tr+tr,
+.info-prayers .prayer-table tr+tr {
   border-top: 1px solid var(--white-06);
 }
 
-.info-prayers .prayer-table td {
-  display: block;
+.prayer-page .prayer-table tr:hover,
+.info-prayers .prayer-table tr:hover {
+  background:
+    radial-gradient(circle at 8% 50%, rgba(255, 255, 255, 0.06), transparent 34%),
+    rgba(255, 255, 255, 0.045);
 }
 
+.prayer-page .prayer-table tr:first-child,
+.info-prayers .prayer-table tr:first-child {
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+.prayer-page .prayer-table tr:last-child,
+.info-prayers .prayer-table tr:last-child {
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+.prayer-page .prayer-table td,
+.info-prayers .prayer-table td {
+  display: block;
+  border-top: 0;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.prayer-page .prayer-table td:first-child,
+.info-prayers .prayer-table td:first-child {
+  grid-column: 1;
+}
+
+.prayer-page .prayer-table td:nth-child(2),
 .info-prayers .prayer-table td:nth-child(2) {
+  grid-column: 2;
   text-align: left;
+  justify-self: stretch;
+  width: 100%;
+}
+
+.prayer-page .prayer-table-actions td:last-child,
+.info-prayers .prayer-table-actions td:last-child {
+  display: none;
 }
 
 .prayer-page .prayer-table td:first-child {
@@ -1005,15 +1288,31 @@
 }
 
 .prayer-table .leaderboard-user {
-  font-size: 1rem;
+  font-size: 1.12rem;
   font-weight: 700;
-  line-height: 1.45;
+  line-height: 1.35;
+  transition: color 160ms ease;
 }
 
 .prayer-table td:nth-child(2) {
-  font-size: 1rem;
+  font-size: 1.12rem;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
+}
+
+.prayer-table tr:hover .leaderboard-user {
+  color: var(--white);
+}
+
+.prayer-table .leaderboard-row-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--white-72);
+  transition: color 160ms ease;
+}
+
+.prayer-table tr:hover .leaderboard-row-icon {
+  color: var(--white-92);
 }
 
 .prayer-message {
@@ -1041,6 +1340,10 @@
   transition: color 180ms ease, opacity 180ms ease;
 }
 
+.prayer-table tr:hover .prayer-message-text {
+  color: var(--white-92);
+}
+
 .prayer-reactions {
   display: inline-flex;
   flex-wrap: wrap;
@@ -1054,15 +1357,15 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-width: 32px;
-  min-height: 26px;
-  padding: 2px 6px;
+  min-width: 38px;
+  min-height: 30px;
+  padding: 3px 8px;
   border: 1px solid var(--white-10);
   border-radius: 9px;
   background: var(--white-06);
   color: var(--white-92);
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -1158,10 +1461,47 @@
 }
 
 .missed-answer-actions .dashboard-action {
+  justify-content: center;
   min-height: 52px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--white-10);
+  border-radius: 12px;
   font-size: clamp(0.95rem, 1.6vw, 1.08rem);
   font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+.missed-answer-actions .dashboard-action+.dashboard-action {
+  border-left: 1px solid var(--white-10);
+}
+
+.missed-answer-actions .dashboard-action::before {
+  display: none;
+}
+
+.missed-answer-actions .dashboard-action-yes {
+  background: var(--white);
+  color: var(--black);
+}
+
+.missed-answer-actions .dashboard-action-no {
+  background: var(--white-06);
+  color: var(--white);
+}
+
+.missed-answer-actions .dashboard-action:hover,
+.missed-answer-actions .dashboard-action:focus-visible {
+  background: var(--white-10);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+
+.missed-answer-actions .dashboard-action-yes:hover,
+.missed-answer-actions .dashboard-action-yes:focus-visible {
+  background: var(--white-92);
+  color: var(--black);
 }
 
 .prayer-reaction-choice {
@@ -1200,7 +1540,7 @@
 }
 
 .customer-container {
-  width: min(100%, 980px);
+  width: min(100%, 1160px);
 }
 
 .customer-head {
@@ -1285,7 +1625,7 @@
 }
 
 .statistics-container {
-  width: min(100%, 920px);
+  width: min(100%, 1160px);
 }
 
 .statistics-insights,
@@ -1438,6 +1778,285 @@
   background: linear-gradient(90deg, rgba(128, 218, 172, 0.76), rgba(190, 246, 218, 0.86));
 }
 
+.prayer-world-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.92fr);
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 360px;
+  margin-top: var(--space-4);
+  margin-bottom: 0;
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.prayer-world-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 78% 20%, rgba(210, 255, 235, 0.08), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.075), transparent 46%);
+  opacity: 0.86;
+}
+
+.prayer-world-card:hover,
+.prayer-world-card:focus-within {
+  border-color: var(--white-18);
+  background: rgba(255, 255, 255, 0.075);
+  transform: translateY(-1px);
+}
+
+.prayer-world-card .dashboard-card-head {
+  align-items: flex-start;
+}
+
+.prayer-world-card .dashboard-card-head div {
+  min-width: 0;
+}
+
+.prayer-world-card .dashboard-card-head p {
+  margin: 6px 0 0;
+  color: var(--white-54);
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.prayer-world-highlight {
+  margin: var(--space-5) 0 var(--space-4);
+}
+
+.prayer-world-highlight p:last-child {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.prayer-world-regions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.prayer-world-region {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) 34px minmax(96px, 0.85fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.prayer-world-region span:first-child,
+.prayer-world-region strong {
+  color: var(--white-54);
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: color 160ms ease;
+}
+
+.prayer-world-region strong {
+  color: var(--white-72);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.prayer-world-region.active span:first-child,
+.prayer-world-region.active strong,
+.prayer-world-region:hover span:first-child,
+.prayer-world-region:hover strong {
+  color: var(--white);
+}
+
+.prayer-world-region-track {
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--white-06);
+}
+
+.prayer-world-region-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(78, 166, 124, 0.58), rgba(138, 218, 177, 0.68));
+  transition: background 160ms ease;
+}
+
+.prayer-world-region.active .prayer-world-region-track span {
+  background: linear-gradient(90deg, rgba(100, 186, 144, 0.68), rgba(158, 232, 194, 0.78));
+}
+
+.prayer-world-region:hover .prayer-world-region-track span,
+.prayer-world-region.active:hover .prayer-world-region-track span {
+  background: linear-gradient(90deg, rgba(128, 218, 172, 0.76), rgba(190, 246, 218, 0.86));
+}
+
+.prayer-world-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 292px;
+}
+
+.prayer-globe {
+  position: relative;
+  width: min(292px, 78vw);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--white-10);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.2), transparent 20%),
+    radial-gradient(circle at 58% 45%, rgba(112, 204, 160, 0.1), transparent 40%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035) 48%, rgba(0, 0, 0, 0.66)),
+    var(--black);
+  box-shadow:
+    inset -32px -42px 68px rgba(0, 0, 0, 0.58),
+    inset 18px 16px 36px rgba(255, 255, 255, 0.055),
+    0 26px 70px rgba(0, 0, 0, 0.38);
+  transition: border-color 180ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.prayer-world-card:hover .prayer-globe {
+  border-color: var(--white-18);
+  box-shadow:
+    inset -34px -44px 72px rgba(0, 0, 0, 0.56),
+    inset 20px 18px 38px rgba(255, 255, 255, 0.065),
+    0 30px 78px rgba(0, 0, 0, 0.42),
+    0 0 42px rgba(184, 255, 224, 0.08);
+  transform: translateY(-2px) scale(1.012);
+}
+
+.prayer-globe::before,
+.prayer-globe::after {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.prayer-globe::before {
+  transform: scaleX(0.42);
+}
+
+.prayer-globe::after {
+  transform: scaleY(0.42);
+}
+
+.prayer-globe-shine {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(255, 255, 255, 0.038) 40px, transparent 41px),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(255, 255, 255, 0.032) 40px, transparent 41px);
+  opacity: 0.62;
+  transition: opacity 180ms ease;
+}
+
+.prayer-world-card:hover .prayer-globe-shine {
+  opacity: 0.82;
+}
+
+.prayer-globe-land {
+  position: absolute;
+  display: block;
+  background: rgba(212, 255, 235, 0.13);
+  filter: blur(0.2px);
+  opacity: 0.76;
+  transition: background 180ms ease, opacity 180ms ease, transform 220ms ease;
+}
+
+.prayer-world-card:hover .prayer-globe-land {
+  background: rgba(224, 255, 241, 0.18);
+  opacity: 0.9;
+}
+
+.prayer-globe-land-americas {
+  left: 18%;
+  top: 25%;
+  width: 24%;
+  height: 42%;
+  border-radius: 58% 38% 48% 46%;
+  clip-path: polygon(34% 0, 74% 8%, 86% 24%, 64% 35%, 78% 50%, 56% 67%, 62% 100%, 38% 84%, 30% 62%, 12% 48%, 22% 28%);
+}
+
+.prayer-globe-land-europe {
+  left: 47%;
+  top: 27%;
+  width: 16%;
+  height: 16%;
+  border-radius: 44% 52% 38% 48%;
+  clip-path: polygon(12% 28%, 42% 4%, 78% 18%, 98% 48%, 66% 70%, 30% 62%);
+}
+
+.prayer-globe-land-africa {
+  left: 48%;
+  top: 42%;
+  width: 18%;
+  height: 32%;
+  border-radius: 48% 42% 58% 44%;
+  clip-path: polygon(34% 0, 78% 12%, 94% 42%, 70% 100%, 42% 88%, 18% 54%);
+}
+
+.prayer-globe-land-asia {
+  left: 60%;
+  top: 28%;
+  width: 30%;
+  height: 35%;
+  border-radius: 45% 55% 42% 52%;
+  clip-path: polygon(4% 22%, 34% 0, 82% 10%, 100% 34%, 76% 50%, 88% 74%, 52% 92%, 34% 62%, 8% 58%);
+}
+
+.prayer-globe-land-oceania {
+  left: 72%;
+  top: 66%;
+  width: 17%;
+  height: 13%;
+  border-radius: 50%;
+  clip-path: polygon(14% 42%, 44% 8%, 84% 22%, 96% 58%, 54% 88%, 18% 74%);
+}
+
+.prayer-globe-point {
+  position: absolute;
+  z-index: 2;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(211, 255, 236, 0.92);
+  box-shadow:
+    0 0 0 5px rgba(190, 255, 226, 0.08),
+    0 0 20px rgba(190, 255, 226, 0.42);
+  transform: translate(-50%, -50%) scale(var(--point-scale, 1));
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.prayer-world-card:hover .prayer-globe-point {
+  box-shadow:
+    0 0 0 6px rgba(190, 255, 226, 0.1),
+    0 0 24px rgba(190, 255, 226, 0.5);
+  transform: translate(-50%, -50%) scale(calc(var(--point-scale, 1) * 1.08));
+}
+
+.prayer-globe-point.active {
+  background: var(--white);
+  box-shadow:
+    0 0 0 7px rgba(238, 255, 247, 0.11),
+    0 0 28px rgba(210, 255, 235, 0.58);
+}
+
+.prayer-world-card:hover .prayer-globe-point.active {
+  box-shadow:
+    0 0 0 9px rgba(238, 255, 247, 0.13),
+    0 0 34px rgba(210, 255, 235, 0.66);
+}
+
 @media (max-width: 680px) {
 
   .dashboard-actions,
@@ -1445,11 +2064,31 @@
     grid-template-columns: 1fr;
   }
 
+  .dashboard-actions .dashboard-action+.dashboard-action {
+    border-left: 0;
+    border-top: 1px solid var(--white-10);
+  }
+
+  .dashboard-action {
+    min-height: 132px;
+    padding: var(--space-4);
+  }
+
   .dashboard-current {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-3);
     padding: var(--space-3);
     text-align: center;
+  }
+
+  .dashboard-current-timer {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    text-align: center;
+  }
+
+  .dashboard-current-timer .dashboard-timer {
+    justify-items: center;
   }
 
   .dashboard-week {
@@ -1517,6 +2156,26 @@
 
   .statistics-insight {
     min-height: 142px;
+  }
+
+  .prayer-world-card {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    min-height: 0;
+  }
+
+  .prayer-world-visual {
+    min-height: 232px;
+    order: -1;
+  }
+
+  .prayer-globe {
+    width: min(232px, 74vw);
+  }
+
+  .prayer-world-region {
+    grid-template-columns: minmax(82px, 1fr) 30px minmax(82px, 0.82fr);
+    gap: var(--space-2);
   }
 
   .info-grid {
@@ -1593,11 +2252,13 @@
   .info-prayers .prayer-table tr,
   .prayer-page .prayer-table tr {
     grid-template-columns: 1fr;
-    padding: 8px 0;
+    min-height: 0;
+    padding: 12px;
+    border-radius: 12px;
   }
 
-  .info-prayers .prayer-table tr + tr,
-  .prayer-page .prayer-table tr + tr {
+  .info-prayers .prayer-table tr+tr,
+  .prayer-page .prayer-table tr+tr {
     border-top: 1px solid var(--white-06);
   }
 
@@ -1628,9 +2289,9 @@
   }
 
   .prayer-page .prayer-remove-button {
-    min-height: 20px;
-    padding: 2px 5px;
-    font-size: 0.62rem;
+    min-height: 26px;
+    padding: 3px 8px;
+    font-size: 0.72rem;
     margin-left: 5px;
   }
 
@@ -1644,9 +2305,9 @@
   }
 
   .prayer-reaction-button {
-    min-width: 30px;
-    min-height: 24px;
-    font-size: 0.72rem;
+    min-width: 34px;
+    min-height: 26px;
+    font-size: 0.76rem;
   }
 
   .prayer-filter-panel {
@@ -1664,6 +2325,7 @@
 }
 
 @media (max-width: 420px) {
+
   .leaderboard-table th:last-child,
   .leaderboard-table td:last-child {
     width: 126px;

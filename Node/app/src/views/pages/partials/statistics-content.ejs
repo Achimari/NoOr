@@ -52,6 +52,51 @@
           </div>
         </article>
       </section>
+
+      <section class="dashboard-card prayer-world-card" aria-label="Our community">
+        <div class="prayer-world-copy">
+          <header class="dashboard-card-head">
+            <div>
+              <h2>Our community</h2>
+              <p>Based on user time zones</p>
+            </div>
+            <span><%= statistics.prayerWorld.totalUsers %> users</span>
+          </header>
+
+          <div class="prayer-world-highlight">
+            <p class="dashboard-label">Most active city</p>
+            <p><%= statistics.prayerWorld.activeRegion %></p>
+          </div>
+
+          <div class="prayer-world-regions">
+            <% statistics.prayerWorld.regions.forEach((region) => { %>
+              <div class="prayer-world-region<%= region.isActive ? " active" : "" %>">
+                <span><%= region.label %></span>
+                <strong><%= region.count %></strong>
+                <span class="prayer-world-region-track" aria-hidden="true">
+                  <span style="width: <%= Math.max(region.percentage, region.count > 0 ? 8 : 0) %>%"></span>
+                </span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <div class="prayer-world-visual" aria-hidden="true">
+          <div class="prayer-globe">
+            <span class="prayer-globe-shine"></span>
+            <span class="prayer-globe-land prayer-globe-land-americas"></span>
+            <span class="prayer-globe-land prayer-globe-land-europe"></span>
+            <span class="prayer-globe-land prayer-globe-land-africa"></span>
+            <span class="prayer-globe-land prayer-globe-land-asia"></span>
+            <span class="prayer-globe-land prayer-globe-land-oceania"></span>
+            <% statistics.prayerWorld.regions.forEach((region) => { %>
+              <% if (region.count > 0) { %>
+                <span class="prayer-globe-point<%= region.isActive ? " active" : "" %>" style="left: <%= region.x %>%; top: <%= region.y %>%; --point-scale: <%= region.pointScale %>"></span>
+              <% } %>
+            <% }) %>
+          </div>
+        </div>
+      </section>
     </div>
   </section>
 

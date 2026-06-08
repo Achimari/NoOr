@@ -1,28 +1,102 @@
 [
-  { "id": "discipline-freedom", "text": "Discipline today.\nFreedom tomorrow.", "source": "NoOr" },
-  { "id": "small-choice", "text": "One small choice.\nOne stronger day.", "source": "NoOr" },
-  { "id": "stay-steady", "text": "Stay steady.\nThe streak follows.", "source": "NoOr" },
-  { "id": "win-quiet", "text": "Win quietly.\nRepeat tomorrow.", "source": "NoOr" },
-  { "id": "urge-passes", "text": "The urge passes.\nYour character stays.", "source": "NoOr" },
-  { "id": "protect-peace", "text": "Protect your peace.\nProtect your future.", "source": "NoOr" },
-  { "id": "answer-now", "text": "Answer now.\nThank yourself later.", "source": "NoOr" },
-  { "id": "stronger-than-mood", "text": "You are stronger\nthan your mood.", "source": "NoOr" },
-  { "id": "clean-day", "text": "Keep today clean.\nBuild from there.", "source": "NoOr" },
-  { "id": "no-drama", "text": "No drama.\nJust the next right step.", "source": "NoOr" },
-  { "id": "future-self", "text": "Your future self\nis watching.", "source": "NoOr" },
-  { "id": "choose-control", "text": "Choose control.\nChoose freedom.", "source": "NoOr" },
-  { "id": "hard-minute", "text": "A hard minute\ncan save a day.", "source": "NoOr" },
-  { "id": "dont-negotiate", "text": "Do not negotiate\nwith old habits.", "source": "NoOr" },
-  { "id": "clear-mind", "text": "Clear mind.\nClean action.", "source": "NoOr" },
-  { "id": "hold-line", "text": "Hold the line.\nYou know why.", "source": "NoOr" },
-  { "id": "strong-today", "text": "Be strong today.\nBe proud tonight.", "source": "NoOr" },
-  { "id": "one-promise", "text": "Keep one promise.\nBecome that person.", "source": "NoOr" },
-  { "id": "reset-posture", "text": "Stand up.\nReset your posture.", "source": "NoOr" },
-  { "id": "less-talk", "text": "Less talk.\nMore proof.", "source": "NoOr" },
-  { "id": "guard-attention", "text": "Guard your attention.\nGuard your life.", "source": "NoOr" },
-  { "id": "simple-victory", "text": "A simple victory\nstill counts.", "source": "NoOr" },
-  { "id": "be-honest", "text": "Be honest.\nThen be better.", "source": "NoOr" },
-  { "id": "leave-loop", "text": "Leave the loop.\nTake the step.", "source": "NoOr" },
-  { "id": "today-matters", "text": "Today matters.\nAct like it.", "source": "NoOr" },
-  { "id": "patience-power", "text": "Patience is power.\nUse it well.", "source": "NoOr" }
+  {
+    "id": "1-cor-10-13",
+    "text": "God is faithful.\nHe provides a way out.",
+    "source": "1 Corinthians 10:13"
+  },
+  {
+    "id": "phil-4-13",
+    "text": "I can do all things\nthrough Christ.",
+    "source": "Philippians 4:13"
+  },
+  {
+    "id": "gal-6-9",
+    "text": "Do not grow weary.\nThe harvest is coming.",
+    "source": "Galatians 6:9"
+  },
+  {
+    "id": "josh-1-9",
+    "text": "Be strong.\nBe courageous.",
+    "source": "Joshua 1:9"
+  },
+  {
+    "id": "prov-4-23",
+    "text": "Guard your heart.\nGuard your life.",
+    "source": "Proverbs 4:23"
+  },
+  {
+    "id": "psalm-119-11",
+    "text": "Hide His Word.\nStand firm.",
+    "source": "Psalm 119:11"
+  },
+  {
+    "id": "rom-12-21",
+    "text": "Overcome evil.\nWith good.",
+    "source": "Romans 12:21"
+  },
+  {
+    "id": "2-tim-1-7",
+    "text": "Power.\nLove. Self-control.",
+    "source": "2 Timothy 1:7"
+  },
+  {
+    "id": "heb-12-1",
+    "text": "Lay aside sin.\nRun the race.",
+    "source": "Hebrews 12:1"
+  },
+  {
+    "id": "matt-26-41",
+    "text": "Watch and pray.\nStand strong.",
+    "source": "Matthew 26:41"
+  },
+  {
+    "id": "psalm-46-1",
+    "text": "God is our refuge.\nAnd strength.",
+    "source": "Psalm 46:1"
+  },
+  {
+    "id": "isaiah-40-31",
+    "text": "Hope in the Lord.\nRenew your strength.",
+    "source": "Isaiah 40:31"
+  },
+  {
+    "id": "eph-6-11",
+    "text": "Put on the armor.\nStand firm.",
+    "source": "Ephesians 6:11"
+  },
+  {
+    "id": "james-4-7",
+    "text": "Resist the devil.\nHe will flee.",
+    "source": "James 4:7"
+  },
+  {
+    "id": "psalm-37-5",
+    "text": "Commit your way.\nTrust the Lord.",
+    "source": "Psalm 37:5"
+  },
+  {
+    "id": "1-peter-5-7",
+    "text": "Cast your cares.\nHe cares for you.",
+    "source": "1 Peter 5:7"
+  },
+  {
+    "id": "rom-8-37",
+    "text": "More than conquerors.\nThrough Christ.",
+    "source": "Romans 8:37"
+  },
+  {
+    "id": "john-8-36",
+    "text": "The Son sets free.\nLive free.",
+    "source": "John 8:36"
+  },
+  {
+    "id": "psalm-34-8",
+    "text": "Taste and see.\nThe Lord is good.",
+    "source": "Psalm 34:8"
+  },
+  {
+    "id": "lam-3-23",
+    "text": "New mercies.\nEvery morning.",
+    "source": "Lamentations 3:23"
+  }
 ]

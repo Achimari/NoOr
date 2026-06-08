@@ -22,7 +22,7 @@
               <div class="<%= canShowReactions ? "prayer-message" : "prayer-inline-message" %>"<% if (canShowReactions) { %> data-prayer-react-open="<%= item.id %>" tabindex="0" role="button" aria-label="Choose prayer reaction"<% } %>>
                 <span class="prayer-message-text"><%= item.prayer %></span>
                 <% if (canShowActions && item.canMarkAnswered) { %>
-                  <button class="prayer-remove-button" type="button" data-prayer-answered="<%= item.id %>" aria-label="Mark prayer as answered">Mark as answered</button>
+                  <button class="prayer-remove-button" type="button" data-prayer-answered="<%= item.id %>" aria-label="Mark prayer as answered">Answered</button>
                 <% } %>
                 <% if (canShowReactions) { %>
                 <div class="prayer-reactions" data-prayer-reaction-group="<%= item.id %>" aria-label="Prayer reactions">

@@ -1,19 +1,23 @@
 <main class="home-page dashboard-page" data-leaderboard data-current-user-id="<%= leaderboard.current.id %>">
   <section class="section dashboard-section">
     <div class="container dashboard-container">
-      <header class="dashboard-head">
-        <p class="dashboard-kicker">One action. Stronger you.</p>
-        <h1 class="dashboard-title">Did you stay strong today?</h1>
-      </header>
-
       <div class="dashboard-actions" aria-label="Daily action">
-        <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant: "primary" ,
-          className: "dashboard-action dashboard-action-yes" , label: "Yes, I did" }) %>
+        <button class="dashboard-action dashboard-action-yes" type="button">
+          <span class="dashboard-action-copy">
+            <span class="dashboard-action-label">YES</span>
+            <span class="dashboard-action-subtitle">I stayed strong</span>
+          </span>
+          <span class="dashboard-action-selected-icon" aria-hidden="true"></span>
+        </button>
 
-          <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant: "secondary" ,
-            className: "dashboard-action dashboard-action-no" , label: "No, I didn't" }) %>
+        <button class="dashboard-action dashboard-action-no" type="button">
+          <span class="dashboard-action-copy">
+            <span class="dashboard-action-label">NO</span>
+            <span class="dashboard-action-subtitle">I struggled today</span>
+          </span>
+          <span class="dashboard-action-selected-icon" aria-hidden="true"></span>
+        </button>
       </div>
-      <p class="dashboard-answer-status" data-check-in-message aria-live="polite"></p>
 
       <article class="dashboard-current" aria-live="polite">
         <div>
@@ -33,6 +37,7 @@
             <span class="dashboard-day<%= day.successful ? " active" : "" %><%= day.missed ? " missed" : "" %>" data-week-day="<%= day.dateKey %>" data-week-answer="<%= day.answer || "" %>" data-week-missed="<%= day.missed ? "true" : "false" %>"><%= day.label %></span>
             <% }) %>
         </div>
+        <p class="dashboard-answer-status dashboard-current-timer" data-check-in-message aria-live="polite"></p>
       </article>
 
       <section class="dashboard-card">

@@ -25,6 +25,7 @@ const prayerFilterClear = document.querySelector("[data-prayer-filter-clear]");
 const telegramConnectButton = document.querySelector(".telegram-connect-button");
 const telegramStatus = document.querySelector("[data-telegram-status]");
 const statisticsInsightCards = document.querySelectorAll(".statistics-insight");
+const dashboardActionCards = document.querySelectorAll(".dashboard-actions .dashboard-action");
 const header = document.querySelector(".header");
 const headerMenuToggle = document.querySelector("[data-header-menu-toggle]");
 const timezoneMenu = document.querySelector("[data-timezone-menu]");
@@ -47,6 +48,14 @@ statisticsInsightCards.forEach((card) => {
     const rect = card.getBoundingClientRect();
     card.style.setProperty("--glow-x", `${event.clientX - rect.left}px`);
     card.style.setProperty("--glow-y", `${event.clientY - rect.top}px`);
+  });
+});
+
+dashboardActionCards.forEach((card) => {
+  card.addEventListener("pointermove", (event) => {
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty("--action-glow-x", `${event.clientX - rect.left}px`);
+    card.style.setProperty("--action-glow-y", `${event.clientY - rect.top}px`);
   });
 });
 
@@ -614,7 +623,7 @@ function renderPrayers(prayers, targetBody = prayersBody) {
               <td>
                 <div class="${showReactions ? "prayer-message" : "prayer-inline-message"}" ${showReactions ? `data-prayer-react-open="${item.id}" tabindex="0" role="button" aria-label="Choose prayer reaction"` : ""}>
                   <span class="prayer-message-text">${escapeHtml(item.prayer)}</span>
-                  ${showActions && item.canMarkAnswered ? `<button class="prayer-remove-button" type="button" data-prayer-answered="${item.id}" aria-label="Mark prayer as answered">Mark as answered</button>` : ""}
+                  ${showActions && item.canMarkAnswered ? `<button class="prayer-remove-button" type="button" data-prayer-answered="${item.id}" aria-label="Mark prayer as answered">Answered</button>` : ""}
                   ${showReactions ? renderPrayerReactions(item) : ""}
                 </div>
               </td>

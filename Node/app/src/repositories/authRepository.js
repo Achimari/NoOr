@@ -29,6 +29,14 @@ export async function findAuthUserById(id) {
   });
 }
 
+export async function findAuthUserTimezones() {
+  return prisma.auth.findMany({
+    select: {
+      timezone: true,
+    },
+  });
+}
+
 export async function updateAuthUserTimezone({ id, timezone }) {
   return prisma.auth.update({
     where: { id },

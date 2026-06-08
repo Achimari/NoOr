@@ -1,4 +1,5 @@
 import { findCheckInHistoryByUserId } from "../repositories/checkInRepository.js";
+import { findAuthUserTimezones } from "../repositories/authRepository.js";
 
 const WEEK_DAYS = [
   { label: "Mon", longLabel: "Monday" },
@@ -8,6 +9,15 @@ const WEEK_DAYS = [
   { label: "Fri", longLabel: "Friday" },
   { label: "Sat", longLabel: "Saturday" },
   { label: "Sun", longLabel: "Sunday" },
+];
+
+const TIMEZONE_AREAS = [
+  { prefix: "Europe", x: 52, y: 31, spreadX: 16, spreadY: 12 },
+  { prefix: "Asia", x: 70, y: 39, spreadX: 18, spreadY: 16 },
+  { prefix: "America", x: 25, y: 45, spreadX: 18, spreadY: 18 },
+  { prefix: "Africa", x: 51, y: 55, spreadX: 14, spreadY: 15 },
+  { prefix: "Australia", x: 78, y: 67, spreadX: 10, spreadY: 9 },
+  { prefix: "Pacific", x: 82, y: 64, spreadX: 12, spreadY: 11 },
 ];
 
 function getWeekdayIndex(dateKey) {
@@ -31,8 +41,85 @@ function buildChartRows(days, field, maxValue) {
   }));
 }
 
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function hashString(value) {
+  return [...value].reduce((hash, character) => (
+    (hash * 31 + character.charCodeAt(0)) % 997
+  ), 7);
+}
+
+function getTimezoneArea(timezone) {
+  return TIMEZONE_AREAS.find((area) => timezone?.startsWith(`${area.prefix}/`)) || {
+    x: 44,
+    y: 66,
+    spreadX: 12,
+    spreadY: 12,
+  };
+}
+
+function getTimezoneCityLabel(timezone) {
+  const [, ...parts] = String(timezone || "").split("/");
+  return (parts.at(-1) || timezone || "Unknown").replace(/_/g, " ");
+}
+
+function getTimezonePoint(timezone) {
+  const area = getTimezoneArea(timezone);
+  const hash = hashString(timezone || "");
+  const xOffset = ((hash % 17) / 16 - 0.5) * area.spreadX;
+  const yOffset = ((Math.floor(hash / 17) % 17) / 16 - 0.5) * area.spreadY;
+
+  return {
+    x: clamp(Math.round((area.x + xOffset) * 10) / 10, 12, 88),
+    y: clamp(Math.round((area.y + yOffset) * 10) / 10, 16, 82),
+  };
+}
+
+function buildPrayerWorld(rows) {
+  const timezones = new Map();
+
+  for (const row of rows) {
+    const timezone = row.timezone || "Unknown";
+    const current = timezones.get(timezone) || {
+      id: timezone.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      label: getTimezoneCityLabel(timezone),
+      timezone,
+      count: 0,
+      ...getTimezonePoint(timezone),
+    };
+    current.count += 1;
+    timezones.set(timezone, current);
+  }
+
+  const regions = [...timezones.values()].sort((first, second) => (
+    second.count - first.count || first.label.localeCompare(second.label)
+  ));
+  const totalUsers = regions.reduce((total, region) => total + region.count, 0);
+  const maxCount = Math.max(0, ...regions.map((region) => region.count));
+  const activeRegion = regions.reduce((topRegion, region) => {
+    if (!topRegion || region.count > topRegion.count) return region;
+    return topRegion;
+  }, null);
+
+  return {
+    activeRegion: maxCount > 0 ? activeRegion.label : "Not enough data",
+    totalUsers,
+    regions: regions.map((region) => ({
+      ...region,
+      percentage: totalUsers > 0 ? Math.round((region.count / totalUsers) * 100) : 0,
+      pointScale: maxCount > 0 ? 0.72 + (region.count / maxCount) * 0.72 : 0.72,
+      isActive: maxCount > 0 && region.id === activeRegion.id,
+    })),
+  };
+}
+
 export async function getStatisticsSummary(userId) {
-  const historyRows = await findCheckInHistoryByUserId(userId);
+  const [historyRows, timezoneRows] = await Promise.all([
+    findCheckInHistoryByUserId(userId),
+    findAuthUserTimezones(),
+  ]);
   const days = WEEK_DAYS.map((day) => ({
     ...day,
     yes: 0,
@@ -77,5 +164,6 @@ export async function getStatisticsSummary(userId) {
       no: totalNo,
       answers: totalYes + totalNo,
     },
+    prayerWorld: buildPrayerWorld(timezoneRows),
   };
 }
