@@ -6,11 +6,15 @@
 .dashboard-section {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-height: calc(100vh - 74px);
   background:
     radial-gradient(circle at 50% 0%, var(--white-10), transparent 30%),
     var(--black);
+}
+
+.dashboard-section > .container {
+  margin: 0 auto;
 }
 
 .dashboard-container {
