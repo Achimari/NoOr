@@ -1,37 +1,20 @@
 import { env } from "../config/env.js";
-import { getTodayDateKey, getZonedParts } from "../utils/dateKey.js";
 import { logger } from "../utils/logger.js";
 import { sendDailyAnswerReminders, sendDailyPrayerDigest } from "./telegramService.js";
 
 const CHECK_INTERVAL_MS = 60 * 1000;
-const PRAYER_DIGEST_HOUR = 22;
 
 let schedulerId;
-let lastAnswerReminderKey;
-let lastPrayerDigestKey;
-
-function getReminderHour() {
-  return (env.CHECK_IN_RESET_HOUR + 23) % 24;
-}
-
-function shouldRunAtHour(parts, hour) {
-  return Number(parts.hour) === hour && Number(parts.minute || 0) === 0;
-}
 
 async function runSchedulerTick(now = new Date()) {
-  const parts = getZonedParts(now);
-  const dateKey = getTodayDateKey(now);
-
-  if (shouldRunAtHour(parts, getReminderHour()) && lastAnswerReminderKey !== dateKey) {
-    lastAnswerReminderKey = dateKey;
-    const result = await sendDailyAnswerReminders(dateKey);
-    logger.info({ dateKey, sent: result.sent }, "Telegram answer reminders sent");
+  const answerReminderResult = await sendDailyAnswerReminders(now);
+  if (answerReminderResult.sent > 0) {
+    logger.info({ sent: answerReminderResult.sent }, "Telegram answer reminders sent");
   }
 
-  if (shouldRunAtHour(parts, PRAYER_DIGEST_HOUR) && lastPrayerDigestKey !== dateKey) {
-    lastPrayerDigestKey = dateKey;
-    const result = await sendDailyPrayerDigest(dateKey);
-    logger.info({ dateKey, sent: result.sent }, "Telegram prayer digest sent");
+  const prayerDigestResult = await sendDailyPrayerDigest(now);
+  if (prayerDigestResult.sent > 0) {
+    logger.info({ sent: prayerDigestResult.sent }, "Telegram prayer digest sent");
   }
 }
 
