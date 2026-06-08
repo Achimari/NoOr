@@ -1,0 +1,59 @@
+<main class="dashboard-page statistics-page">
+  <section class="section dashboard-section statistics-section">
+    <div class="container statistics-container">
+      <section class="statistics-insights" aria-label="Statistics insights">
+        <article class="dashboard-card statistics-insight statistics-insight-hard">
+          <p class="dashboard-label">Hardest day</p>
+          <p class="statistics-insight-value"><%= statistics.hardestDay.label %></p>
+          <p class="statistics-insight-caption"><%= statistics.hardestDay.caption %></p>
+        </article>
+
+        <article class="dashboard-card statistics-insight statistics-insight-easy">
+          <p class="dashboard-label">Easiest day</p>
+          <p class="statistics-insight-value"><%= statistics.easiestDay.label %></p>
+          <p class="statistics-insight-caption"><%= statistics.easiestDay.caption %></p>
+        </article>
+      </section>
+
+      <section class="statistics-graphs" aria-label="Answer charts">
+        <article class="dashboard-card statistics-chart-card">
+          <header class="dashboard-card-head">
+            <h2>No answers</h2>
+            <span><%= statistics.totals.no %> total</span>
+          </header>
+          <div class="statistics-chart statistics-chart-no">
+            <% statistics.noChart.forEach((day) => { %>
+              <div class="statistics-bar-row">
+                <span class="statistics-bar-label"><%= day.label %></span>
+                <span class="statistics-bar-track" aria-hidden="true">
+                  <span class="statistics-bar-fill" style="width: <%= day.percentage %>%"></span>
+                </span>
+                <span class="statistics-bar-value"><%= day.value %></span>
+              </div>
+            <% }) %>
+          </div>
+        </article>
+
+        <article class="dashboard-card statistics-chart-card">
+          <header class="dashboard-card-head">
+            <h2>Yes answers</h2>
+            <span><%= statistics.totals.yes %> total</span>
+          </header>
+          <div class="statistics-chart statistics-chart-yes">
+            <% statistics.yesChart.forEach((day) => { %>
+              <div class="statistics-bar-row">
+                <span class="statistics-bar-label"><%= day.label %></span>
+                <span class="statistics-bar-track" aria-hidden="true">
+                  <span class="statistics-bar-fill" style="width: <%= day.percentage %>%"></span>
+                </span>
+                <span class="statistics-bar-value"><%= day.value %></span>
+              </div>
+            <% }) %>
+          </div>
+        </article>
+      </section>
+    </div>
+  </section>
+
+  <%- include("../../components/layout/footer") %>
+</main>

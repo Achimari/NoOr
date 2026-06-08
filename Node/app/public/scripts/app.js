@@ -24,6 +24,7 @@ const prayerTimeLabel = document.querySelector("[data-prayer-time-label]");
 const prayerFilterClear = document.querySelector("[data-prayer-filter-clear]");
 const telegramConnectButton = document.querySelector(".telegram-connect-button");
 const telegramStatus = document.querySelector("[data-telegram-status]");
+const statisticsInsightCards = document.querySelectorAll(".statistics-insight");
 const header = document.querySelector(".header");
 const headerMenuToggle = document.querySelector("[data-header-menu-toggle]");
 const timezoneMenu = document.querySelector("[data-timezone-menu]");
@@ -40,6 +41,14 @@ let prayerTimeOrder = "newest";
 let toastTimerId;
 let reactionChooserPrayerId = null;
 let missedAnswerDateKey = null;
+
+statisticsInsightCards.forEach((card) => {
+  card.addEventListener("pointermove", (event) => {
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty("--glow-x", `${event.clientX - rect.left}px`);
+    card.style.setProperty("--glow-y", `${event.clientY - rect.top}px`);
+  });
+});
 
 function setHeaderMenuOpen(isOpen) {
   if (!header || !headerMenuToggle) return;

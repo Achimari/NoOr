@@ -13,6 +13,7 @@ router.get("/info", requireAuth, (req, res) => res.redirect("/community"));
 
 const pages = [
   { path: "/daily-check-in", view: "home", pageId: "daily-check-in", titleKey: "dailyCheckIn.title" },
+  { path: "/statistics", view: "statistics", pageId: "statistics", titleKey: "statistics.title" },
   { path: "/my-prayers", view: "my-prayers", pageId: "my-prayers", titleKey: "myPrayers.title" },
   { path: "/community", view: "community", pageId: "community", titleKey: "community.title" },
   { path: "/about", view: "about", pageId: "about", titleKey: "about.title" },

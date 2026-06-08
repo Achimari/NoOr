@@ -1279,6 +1279,165 @@
   line-height: 1.45;
 }
 
+.statistics-section {
+  align-items: flex-start;
+  padding: var(--space-6) 0;
+}
+
+.statistics-container {
+  width: min(100%, 920px);
+}
+
+.statistics-insights,
+.statistics-graphs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.statistics-insights {
+  margin-bottom: var(--space-4);
+}
+
+.statistics-insight {
+  position: relative;
+  --glow-x: 50%;
+  --glow-y: 50%;
+  min-height: 164px;
+  overflow: hidden;
+  margin-bottom: 0;
+  padding: var(--space-4);
+  isolation: isolate;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.statistics-insight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.statistics-insight-hard::before {
+  background:
+    radial-gradient(circle 260px at var(--glow-x) var(--glow-y), rgba(255, 210, 210, 0.18), transparent 62%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035));
+}
+
+.statistics-insight-easy::before {
+  background:
+    radial-gradient(circle 260px at var(--glow-x) var(--glow-y), rgba(210, 255, 235, 0.18), transparent 62%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035));
+}
+
+.statistics-insight:hover,
+.statistics-insight:focus-within {
+  border-color: var(--white-18);
+  background: var(--white-06);
+  transform: translateY(-1px);
+}
+
+.statistics-insight:hover::before,
+.statistics-insight:focus-within::before {
+  opacity: 0.92;
+}
+
+.statistics-insight-value {
+  max-width: 11ch;
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--white);
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statistics-insight-caption {
+  margin: 0;
+  color: var(--white-54);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.statistics-chart-card {
+  margin-bottom: 0;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.statistics-chart-card:hover,
+.statistics-chart-card:focus-within {
+  border-color: var(--white-18);
+  background: rgba(255, 255, 255, 0.075);
+  transform: translateY(-1px);
+}
+
+.statistics-chart {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.statistics-bar-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 28px;
+  border-radius: 10px;
+}
+
+.statistics-bar-label,
+.statistics-bar-value {
+  color: var(--white-54);
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  transition: color 160ms ease;
+}
+
+.statistics-bar-value {
+  color: var(--white-72);
+  text-align: right;
+}
+
+.statistics-bar-row:hover .statistics-bar-label,
+.statistics-bar-row:hover .statistics-bar-value {
+  color: var(--white);
+}
+
+.statistics-bar-track {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--white-06);
+}
+
+.statistics-bar-fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  transition: width 240ms ease, background 160ms ease;
+}
+
+.statistics-chart-no .statistics-bar-fill {
+  background: linear-gradient(90deg, rgba(178, 92, 92, 0.58), rgba(220, 146, 146, 0.68));
+}
+
+.statistics-chart-no .statistics-bar-row:hover .statistics-bar-fill {
+  background: linear-gradient(90deg, rgba(218, 128, 128, 0.76), rgba(244, 188, 188, 0.86));
+}
+
+.statistics-chart-yes .statistics-bar-fill {
+  background: linear-gradient(90deg, rgba(78, 166, 124, 0.58), rgba(138, 218, 177, 0.68));
+}
+
+.statistics-chart-yes .statistics-bar-row:hover .statistics-bar-fill {
+  background: linear-gradient(90deg, rgba(128, 218, 172, 0.76), rgba(190, 246, 218, 0.86));
+}
+
 @media (max-width: 680px) {
 
   .dashboard-actions,
@@ -1346,8 +1505,18 @@
 
   .info-grid,
   .prayer-grid,
+  .statistics-insights,
+  .statistics-graphs,
   .customer-grid {
     grid-template-columns: 1fr;
+  }
+
+  .statistics-section {
+    padding: var(--space-5) 0;
+  }
+
+  .statistics-insight {
+    min-height: 142px;
   }
 
   .info-grid {

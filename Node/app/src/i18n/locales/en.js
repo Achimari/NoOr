@@ -6,6 +6,7 @@ export default {
     languages: { ru: "RU", en: "EN" },
     nav: [
       { label: "Daily Check-in", to: "/daily-check-in" },
+      { label: "Statistics", to: "/statistics" },
       { label: "My Prayers", to: "/my-prayers" },
       { label: "Community", to: "/community" }
     ]
@@ -31,6 +32,7 @@ export default {
   },
   about: { title: "", subtitle: "", roadmap: [] },
   dailyCheckIn: { title: "Daily Check-in", subtitle: "", items: [] },
+  statistics: { title: "Statistics", subtitle: "", items: [] },
   myPrayers: { title: "My Prayer Requests", subtitle: "", items: [] },
   community: { title: "Community", subtitle: "", items: [] },
   auth: {

@@ -1,6 +1,7 @@
 import { getLeaderboardSummary } from "../services/leaderboardService.js";
 import { getCheckInStatus } from "../services/checkInService.js";
 import { getPrayers, getUserPrayers } from "../services/prayerService.js";
+import { getStatisticsSummary } from "../services/statisticsService.js";
 import { readFileSync } from "node:fs";
 
 const motivationPhrases = JSON.parse(
@@ -49,6 +50,10 @@ export function renderPage({ view, pageId, titleKey }) {
     if (pageId === "my-prayers") {
       viewData.prayerLists = await getUserPrayers(req.user.id);
       viewData.showPrayerActions = true;
+    }
+
+    if (pageId === "statistics") {
+      viewData.statistics = await getStatisticsSummary(req.user.id);
     }
 
     res.render(`pages/${view}`, {
