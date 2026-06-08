@@ -1,8 +1,10 @@
 import {
-  findLeaderboardValueById,
-  findTopLeaderboardRows,
-} from "../repositories/leaderboardRepository.js";
-import { findMissedDaysByUserIds } from "../repositories/checkInRepository.js";
+  calculateCurrentStreak,
+  calculateMaxStreak,
+  findCheckInHistoryByUserId,
+  findMissedDaysByUserIds,
+  findUsersWithCheckInHistory,
+} from "../repositories/checkInRepository.js";
 import { createDailyCheckIn, getWeeklyCheckInDays, markMissedDaysAsNo } from "./checkInService.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
@@ -20,21 +22,38 @@ function sanitizeLeaderboardEntry(row, index, missedDaysByUserId) {
   return {
     rank: index + 1,
     id: row.id,
-    name: row.user.name,
+    name: row.name,
     value: row.value,
     maxStreak: row.maxStreak || 0,
     missedDays: sanitizeMissedDays(missedDaysByUserId.get(row.id)),
   };
 }
 
+function toLeaderboardRow(user) {
+  const historyRows = user.checkInHistory || [];
+
+  return {
+    id: user.id,
+    name: user.name,
+    value: calculateCurrentStreak(historyRows),
+    maxStreak: calculateMaxStreak(historyRows),
+  };
+}
+
+function sortLeaderboardRows(first, second) {
+  if (second.value !== first.value) return second.value - first.value;
+  return first.id - second.id;
+}
+
 export async function getLeaderboardSummary(userId, timezone) {
   await markMissedDaysAsNo(userId, timezone);
 
-  const [currentRow, topRows, weekDays] = await Promise.all([
-    findLeaderboardValueById(userId),
-    findTopLeaderboardRows(),
+  const [currentHistoryRows, users, weekDays] = await Promise.all([
+    findCheckInHistoryByUserId(userId),
+    findUsersWithCheckInHistory(),
     getWeeklyCheckInDays(userId, timezone),
   ]);
+  const topRows = users.map(toLeaderboardRow).sort(sortLeaderboardRows).slice(0, 10);
   const userIds = [...new Set([userId, ...topRows.map((row) => row.id)])];
   const missedRows = await findMissedDaysByUserIds(userIds);
   const missedDaysByUserId = new Map(missedRows.map((row) => [row.id, row]));
@@ -42,8 +61,8 @@ export async function getLeaderboardSummary(userId, timezone) {
   return {
     current: {
       id: userId,
-      value: currentRow?.value || 0,
-      maxStreak: currentRow?.maxStreak || 0,
+      value: calculateCurrentStreak(currentHistoryRows),
+      maxStreak: calculateMaxStreak(currentHistoryRows),
       todayDateKey: getTodayDateKey(new Date(), timezone),
       weekDays,
       missedDays: sanitizeMissedDays(missedDaysByUserId.get(userId)),

@@ -28,6 +28,31 @@ export async function findCheckInHistoryByDateKeys(userId, dateKeys) {
   });
 }
 
+export async function findCheckInHistoryByUserId(userId) {
+  return prisma.checkInHistory.findMany({
+    where: { userId },
+    select: {
+      dateKey: true,
+      answer: true,
+    },
+  });
+}
+
+export async function findUsersWithCheckInHistory() {
+  return prisma.auth.findMany({
+    select: {
+      id: true,
+      name: true,
+      checkInHistory: {
+        select: {
+          dateKey: true,
+          answer: true,
+        },
+      },
+    },
+  });
+}
+
 function formatDateKey(date) {
   return date.toISOString().slice(0, 10);
 }
@@ -46,7 +71,7 @@ function nextDateKey(dateKey) {
   return formatDateKey(date);
 }
 
-function calculateCurrentStreak(historyRows) {
+export function calculateCurrentStreak(historyRows) {
   const rows = [...historyRows].sort((first, second) => second.dateKey.localeCompare(first.dateKey));
   if (!rows.length || rows[0].answer !== "YES") return 0;
 
@@ -63,7 +88,7 @@ function calculateCurrentStreak(historyRows) {
   return streak;
 }
 
-function calculateMaxStreak(historyRows) {
+export function calculateMaxStreak(historyRows) {
   const rows = [...historyRows].sort((first, second) => first.dateKey.localeCompare(second.dateKey));
   let streak = 0;
   let maxStreak = 0;
@@ -82,31 +107,6 @@ function calculateMaxStreak(historyRows) {
   }
 
   return maxStreak;
-}
-
-async function recalculateLeaderboard(tx, userId) {
-  const historyRows = await tx.checkInHistory.findMany({
-    where: { userId },
-    select: {
-      dateKey: true,
-      answer: true,
-    },
-  });
-  const value = calculateCurrentStreak(historyRows);
-  const maxStreak = calculateMaxStreak(historyRows);
-
-  await tx.leaderboard.upsert({
-    where: { id: userId },
-    create: {
-      id: userId,
-      value,
-      maxStreak,
-    },
-    update: {
-      value,
-      maxStreak,
-    },
-  });
 }
 
 async function updateCurrentCheckIn(tx, { userId, dateKey, answer }) {
@@ -135,7 +135,7 @@ async function updateCurrentCheckIn(tx, { userId, dateKey, answer }) {
   });
 }
 
-export async function createCheckInAndUpdateLeaderboard({ userId, dateKey, answer }) {
+export async function createCheckIn({ userId, dateKey, answer }) {
   return prisma.$transaction(async (tx) => {
     const history = await tx.checkInHistory.createMany({
       data: [{
@@ -151,7 +151,6 @@ export async function createCheckInAndUpdateLeaderboard({ userId, dateKey, answe
     }
 
     await updateCurrentCheckIn(tx, { userId, dateKey, answer });
-    await recalculateLeaderboard(tx, userId);
 
     return tx.checkIn.findUnique({
       where: { id: userId },
@@ -255,8 +254,6 @@ export async function resolveMissedCheckIn({ userId, dateKey, answer }) {
         dates,
       },
     });
-
-    await recalculateLeaderboard(tx, userId);
 
     return tx.checkIn.findUnique({
       where: { id: userId },

@@ -5,11 +5,6 @@ export async function createAuthUser({ name, passwordHash }) {
     data: {
       name,
       passwordHash,
-      leaderboard: {
-        create: {
-          value: 0,
-        },
-      },
       checkIn: {
         create: {},
       },

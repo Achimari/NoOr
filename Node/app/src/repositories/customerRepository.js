@@ -9,13 +9,13 @@ export async function findCustomerDetailsById(id) {
       isTelegramLinked: true,
       createdAt: true,
       updatedAt: true,
-      leaderboard: {
+      checkIn: {
         select: {
-          value: true,
-          maxStreak: true,
+          dateKey: true,
+          answer: true,
         },
       },
-      checkIn: {
+      checkInHistory: {
         select: {
           dateKey: true,
           answer: true,

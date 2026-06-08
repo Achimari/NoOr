@@ -15,7 +15,6 @@ model Auth {
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   sessions              Session[]
-  leaderboard           Leaderboard?
   checkIn               CheckIn?
   checkInHistory        CheckInHistory[]
   missedDays            MissedDays?
@@ -37,13 +36,6 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
-}
-
-model Leaderboard {
-  id        Int  @id
-  value     Int  @default(0)
-  maxStreak Int  @default(0) @map("max_streak")
-  user      Auth @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model CheckIn {

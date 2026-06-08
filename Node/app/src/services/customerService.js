@@ -1,4 +1,5 @@
 import { findCustomerDetailsById } from "../repositories/customerRepository.js";
+import { calculateCurrentStreak, calculateMaxStreak } from "../repositories/checkInRepository.js";
 import { AppError } from "../utils/appError.js";
 
 function formatTelegramUsername(username) {
@@ -11,8 +12,8 @@ function sanitizeCustomer(row) {
     name: row.name,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-    currentStreak: row.leaderboard?.value || 0,
-    maxStreak: row.leaderboard?.maxStreak || 0,
+    currentStreak: calculateCurrentStreak(row.checkInHistory || []),
+    maxStreak: calculateMaxStreak(row.checkInHistory || []),
     todayAnswer: row.checkIn?.answer || null,
     todayDateKey: row.checkIn?.dateKey || null,
     prayers: row.prayers.map((item) => ({

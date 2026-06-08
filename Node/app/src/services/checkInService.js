@@ -1,6 +1,6 @@
 import {
   addMissedCheckInDates,
-  createCheckInAndUpdateLeaderboard,
+  createCheckIn,
   findCheckInHistoryByDateKeys,
   findCheckInById,
   findMissedDaysByUserId,
@@ -124,7 +124,7 @@ export async function createDailyCheckIn(userId, answer, timezone) {
   await markMissedDaysAsNo(userId, timezone);
 
   const dateKey = getTodayDateKey(new Date(), timezone);
-  const checkIn = await createCheckInAndUpdateLeaderboard({ userId, dateKey, answer });
+  const checkIn = await createCheckIn({ userId, dateKey, answer });
 
   if (!checkIn) {
     throw new AppError("Already answered today", 409);
