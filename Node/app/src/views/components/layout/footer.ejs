@@ -4,6 +4,9 @@
       <% if (t("footer.copyright")) { %>
         <p class="footer-text">&copy; <%= new Date().getFullYear() %> <%= t("footer.copyright") %></p>
       <% } %>
+      <% if (t("footer.tagline")) { %>
+        <p class="footer-tagline"><%= t("footer.tagline") %></p>
+      <% } %>
       <% if ((siteData.socialLinks || []).length) { %>
         <nav class="footer-socials" aria-label="<%= t("footer.socialAria") %>">
           <% (siteData.socialLinks || []).forEach((item) => { %>

@@ -11,6 +11,11 @@ const WEEK_DAYS = [
   { label: "Sun", longLabel: "Sunday" },
 ];
 
+const TIME_OF_DAY_GROUPS = [
+  { id: "day", label: "Day", tone: "day" },
+  { id: "night", label: "Night", tone: "night" },
+];
+
 const TIMEZONE_AREAS = [
   { prefix: "Europe", x: 52, y: 31, spreadX: 16, spreadY: 12 },
   { prefix: "Asia", x: 70, y: 39, spreadX: 18, spreadY: 16 },
@@ -39,6 +44,50 @@ function buildChartRows(days, field, maxValue) {
     value: day[field],
     percentage: maxValue > 0 ? Math.max(6, Math.round((day[field] / maxValue) * 100)) : 0,
   }));
+}
+
+function buildDistributionRows(rows, maxValue) {
+  const totalValue = rows.reduce((total, row) => total + row.value, 0);
+
+  return rows.map((row) => ({
+    ...row,
+    percentage: maxValue > 0 ? Math.max(6, Math.round((row.value / maxValue) * 100)) : 0,
+    sharePercentage: totalValue > 0 ? Math.round((row.value / totalValue) * 100) : 0,
+  }));
+}
+
+function getHourInTimezone(date, timezone) {
+  try {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      hour: "2-digit",
+      hour12: false,
+      timeZone: timezone || "UTC",
+    }).formatToParts(date);
+    const hour = Number(parts.find((part) => part.type === "hour")?.value);
+    return Number.isFinite(hour) ? hour : null;
+  } catch {
+    return date.getUTCHours();
+  }
+}
+
+function buildTimeOfDayChart(historyRows) {
+  const counts = TIME_OF_DAY_GROUPS.map((group) => ({ ...group, value: 0 }));
+
+  for (const row of historyRows) {
+    const answeredAt = new Date(row.createdAt);
+    if (Number.isNaN(answeredAt.getTime())) continue;
+
+    const hour = getHourInTimezone(answeredAt, row.user?.timezone);
+    if (hour === null) continue;
+
+    if (hour >= 6 && hour < 18) {
+      counts[0].value += 1;
+    } else {
+      counts[1].value += 1;
+    }
+  }
+
+  return buildDistributionRows(counts, Math.max(0, ...counts.map((row) => row.value)));
 }
 
 function clamp(value, min, max) {
@@ -145,6 +194,11 @@ export async function getStatisticsSummary() {
   const easiestDay = getTopDay(days, "yes");
   const totalYes = days.reduce((total, day) => total + day.yes, 0);
   const totalNo = days.reduce((total, day) => total + day.no, 0);
+  const answerDistribution = [
+    { id: "yes", label: "Yes", tone: "yes", value: totalYes },
+    { id: "no", label: "No", tone: "no", value: totalNo },
+  ];
+  const maxAnswerDistribution = Math.max(0, ...answerDistribution.map((row) => row.value));
 
   return {
     hardestDay: {
@@ -159,6 +213,8 @@ export async function getStatisticsSummary() {
     },
     noChart: buildChartRows(days, "no", maxNo),
     yesChart: buildChartRows(days, "yes", maxYes),
+    timeOfDayChart: buildTimeOfDayChart(historyRows),
+    answerDistributionChart: buildDistributionRows(answerDistribution, maxAnswerDistribution),
     totals: {
       yes: totalYes,
       no: totalNo,

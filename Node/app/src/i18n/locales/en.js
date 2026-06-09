@@ -12,7 +12,8 @@ export default {
     ]
   },
   footer: {
-    copyright: "",
+    copyright: "NoOr. All rights reserved.",
+    tagline: "",
     socialAria: "Social links"
   },
   home: {

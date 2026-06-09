@@ -14,7 +14,7 @@
   background: var(--header-bg);
   border-bottom: 1px solid var(--white-10);
   padding: var(--space-3) 0;
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-main);
   position: sticky;
   top: 0;
   z-index: 80;

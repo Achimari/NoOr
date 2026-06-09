@@ -4,7 +4,7 @@
       <div class="info-grid">
         <div class="info-column">
           <article class="dashboard-card info-motivation">
-            <p class="dashboard-label">Daily motivation</p>
+            <p class="dashboard-label">Daily encouragement</p>
             <blockquote>
               <% (motivationPhrase.text || "").split("\n").forEach((line, index, lines) => { %>
                 <%= line %><% if (index < lines.length - 1) { %><br /><% } %>
@@ -45,7 +45,7 @@
               </span>
             </header>
             <p class="dashboard-label telegram-card-copy">
-              Connect the bot to receive reminders and prayer lists in Telegram.
+              Link Telegram to receive reminders and prayer lists.
             </p>
             <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant:
               telegramState.isTelegramLinked ? "secondary" : "primary" , className: "telegram-connect-button" , label:
@@ -57,8 +57,8 @@
         <section class="dashboard-card info-prayers">
           <header class="dashboard-card-head prayer-filter-head">
             <div class="prayer-panel-copy">
-              <h2>Community prayers</h2>
-              <p>Browse prayer requests from the community and support others through prayer.</p>
+              <h2>Community prayer requests</h2>
+              <p>Read requests from the community and add your support.</p>
             </div>
             <button class="prayer-filter-button" type="button" data-prayer-filter-toggle aria-expanded="false" aria-controls="prayer-filter-panel" aria-label="Filter prayers">
               <span class="prayer-filter-glyph" aria-hidden="true"></span>

@@ -43,6 +43,12 @@ export async function findAllCheckInHistory() {
     select: {
       dateKey: true,
       answer: true,
+      createdAt: true,
+      user: {
+        select: {
+          timezone: true,
+        },
+      },
     },
   });
 }
