@@ -53,7 +53,7 @@ export function renderPage({ view, pageId, titleKey }) {
     }
 
     if (pageId === "statistics") {
-      viewData.statistics = await getStatisticsSummary(req.user.id);
+      viewData.statistics = await getStatisticsSummary();
     }
 
     res.render(`pages/${view}`, {

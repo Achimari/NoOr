@@ -38,6 +38,15 @@ export async function findCheckInHistoryByUserId(userId) {
   });
 }
 
+export async function findAllCheckInHistory() {
+  return prisma.checkInHistory.findMany({
+    select: {
+      dateKey: true,
+      answer: true,
+    },
+  });
+}
+
 export async function findUsersWithCheckInHistory() {
   return prisma.auth.findMany({
     select: {

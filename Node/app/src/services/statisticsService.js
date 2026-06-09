@@ -1,4 +1,4 @@
-import { findCheckInHistoryByUserId } from "../repositories/checkInRepository.js";
+import { findAllCheckInHistory } from "../repositories/checkInRepository.js";
 import { findAuthUserTimezones } from "../repositories/authRepository.js";
 
 const WEEK_DAYS = [
@@ -115,9 +115,9 @@ function buildPrayerWorld(rows) {
   };
 }
 
-export async function getStatisticsSummary(userId) {
+export async function getStatisticsSummary() {
   const [historyRows, timezoneRows] = await Promise.all([
-    findCheckInHistoryByUserId(userId),
+    findAllCheckInHistory(),
     findAuthUserTimezones(),
   ]);
   const days = WEEK_DAYS.map((day) => ({
