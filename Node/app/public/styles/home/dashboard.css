@@ -31,7 +31,7 @@
     var(--black);
 }
 
-.dashboard-section > .container {
+.dashboard-section>.container {
   margin: 0 auto;
 }
 
@@ -749,13 +749,13 @@
 }
 
 .community-page .info-grid {
-  --info-panel-height: clamp(800px, calc(100vh - 132px), 940px);
+  --info-panel-height: clamp(868px, calc(100vh - 132px), 940px);
 }
 
 .info-column {
   display: grid;
   gap: var(--space-5);
-  grid-template-rows: minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(270px, 0.98fr);
+  grid-template-rows: minmax(230px, 0.74fr) minmax(330px, 1fr) minmax(260px, 0.78fr);
   min-height: 0;
 }
 
@@ -826,8 +826,9 @@
 
 .info-telegram-card {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: var(--space-5);
+  grid-template-rows: auto auto auto;
+  align-content: space-between;
+  gap: var(--space-4);
   margin-bottom: 0;
   padding: var(--space-5);
 }
