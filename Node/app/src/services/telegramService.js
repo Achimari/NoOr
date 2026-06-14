@@ -33,6 +33,7 @@ const telegramActions = {
   answerYes: "noor:answer_yes",
   answerNo: "noor:answer_no",
   seePrayers: "noor:see_prayers",
+  website: "noor:website",
   menu: "noor:menu",
 };
 
@@ -50,6 +51,11 @@ function assertTelegramConfigured() {
   }
 }
 
+function getWebsiteUrl() {
+  const appUrl = env.APP_URL || env.CORS_ORIGIN.split(",")[0]?.trim() || "";
+  return appUrl.replace(/\/+$/, "");
+}
+
 function menuKeyboard() {
   return {
     inline_keyboard: [
@@ -57,7 +63,10 @@ function menuKeyboard() {
         { text: "Add prayer", callback_data: telegramActions.addPrayer },
         { text: "Answer today", callback_data: telegramActions.answer },
       ],
-      [{ text: "See prayers", callback_data: telegramActions.seePrayers }],
+      [
+        { text: "See prayers", callback_data: telegramActions.seePrayers },
+        { text: "Website", callback_data: telegramActions.website },
+      ],
     ],
   };
 }
@@ -143,6 +152,23 @@ async function sendPrayerList(chatId) {
   const prayers = await getPrayers();
 
   await activeBot.sendMessage(chatId, formatPrayers(prayers), {
+    reply_markup: menuKeyboard(),
+  });
+}
+
+async function sendWebsiteLink(chatId) {
+  const activeBot = getTelegramBot();
+  if (!activeBot) return;
+
+  const websiteUrl = getWebsiteUrl();
+  if (!websiteUrl) {
+    await activeBot.sendMessage(chatId, "Website link is not configured yet.", {
+      reply_markup: menuKeyboard(),
+    });
+    return;
+  }
+
+  await activeBot.sendMessage(chatId, `Open NoOr:\n${websiteUrl}`, {
     reply_markup: menuKeyboard(),
   });
 }
@@ -261,6 +287,11 @@ export async function handleTelegramAction(query) {
 
     if (query.data === telegramActions.seePrayers) {
       await sendPrayerList(chatId);
+      return;
+    }
+
+    if (query.data === telegramActions.website) {
+      await sendWebsiteLink(chatId);
       return;
     }
 

@@ -10,6 +10,7 @@ const envSchema = z.object({
   APP_TIMEZONE: z.string().min(1).default("Europe/Riga"),
   CHECK_IN_RESET_HOUR: z.coerce.number().int().min(0).max(23).default(0),
   TELEGRAM_BOT_TOKEN: z.string().default(""),
+  APP_URL: z.string().url().or(z.literal("")).default(""),
   CORS_ORIGIN: z.string().default(""),
 });
 
