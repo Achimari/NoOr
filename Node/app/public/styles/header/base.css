@@ -316,6 +316,43 @@ body.header-menu-open {
   margin: 0;
 }
 
+.header-settings-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--white-18);
+  border-radius: 12px;
+  background: var(--white-06);
+  color: var(--white-72);
+  text-decoration: none;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.header-settings-link:visited {
+  color: var(--white-72);
+}
+
+.header-settings-link:hover,
+.header-settings-link:focus-visible,
+.header-settings-link.active {
+  background: var(--white-10);
+  border-color: var(--white-18);
+  color: var(--white);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.header-settings-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .header-auth-link {
   position: relative;
   border: 0;

@@ -29,6 +29,20 @@ export async function findAuthUserById(id) {
   });
 }
 
+export async function findOtherAuthUserByName({ id, name }) {
+  return prisma.auth.findFirst({
+    where: {
+      id: {
+        not: id,
+      },
+      name: {
+        equals: name,
+        mode: "insensitive",
+      },
+    },
+  });
+}
+
 export async function findAuthUserTimezones() {
   return prisma.auth.findMany({
     select: {
@@ -41,6 +55,20 @@ export async function updateAuthUserTimezone({ id, timezone }) {
   return prisma.auth.update({
     where: { id },
     data: { timezone },
+  });
+}
+
+export async function updateAuthUserName({ id, name }) {
+  return prisma.auth.update({
+    where: { id },
+    data: { name },
+  });
+}
+
+export async function updateAuthUserPasswordHash({ id, passwordHash }) {
+  return prisma.auth.update({
+    where: { id },
+    data: { passwordHash },
   });
 }
 

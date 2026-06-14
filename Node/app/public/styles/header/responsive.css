@@ -128,6 +128,17 @@
     border-radius: 10px;
   }
 
+  .header-settings-link {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .header-settings-icon {
+    width: 15px;
+    height: 15px;
+  }
+
   .header-timezone-button {
     min-height: 32px;
     padding: 0 8px;
@@ -185,6 +196,17 @@
     min-height: 28px;
     padding: 0 6px;
     border-radius: 9px;
+  }
+
+  .header-settings-link {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+  }
+
+  .header-settings-icon {
+    width: 13px;
+    height: 13px;
   }
 
   .header-timezone-button {

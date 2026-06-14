@@ -34,6 +34,9 @@ const timezoneOptions = document.querySelector("[data-timezone-options]");
 const timezoneCurrent = document.querySelector("[data-timezone-current]");
 const timezoneSearch = document.querySelector("[data-timezone-search]");
 const timezoneEmpty = document.querySelector("[data-timezone-empty]");
+const settingsAnswer = document.querySelector("[data-settings-answer]");
+const settingsAnswerCurrent = document.querySelector("[data-settings-answer-current]");
+const settingsAnswerOptions = document.querySelectorAll("[data-settings-answer-option]");
 const prayerReactionEmoji = ["🙏", "❤️", "🙌", "🕊️", "💪", "🤍"];
 const currentUserId = Number(leaderboardRoot?.dataset.currentUserId || 0);
 let resetTimerId;
@@ -42,6 +45,8 @@ let prayerTimeOrder = "newest";
 let toastTimerId;
 let reactionChooserPrayerId = null;
 let missedAnswerDateKey = null;
+let settingsCurrentAnswer = null;
+let pendingSettingsAnswer = null;
 
 statisticsInsightCards.forEach((card) => {
   card.addEventListener("pointermove", (event) => {
@@ -175,6 +180,98 @@ function showToast(message, variant = "default") {
   toastTimerId = window.setTimeout(() => {
     toast.classList.remove("visible");
   }, 3200);
+}
+
+const settingsToast = document.querySelector("[data-settings-toast]");
+if (settingsToast?.dataset.settingsToast) {
+  showToast(settingsToast.dataset.settingsToast, settingsToast.dataset.settingsToastVariant || "default");
+}
+
+function setSettingsAnswerState(answer) {
+  settingsCurrentAnswer = answer || null;
+
+  if (settingsAnswerCurrent) {
+    settingsAnswerCurrent.textContent = answer || "Pending";
+  }
+
+  settingsAnswerOptions.forEach((button) => {
+    button.classList.toggle("selected", button.dataset.settingsAnswerOption === answer);
+  });
+}
+
+async function loadSettingsAnswer() {
+  if (!settingsAnswer) return;
+
+  const response = await fetch("/api/check-in/status", {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (response.status === 401) {
+    window.location.href = "/login";
+    return;
+  }
+
+  if (!response.ok) {
+    setSettingsAnswerState(null);
+    showToast("Could not load today's answer", "error");
+    return;
+  }
+
+  const status = await response.json();
+  setSettingsAnswerState(status.answer);
+}
+
+async function saveSettingsAnswer(answer) {
+  settingsAnswerOptions.forEach((button) => {
+    button.disabled = true;
+  });
+  setSettingsAnswerState(answer);
+
+  try {
+    const response = await fetch("/api/check-in/today", {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ answer }),
+    });
+
+    if (response.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      await loadSettingsAnswer();
+      showToast(data.error || "Could not change today's answer", "error");
+      return;
+    }
+
+    setSettingsAnswerState(data.status?.answer || answer);
+    showToast(answer === "YES" ? "Today's answer changed to yes" : "Today's answer changed to no");
+  } catch {
+    await loadSettingsAnswer();
+    showToast("Could not change today's answer", "error");
+  } finally {
+    settingsAnswerOptions.forEach((button) => {
+      button.disabled = false;
+    });
+  }
+}
+
+if (settingsAnswer) {
+  settingsAnswerOptions.forEach((button) => {
+    button.addEventListener("click", () => {
+      const answer = button.dataset.settingsAnswerOption;
+      if (!answer || answer === settingsCurrentAnswer) return;
+      openSettingsAnswerConfirmModal(answer);
+    });
+  });
+  loadSettingsAnswer();
 }
 
 function renderLeaderboard(leaderboard) {
@@ -432,6 +529,54 @@ function closeMissedAnswerModal() {
     });
   }
   missedAnswerDateKey = null;
+}
+
+function getSettingsAnswerConfirmModal() {
+  let modal = document.querySelector("[data-settings-answer-confirm-modal]");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.className = "settings-confirm-modal";
+  modal.setAttribute("data-settings-answer-confirm-modal", "");
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="settings-confirm-backdrop" data-settings-answer-cancel></div>
+    <div class="settings-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-answer-confirm-title">
+      <header class="settings-confirm-head">
+        <p class="dashboard-label">Today's answer</p>
+        <h2 id="settings-answer-confirm-title">Are you sure?</h2>
+        <p data-settings-answer-confirm-copy>Change today's answer?</p>
+      </header>
+      <div class="settings-confirm-actions">
+        <button class="settings-confirm-button settings-confirm-cancel" type="button" data-settings-answer-cancel>Cancel</button>
+        <button class="settings-confirm-button settings-confirm-save" type="button" data-settings-answer-confirm>Change</button>
+      </div>
+    </div>
+  `;
+  document.body.append(modal);
+  return modal;
+}
+
+function openSettingsAnswerConfirmModal(answer) {
+  pendingSettingsAnswer = answer;
+  const modal = getSettingsAnswerConfirmModal();
+  const copy = modal.querySelector("[data-settings-answer-confirm-copy]");
+  if (copy) {
+    copy.textContent = `Change today's answer to ${answer === "YES" ? "YES" : "NO"}?`;
+  }
+  modal.hidden = false;
+  modal.querySelector("[data-settings-answer-confirm]")?.focus();
+}
+
+function closeSettingsAnswerConfirmModal() {
+  const modal = document.querySelector("[data-settings-answer-confirm-modal]");
+  if (modal) {
+    modal.hidden = true;
+    modal.querySelectorAll("[data-settings-answer-confirm], [data-settings-answer-cancel]").forEach((button) => {
+      button.disabled = false;
+    });
+  }
+  pendingSettingsAnswer = null;
 }
 
 function formatItemCount(count) {
@@ -745,6 +890,24 @@ if (prayersBody?.dataset.prayerReactions === "true") {
 }
 
 document.addEventListener("click", async (event) => {
+  const settingsAnswerCancel = event.target.closest("[data-settings-answer-cancel]");
+  if (settingsAnswerCancel) {
+    closeSettingsAnswerConfirmModal();
+    return;
+  }
+
+  const settingsAnswerConfirm = event.target.closest("[data-settings-answer-confirm]");
+  if (settingsAnswerConfirm && pendingSettingsAnswer) {
+    const answer = pendingSettingsAnswer;
+    const modal = settingsAnswerConfirm.closest("[data-settings-answer-confirm-modal]");
+    modal?.querySelectorAll("[data-settings-answer-confirm], [data-settings-answer-cancel]").forEach((button) => {
+      button.disabled = true;
+    });
+    closeSettingsAnswerConfirmModal();
+    await saveSettingsAnswer(answer);
+    return;
+  }
+
   const missedCloseButton = event.target.closest("[data-missed-close]");
   if (missedCloseButton) {
     closeMissedAnswerModal();
@@ -855,6 +1018,7 @@ document.addEventListener("keydown", (event) => {
     setTimezoneMenuOpen(false);
     closeReactionChooser();
     closeMissedAnswerModal();
+    closeSettingsAnswerConfirmModal();
   }
 });
 

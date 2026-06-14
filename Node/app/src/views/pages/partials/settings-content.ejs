@@ -1,0 +1,71 @@
+<main class="dashboard-page settings-page" data-settings-toast="<%= toastMessage || "" %>" data-settings-toast-variant="<%= toastVariant || "default" %>">
+  <section class="section dashboard-section">
+    <div class="container settings-container">
+      <div class="settings-grid">
+        <div class="settings-column">
+          <form class="dashboard-card settings-card settings-form" action="/settings/nickname" method="post">
+            <header class="dashboard-card-head">
+              <h2>Nickname</h2>
+            </header>
+
+            <label class="settings-field">
+              <span>Nickname</span>
+              <input type="text" name="name" autocomplete="name" value="<%= values.name || auth.name %>" required />
+            </label>
+
+            <%- include("../../components/ui/button", {
+              tag: "button",
+              type: "submit",
+              variant: "primary",
+              className: "settings-submit",
+              label: "Save nickname"
+            }) %>
+          </form>
+
+          <section class="dashboard-card settings-card settings-answer-card" data-settings-answer>
+            <header class="dashboard-card-head settings-answer-head">
+              <h2>Today's answer</h2>
+              <span class="settings-answer-status" data-settings-answer-current>Loading</span>
+            </header>
+
+            <div class="settings-answer-actions" aria-label="Change today's answer">
+              <button class="settings-answer-button settings-answer-yes" type="button" data-settings-answer-option="YES">YES</button>
+              <button class="settings-answer-button settings-answer-no" type="button" data-settings-answer-option="NO">NO</button>
+            </div>
+          </section>
+        </div>
+
+        <form class="dashboard-card settings-card settings-form" action="/settings/password" method="post">
+          <header class="dashboard-card-head">
+            <h2>Password</h2>
+          </header>
+
+          <label class="settings-field">
+            <span>Current password</span>
+            <input type="password" name="currentPassword" autocomplete="current-password" required />
+          </label>
+
+          <label class="settings-field">
+            <span>New password</span>
+            <input type="password" name="password" autocomplete="new-password" required />
+          </label>
+
+          <label class="settings-field">
+            <span>Confirm new password</span>
+            <input type="password" name="passwordConfirmation" autocomplete="new-password" required />
+          </label>
+
+          <%- include("../../components/ui/button", {
+            tag: "button",
+            type: "submit",
+            variant: "primary",
+            className: "settings-submit",
+            label: "Change password"
+          }) %>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <%- include("../../components/layout/footer") %>
+</main>

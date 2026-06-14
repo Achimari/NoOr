@@ -173,6 +173,33 @@ export async function createCheckIn({ userId, dateKey, answer }) {
   });
 }
 
+export async function updateCheckInForDate({ userId, dateKey, answer }) {
+  return prisma.$transaction(async (tx) => {
+    await tx.checkInHistory.upsert({
+      where: {
+        userId_dateKey: {
+          userId,
+          dateKey,
+        },
+      },
+      create: {
+        userId,
+        dateKey,
+        answer,
+      },
+      update: {
+        answer,
+      },
+    });
+
+    await updateCurrentCheckIn(tx, { userId, dateKey, answer });
+
+    return tx.checkIn.findUnique({
+      where: { id: userId },
+    });
+  });
+}
+
 export async function addMissedCheckInDates({ userId, dateKeys }) {
   if (!dateKeys.length) return 0;
 

@@ -20,6 +20,9 @@
     <div class="header-actions">
       <nav class="header-auth-actions" aria-label="Account">
         <% if (auth) { %>
+          <a class="header-settings-link<%= currentPath === "/settings" ? " active" : "" %>" href="/settings" aria-label="Open settings">
+            <%- include("../ui/icon", { name: "gear", className: "header-settings-icon" }) %>
+          </a>
           <div class="header-timezone" data-timezone-menu>
             <button class="header-timezone-button" type="button" data-timezone-toggle aria-expanded="false" aria-label="Change timezone">
               <span data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>

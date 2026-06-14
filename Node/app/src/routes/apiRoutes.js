@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getCurrentUser } from "../controllers/apiController.js";
-import { answerCurrentMissedDay, getCurrentCheckInStatus } from "../controllers/checkInController.js";
+import { answerCurrentMissedDay, getCurrentCheckInStatus, updateCurrentCheckInAnswer } from "../controllers/checkInController.js";
 import { getCustomerDetailsApi } from "../controllers/customerController.js";
 import { getLeaderboard, incrementLeaderboard, resetLeaderboard } from "../controllers/leaderboardController.js";
 import { answerPrayer, deletePrayerReaction, listPrayers, postPrayer, postPrayerReaction } from "../controllers/prayerController.js";
@@ -18,6 +18,7 @@ router.get("/api/me", requireAuth, asyncHandler(getCurrentUser));
 router.patch("/api/me/timezone", requireAuth, validateBody(timezoneSchema), asyncHandler(updateCurrentUserTimezone));
 router.get("/api/customers/:id", requireAuth, asyncHandler(getCustomerDetailsApi));
 router.get("/api/check-in/status", requireAuth, asyncHandler(getCurrentCheckInStatus));
+router.patch("/api/check-in/today", requireAuth, asyncHandler(updateCurrentCheckInAnswer));
 router.post("/api/check-in/missed", requireAuth, asyncHandler(answerCurrentMissedDay));
 router.get("/api/leaderboard", requireAuth, asyncHandler(getLeaderboard));
 router.post("/api/leaderboard/increment", requireAuth, asyncHandler(incrementLeaderboard));

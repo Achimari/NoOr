@@ -10,6 +10,9 @@ import {
   findActiveSessionByHash,
   findAuthUserById,
   findAuthUserByName,
+  findOtherAuthUserByName,
+  updateAuthUserName,
+  updateAuthUserPasswordHash,
   updateAuthUserTimezone,
 } from "../repositories/authRepository.js";
 import { getSafeTimezone, isSupportedTimezone } from "../utils/timezones.js";
@@ -107,6 +110,32 @@ export async function updateUserTimezone({ userId, timezone }) {
   }
 
   const user = await updateAuthUserTimezone({ id: userId, timezone });
+  return sanitizeUser(user);
+}
+
+export async function updateUserName({ userId, name }) {
+  const existingUser = await findOtherAuthUserByName({ id: userId, name });
+  if (existingUser) {
+    throw new AppError("Nickname is already taken", 409);
+  }
+
+  const user = await updateAuthUserName({ id: userId, name });
+  return sanitizeUser(user);
+}
+
+export async function updateUserPassword({ userId, currentPassword, password }) {
+  const user = await findAuthUserById(Number(userId));
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!isCurrentPasswordValid) {
+    throw new AppError("Current password is incorrect", 401);
+  }
+
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  await updateAuthUserPasswordHash({ id: userId, passwordHash });
   return sanitizeUser(user);
 }
 

@@ -5,6 +5,7 @@ import {
   findCheckInById,
   findMissedDaysByUserId,
   resolveMissedCheckIn,
+  updateCheckInForDate,
 } from "../repositories/checkInRepository.js";
 import { AppError } from "../utils/appError.js";
 import { getNextResetAt, getTodayDateKey } from "../utils/dateKey.js";
@@ -144,4 +145,15 @@ export async function answerMissedDay(userId, { dateKey, answer, timezone }) {
   }
 
   await resolveMissedCheckIn({ userId, dateKey, answer });
+}
+
+export async function updateTodayCheckIn(userId, { answer, timezone }) {
+  await markMissedDaysAsNo(userId, timezone);
+
+  if (!["YES", "NO"].includes(answer)) {
+    throw new AppError("Choose today's answer", 400);
+  }
+
+  const dateKey = getTodayDateKey(new Date(), timezone);
+  await updateCheckInForDate({ userId, dateKey, answer });
 }
