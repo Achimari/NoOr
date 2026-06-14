@@ -53,8 +53,8 @@ export async function getLeaderboardSummary(userId, timezone) {
     findUsersWithCheckInHistory(),
     getWeeklyCheckInDays(userId, timezone),
   ]);
-  const topRows = users.map(toLeaderboardRow).sort(sortLeaderboardRows).slice(0, 10);
-  const userIds = [...new Set([userId, ...topRows.map((row) => row.id)])];
+  const leaderboardRows = users.map(toLeaderboardRow).sort(sortLeaderboardRows);
+  const userIds = [...new Set([userId, ...leaderboardRows.map((row) => row.id)])];
   const missedRows = await findMissedDaysByUserIds(userIds);
   const missedDaysByUserId = new Map(missedRows.map((row) => [row.id, row]));
 
@@ -67,7 +67,7 @@ export async function getLeaderboardSummary(userId, timezone) {
       weekDays,
       missedDays: sanitizeMissedDays(missedDaysByUserId.get(userId)),
     },
-    leaders: topRows.map((row, index) => sanitizeLeaderboardEntry(row, index, missedDaysByUserId)),
+    leaders: leaderboardRows.map((row, index) => sanitizeLeaderboardEntry(row, index, missedDaysByUserId)),
   };
 }
 
