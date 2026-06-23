@@ -21,24 +21,35 @@
 
       <article class="dashboard-current" aria-live="polite">
         <div>
-          <p class="dashboard-label">Current streak</p>
-          <p class="dashboard-value"><span data-current-value>
-              <%= leaderboard.current.value %>
+          <p class="dashboard-label">Best score</p>
+          <p class="dashboard-value"><span data-overall-best-value>
+              <%= leaderboard.overallBest?.value || 0 %>
             </span><span class="dashboard-value-unit"> Days</span></p>
         </div>
         <div>
-          <p class="dashboard-label">Best streak</p>
-          <p class="dashboard-value"><span data-max-value>
-              <%= leaderboard.current.maxStreak %>
-            </span><span class="dashboard-value-unit"> Days</span></p>
+          <p class="dashboard-label">Score holder</p>
+          <p class="dashboard-value dashboard-holder-name" data-overall-best-name>
+            <%= leaderboard.overallBest?.name || "No record yet" %>
+          </p>
         </div>
         <div class="dashboard-week" data-current-date-key="<%= leaderboard.current.todayDateKey %>" aria-hidden="true">
           <% (leaderboard.current.weekDays || []).forEach((day)=> { %>
             <span class="dashboard-day<%= day.successful ? " active" : "" %><%= day.missed ? " missed" : "" %>" data-week-day="<%= day.dateKey %>" data-week-answer="<%= day.answer || "" %>" data-week-missed="<%= day.missed ? "true" : "false" %>"><%= day.label %></span>
             <% }) %>
         </div>
-        <p class="dashboard-answer-status dashboard-current-timer" data-check-in-message aria-live="polite"></p>
       </article>
+
+      <aside class="dashboard-timer-card" data-check-in-timer hidden aria-live="polite">
+        <div class="dashboard-timer-copy">
+          <div>
+            <p class="dashboard-timer-label">Next answer</p>
+          </div>
+          <span class="dashboard-timer-value" data-check-in-message>00:00:00</span>
+        </div>
+        <div class="dashboard-timer-track" role="progressbar" aria-label="Progress toward next answer" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span class="dashboard-timer-progress" data-check-in-progress></span>
+        </div>
+      </aside>
 
       <section class="dashboard-card">
         <header class="dashboard-card-head">

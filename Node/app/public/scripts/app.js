@@ -1,11 +1,13 @@
 const leaderboardRoot = document.querySelector("[data-leaderboard]");
-const currentValue = document.querySelector("[data-current-value]");
-const maxValue = document.querySelector("[data-max-value]");
+const overallBestValue = document.querySelector("[data-overall-best-value]");
+const overallBestName = document.querySelector("[data-overall-best-name]");
 const leaderboardBody = document.querySelector("[data-leaderboard-body]");
 const tableCount = document.querySelector("[data-table-count]");
 const yesButton = document.querySelector(".dashboard-action-yes");
 const noButton = document.querySelector(".dashboard-action-no");
 const checkInMessage = document.querySelector("[data-check-in-message]");
+const checkInTimer = document.querySelector("[data-check-in-timer]");
+const checkInProgress = document.querySelector("[data-check-in-progress]");
 const dashboardWeek = document.querySelector(".dashboard-week");
 const weekDayButtons = document.querySelectorAll("[data-week-day]");
 const prayerForm = document.querySelector("[data-prayer-form]");
@@ -275,11 +277,13 @@ if (settingsAnswer) {
 }
 
 function renderLeaderboard(leaderboard) {
-  if (!leaderboardRoot || !leaderboard || !currentValue || !leaderboardBody) return;
+  if (!leaderboardRoot || !leaderboard || !leaderboardBody) return;
 
-  currentValue.textContent = leaderboard.current.value;
-  if (maxValue) {
-    maxValue.textContent = leaderboard.current.maxStreak || 0;
+  if (overallBestValue) {
+    overallBestValue.textContent = leaderboard.overallBest?.value || 0;
+  }
+  if (overallBestName) {
+    overallBestName.textContent = leaderboard.overallBest?.name || "No record yet";
   }
   if (dashboardWeek && leaderboard.current.todayDateKey) {
     dashboardWeek.dataset.currentDateKey = leaderboard.current.todayDateKey;
@@ -1185,23 +1189,24 @@ function setAnswerState(status) {
   yesButton.classList.toggle("selected", status.answer === "YES");
   noButton.classList.toggle("selected", status.answer === "NO");
 
-  if (checkInMessage) {
+  if (checkInMessage && checkInTimer) {
     if (status.answeredToday && status.nextResetAt) {
+      checkInTimer.hidden = false;
       renderResetTimer(status.nextResetAt);
       resetTimerId = window.setInterval(() => renderResetTimer(status.nextResetAt), 1000);
     } else {
-      checkInMessage.textContent = "";
+      checkInTimer.hidden = true;
     }
   }
 }
 
 function renderResetTimer(nextResetAt) {
-  if (!checkInMessage) return;
+  if (!checkInMessage || !checkInTimer) return;
 
   const remainingMs = Math.max(0, new Date(nextResetAt).getTime() - Date.now());
 
   if (remainingMs === 0) {
-    checkInMessage.textContent = "";
+    checkInTimer.hidden = true;
     yesButton.disabled = false;
     noButton.disabled = false;
     yesButton.classList.remove("selected");
@@ -1214,13 +1219,14 @@ function renderResetTimer(nextResetAt) {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
+  const dayMs = 24 * 60 * 60 * 1000;
+  const progress = Math.min(100, Math.max(0, ((dayMs - remainingMs) / dayMs) * 100));
 
-  checkInMessage.innerHTML = `
-    <span class="dashboard-timer">
-      <span class="dashboard-timer-label">Next answer</span>
-      <span class="dashboard-timer-value">${formatTimerPart(hours)}:${formatTimerPart(minutes)}:${formatTimerPart(seconds)}</span>
-    </span>
-  `;
+  checkInMessage.textContent = `${formatTimerPart(hours)}:${formatTimerPart(minutes)}:${formatTimerPart(seconds)}`;
+  if (checkInProgress) {
+    checkInProgress.style.width = `${progress}%`;
+    checkInProgress.parentElement?.setAttribute("aria-valuenow", String(Math.round(progress)));
+  }
 }
 
 function formatTimerPart(value) {

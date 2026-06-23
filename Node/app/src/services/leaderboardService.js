@@ -45,6 +45,22 @@ function sortLeaderboardRows(first, second) {
   return first.id - second.id;
 }
 
+function getOverallBestStreak(rows) {
+  const bestRow = rows.reduce((best, row) => {
+    if (!best || row.maxStreak > best.maxStreak) return row;
+    if (row.maxStreak === best.maxStreak && row.id < best.id) return row;
+    return best;
+  }, null);
+
+  if (!bestRow || bestRow.maxStreak <= 0) return null;
+
+  return {
+    id: bestRow.id,
+    name: bestRow.name,
+    value: bestRow.maxStreak,
+  };
+}
+
 export async function getLeaderboardSummary(userId, timezone) {
   await markMissedDaysAsNo(userId, timezone);
 
@@ -67,6 +83,7 @@ export async function getLeaderboardSummary(userId, timezone) {
       weekDays,
       missedDays: sanitizeMissedDays(missedDaysByUserId.get(userId)),
     },
+    overallBest: getOverallBestStreak(leaderboardRows),
     leaders: leaderboardRows.map((row, index) => sanitizeLeaderboardEntry(row, index, missedDaysByUserId)),
   };
 }

@@ -307,52 +307,23 @@
   text-align: center;
 }
 
-.dashboard-current .dashboard-answer-status {
-  margin: 0;
-  text-align: left;
-}
-
 .dashboard-answer-status:empty {
   display: none;
 }
 
-.dashboard-timer-label,
-.dashboard-timer-value {
-  display: flex;
-  align-items: center;
-}
-
-.dashboard-timer {
-  display: grid;
-  gap: var(--space-1);
-  width: auto;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
 .dashboard-timer-label {
+  margin: 0 0 var(--space-1);
   color: var(--white-54);
   font-size: 0.92rem;
-  font-weight: 700;
-  text-transform: none;
+  font-weight: 800;
 }
 
 .dashboard-timer-value {
-  justify-content: flex-start;
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
   color: var(--white);
   font-size: 1.72rem;
-  font-weight: 800;
+  font-weight: 850;
   line-height: 1.08;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
 }
 
 .app-toast {
@@ -396,7 +367,7 @@
 
 .dashboard-current {
   display: grid;
-  grid-template-columns: minmax(150px, 0.86fr) minmax(150px, 0.86fr) minmax(380px, 1.35fr) minmax(170px, 0.72fr);
+  grid-template-columns: minmax(150px, 0.7fr) minmax(180px, 0.8fr) minmax(380px, 1.3fr);
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-5);
@@ -431,6 +402,12 @@
   font-size: 2rem;
 }
 
+.dashboard-holder-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .dashboard-week {
   display: grid;
   grid-template-columns: repeat(7, 38px);
@@ -438,9 +415,43 @@
   justify-content: start;
 }
 
-.dashboard-current-timer {
-  justify-self: end;
-  min-width: 150px;
+.dashboard-timer-card {
+  display: grid;
+  gap: var(--space-3);
+  margin: calc(var(--space-4) * -0.35) 0 var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--white-10);
+  border-radius: var(--dashboard-card-radius);
+  background: var(--dashboard-card-bg);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-timer-card[hidden] {
+  display: none;
+}
+
+.dashboard-timer-copy {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-timer-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--white-10);
+}
+
+.dashboard-timer-progress {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--white-54), var(--white));
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.24);
+  transition: width 1s linear;
 }
 
 .dashboard-day {
@@ -2218,8 +2229,14 @@
 
 .statistics-donut-time,
 .statistics-donut-answer {
-  --donut-primary: rgba(138, 218, 177, 0.82);
-  --donut-secondary: rgba(220, 146, 146, 0.72);
+  --donut-primary: rgba(78, 166, 124, 0.58);
+  --donut-secondary: rgba(178, 92, 92, 0.58);
+}
+
+.statistics-donut-card:hover .statistics-donut,
+.statistics-donut-card:focus-within .statistics-donut {
+  --donut-primary: rgba(128, 218, 172, 0.76);
+  --donut-secondary: rgba(218, 128, 128, 0.76);
 }
 
 .statistics-donut-legend {
@@ -2252,9 +2269,9 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--donut-dot);
-  box-shadow: 0 0 18px var(--donut-dot);
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  background: var(--donut-default);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--donut-default) 55%, transparent);
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 .statistics-donut-card:hover .statistics-donut-row,
@@ -2276,7 +2293,8 @@
 .statistics-donut-row:hover::before,
 .statistics-donut-card:hover .statistics-donut-row::before,
 .statistics-donut-card:focus-within .statistics-donut-row::before {
-  box-shadow: 0 0 24px var(--donut-dot);
+  background: var(--donut-accent);
+  box-shadow: 0 0 24px var(--donut-accent);
   transform: scale(1.12);
 }
 
@@ -2286,12 +2304,14 @@
 
 .statistics-donut-row-yes,
 .statistics-donut-row-day {
-  --donut-dot: rgba(190, 246, 218, 0.86);
+  --donut-default: rgba(78, 166, 124, 0.58);
+  --donut-accent: rgba(128, 218, 172, 0.76);
 }
 
 .statistics-donut-row-no,
 .statistics-donut-row-night {
-  --donut-dot: rgba(244, 188, 188, 0.82);
+  --donut-default: rgba(178, 92, 92, 0.58);
+  --donut-accent: rgba(218, 128, 128, 0.76);
 }
 
 .prayer-world-card {
@@ -2584,7 +2604,7 @@
 
   .dashboard-actions,
   .dashboard-current {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .dashboard-actions .dashboard-action+.dashboard-action {
@@ -2598,20 +2618,24 @@
   }
 
   .dashboard-current {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: var(--space-3);
     padding: var(--space-3);
     text-align: center;
   }
 
-  .dashboard-current-timer {
-    grid-column: 1 / -1;
-    justify-self: stretch;
-    text-align: center;
+  .dashboard-timer-card {
+    padding: var(--space-3);
   }
 
-  .dashboard-current-timer .dashboard-timer {
-    justify-items: center;
+  .dashboard-timer-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .dashboard-timer-value {
+    flex: 0 0 auto;
+    font-size: 1.35rem;
   }
 
   .dashboard-week {
