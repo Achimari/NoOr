@@ -91,7 +91,15 @@ export async function findActiveSessionByHash(sessionTokenHash) {
       },
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          isTelegramLinked: true,
+          timezone: true,
+          createdAt: true,
+        },
+      },
     },
   });
 }

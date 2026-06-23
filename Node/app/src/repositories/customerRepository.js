@@ -36,8 +36,6 @@ export async function findCustomerDetailsById(id) {
           telegramFirstName: true,
           isActive: true,
           connectedAt: true,
-          createdAt: true,
-          updatedAt: true,
         },
       },
     },

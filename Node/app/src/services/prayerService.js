@@ -10,7 +10,16 @@ import {
 import { AppError } from "../utils/appError.js";
 import { prayerReactionEmoji } from "../validators/prayerValidators.js";
 
-export const supportedPrayerReactions = prayerReactionEmoji;
+const supportedPrayerReactions = prayerReactionEmoji;
+
+function parsePrayerId(id) {
+  const prayerId = Number(id);
+  if (!Number.isInteger(prayerId) || prayerId <= 0) {
+    throw new AppError("Prayer not found", 404);
+  }
+
+  return prayerId;
+}
 
 function summarizeReactions(reactions = []) {
   const counts = new Map();
@@ -66,11 +75,7 @@ export async function getUserPrayers(userId) {
 }
 
 export async function markPrayerAnswered({ id, userId }) {
-  const prayerId = Number(id);
-  if (!Number.isInteger(prayerId) || prayerId <= 0) {
-    throw new AppError("Prayer not found", 404);
-  }
-
+  const prayerId = parsePrayerId(id);
   const result = await markPrayerAnsweredByOwner({ id: prayerId, userId });
   if (result.count === 0) {
     throw new AppError("Prayer not found", 404);
@@ -80,11 +85,7 @@ export async function markPrayerAnswered({ id, userId }) {
 }
 
 export async function reactToPrayer({ id, userId, emoji }) {
-  const prayerId = Number(id);
-  if (!Number.isInteger(prayerId) || prayerId <= 0) {
-    throw new AppError("Prayer not found", 404);
-  }
-
+  const prayerId = parsePrayerId(id);
   if (!supportedPrayerReactions.includes(emoji)) {
     throw new AppError("Choose a supported reaction", 400);
   }
@@ -108,11 +109,7 @@ export async function reactToPrayer({ id, userId, emoji }) {
 }
 
 export async function removePrayerReaction({ id, userId }) {
-  const prayerId = Number(id);
-  if (!Number.isInteger(prayerId) || prayerId <= 0) {
-    throw new AppError("Prayer not found", 404);
-  }
-
+  const prayerId = parsePrayerId(id);
   const prayer = await findPrayerById(prayerId);
   if (!prayer) {
     throw new AppError("Prayer not found", 404);

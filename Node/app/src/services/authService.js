@@ -19,7 +19,7 @@ import { getSafeTimezone, isSupportedTimezone } from "../utils/timezones.js";
 
 const SALT_ROUNDS = 12;
 
-export function sanitizeUser(user) {
+function sanitizeUser(user) {
   return {
     id: user.id,
     name: user.name,
@@ -29,7 +29,7 @@ export function sanitizeUser(user) {
   };
 }
 
-export function hashSessionToken(sessionToken) {
+function hashSessionToken(sessionToken) {
   return crypto.createHash("sha256").update(sessionToken).digest("hex");
 }
 
@@ -93,15 +93,6 @@ export async function loginUser({ name, password }) {
     user: sanitizeUser(user),
     ...session,
   };
-}
-
-export async function getUserById(id) {
-  const user = await findAuthUserById(Number(id));
-  if (!user) {
-    throw new AppError("User not found", 404);
-  }
-
-  return sanitizeUser(user);
 }
 
 export async function updateUserTimezone({ userId, timezone }) {

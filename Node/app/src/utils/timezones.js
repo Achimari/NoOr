@@ -39,7 +39,7 @@ const timezoneCountryCodes = {
   "Europe/Warsaw": "PL",
 };
 
-function getSupportedTimezones() {
+function loadSupportedTimezones() {
   if (typeof Intl.supportedValuesOf === "function") {
     return Intl.supportedValuesOf("timeZone");
   }
@@ -59,12 +59,15 @@ function getSupportedTimezones() {
   ];
 }
 
+const supportedTimezones = loadSupportedTimezones();
+const supportedTimezoneSet = new Set(supportedTimezones);
+
 export function isSupportedTimezone(timezone) {
   if (!timezone || typeof timezone !== "string") return false;
 
   try {
     new Intl.DateTimeFormat("en", { timeZone: timezone }).format(new Date());
-    return getSupportedTimezones().includes(timezone);
+    return supportedTimezoneSet.has(timezone);
   } catch {
     return false;
   }
@@ -86,11 +89,13 @@ export function getTimezoneLabel(timezone) {
   return formatTimezoneLabel(getSafeTimezone(timezone));
 }
 
+const timezoneOptions = supportedTimezones
+  .map((value) => ({
+    value,
+    label: formatTimezoneLabel(value),
+  }))
+  .sort((first, second) => first.label.localeCompare(second.label));
+
 export function getTimezoneOptions() {
-  return getSupportedTimezones()
-    .map((value) => ({
-      value,
-      label: formatTimezoneLabel(value),
-    }))
-    .sort((first, second) => first.label.localeCompare(second.label));
+  return timezoneOptions;
 }

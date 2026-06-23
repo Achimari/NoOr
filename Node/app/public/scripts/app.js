@@ -50,21 +50,18 @@ let missedAnswerDateKey = null;
 let settingsCurrentAnswer = null;
 let pendingSettingsAnswer = null;
 
-statisticsInsightCards.forEach((card) => {
-  card.addEventListener("pointermove", (event) => {
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty("--glow-x", `${event.clientX - rect.left}px`);
-    card.style.setProperty("--glow-y", `${event.clientY - rect.top}px`);
+function bindPointerGlow(cards, xProperty, yProperty) {
+  cards.forEach((card) => {
+    card.addEventListener("pointermove", (event) => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty(xProperty, `${event.clientX - rect.left}px`);
+      card.style.setProperty(yProperty, `${event.clientY - rect.top}px`);
+    });
   });
-});
+}
 
-dashboardActionCards.forEach((card) => {
-  card.addEventListener("pointermove", (event) => {
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty("--action-glow-x", `${event.clientX - rect.left}px`);
-    card.style.setProperty("--action-glow-y", `${event.clientY - rect.top}px`);
-  });
-});
+bindPointerGlow(statisticsInsightCards, "--glow-x", "--glow-y");
+bindPointerGlow(dashboardActionCards, "--action-glow-x", "--action-glow-y");
 
 function setHeaderMenuOpen(isOpen) {
   if (!header || !headerMenuToggle) return;

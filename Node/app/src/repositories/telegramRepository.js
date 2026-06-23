@@ -13,9 +13,6 @@ export async function createTelegramConnectToken({ userId, tokenHash, expiresAt 
 export async function findTelegramConnectToken(tokenHash) {
   return prisma.telegramConnectToken.findUnique({
     where: { tokenHash },
-    include: {
-      user: true,
-    },
   });
 }
 
@@ -65,8 +62,6 @@ export async function findActiveTelegramConnections() {
     include: {
       user: {
         select: {
-          id: true,
-          name: true,
           timezone: true,
           checkIn: {
             select: {

@@ -40,7 +40,3 @@ export function stopTelegramNotificationScheduler() {
   clearInterval(schedulerId);
   schedulerId = null;
 }
-
-export const schedulerInternals = {
-  runSchedulerTick,
-};

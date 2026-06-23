@@ -59,7 +59,6 @@ export function renderPage({ view, pageId, titleKey }) {
     res.render(`pages/${view}`, {
       pageId,
       title: res.locals.t(titleKey),
-      siteData: res.locals.siteData,
       ...viewData,
     });
   };
