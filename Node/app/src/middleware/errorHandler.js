@@ -1,6 +1,14 @@
 import { logger } from "../utils/logger.js";
 
+export function isApiRequest(req) {
+  return req.path.startsWith("/api/") || req.path.startsWith("/auth/");
+}
+
 export function notFoundHandler(req, res) {
+  if (isApiRequest(req) || !req.accepts("html")) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
   res.status(404).render("pages/not-found", {
     pageId: "not-found",
     title: res.locals.t("notFound.title"),
@@ -24,16 +32,16 @@ export function errorHandler(error, req, res, next) {
     "Request failed",
   );
 
-  const isApiRequest = req.path.startsWith("/api/") || req.path.startsWith("/auth/");
-
-  if (!isApiRequest && req.accepts("html")) {
+  if (!isApiRequest(req) && req.accepts("html")) {
     return res.status(statusCode).render("pages/not-found", {
       pageId: "error",
       title: statusCode === 401 ? "Unauthorized" : "Error",
     });
   }
 
+  const exposeMessage = isClientError || error.isOperational;
+
   return res.status(statusCode).json({
-    error: isClientError ? error.message : "Internal server error",
+    error: exposeMessage ? error.message : "Internal server error",
   });
 }

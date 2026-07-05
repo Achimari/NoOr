@@ -1,4 +1,5 @@
 import { env, isProduction } from "../config/env.js";
+import { isApiRequest } from "./errorHandler.js";
 import { getSessionByToken, getSessionMaxAgeMs } from "../services/authService.js";
 
 export const authCookieName = env.SESSION_COOKIE_NAME;
@@ -23,7 +24,7 @@ export function getClearAuthCookieOptions() {
 }
 
 function rejectUnauthenticated(req, res) {
-  if (req.path.startsWith("/api/") || req.path.startsWith("/auth/")) {
+  if (isApiRequest(req)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 

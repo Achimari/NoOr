@@ -88,17 +88,18 @@ export async function markMissedDaysAsNo(userId, timezone) {
   });
 
   await addMissedCheckInDates({ userId, dateKeys: missedDateKeys });
+
+  return checkIn;
 }
 
-export async function getCheckInStatus(userId, timezone) {
-  await markMissedDaysAsNo(userId, timezone);
+export async function getCheckInStatus(userId, timezone, { syncMissedDays = true, weekDays } = {}) {
+  const checkIn = syncMissedDays
+    ? await markMissedDaysAsNo(userId, timezone)
+    : await findCheckInById(userId);
 
   const dateKey = getTodayDateKey(new Date(), timezone);
   const nextResetAt = getNextResetAt(new Date(), timezone).toISOString();
-  const [checkIn, weekDays] = await Promise.all([
-    findCheckInById(userId),
-    getWeeklyCheckInDays(userId, timezone),
-  ]);
+  weekDays = weekDays || (await getWeeklyCheckInDays(userId, timezone));
 
   if (!checkIn || checkIn.dateKey !== dateKey || !checkIn.answer) {
     return {

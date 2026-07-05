@@ -1,8 +1,4 @@
-import {
-  getLeaderboardSummary,
-  incrementUserLeaderboard,
-  resetUserLeaderboard,
-} from "../services/leaderboardService.js";
+import { getLeaderboardSummary, submitDailyAnswer } from "../services/leaderboardService.js";
 
 export async function getLeaderboard(req, res) {
   const leaderboard = await getLeaderboardSummary(req.user.id, req.user.timezone);
@@ -10,11 +6,11 @@ export async function getLeaderboard(req, res) {
 }
 
 export async function incrementLeaderboard(req, res) {
-  const leaderboard = await incrementUserLeaderboard(req.user.id, req.user.timezone);
-  return res.json({ leaderboard });
+  const { status, leaderboard } = await submitDailyAnswer(req.user.id, "YES", req.user.timezone);
+  return res.json({ leaderboard, status });
 }
 
 export async function resetLeaderboard(req, res) {
-  const leaderboard = await resetUserLeaderboard(req.user.id, req.user.timezone);
-  return res.json({ leaderboard });
+  const { status, leaderboard } = await submitDailyAnswer(req.user.id, "NO", req.user.timezone);
+  return res.json({ leaderboard, status });
 }

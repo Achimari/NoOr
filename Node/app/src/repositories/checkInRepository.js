@@ -28,16 +28,6 @@ export async function findCheckInHistoryByDateKeys(userId, dateKeys) {
   });
 }
 
-export async function findCheckInHistoryByUserId(userId) {
-  return prisma.checkInHistory.findMany({
-    where: { userId },
-    select: {
-      dateKey: true,
-      answer: true,
-    },
-  });
-}
-
 export async function findAllCheckInHistory() {
   return prisma.checkInHistory.findMany({
     select: {
@@ -165,11 +155,7 @@ export async function createCheckIn({ userId, dateKey, answer }) {
       return null;
     }
 
-    await updateCurrentCheckIn(tx, { userId, dateKey, answer });
-
-    return tx.checkIn.findUnique({
-      where: { id: userId },
-    });
+    return updateCurrentCheckIn(tx, { userId, dateKey, answer });
   });
 }
 
@@ -192,11 +178,7 @@ export async function updateCheckInForDate({ userId, dateKey, answer }) {
       },
     });
 
-    await updateCurrentCheckIn(tx, { userId, dateKey, answer });
-
-    return tx.checkIn.findUnique({
-      where: { id: userId },
-    });
+    return updateCurrentCheckIn(tx, { userId, dateKey, answer });
   });
 }
 
@@ -285,7 +267,7 @@ export async function resolveMissedCheckIn({ userId, dateKey, answer }) {
       }],
       skipDuplicates: true,
     });
-    await updateCurrentCheckIn(tx, { userId, dateKey, answer });
+    const checkIn = await updateCurrentCheckIn(tx, { userId, dateKey, answer });
 
     const dates = missed.dates.filter((missedDateKey) => missedDateKey !== dateKey).sort();
 
@@ -297,8 +279,6 @@ export async function resolveMissedCheckIn({ userId, dateKey, answer }) {
       },
     });
 
-    return tx.checkIn.findUnique({
-      where: { id: userId },
-    });
+    return checkIn;
   });
 }

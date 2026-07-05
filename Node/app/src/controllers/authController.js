@@ -87,20 +87,9 @@ export async function registerApi(req, res) {
 }
 
 export async function loginApi(req, res) {
-  if (req.validationErrors) {
-    return res.status(400).json({ errors: req.validationErrors });
-  }
-
-  try {
-    const { user, sessionToken } = await loginUser(req.validatedBody);
-    res.cookie(authCookieName, sessionToken, getAuthCookieOptions());
-    return res.json({ user });
-  } catch (error) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-    throw error;
-  }
+  const { user, sessionToken } = await loginUser(req.validatedBody);
+  res.cookie(authCookieName, sessionToken, getAuthCookieOptions());
+  return res.json({ user });
 }
 
 export async function logoutApi(req, res) {

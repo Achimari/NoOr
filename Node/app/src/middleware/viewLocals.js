@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { createViewLocals } from "../i18n/index.js";
+import { isProduction } from "../config/env.js";
 import { siteData } from "../data/siteData.js";
 import { paths } from "../config/paths.js";
 import { getTimezoneLabel, getTimezoneOptions } from "../utils/timezones.js";
@@ -21,7 +22,7 @@ const sourceStyles = [
 
 function loadAssetManifest() {
   const manifestPath = path.join(paths.public, "assets", "manifest.json");
-  if (process.env.NODE_ENV !== "production" || !existsSync(manifestPath)) {
+  if (!isProduction || !existsSync(manifestPath)) {
     return {
       styles: sourceStyles,
       script: "/scripts/app.js",

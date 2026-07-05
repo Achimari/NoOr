@@ -1,11 +1,10 @@
 import {
   calculateCurrentStreak,
   calculateMaxStreak,
-  findCheckInHistoryByUserId,
   findMissedDaysByUserIds,
   findUsersWithCheckInHistory,
 } from "../repositories/checkInRepository.js";
-import { createDailyCheckIn, getWeeklyCheckInDays, markMissedDaysAsNo } from "./checkInService.js";
+import { createDailyCheckIn, getCheckInStatus, getWeeklyCheckInDays, markMissedDaysAsNo } from "./checkInService.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
 function sanitizeMissedDays(row) {
@@ -61,14 +60,16 @@ function getOverallBestStreak(rows) {
   };
 }
 
-export async function getLeaderboardSummary(userId, timezone) {
-  await markMissedDaysAsNo(userId, timezone);
+export async function getLeaderboardSummary(userId, timezone, { syncMissedDays = true, weekDays } = {}) {
+  if (syncMissedDays) {
+    await markMissedDaysAsNo(userId, timezone);
+  }
 
-  const [currentHistoryRows, users, weekDays] = await Promise.all([
-    findCheckInHistoryByUserId(userId),
+  const [users, resolvedWeekDays] = await Promise.all([
     findUsersWithCheckInHistory(),
-    getWeeklyCheckInDays(userId, timezone),
+    weekDays || getWeeklyCheckInDays(userId, timezone),
   ]);
+  const currentHistoryRows = users.find((user) => user.id === userId)?.checkInHistory || [];
   const leaderboardRows = users.map(toLeaderboardRow).sort(sortLeaderboardRows);
   const userIds = [...new Set([userId, ...leaderboardRows.map((row) => row.id)])];
   const missedRows = await findMissedDaysByUserIds(userIds);
@@ -80,7 +81,7 @@ export async function getLeaderboardSummary(userId, timezone) {
       value: calculateCurrentStreak(currentHistoryRows),
       maxStreak: calculateMaxStreak(currentHistoryRows),
       todayDateKey: getTodayDateKey(new Date(), timezone),
-      weekDays,
+      weekDays: resolvedWeekDays,
       missedDays: sanitizeMissedDays(missedDaysByUserId.get(userId)),
     },
     overallBest: getOverallBestStreak(leaderboardRows),
@@ -88,12 +89,21 @@ export async function getLeaderboardSummary(userId, timezone) {
   };
 }
 
-export async function incrementUserLeaderboard(userId, timezone) {
-  await createDailyCheckIn(userId, "YES", timezone);
-  return getLeaderboardSummary(userId, timezone);
+export async function getCheckInOverview(userId, timezone, { syncMissedDays = true } = {}) {
+  if (syncMissedDays) {
+    await markMissedDaysAsNo(userId, timezone);
+  }
+
+  const weekDays = await getWeeklyCheckInDays(userId, timezone);
+  const [status, leaderboard] = await Promise.all([
+    getCheckInStatus(userId, timezone, { syncMissedDays: false, weekDays }),
+    getLeaderboardSummary(userId, timezone, { syncMissedDays: false, weekDays }),
+  ]);
+
+  return { status, leaderboard };
 }
 
-export async function resetUserLeaderboard(userId, timezone) {
-  await createDailyCheckIn(userId, "NO", timezone);
-  return getLeaderboardSummary(userId, timezone);
+export async function submitDailyAnswer(userId, answer, timezone) {
+  await createDailyCheckIn(userId, answer, timezone);
+  return getCheckInOverview(userId, timezone, { syncMissedDays: false });
 }

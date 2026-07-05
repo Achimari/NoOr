@@ -10,8 +10,6 @@ import {
 import { AppError } from "../utils/appError.js";
 import { prayerReactionEmoji } from "../validators/prayerValidators.js";
 
-const supportedPrayerReactions = prayerReactionEmoji;
-
 function parsePrayerId(id) {
   const prayerId = Number(id);
   if (!Number.isInteger(prayerId) || prayerId <= 0) {
@@ -24,12 +22,12 @@ function parsePrayerId(id) {
 function summarizeReactions(reactions = []) {
   const counts = new Map();
   reactions.forEach((reaction) => {
-    if (supportedPrayerReactions.includes(reaction.emoji)) {
+    if (prayerReactionEmoji.includes(reaction.emoji)) {
       counts.set(reaction.emoji, (counts.get(reaction.emoji) || 0) + 1);
     }
   });
 
-  supportedPrayerReactions.forEach((emoji) => {
+  prayerReactionEmoji.forEach((emoji) => {
     if (!counts.has(emoji)) {
       counts.set(emoji, 0);
     }
@@ -86,7 +84,7 @@ export async function markPrayerAnswered({ id, userId }) {
 
 export async function reactToPrayer({ id, userId, emoji }) {
   const prayerId = parsePrayerId(id);
-  if (!supportedPrayerReactions.includes(emoji)) {
+  if (!prayerReactionEmoji.includes(emoji)) {
     throw new AppError("Choose a supported reaction", 400);
   }
 

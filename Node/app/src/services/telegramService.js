@@ -13,9 +13,8 @@ import {
   upsertTelegramConnection,
 } from "../repositories/telegramRepository.js";
 import { getTelegramBot, getTelegramBotUsername } from "./telegramBotService.js";
-import { getCheckInStatus } from "./checkInService.js";
-import { addPrayer } from "./prayerService.js";
-import { incrementUserLeaderboard, resetUserLeaderboard } from "./leaderboardService.js";
+import { createDailyCheckIn, getCheckInStatus } from "./checkInService.js";
+import { addPrayer, getPrayers } from "./prayerService.js";
 import { getTodayDateKey, getZonedParts } from "../utils/dateKey.js";
 import { env } from "../config/env.js";
 
@@ -148,7 +147,6 @@ async function sendPrayerList(chatId) {
   const activeBot = getTelegramBot();
   if (!activeBot) return;
 
-  const { getPrayers } = await import("./prayerService.js");
   const prayers = await getPrayers();
 
   await activeBot.sendMessage(chatId, formatPrayers(prayers), {
@@ -299,11 +297,7 @@ export async function handleTelegramAction(query) {
       const answer = query.data === telegramActions.answerYes ? "YES" : "NO";
 
       try {
-        if (answer === "YES") {
-          await incrementUserLeaderboard(connection.userId, connection.user.timezone);
-        } else {
-          await resetUserLeaderboard(connection.userId, connection.user.timezone);
-        }
+        await createDailyCheckIn(connection.userId, answer, connection.user.timezone);
       } catch (error) {
         if (error instanceof AppError && error.statusCode === 409) {
           const status = await getCheckInStatus(connection.userId, connection.user.timezone);
@@ -390,10 +384,11 @@ export async function sendDailyAnswerReminders(now = new Date()) {
   if (!activeBot) return { sent: 0 };
 
   const connections = await findActiveTelegramConnections();
+  const reminderHour = getAnswerReminderHour();
   let sent = 0;
 
   for (const connection of connections) {
-    if (!shouldRunAtLocalHour(now, connection.user.timezone, getAnswerReminderHour())) continue;
+    if (!shouldRunAtLocalHour(now, connection.user.timezone, reminderHour)) continue;
 
     const userDateKey = getTodayDateKey(now, connection.user.timezone);
     const answeredToday = connection.user.checkIn?.dateKey === userDateKey && connection.user.checkIn?.answer;
@@ -426,13 +421,15 @@ export async function sendDailyPrayerDigest(now = new Date()) {
   if (!activeBot) return { sent: 0 };
 
   const connections = await findActiveTelegramConnections();
-  const { getPrayers } = await import("./prayerService.js");
+  const dueConnections = connections.filter((connection) =>
+    shouldRunAtLocalHour(now, connection.user.timezone, PRAYER_DIGEST_HOUR),
+  );
+  if (!dueConnections.length) return { sent: 0 };
+
   const message = formatPrayers(await getPrayers());
   let sent = 0;
 
-  for (const connection of connections) {
-    if (!shouldRunAtLocalHour(now, connection.user.timezone, PRAYER_DIGEST_HOUR)) continue;
-
+  for (const connection of dueConnections) {
     const userDateKey = getTodayDateKey(now, connection.user.timezone);
     const claimed = await claimTelegramNotification({
       userId: connection.userId,

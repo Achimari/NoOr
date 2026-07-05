@@ -115,7 +115,7 @@ export async function updateUserName({ userId, name }) {
 }
 
 export async function updateUserPassword({ userId, currentPassword, password }) {
-  const user = await findAuthUserById(Number(userId));
+  const user = await findAuthUserById(userId);
   if (!user) {
     throw new AppError("User not found", 404);
   }

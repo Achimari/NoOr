@@ -1,5 +1,4 @@
-import { getLeaderboardSummary } from "../services/leaderboardService.js";
-import { getCheckInStatus } from "../services/checkInService.js";
+import { getCheckInOverview, getLeaderboardSummary } from "../services/leaderboardService.js";
 import { getPrayers, getUserPrayers } from "../services/prayerService.js";
 import { getStatisticsSummary } from "../services/statisticsService.js";
 import { readFileSync } from "node:fs";
@@ -23,9 +22,8 @@ export function renderPage({ view, pageId, titleKey }) {
     }
 
     if (pageId === "community") {
-      const [leaderboard, checkIn, prayers] = await Promise.all([
-        getLeaderboardSummary(req.user.id, req.user.timezone),
-        getCheckInStatus(req.user.id, req.user.timezone),
+      const [{ status, leaderboard }, prayers] = await Promise.all([
+        getCheckInOverview(req.user.id, req.user.timezone),
         getPrayers(req.user.id),
       ]);
 
@@ -33,7 +31,7 @@ export function renderPage({ view, pageId, titleKey }) {
         name: req.user.name,
         currentStreak: leaderboard.current.value,
         maxStreak: leaderboard.current.maxStreak,
-        todayAnswer: checkIn.answer || "Pending",
+        todayAnswer: status.answer || "Pending",
       };
       viewData.telegramState = {
         isTelegramLinked: Boolean(req.user.isTelegramLinked),

@@ -1,5 +1,4 @@
 import { addPrayer, getUserPrayers, markPrayerAnswered, reactToPrayer, removePrayerReaction } from "../services/prayerService.js";
-import { AppError } from "../utils/appError.js";
 
 export async function listPrayers(req, res) {
   const prayerLists = await getUserPrayers(req.user.id);
@@ -7,10 +6,6 @@ export async function listPrayers(req, res) {
 }
 
 export async function postPrayer(req, res) {
-  if (req.validationErrors) {
-    return res.status(400).json({ errors: req.validationErrors });
-  }
-
   const prayer = await addPrayer({
     userId: req.user.id,
     prayer: req.validatedBody.prayer,
@@ -20,57 +15,29 @@ export async function postPrayer(req, res) {
 }
 
 export async function answerPrayer(req, res) {
-  try {
-    await markPrayerAnswered({
-      id: req.params.id,
-      userId: req.user.id,
-    });
+  await markPrayerAnswered({
+    id: req.params.id,
+    userId: req.user.id,
+  });
 
-    return res.json({ success: true });
-  } catch (error) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-
-    throw error;
-  }
+  return res.json({ success: true });
 }
 
 export async function postPrayerReaction(req, res) {
-  if (req.validationErrors) {
-    return res.status(400).json({ errors: req.validationErrors });
-  }
+  const prayer = await reactToPrayer({
+    id: req.params.id,
+    userId: req.user.id,
+    emoji: req.validatedBody.emoji,
+  });
 
-  try {
-    const prayer = await reactToPrayer({
-      id: req.params.id,
-      userId: req.user.id,
-      emoji: req.validatedBody.emoji,
-    });
-
-    return res.json({ prayer });
-  } catch (error) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-
-    throw error;
-  }
+  return res.json({ prayer });
 }
 
 export async function deletePrayerReaction(req, res) {
-  try {
-    const prayer = await removePrayerReaction({
-      id: req.params.id,
-      userId: req.user.id,
-    });
+  const prayer = await removePrayerReaction({
+    id: req.params.id,
+    userId: req.user.id,
+  });
 
-    return res.json({ prayer });
-  } catch (error) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    }
-
-    throw error;
-  }
+  return res.json({ prayer });
 }

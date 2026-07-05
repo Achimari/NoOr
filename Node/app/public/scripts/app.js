@@ -50,6 +50,29 @@ let missedAnswerDateKey = null;
 let settingsCurrentAnswer = null;
 let pendingSettingsAnswer = null;
 
+async function apiFetch(url, { method = "GET", body } = {}) {
+  const options = { method, headers: { Accept: "application/json" } };
+  if (body !== undefined) {
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch {
+    return { ok: false, status: 0, data: {} };
+  }
+
+  if (response.status === 401) {
+    window.location.href = "/login";
+    return null;
+  }
+
+  const data = await response.json().catch(() => ({}));
+  return { ok: response.ok, status: response.status, data };
+}
+
 function bindPointerGlow(cards, xProperty, yProperty) {
   cards.forEach((card) => {
     card.addEventListener("pointermove", (event) => {
@@ -123,29 +146,17 @@ timezoneOptions?.addEventListener("click", async (event) => {
   const timezone = button.dataset.timezoneOption;
   button.disabled = true;
 
-  const response = await fetch("/api/me/timezone", {
-    method: "PATCH",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ timezone }),
-  });
+  const result = await apiFetch("/api/me/timezone", { method: "PATCH", body: { timezone } });
+  if (!result) return;
 
-  if (response.status === 401) {
-    window.location.href = "/login";
-    return;
-  }
-
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
+  if (!result.ok) {
     button.disabled = false;
-    showToast(data.error || data.errors?.[0] || "Could not save timezone", "error");
+    showToast(result.data.error || result.data.errors?.[0] || "Could not save timezone", "error");
     return;
   }
 
-  if (timezoneCurrent && data.timezone?.label) {
-    timezoneCurrent.textContent = data.timezone.label;
+  if (timezoneCurrent && result.data.timezone?.label) {
+    timezoneCurrent.textContent = result.data.timezone.label;
   }
   setTimezoneMenuOpen(false);
   showToast("Timezone updated");
@@ -201,25 +212,16 @@ function setSettingsAnswerState(answer) {
 async function loadSettingsAnswer() {
   if (!settingsAnswer) return;
 
-  const response = await fetch("/api/check-in/status", {
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  const result = await apiFetch("/api/check-in/status");
+  if (!result) return;
 
-  if (response.status === 401) {
-    window.location.href = "/login";
-    return;
-  }
-
-  if (!response.ok) {
+  if (!result.ok) {
     setSettingsAnswerState(null);
     showToast("Could not load today's answer", "error");
     return;
   }
 
-  const status = await response.json();
-  setSettingsAnswerState(status.answer);
+  setSettingsAnswerState(result.data.answer);
 }
 
 async function saveSettingsAnswer(answer) {
@@ -229,32 +231,17 @@ async function saveSettingsAnswer(answer) {
   setSettingsAnswerState(answer);
 
   try {
-    const response = await fetch("/api/check-in/today", {
-      method: "PATCH",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ answer }),
-    });
+    const result = await apiFetch("/api/check-in/today", { method: "PATCH", body: { answer } });
+    if (!result) return;
 
-    if (response.status === 401) {
-      window.location.href = "/login";
-      return;
-    }
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
+    if (!result.ok) {
       await loadSettingsAnswer();
-      showToast(data.error || "Could not change today's answer", "error");
+      showToast(result.data.error || "Could not change today's answer", "error");
       return;
     }
 
-    setSettingsAnswerState(data.status?.answer || answer);
+    setSettingsAnswerState(result.data.status?.answer || answer);
     showToast(answer === "YES" ? "Today's answer changed to yes" : "Today's answer changed to no");
-  } catch {
-    await loadSettingsAnswer();
-    showToast("Could not change today's answer", "error");
   } finally {
     settingsAnswerOptions.forEach((button) => {
       button.disabled = false;
@@ -796,28 +783,10 @@ function renderUserPrayerLists(prayerLists) {
 async function loadPrayers() {
   if (!prayersBody) return;
 
-  const response = await fetch("/api/prayers", {
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  const result = await apiFetch("/api/prayers");
+  if (!result?.ok) return;
 
-  if (response.status === 401) {
-    window.location.href = "/login";
-    return;
-  }
-
-  if (!response.ok) return;
-
-  const data = await response.json();
-  if (data.prayerLists) {
-    renderUserPrayerLists(data.prayerLists);
-    return;
-  }
-
-  allPrayers = Array.isArray(data.prayers) ? data.prayers : [];
-  updatePrayerUserOptions(allPrayers);
-  applyPrayerFilters();
+  renderUserPrayerLists(result.data.prayerLists || {});
 }
 
 if (prayerFilterToggle && prayerFilterPanel) {
@@ -850,19 +819,10 @@ if (prayersBody?.dataset.prayerActions === "true") {
     if (!button) return;
 
     button.disabled = true;
-    const response = await fetch(`/api/prayers/${button.dataset.prayerAnswered}/answered`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    const result = await apiFetch(`/api/prayers/${button.dataset.prayerAnswered}/answered`, { method: "POST" });
+    if (!result) return;
 
-    if (response.status === 401) {
-      window.location.href = "/login";
-      return;
-    }
-
-    if (!response.ok) {
+    if (!result.ok) {
       button.disabled = false;
       showToast("Could not mark prayer as answered", "error");
       return;
@@ -929,34 +889,29 @@ document.addEventListener("click", async (event) => {
       button.disabled = true;
     });
 
-    const response = await fetch("/api/check-in/missed", {
+    const result = await apiFetch("/api/check-in/missed", {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      body: {
         dateKey: missedAnswerDateKey,
         answer,
-      }),
+      },
     });
+    if (!result) return;
 
-    if (response.status === 401) {
-      window.location.href = "/login";
-      return;
-    }
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.leaderboard) {
+    if (!result.ok || !result.data.leaderboard) {
       modal?.querySelectorAll("[data-missed-answer]").forEach((button) => {
         button.disabled = false;
       });
-      showToast(data.error || "Could not save missed day", "error");
+      showToast(result.data.error || "Could not save missed day", "error");
       return;
     }
 
-    renderLeaderboard(data.leaderboard);
-    await loadCheckInStatus();
+    renderLeaderboard(result.data.leaderboard);
+    if (result.data.status) {
+      setAnswerState(result.data.status);
+    } else {
+      await loadCheckInStatus();
+    }
     closeMissedAnswerModal();
     showToast(answer === "YES" ? "Missed day saved: yes" : "Missed day saved: no");
     return;
@@ -984,30 +939,21 @@ document.addEventListener("click", async (event) => {
     reactionButton.disabled = true;
   });
 
-  const response = await fetch(`/api/prayers/${prayerId}/reaction`, {
-    method: isRemoving ? "DELETE" : "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: isRemoving ? undefined : JSON.stringify({ emoji }),
-  });
+  const result = await apiFetch(
+    `/api/prayers/${prayerId}/reaction`,
+    isRemoving ? { method: "DELETE" } : { method: "POST", body: { emoji } },
+  );
+  if (!result) return;
 
-  if (response.status === 401) {
-    window.location.href = "/login";
-    return;
-  }
-
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok || !data.prayer) {
+  if (!result.ok || !result.data.prayer) {
     chooser.querySelectorAll("[data-prayer-reaction]").forEach((reactionButton) => {
       reactionButton.disabled = false;
     });
-    showToast(data.error || "Could not add reaction", "error");
+    showToast(result.data.error || "Could not add reaction", "error");
     return;
   }
 
-  allPrayers = allPrayers.map((item) => (item.id === data.prayer.id ? data.prayer : item));
+  allPrayers = allPrayers.map((item) => (item.id === result.data.prayer.id ? result.data.prayer : item));
   closeReactionChooser();
   applyPrayerFilters();
   showToast(isRemoving ? "Reaction removed" : "Reaction saved");
@@ -1029,41 +975,27 @@ async function updateLeaderboard(action) {
   noButton?.classList.toggle("selected", action === "reset");
   markTodayWeekDay(action === "increment" ? "YES" : "NO");
 
-  let response;
+  const result = await apiFetch(endpoint, { method: "POST" });
+  if (!result) return;
 
-  try {
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-    });
-  } catch {
-    await loadCheckInStatus();
-    showToast("Could not save answer", "error");
-    return;
-  }
-
-  if (response.status === 401) {
-    window.location.href = "/login";
-    return;
-  }
-
-  if (response.status === 409) {
+  if (result.status === 409) {
     await loadCheckInStatus();
     showToast("You already answered today");
     return;
   }
 
-  if (!response.ok) {
+  if (!result.ok) {
     await loadCheckInStatus();
     showToast("Could not save answer", "error");
     return;
   }
 
-  const data = await response.json();
-  renderLeaderboard(data.leaderboard);
-  await loadCheckInStatus();
+  renderLeaderboard(result.data.leaderboard);
+  if (result.data.status) {
+    setAnswerState(result.data.status);
+  } else {
+    await loadCheckInStatus();
+  }
   showToast(action === "reset" ? "Answer saved: no" : "Answer saved: yes");
 }
 
@@ -1091,23 +1023,12 @@ if (prayerForm) {
 
     if (!prayer) return;
 
-    const response = await fetch("/api/prayers", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ prayer }),
-    });
+    const result = await apiFetch("/api/prayers", { method: "POST", body: { prayer } });
+    if (!result) return;
 
-    if (response.status === 401) {
-      window.location.href = "/login";
-      return;
-    }
-
-    if (!response.ok) {
+    if (!result.ok) {
       if (prayerStatus) prayerStatus.textContent = "";
-      showToast("Could not add prayer", "error");
+      showToast(result.data.errors?.[0] || "Could not add prayer", "error");
       return;
     }
 
@@ -1124,52 +1045,25 @@ if (telegramConnectButton) {
     if (telegramStatus) telegramStatus.textContent = "";
     showToast("Preparing Telegram link");
 
-    try {
-      const response = await fetch("/api/telegram/connect-link", {
-        headers: {
-          Accept: "application/json",
-        },
-      });
+    const result = await apiFetch("/api/telegram/connect-link");
+    if (!result) return;
 
-      if (response.status === 401) {
-        window.location.href = "/login";
-        return;
-      }
-
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.link) {
-        if (telegramStatus) telegramStatus.textContent = "";
-        showToast(data.error || "Could not create Telegram link", "error");
-        telegramConnectButton.disabled = false;
-        return;
-      }
-
-      if (telegramStatus) telegramStatus.textContent = "";
-      showToast(data.botUsername ? `Telegram link ready: @${data.botUsername}` : "Telegram link ready");
-      window.location.href = data.link;
-    } catch {
-      if (telegramStatus) telegramStatus.textContent = "";
-      showToast("Could not create Telegram link", "error");
+    if (!result.ok || !result.data.link) {
+      showToast(result.data.error || "Could not create Telegram link", "error");
       telegramConnectButton.disabled = false;
+      return;
     }
+
+    showToast(result.data.botUsername ? `Telegram link ready: @${result.data.botUsername}` : "Telegram link ready");
+    window.location.href = result.data.link;
   });
 }
 
 async function loadCheckInStatus() {
-  const response = await fetch("/api/check-in/status", {
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  const result = await apiFetch("/api/check-in/status");
+  if (!result?.ok) return;
 
-  if (response.status === 401) {
-    window.location.href = "/login";
-    return;
-  }
-
-  if (!response.ok) return;
-
-  setAnswerState(await response.json());
+  setAnswerState(result.data);
 }
 
 function setAnswerState(status) {
