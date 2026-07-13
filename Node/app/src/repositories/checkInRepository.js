@@ -43,6 +43,15 @@ export async function findAllCheckInHistory() {
   });
 }
 
+export async function findCheckInHistoryByUserId(userId) {
+  return prisma.checkInHistory.findMany({
+    where: { userId },
+    select: {
+      answer: true,
+    },
+  });
+}
+
 export async function findUsersWithCheckInHistory() {
   return prisma.auth.findMany({
     select: {

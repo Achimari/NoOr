@@ -51,7 +51,7 @@ export function renderPage({ view, pageId, titleKey }) {
     }
 
     if (pageId === "statistics") {
-      viewData.statistics = await getStatisticsSummary();
+      viewData.statistics = await getStatisticsSummary(req.user.id);
     }
 
     res.render(`pages/${view}`, {

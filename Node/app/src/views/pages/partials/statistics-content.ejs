@@ -98,24 +98,25 @@
         </div>
       </section>
 
-      <section class="statistics-graphs statistics-patterns" aria-label="Community answer patterns">
-        <% const dayShare = statistics.timeOfDayChart.find((period) => period.id === "day")?.sharePercentage || 0; %>
+      <section class="statistics-graphs statistics-patterns" aria-label="Answer patterns">
+        <% const currentUserYesShare = statistics.currentUserAnswerDistributionChart.find((answer) => answer.id === "yes")?.sharePercentage || 0; %>
+        <% const currentUserAnswers = statistics.currentUserAnswerDistributionChart.reduce((total, answer) => total + answer.value, 0); %>
         <% const yesShare = statistics.answerDistributionChart.find((answer) => answer.id === "yes")?.sharePercentage || 0; %>
 
         <article class="dashboard-card statistics-donut-card">
           <header class="dashboard-card-head">
-            <h2>Day or night</h2>
-            <span><%= statistics.totals.answers %> total</span>
+            <h2>Your answers</h2>
+            <span><%= currentUserAnswers %> total</span>
           </header>
           <div class="statistics-donut-layout">
-            <div class="statistics-donut statistics-donut-time" style="--donut-main: <%= dayShare %>%">
-              <span><%= dayShare %>%</span>
+            <div class="statistics-donut statistics-donut-answer" style="--donut-main: <%= currentUserYesShare %>%">
+              <span><%= currentUserYesShare %>%</span>
             </div>
             <div class="statistics-donut-legend">
-              <% statistics.timeOfDayChart.forEach((period) => { %>
-                <div class="statistics-donut-row statistics-donut-row-<%= period.tone %>">
-                  <span><%= period.label %></span>
-                  <strong><%= period.value %></strong>
+              <% statistics.currentUserAnswerDistributionChart.forEach((answer) => { %>
+                <div class="statistics-donut-row statistics-donut-row-<%= answer.tone %>">
+                  <span><%= answer.label %></span>
+                  <strong><%= answer.value %></strong>
                 </div>
               <% }) %>
             </div>

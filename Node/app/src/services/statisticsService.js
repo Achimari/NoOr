@@ -1,4 +1,4 @@
-import { findAllCheckInHistory } from "../repositories/checkInRepository.js";
+import { findAllCheckInHistory, findCheckInHistoryByUserId } from "../repositories/checkInRepository.js";
 import { findAuthUserTimezones } from "../repositories/authRepository.js";
 
 const WEEK_DAYS = [
@@ -9,11 +9,6 @@ const WEEK_DAYS = [
   { label: "Fri", longLabel: "Friday" },
   { label: "Sat", longLabel: "Saturday" },
   { label: "Sun", longLabel: "Sunday" },
-];
-
-const TIME_OF_DAY_GROUPS = [
-  { id: "day", label: "Day", tone: "day" },
-  { id: "night", label: "Night", tone: "night" },
 ];
 
 const TIMEZONE_AREAS = [
@@ -54,40 +49,6 @@ function buildDistributionRows(rows, maxValue) {
     percentage: maxValue > 0 ? Math.max(6, Math.round((row.value / maxValue) * 100)) : 0,
     sharePercentage: totalValue > 0 ? Math.round((row.value / totalValue) * 100) : 0,
   }));
-}
-
-function getHourInTimezone(date, timezone) {
-  try {
-    const parts = new Intl.DateTimeFormat("en-GB", {
-      hour: "2-digit",
-      hour12: false,
-      timeZone: timezone || "UTC",
-    }).formatToParts(date);
-    const hour = Number(parts.find((part) => part.type === "hour")?.value);
-    return Number.isFinite(hour) ? hour : null;
-  } catch {
-    return date.getUTCHours();
-  }
-}
-
-function buildTimeOfDayChart(historyRows) {
-  const counts = TIME_OF_DAY_GROUPS.map((group) => ({ ...group, value: 0 }));
-
-  for (const row of historyRows) {
-    const answeredAt = new Date(row.createdAt);
-    if (Number.isNaN(answeredAt.getTime())) continue;
-
-    const hour = getHourInTimezone(answeredAt, row.user?.timezone);
-    if (hour === null) continue;
-
-    if (hour >= 6 && hour < 18) {
-      counts[0].value += 1;
-    } else {
-      counts[1].value += 1;
-    }
-  }
-
-  return buildDistributionRows(counts, Math.max(0, ...counts.map((row) => row.value)));
 }
 
 function clamp(value, min, max) {
@@ -164,9 +125,10 @@ function buildPrayerWorld(rows) {
   };
 }
 
-export async function getStatisticsSummary() {
-  const [historyRows, timezoneRows] = await Promise.all([
+export async function getStatisticsSummary(userId) {
+  const [historyRows, currentUserHistoryRows, timezoneRows] = await Promise.all([
     findAllCheckInHistory(),
+    findCheckInHistoryByUserId(userId),
     findAuthUserTimezones(),
   ]);
   const days = WEEK_DAYS.map((day) => ({
@@ -199,6 +161,24 @@ export async function getStatisticsSummary() {
     { id: "no", label: "No", tone: "no", value: totalNo },
   ];
   const maxAnswerDistribution = Math.max(0, ...answerDistribution.map((row) => row.value));
+  const currentUserAnswerDistribution = [
+    {
+      id: "yes",
+      label: "Yes",
+      tone: "yes",
+      value: currentUserHistoryRows.filter((row) => row.answer === "YES").length,
+    },
+    {
+      id: "no",
+      label: "No",
+      tone: "no",
+      value: currentUserHistoryRows.filter((row) => row.answer === "NO").length,
+    },
+  ];
+  const maxCurrentUserAnswerDistribution = Math.max(
+    0,
+    ...currentUserAnswerDistribution.map((row) => row.value),
+  );
 
   return {
     hardestDay: {
@@ -213,7 +193,10 @@ export async function getStatisticsSummary() {
     },
     noChart: buildChartRows(days, "no", maxNo),
     yesChart: buildChartRows(days, "yes", maxYes),
-    timeOfDayChart: buildTimeOfDayChart(historyRows),
+    currentUserAnswerDistributionChart: buildDistributionRows(
+      currentUserAnswerDistribution,
+      maxCurrentUserAnswerDistribution,
+    ),
     answerDistributionChart: buildDistributionRows(answerDistribution, maxAnswerDistribution),
     totals: {
       yes: totalYes,
