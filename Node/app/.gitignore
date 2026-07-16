@@ -16,6 +16,9 @@ pnpm-debug.log*
 .idea/
 .vscode/
 
+# Claude local configuration, skills, and generated data
+.claude/
+
 # Build and generated output
 dist/
 coverage/
