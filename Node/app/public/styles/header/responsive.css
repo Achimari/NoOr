@@ -123,15 +123,13 @@
   }
 
   .header-auth-button {
-    min-height: 32px;
-    padding: 0 8px;
-    border-radius: 10px;
+    min-height: 36px;
+    padding: 0 10px;
   }
 
   .header-settings-link {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
   }
 
   .header-settings-icon {
@@ -140,10 +138,9 @@
   }
 
   .header-timezone-button {
-    min-height: 32px;
-    padding: 0 8px;
-    border-radius: 10px;
-    font-size: 11px;
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
   }
 
   .header-timezone-menu {
@@ -189,30 +186,28 @@
   }
 
   .header-auth-link {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .header-auth-button {
-    min-height: 28px;
-    padding: 0 6px;
-    border-radius: 9px;
+    min-height: 36px;
+    padding: 0 8px;
   }
 
   .header-settings-link {
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
+    width: 36px;
+    height: 36px;
   }
 
   .header-settings-icon {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
   }
 
   .header-timezone-button {
-    min-height: 28px;
-    padding: 0 6px;
-    font-size: 10px;
+    min-height: 36px;
+    padding: 0 8px;
+    font-size: 12px;
   }
 }
 
@@ -227,28 +222,10 @@
   }
 
   .header-auth-link {
-    font-size: 11px;
-  }
-
-  .header-auth-button {
-    min-height: 28px;
-    padding: 0 6px;
+    font-size: 12px;
   }
 
   .header-timezone-menu {
     right: -54px;
-  }
-
-  .header-menu-button {
-    width: 30px;
-    height: 30px;
-  }
-
-  .header-menu-button span:first-child {
-    top: 12px;
-  }
-
-  .header-menu-button span:last-child {
-    top: 19px;
   }
 }

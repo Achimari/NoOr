@@ -1,24 +1,24 @@
+/* ============================================================
+   NoOr app surfaces — dark data product system
+   Roles: page #0b0c0d, surface #101214, elevated #15181b
+   Radius: panels 18px, controls 10-12px, tags 6-8px
+   ============================================================ */
+
 .dashboard-page {
-  --table-body-size: 1.12rem;
-  --table-head-size: 0.86rem;
-  --table-row-padding-y: 16px;
-  --table-row-padding-x: var(--space-5);
-  --table-row-min-height: 72px;
-  --table-body-weight: 750;
-  --table-strong-weight: 850;
+  --table-body-size: 0.95rem;
+  --table-head-size: 0.75rem;
+  --table-row-padding-y: 10px;
+  --table-row-padding-x: var(--space-4);
+  --table-row-min-height: 58px;
   --accent-green: rgb(190, 246, 218);
   --accent-red: rgb(244, 188, 188);
-  --dashboard-card-radius: 18px;
-  --dashboard-card-bg:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.075), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.026)),
-    rgba(255, 255, 255, 0.045);
-  --dashboard-card-bg-hover:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.1), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.068), rgba(255, 255, 255, 0.032)),
-    rgba(255, 255, 255, 0.06);
-  background: var(--black);
-  color: var(--white);
+  --green-soft: rgba(128, 218, 172, 0.55);
+  --red-soft: rgba(218, 128, 128, 0.55);
+  --row-hover: rgba(255, 255, 255, 0.03);
+  --row-current: rgba(255, 255, 255, 0.05);
+  --focus-ring-color: rgba(255, 255, 255, 0.55);
+  background: var(--bg-page);
+  color: var(--text-primary);
 }
 
 .dashboard-section {
@@ -27,8 +27,8 @@
   align-items: flex-start;
   min-height: calc(100vh - 74px);
   background:
-    radial-gradient(circle at 50% 0%, var(--white-10), transparent 30%),
-    var(--black);
+    radial-gradient(ellipse 90% 40% at 50% 0%, rgba(255, 255, 255, 0.045), transparent 68%),
+    var(--bg-page);
 }
 
 .dashboard-section>.container {
@@ -56,22 +56,24 @@
 }
 
 .dashboard-kicker {
-  margin: 0 0 var(--space-2);
-  color: var(--white-54);
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  margin: 0 0 var(--space-1);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .dashboard-title {
   margin: 0;
-  color: var(--white);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 850;
-  line-height: 1.08;
-  letter-spacing: 0;
+  color: var(--text-primary);
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
 }
+
+/* ------------------------------------------------------------
+   YES / NO decision area — the one surface that keeps gradients
+   ------------------------------------------------------------ */
 
 .dashboard-actions {
   position: relative;
@@ -81,75 +83,57 @@
   width: 100%;
   margin-bottom: var(--space-4);
   overflow: hidden;
-  border: 0;
-  border-radius: 20px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 36%),
-    rgba(255, 255, 255, 0.045);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--surface-1);
 }
 
 .dashboard-action {
   position: relative;
-  --action-glow-x: 50%;
-  --action-glow-y: 50%;
-  --action-accent: rgba(255, 255, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  min-height: 178px;
+  min-height: 172px;
   padding: var(--space-6);
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--white);
+  color: var(--text-primary);
   font: inherit;
   text-align: center;
   cursor: pointer;
-  overflow: hidden;
-  isolation: isolate;
-  transition: background 180ms ease, box-shadow 180ms ease, transform 160ms ease, color 180ms ease;
+  transition:
+    background var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .dashboard-action+.dashboard-action {
-  border-left: 0;
-}
-
-.dashboard-action::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(circle 260px at var(--action-glow-x) var(--action-glow-y), var(--action-accent), transparent 62%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.065), transparent 54%);
-  opacity: 0;
-  transition: opacity 220ms ease;
+  border-left: 1px solid var(--border-subtle);
 }
 
 .dashboard-action-copy {
   display: grid;
   justify-items: center;
-  gap: 12px;
+  gap: 10px;
   margin: 0 auto;
 }
 
 .dashboard-action-label {
-  color: var(--white);
-  font-size: clamp(3.8rem, 6.4vw, 5.9rem);
-  font-weight: 900;
-  line-height: 0.9;
-  letter-spacing: 0;
-  transition: transform 180ms ease, font-weight 180ms ease;
+  color: var(--text-primary);
+  font-size: clamp(3.2rem, 5.6vw, 4.8rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
 }
 
 .dashboard-action-subtitle {
-  color: var(--white-72);
-  font-size: clamp(1.2rem, 1.9vw, 1.52rem);
-  font-weight: 700;
-  line-height: 1.2;
-  transition: color 180ms ease;
+  color: var(--text-muted);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  font-weight: 500;
+  line-height: 1.3;
+  transition: color var(--duration-ui) var(--ease-out);
 }
 
 .dashboard-action-selected-icon {
@@ -157,88 +141,40 @@
 }
 
 .dashboard-action-yes {
-  --action-accent: rgba(190, 246, 218, 0.28);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(190, 246, 218, 0.18), transparent 58%),
-    linear-gradient(90deg, rgba(78, 166, 124, 0.16), rgba(138, 218, 177, 0.18));
-}
-
-.dashboard-action-yes {
-  color: var(--white);
+  background: linear-gradient(180deg, rgba(128, 218, 172, 0.08), rgba(128, 218, 172, 0.03));
 }
 
 .dashboard-action-no {
-  --action-accent: rgba(244, 188, 188, 0.28);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(244, 188, 188, 0.18), transparent 58%),
-    linear-gradient(90deg, rgba(178, 92, 92, 0.16), rgba(220, 146, 146, 0.18));
-}
-
-.dashboard-action-no {
-  color: var(--white);
-}
-
-.dashboard-action:hover,
-.dashboard-action:focus-visible {
-  box-shadow: inset 0 0 42px rgba(255, 255, 255, 0.035);
-  outline: none;
+  background: linear-gradient(180deg, rgba(218, 128, 128, 0.08), rgba(218, 128, 128, 0.03));
 }
 
 .dashboard-action-yes:hover,
 .dashboard-action-yes:focus-visible {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(190, 246, 218, 0.24), transparent 58%),
-    linear-gradient(90deg, rgba(128, 218, 172, 0.22), rgba(190, 246, 218, 0.26));
+  background: linear-gradient(180deg, rgba(128, 218, 172, 0.16), rgba(128, 218, 172, 0.06));
 }
 
 .dashboard-action-no:hover,
 .dashboard-action-no:focus-visible {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(244, 188, 188, 0.24), transparent 58%),
-    linear-gradient(90deg, rgba(218, 128, 128, 0.22), rgba(244, 188, 188, 0.26));
-}
-
-.dashboard-action:hover::before,
-.dashboard-action:focus-visible::before,
-.dashboard-action.selected::before {
-  opacity: 1;
-}
-
-.dashboard-action:hover .dashboard-action-label,
-.dashboard-action:focus-visible .dashboard-action-label {
-  transform: scale(1.035);
-  font-weight: 900;
+  background: linear-gradient(180deg, rgba(218, 128, 128, 0.16), rgba(218, 128, 128, 0.06));
 }
 
 .dashboard-action:hover .dashboard-action-subtitle,
 .dashboard-action:focus-visible .dashboard-action-subtitle {
-  color: var(--white-72);
+  color: var(--text-primary);
 }
 
 .dashboard-action:active {
-  transform: scale(0.992);
+  transform: scale(0.98);
 }
 
 .dashboard-action-yes.selected {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(246, 255, 251, 0.42), transparent 58%),
-    linear-gradient(90deg, rgba(128, 218, 172, 0.92), rgba(190, 246, 218, 0.98));
+  background: linear-gradient(180deg, rgba(146, 226, 184, 0.94), rgba(190, 246, 218, 0.9));
   color: var(--black);
-  box-shadow:
-    inset 0 0 0 1px rgba(246, 255, 251, 0.32),
-    inset 0 -28px 64px rgba(0, 0, 0, 0.08),
-    0 0 42px rgba(128, 218, 172, 0.18);
 }
 
 .dashboard-action-no.selected {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 246, 246, 0.42), transparent 58%),
-    linear-gradient(90deg, rgba(218, 128, 128, 0.92), rgba(244, 188, 188, 0.98));
+  background: linear-gradient(180deg, rgba(224, 142, 142, 0.94), rgba(244, 188, 188, 0.9));
   color: var(--black);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 246, 246, 0.32),
-    inset 0 -28px 64px rgba(0, 0, 0, 0.08),
-    0 0 42px rgba(218, 128, 128, 0.18);
 }
 
 .dashboard-action.selected .dashboard-action-label,
@@ -246,23 +182,23 @@
   color: var(--black);
 }
 
-.dashboard-action.selected .dashboard-action-label {
-  font-weight: 950;
-}
-
 .dashboard-action.selected .dashboard-action-subtitle {
-  opacity: 0.78;
+  opacity: 0.72;
 }
 
-.dashboard-action-yes:hover,
-.dashboard-action-yes:focus-visible {
-  color: var(--white);
+.dashboard-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
 }
 
-.dashboard-action-no:hover,
-.dashboard-action-no:focus-visible {
-  color: var(--white);
+.dashboard-action.selected:disabled {
+  opacity: 1;
 }
+
+/* ------------------------------------------------------------
+   Buttons on dark surfaces
+   ------------------------------------------------------------ */
 
 .dashboard-page .btn-primary {
   background: var(--white);
@@ -275,35 +211,27 @@
   background: var(--white-92);
   color: var(--black);
   border-color: var(--white-92);
-  transform: translateY(-1px);
 }
 
 .dashboard-page .btn-secondary {
   background: var(--white-06);
-  border-color: var(--white-10);
-  color: var(--white);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
 }
 
 .dashboard-page .btn-secondary:hover,
 .dashboard-page .btn-secondary:focus-visible {
   background: var(--white-10);
-  border-color: var(--white-18);
+  border-color: var(--border-strong);
   color: var(--white);
-  transform: translateY(-1px);
-}
-
-.dashboard-action:disabled {
-  cursor: not-allowed;
-  opacity: 0.46;
-  transform: none;
 }
 
 .dashboard-answer-status {
   min-height: 0;
   margin: 0 0 var(--space-4);
-  color: var(--white-54);
+  color: var(--text-muted);
   font-size: 0.88rem;
-  font-weight: 700;
+  font-weight: 500;
   text-align: center;
 }
 
@@ -311,20 +239,65 @@
   display: none;
 }
 
+/* ------------------------------------------------------------
+   Timer card
+   ------------------------------------------------------------ */
+
 .dashboard-timer-label {
   margin: 0 0 var(--space-1);
-  color: var(--white-54);
-  font-size: 0.92rem;
-  font-weight: 800;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .dashboard-timer-value {
-  color: var(--white);
-  font-size: 1.72rem;
-  font-weight: 850;
+  color: var(--text-primary);
+  font-size: 1.6rem;
+  font-weight: 700;
   line-height: 1.08;
   font-variant-numeric: tabular-nums;
 }
+
+.dashboard-timer-card {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--surface-1);
+}
+
+.dashboard-timer-card[hidden] {
+  display: none;
+}
+
+.dashboard-timer-copy {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-timer-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--white-10);
+}
+
+.dashboard-timer-progress {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--white-72);
+  transition: width 1s linear;
+}
+
+/* ------------------------------------------------------------
+   Toast
+   ------------------------------------------------------------ */
 
 .app-toast {
   position: fixed;
@@ -333,18 +306,20 @@
   z-index: 100;
   max-width: min(360px, calc(100vw - 2 * var(--space-4)));
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--white-18);
-  border-radius: 12px;
-  background: rgba(15, 15, 15, 0.96);
-  color: var(--white);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  color: var(--text-primary);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.35;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(10px);
-  transition: opacity 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+  transform: translateY(8px);
+  transition:
+    opacity var(--duration-ui) var(--ease-out),
+    transform var(--duration-ui) var(--ease-out);
 }
 
 .app-toast.visible {
@@ -353,15 +328,18 @@
 }
 
 .app-toast[data-variant="error"] {
-  border-color: var(--white-54);
+  border-color: var(--red-soft);
 }
+
+/* ------------------------------------------------------------
+   Cards — flat surfaces, no decorative motion
+   ------------------------------------------------------------ */
 
 .dashboard-current,
 .dashboard-card {
-  border: 1px solid var(--white-10);
-  border-radius: var(--dashboard-card-radius);
-  background: var(--dashboard-card-bg);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--surface-1);
   margin-bottom: var(--space-4);
 }
 
@@ -371,7 +349,6 @@
   gap: var(--space-4);
   align-items: center;
   padding: var(--space-5);
-  margin-bottom: var(--space-4);
 }
 
 .dashboard-current>div {
@@ -380,26 +357,29 @@
 
 .dashboard-label {
   margin: 0 0 var(--space-1);
-  color: var(--white-54);
-  font-size: 0.82rem;
-  font-weight: 750;
-  line-height: 1.2;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 .dashboard-value {
   margin: 0;
-  color: var(--white);
-  font-size: 1.55rem;
-  font-weight: 850;
-  line-height: 1.1;
+  color: var(--text-primary);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.12;
+  font-variant-numeric: tabular-nums;
 }
 
-.home-page .dashboard-current .dashboard-label {
-  font-size: 0.92rem;
+.dashboard-value-unit {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .home-page .dashboard-current .dashboard-value {
-  font-size: 2rem;
+  font-size: 1.7rem;
 }
 
 .dashboard-holder-name {
@@ -415,56 +395,17 @@
   justify-content: start;
 }
 
-.dashboard-timer-card {
-  display: grid;
-  gap: var(--space-3);
-  margin: calc(var(--space-4) * -0.35) 0 var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--white-10);
-  border-radius: var(--dashboard-card-radius);
-  background: var(--dashboard-card-bg);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
-}
-
-.dashboard-timer-card[hidden] {
-  display: none;
-}
-
-.dashboard-timer-copy {
-  display: flex;
-  gap: var(--space-4);
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dashboard-timer-track {
-  height: 8px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--white-10);
-}
-
-.dashboard-timer-progress {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--white-54), var(--white));
-  box-shadow: 0 0 18px rgba(255, 255, 255, 0.24);
-  transition: width 1s linear;
-}
-
 .dashboard-day {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 38px;
   height: 38px;
-  border: 1px solid var(--white-10);
+  border: 1px solid var(--border-subtle);
   border-radius: 50%;
-  color: var(--white-54);
-  font-size: 0.9rem;
-  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .dashboard-day.active {
@@ -474,28 +415,13 @@
 }
 
 .dashboard-day.missed {
-  border-color: var(--white-54);
+  border-color: var(--border-strong);
   background: var(--white-10);
-  color: var(--white);
+  color: var(--text-primary);
 }
 
 .dashboard-card {
   padding: var(--space-5);
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
-}
-
-.dashboard-card:hover,
-.dashboard-card:focus-within {
-  border-color: var(--white-18);
-  background: var(--dashboard-card-bg-hover);
-}
-
-.dashboard-card:has(.leaderboard-table):hover,
-.dashboard-card:has(.leaderboard-table):focus-within,
-.dashboard-card:has(.customer-prayer-list):hover,
-.dashboard-card:has(.customer-prayer-list):focus-within {
-  border-color: var(--white-10);
-  background: var(--dashboard-card-bg);
 }
 
 .dashboard-card-head {
@@ -508,33 +434,27 @@
 
 .dashboard-card-head h2 {
   margin: 0;
-  color: var(--white);
-  font-size: clamp(1.22rem, 1.8vw, 1.48rem);
-  font-weight: 850;
-  line-height: 1.12;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
 }
 
 .dashboard-card-head span {
-  color: var(--white-54);
-  font-size: 1rem;
-  font-weight: 800;
-}
-
-.home-page .dashboard-card-head h2 {
-  font-size: 1.48rem;
-}
-
-.home-page .dashboard-card-head span {
-  font-size: 1.08rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .home-page .dashboard-card .dashboard-card-head {
   margin-bottom: var(--space-3);
 }
 
-.home-page .dashboard-card {
-  padding: var(--space-5);
-}
+/* ------------------------------------------------------------
+   Data tables — shared system (leaderboard + prayers)
+   ------------------------------------------------------------ */
 
 .leaderboard-table-wrap {
   overflow-x: auto;
@@ -544,7 +464,7 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  color: var(--white);
+  color: var(--text-primary);
   font-size: var(--table-body-size);
 }
 
@@ -556,57 +476,38 @@
 }
 
 .leaderboard-table thead th {
-  border-bottom: 1px solid var(--white-10);
-}
-
-.leaderboard-table th {
-  color: var(--white-54);
+  padding-top: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   font-size: var(--table-head-size);
   font-weight: 700;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .leaderboard-table td {
   height: var(--table-row-min-height);
-  font-weight: var(--table-body-weight);
+  font-weight: 500;
   border-top: 1px solid var(--white-06);
-  transition: background 160ms ease, color 160ms ease;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .leaderboard-table tbody tr:first-child td {
   border-top: 0;
 }
 
-.leaderboard-table tbody tr:first-child td:first-child {
-  border-top-left-radius: 0;
-}
-
-.leaderboard-table tbody tr:first-child td:last-child {
-  border-top-right-radius: 0;
-}
-
-.leaderboard-table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 0;
-}
-
-.leaderboard-table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 0;
-}
-
-.leaderboard-table:not(.prayer-table) tbody tr:hover td {
-  background: rgba(255, 255, 255, 0.045);
-}
-
 .leaderboard-table th:first-child,
 .leaderboard-table td:first-child {
-  width: 74px;
-  color: var(--white-54);
+  width: 56px;
+  color: var(--text-muted);
 }
 
 .leaderboard-table th:last-child,
 .leaderboard-table td:last-child {
+  width: 1%;
   text-align: right;
-  width: 360px;
+  white-space: nowrap;
 }
 
 .leaderboard-table th:nth-child(2),
@@ -614,9 +515,26 @@
   width: auto;
 }
 
-.leaderboard-empty {
-  color: var(--white-54);
-  text-align: center !important;
+@media (hover: hover) and (pointer: fine) {
+  .leaderboard-table:not(.prayer-table) tbody tr:hover td {
+    background: var(--row-hover);
+  }
+}
+
+.leaderboard-table:not(.prayer-table) tbody tr:focus-within td {
+  background: var(--row-hover);
+}
+
+.leaderboard-table tbody tr.is-current td {
+  background: var(--row-current);
+}
+
+.leaderboard-table tbody tr.is-current td:first-child {
+  box-shadow: inset 2px 0 0 var(--white-72);
+}
+
+.leaderboard-table tbody tr.is-current .leaderboard-rank {
+  color: var(--text-primary);
 }
 
 .leaderboard-head-label,
@@ -624,32 +542,9 @@
 .leaderboard-streak {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-2);
   min-height: 32px;
-  line-height: 1.2;
-}
-
-.leaderboard-rank {
-  font-weight: var(--table-strong-weight);
-  color: var(--white-54);
-  transition: color 160ms ease;
-}
-
-.leaderboard-table:not(.prayer-table) tbody tr:hover .leaderboard-rank {
-  color: var(--white-92);
-}
-
-.leaderboard-table:not(.prayer-table) tbody tr:hover .leaderboard-user {
-  color: var(--white);
-}
-
-.leaderboard-row-icon {
-  color: var(--white-72);
-  transition: color 160ms ease;
-}
-
-.leaderboard-table:not(.prayer-table) tbody tr:hover .leaderboard-row-icon {
-  color: var(--white-92);
+  line-height: 1.3;
 }
 
 .leaderboard-head-label-right,
@@ -657,94 +552,138 @@
   justify-content: flex-end;
 }
 
+.leaderboard-rank {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 .leaderboard-streak {
   width: 100%;
-  gap: var(--space-4);
+  gap: var(--space-3);
   font-size: var(--table-body-size);
-  font-weight: var(--table-strong-weight);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .leaderboard-missed-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  width: 178px;
-  max-width: 100%;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--white-18);
-  border-radius: 12px;
+  min-height: 30px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-tag);
   background: var(--white-06);
-  color: var(--white-92);
+  color: var(--text-muted);
   font: inherit;
-  font-size: 0.86rem;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
   white-space: nowrap;
   cursor: pointer;
-  flex: 0 0 178px;
   transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .leaderboard-missed-tag:hover,
 .leaderboard-missed-tag:focus-visible {
-  border-color: var(--white-54);
+  border-color: var(--border-strong);
   background: var(--white-10);
-  color: var(--white);
-  transform: translateY(-1px);
-  outline: none;
+  color: var(--text-primary);
+}
+
+.leaderboard-missed-tag:active {
+  transform: scale(0.97);
 }
 
 .leaderboard-missed-tag.is-static {
   cursor: default;
-  color: var(--white-54);
   pointer-events: none;
 }
 
 .leaderboard-icon,
 .leaderboard-row-icon {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
+  stroke-width: 2;
 }
 
 .leaderboard-icon {
-  color: var(--white-54);
+  color: var(--text-muted);
 }
 
 .leaderboard-row-icon {
-  color: var(--white-72);
-  transition: color 160ms ease;
-}
-
-.leaderboard-rank {
-  color: var(--white-54);
-  font-weight: var(--table-strong-weight);
-  transition: color 160ms ease;
+  color: var(--text-muted);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .user-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 100%;
   width: fit-content;
-  color: var(--white);
+  color: var(--text-primary);
   text-decoration: none;
-  transition: color 180ms ease, opacity 180ms ease;
+  overflow-wrap: anywhere;
+  border-radius: 6px;
+  transition: color var(--duration-ui) var(--ease-out);
 }
 
 .user-link:hover,
 .user-link:focus-visible {
-  color: var(--white-72);
+  color: var(--white);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--white-54);
 }
 
-.leaderboard-table .user-link:hover,
-.leaderboard-table .user-link:focus-visible,
-.leaderboard-table:not(.prayer-table) tbody tr:hover .user-link {
-  color: var(--white);
+.user-link:hover .leaderboard-row-icon,
+.user-link:focus-visible .leaderboard-row-icon {
+  color: var(--text-primary);
 }
+
+/* Table empty states */
+.leaderboard-table td.leaderboard-empty {
+  height: auto;
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+p.leaderboard-empty {
+  margin: 0;
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.table-empty-title {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.table-empty-hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------------
+   Info grid (community page + shared panels)
+   ------------------------------------------------------------ */
 
 .info-container {
   width: min(100%, 1160px);
@@ -788,20 +727,21 @@
 
 .info-motivation blockquote {
   margin: 0;
-  color: var(--white);
-  max-width: 20ch;
-  font-size: clamp(1.22rem, 1.9vw, 1.72rem);
-  font-weight: 850;
-  line-height: 1.12;
+  color: var(--text-primary);
+  max-width: 24ch;
+  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
   overflow-wrap: anywhere;
 }
 
 .info-quote-source {
   margin: 0;
-  color: var(--white-54);
-  font-size: 0.88rem;
-  font-weight: 750;
-  line-height: 1.2;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 .info-stat-grid {
@@ -810,29 +750,29 @@
 }
 
 .info-stat-grid .dashboard-value {
-  font-size: clamp(1.28rem, 1.7vw, 1.56rem);
-  line-height: 1.15;
+  font-size: clamp(1.2rem, 1.6vw, 1.4rem);
+  line-height: 1.2;
 }
 
 .info-stat-grid .dashboard-label {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .telegram-card-copy {
   margin: 0;
-  max-width: 32ch;
-  font-size: 1.08rem;
-  font-weight: 650;
-  line-height: 1.5;
+  max-width: 34ch;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.55;
 }
 
 .telegram-connect-button {
   width: 100%;
-  min-height: 56px;
+  min-height: 52px;
   margin-top: auto;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 850;
+  border-radius: 12px;
+  font-size: 0.96rem;
+  font-weight: 700;
 }
 
 .info-telegram-card {
@@ -844,49 +784,279 @@
   padding: var(--space-5);
 }
 
-.prayer-table-actions th:last-child,
-.prayer-table-actions td:last-child {
-  display: none;
+/* ------------------------------------------------------------
+   Prayer tables — real tables on desktop, stacked on mobile
+   ------------------------------------------------------------ */
+
+.prayer-table th.prayer-actions-column,
+.prayer-table td.prayer-row-actions {
+  width: 56px;
+  min-width: 56px;
+  padding-left: 0;
+  padding-right: var(--space-3);
+  text-align: right;
 }
 
-.prayer-remove-button {
+.prayer-row-actions .action-menu-trigger {
+  margin-top: -6px;
+}
+
+.prayer-table-wrap {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.prayer-page .prayer-table-wrap,
+.info-prayers .prayer-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.prayer-page .prayer-table thead th,
+.info-prayers .prayer-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-1);
+}
+
+.prayer-table th:first-child,
+.prayer-table td:first-child {
+  width: 190px;
+  min-width: 150px;
+}
+
+.prayer-table th:nth-child(2),
+.prayer-table td:nth-child(2) {
+  width: auto;
+  text-align: left;
+  white-space: normal;
+}
+
+.prayer-table td {
+  height: auto;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  vertical-align: top;
+}
+
+.prayer-table .leaderboard-user {
+  min-height: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.prayer-table .leaderboard-row-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.prayer-entry {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.prayer-message-text {
+  margin: 0;
+  max-width: 64ch;
+  color: #c6cacd;
+  font-size: var(--table-body-size);
+  font-weight: 500;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.prayer-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.prayer-reactions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.prayer-reaction-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 34px;
-  padding: 4px 12px;
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
+  min-width: 38px;
+  min-height: 28px;
+  padding: 2px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-tag);
   background: var(--white-06);
-  color: var(--white-92);
+  color: var(--text-muted);
   font: inherit;
-  font-size: 0.86rem;
-  font-weight: 800;
+  font-size: 0.8rem;
+  font-weight: 600;
   line-height: 1;
-  margin-left: 6px;
-  vertical-align: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.prayer-reaction-button.selected {
+  border-color: var(--border-strong);
+  background: var(--white-10);
+  color: var(--text-primary);
+}
+
+/* ------------------------------------------------------------
+   Action menu — reusable row-action pattern (trigger + menu)
+   ------------------------------------------------------------ */
+
+.action-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-muted);
   cursor: pointer;
   transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
-.prayer-remove-button:hover,
-.prayer-remove-button:focus-visible {
+.action-menu-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.action-menu-trigger:hover,
+.action-menu-trigger:focus-visible {
+  background: var(--white-06);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.action-menu-trigger[aria-expanded="true"] {
   background: var(--white-10);
-  border-color: var(--white-18);
-  color: var(--white);
-  transform: translateY(-1px);
-  outline: none;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
-.prayer-remove-button:disabled {
+.action-menu-trigger:active {
+  transform: scale(0.97);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .action-menu-trigger {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.action-menu {
+  position: fixed;
+  z-index: var(--z-dropdown);
+  display: grid;
+  width: max-content;
+  min-width: 188px;
+  padding: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  transform-origin: top right;
+  animation: action-menu-in var(--duration-ui) var(--ease-out);
+}
+
+.action-menu[data-placement="top"] {
+  transform-origin: bottom right;
+  animation-name: action-menu-in-up;
+}
+
+.action-menu[hidden] {
+  display: none;
+}
+
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-tag);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.action-menu-item[hidden] {
+  display: none;
+}
+
+.action-menu-item .ui-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+
+.action-menu-item:hover,
+.action-menu-item:focus-visible {
+  background: var(--white-06);
+  color: var(--text-primary);
+}
+
+.action-menu-item:disabled {
   cursor: wait;
   opacity: 0.55;
+  background: transparent;
+  color: var(--text-muted);
 }
+
+@keyframes action-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes action-menu-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------
+   Prayer form (my prayers page)
+   ------------------------------------------------------------ */
 
 .prayer-grid {
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
@@ -901,75 +1071,60 @@
   gap: var(--space-4);
   height: var(--prayer-panel-height);
   padding: var(--space-5);
-  background:
-    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.09), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.028)),
-    rgba(255, 255, 255, 0.045);
 }
 
 .prayer-card-intro {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .prayer-card-intro h2 {
   margin: 0;
-  color: var(--white);
-  font-size: clamp(1.36rem, 2vw, 1.72rem);
-  font-weight: 850;
-  line-height: 1.08;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
 }
 
 .prayer-card-intro p {
   margin: 0;
-  color: var(--white-54);
-  max-width: 36ch;
-  font-size: 0.96rem;
-  font-weight: 650;
-  line-height: 1.38;
+  color: var(--text-muted);
+  max-width: 40ch;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .prayer-field {
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-3);
+  gap: var(--space-2);
   margin-bottom: 0;
   padding: var(--space-4);
-  border: 1px solid var(--white-10);
-  border-radius: 16px;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.022)),
-    rgba(0, 0, 0, 0.18);
-  color: var(--white);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-primary);
   min-height: 0;
   cursor: text;
-  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  transition: border-color var(--duration-ui) var(--ease-out);
 }
 
 .prayer-field>span {
-  color: var(--white-54);
-  font-size: 0.78rem;
-  font-weight: 800;
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .prayer-field:focus-within {
   border-color: var(--white-54);
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.12), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)),
-    rgba(0, 0, 0, 0.2);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
-    0 18px 42px rgba(0, 0, 0, 0.22);
 }
 
 .prayer-field:focus-within>span {
-  color: var(--white-72);
+  color: var(--text-primary);
 }
 
 .prayer-field textarea {
@@ -981,19 +1136,19 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--white);
+  color: var(--text-primary);
   font: inherit;
-  font-size: 1.08rem;
-  font-weight: 650;
-  line-height: 1.45;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.55;
   outline: none;
   caret-color: var(--white);
 }
 
 .prayer-field textarea::placeholder {
-  color: var(--white-54);
-  font-size: 1.08rem;
-  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .prayer-field textarea:focus {
@@ -1002,10 +1157,10 @@
 
 .prayer-form .auth-submit {
   width: 100%;
-  min-height: 56px;
-  border-radius: 14px;
-  font-size: 1rem;
-  font-weight: 850;
+  min-height: 52px;
+  border-radius: 12px;
+  font-size: 0.96rem;
+  font-weight: 700;
 }
 
 .prayer-form-status {
@@ -1047,6 +1202,10 @@
   overflow: hidden;
 }
 
+/* ------------------------------------------------------------
+   Prayer filters — header stays visible, panel expands below
+   ------------------------------------------------------------ */
+
 .prayer-filter-head {
   align-items: flex-start;
   justify-content: space-between;
@@ -1061,22 +1220,19 @@
 
 .prayer-panel-copy h2 {
   margin: 0;
-  color: var(--white);
-  font-size: clamp(1.22rem, 1.8vw, 1.48rem);
-  font-weight: 850;
-  line-height: 1.12;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
 }
 
 .prayer-panel-copy p {
   margin: 0;
-  color: var(--white-54);
-  font-size: 1rem;
-  font-weight: 650;
-  line-height: 1.4;
-}
-
-.info-prayers.filter-open .prayer-filter-head {
-  display: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .prayer-filter-button {
@@ -1084,24 +1240,30 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
-  border: 1px solid var(--white-18);
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
   background: var(--white-06);
-  color: var(--white-72);
+  color: var(--text-muted);
   cursor: pointer;
-  transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  transition:
+    background-color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .prayer-filter-button:hover,
 .prayer-filter-button:focus-visible,
 .prayer-filter-button[aria-expanded="true"] {
   background: var(--white-10);
-  border-color: var(--white-18);
-  color: var(--white);
-  outline: none;
-  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.prayer-filter-button:active {
+  transform: scale(0.97);
 }
 
 .prayer-filter-glyph,
@@ -1133,6 +1295,18 @@
   top: 6px;
 }
 
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .prayer-filter-panel {
   display: grid;
   grid-template-columns: minmax(190px, 1fr) minmax(150px, 0.62fr) auto;
@@ -1140,9 +1314,10 @@
   align-items: end;
   margin: 0 0 var(--space-4);
   padding: var(--space-3);
-  border: 1px solid var(--white-10);
-  border-radius: 14px;
-  background: var(--white-06);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-2);
+  animation: panel-in var(--duration-panel) var(--ease-drawer);
 }
 
 .prayer-filter-panel[hidden] {
@@ -1153,10 +1328,9 @@
   position: relative;
   display: grid;
   gap: var(--space-1);
-  color: var(--white-54);
-  font-size: 0.76rem;
-  font-weight: 700;
-  text-transform: uppercase;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .prayer-filter-combo,
@@ -1166,28 +1340,29 @@
 }
 
 .prayer-filter-control {
-  min-height: 48px;
+  min-height: 44px;
   width: 100%;
   padding: 0 var(--space-3);
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.24);
-  color: var(--white);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-1);
+  color: var(--text-primary);
   font: inherit;
-  font-size: 0.94rem;
-  font-weight: 700;
-  outline: none;
-  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition:
+    background-color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out);
 }
 
 .prayer-filter-control::placeholder {
-  color: var(--white-54);
+  color: var(--text-muted);
 }
 
 .prayer-filter-control:hover,
 .prayer-filter-control:focus,
 .prayer-select-trigger[aria-expanded="true"] {
-  background: var(--white-06);
+  background: var(--surface-2);
   border-color: var(--white-54);
 }
 
@@ -1207,7 +1382,7 @@
   border-bottom: 2px solid currentColor;
   opacity: 0.72;
   transform: rotate(45deg) translateY(-2px);
-  transition: transform 0.18s ease;
+  transition: transform var(--duration-ui) var(--ease-out);
 }
 
 .prayer-select-trigger[aria-expanded="true"] .prayer-select-chevron {
@@ -1223,10 +1398,12 @@
   max-height: 190px;
   overflow-y: auto;
   padding: var(--space-2);
-  border: 1px solid var(--white-18);
-  border-radius: 10px;
-  background: var(--black);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.36);
+  transform-origin: top left;
+  animation: panel-in var(--duration-ui) var(--ease-out);
 }
 
 .prayer-filter-menu[hidden] {
@@ -1237,308 +1414,71 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 46px;
+  min-height: 44px;
   padding: 0 var(--space-3);
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-tag);
   background: transparent;
   color: var(--white-72);
   font: inherit;
-  font-size: 0.94rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.18s ease, color 0.18s ease;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
 .prayer-filter-menu button+button {
-  margin-top: var(--space-1);
+  margin-top: 2px;
 }
 
 .prayer-filter-menu button:hover,
 .prayer-filter-menu button:focus-visible,
 .prayer-filter-menu button.selected {
   background: var(--white-10);
-  color: var(--white);
-  outline: none;
+  color: var(--text-primary);
 }
 
 .prayer-filter-empty {
   display: block;
   padding: var(--space-2);
-  color: var(--white-54);
-  font-size: 0.86rem;
-  font-weight: 700;
-  text-transform: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .prayer-filter-clear {
-  min-height: 48px;
+  min-height: 44px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--white-72);
   font: inherit;
-  font-size: 0.94rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.prayer-table-wrap {
-  border: 1px solid var(--white-06);
-  border-radius: 14px;
-  background: var(--white-06);
-}
-
-.prayer-page .prayer-table-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.info-prayers .prayer-table-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.prayer-page .prayer-table thead th,
-.info-prayers .prayer-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: #111111;
-}
-
-.prayer-page .prayer-table thead,
-.info-prayers .prayer-table thead {
-  display: none;
-}
-
-.prayer-table th,
-.prayer-table td {
-  padding: var(--table-row-padding-y) var(--table-row-padding-x);
-  vertical-align: middle;
-}
-
-.prayer-page .prayer-table td {
-  padding: 0;
-}
-
-.prayer-page .prayer-table,
-.prayer-page .prayer-table tbody {
-  display: block;
-}
-
-.info-prayers .prayer-table td {
-  padding: 0;
-}
-
-.prayer-page .prayer-table,
-.prayer-page .prayer-table tbody,
-.prayer-page .prayer-table tr,
-.info-prayers .prayer-table,
-.info-prayers .prayer-table tbody,
-.info-prayers .prayer-table tr {
-  display: block;
-}
-
-.prayer-page .prayer-table tr,
-.info-prayers .prayer-table tr {
-  display: grid;
-  grid-template-columns: minmax(170px, 0.26fr) minmax(0, 1fr);
-  column-gap: 28px;
-  align-items: center;
-  min-height: var(--table-row-min-height);
-  padding: 8px var(--table-row-padding-x);
-  border-radius: 0;
-  transition: background 160ms ease, box-shadow 160ms ease;
-}
-
-.prayer-page .prayer-table tr+tr,
-.info-prayers .prayer-table tr+tr {
-  border-top: 1px solid var(--white-06);
-}
-
-.prayer-page .prayer-table tr:hover,
-.info-prayers .prayer-table tr:hover {
-  background: rgba(255, 255, 255, 0.038);
-}
-
-.prayer-page .prayer-table tr:first-child,
-.info-prayers .prayer-table tr:first-child {
-  border-top-left-radius: 14px;
-  border-top-right-radius: 14px;
-}
-
-.prayer-page .prayer-table tr:last-child,
-.info-prayers .prayer-table tr:last-child {
-  border-bottom-left-radius: 14px;
-  border-bottom-right-radius: 14px;
-}
-
-.prayer-page .prayer-table td,
-.info-prayers .prayer-table td {
-  display: block;
-  height: auto;
-  border-top: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  align-self: center;
-}
-
-.prayer-page .prayer-table td:first-child,
-.info-prayers .prayer-table td:first-child {
-  grid-column: 1;
-}
-
-.prayer-page .prayer-table td:nth-child(2),
-.info-prayers .prayer-table td:nth-child(2) {
-  grid-column: 2;
-  text-align: left;
-  justify-self: stretch;
-  width: 100%;
-}
-
-.prayer-page .prayer-table-actions td:last-child,
-.info-prayers .prayer-table-actions td:last-child {
-  display: none;
-}
-
-.prayer-page .prayer-table td:first-child {
-  width: auto;
-}
-
-.info-prayers .prayer-table td:first-child {
-  width: auto;
-}
-
-.prayer-table .leaderboard-user {
-  font-size: var(--table-body-size);
-  font-weight: var(--table-strong-weight);
-  line-height: 1.2;
-  transition: color 160ms ease;
-}
-
-.prayer-table tr:hover .leaderboard-user {
-  color: var(--white);
-}
-
-.prayer-table td:nth-child(2) {
-  font-size: var(--table-body-size);
-  font-weight: var(--table-body-weight);
-  line-height: 1.32;
-}
-
-.prayer-table .leaderboard-row-icon {
-  width: 20px;
-  height: 20px;
-  color: var(--white-72);
-  transition: color 160ms ease;
-}
-
-.prayer-table tr:hover .leaderboard-row-icon {
-  color: var(--white-92);
-}
-
-.prayer-message {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  color: var(--white);
-  cursor: pointer;
-  border-radius: 8px;
-  outline: none;
-  transition: color 180ms ease, opacity 180ms ease;
-}
-
-.prayer-inline-message {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.prayer-message:hover .prayer-message-text,
-.prayer-message:focus-visible .prayer-message-text {
-  color: var(--white);
-}
-
-.prayer-message-text {
-  color: #b3b3b3;
-  overflow-wrap: anywhere;
-  transition: color 180ms ease, opacity 180ms ease;
-}
-
-.prayer-table tr:hover .prayer-message-text {
-  color: var(--white-92);
-}
-
-.prayer-reactions {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-left: 0;
-  vertical-align: middle;
-}
-
-.prayer-reaction-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-width: 38px;
-  min-height: 30px;
-  padding: 3px 8px;
-  border: 1px solid var(--white-10);
-  border-radius: 9px;
-  background: var(--white-06);
-  color: var(--white-92);
-  font: inherit;
-  font-size: 0.84rem;
-  font-weight: 800;
-  line-height: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    transform 160ms ease;
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
-.prayer-reaction-button:hover,
-.prayer-reaction-button:focus-visible,
-.prayer-reaction-button.selected {
-  border-color: var(--white-18);
-  background: var(--white-10);
-  color: var(--white);
+.prayer-filter-clear:hover,
+.prayer-filter-clear:focus-visible {
+  background: var(--white-06);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
-.prayer-reaction-button:active {
-  transform: translateY(1px);
-}
+/* ------------------------------------------------------------
+   Modals — backdrop fade + dialog scale, focus kept inside
+   ------------------------------------------------------------ */
 
-.prayer-reaction-button:disabled {
-  cursor: progress;
-  opacity: 0.7;
-}
-
-.prayer-reaction-modal[hidden] {
-  display: none;
-}
-
-.missed-answer-modal[hidden] {
-  display: none;
-}
-
+.prayer-reaction-modal[hidden],
+.missed-answer-modal[hidden],
 .settings-confirm-modal[hidden] {
   display: none;
 }
@@ -1554,6 +1494,28 @@
   padding: var(--space-4);
 }
 
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .prayer-reaction-backdrop,
 .missed-answer-backdrop,
 .settings-confirm-backdrop {
@@ -1561,48 +1523,36 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.56);
   backdrop-filter: blur(4px);
+  animation: backdrop-in 220ms var(--ease-out);
+}
+
+.prayer-reaction-dialog,
+.missed-answer-dialog,
+.settings-confirm-dialog {
+  position: relative;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-panel);
+  background: var(--surface-2);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+  animation: dialog-in 220ms var(--ease-out);
 }
 
 .prayer-reaction-dialog {
-  position: relative;
   display: flex;
   gap: 6px;
   padding: 8px;
-  border: 1px solid var(--white-10);
   border-radius: 14px;
-  background: rgba(17, 17, 17, 0.96);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
 }
 
-.missed-answer-dialog {
-  position: relative;
-  display: grid;
-  gap: var(--space-4);
-  width: min(100%, 420px);
-  padding: var(--space-4);
-  border: 1px solid var(--white-10);
-  border-radius: 14px;
-  background: rgba(17, 17, 17, 0.96);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
-}
-
+.missed-answer-dialog,
 .settings-confirm-dialog {
-  position: relative;
   display: grid;
   gap: var(--space-4);
   width: min(100%, 420px);
-  padding: var(--space-4);
-  border: 1px solid var(--white-10);
-  border-radius: 14px;
-  background: rgba(17, 17, 17, 0.96);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+  padding: var(--space-5);
 }
 
-.missed-answer-head {
-  display: grid;
-  gap: var(--space-1);
-}
-
+.missed-answer-head,
 .settings-confirm-head {
   display: grid;
   gap: var(--space-1);
@@ -1611,26 +1561,21 @@
 .missed-answer-head h2,
 .settings-confirm-head h2 {
   margin: 0;
-  color: var(--white);
+  color: var(--text-primary);
   font-size: 1.12rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .settings-confirm-head p:last-child {
   margin: 0;
   color: var(--white-72);
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.4;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
 }
 
-.missed-answer-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-
+.missed-answer-actions,
 .settings-confirm-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1639,19 +1584,19 @@
 
 .settings-confirm-button {
   min-height: 48px;
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
   background: var(--white-06);
-  color: var(--white);
+  color: var(--text-primary);
   font: inherit;
-  font-size: 0.95rem;
-  font-weight: 850;
+  font-size: 0.92rem;
+  font-weight: 700;
   cursor: pointer;
   transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .settings-confirm-save {
@@ -1663,42 +1608,36 @@
 .settings-confirm-button:hover,
 .settings-confirm-button:focus-visible {
   background: var(--white-10);
-  border-color: var(--white-18);
-  color: var(--white);
-  outline: none;
-  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .settings-confirm-save:hover,
 .settings-confirm-save:focus-visible {
   background: var(--white-92);
+  border-color: var(--white-92);
   color: var(--black);
+}
+
+.settings-confirm-button:active {
+  transform: scale(0.98);
 }
 
 .settings-confirm-button:disabled {
   cursor: progress;
   opacity: 0.68;
+  transform: none;
 }
 
 .missed-answer-actions .dashboard-action {
   justify-content: center;
   min-height: 52px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
-  font-size: clamp(0.95rem, 1.6vw, 1.08rem);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  font-size: 1rem;
   font-weight: 700;
   text-align: center;
-  text-transform: uppercase;
-  box-shadow: none;
-}
-
-.missed-answer-actions .dashboard-action+.dashboard-action {
-  border-left: 1px solid var(--white-10);
-}
-
-.missed-answer-actions .dashboard-action::before {
-  display: none;
 }
 
 .missed-answer-actions .dashboard-action-yes {
@@ -1708,14 +1647,12 @@
 
 .missed-answer-actions .dashboard-action-no {
   background: var(--white-06);
-  color: var(--white);
+  color: var(--text-primary);
 }
 
 .missed-answer-actions .dashboard-action:hover,
 .missed-answer-actions .dashboard-action:focus-visible {
   background: var(--white-10);
-  box-shadow: none;
-  transform: translateY(-1px);
 }
 
 .missed-answer-actions .dashboard-action-yes:hover,
@@ -1728,36 +1665,44 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
-  color: var(--white);
+  color: var(--text-primary);
   font-size: 1.22rem;
   cursor: pointer;
   transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    transform 160ms ease;
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .prayer-reaction-choice:hover,
 .prayer-reaction-choice:focus-visible {
-  border-color: var(--white-10);
+  border-color: var(--border-subtle);
   background: var(--white-10);
-  transform: translateY(-1px);
+}
+
+.prayer-reaction-choice:active {
+  transform: scale(0.95);
 }
 
 .prayer-reaction-choice.selected {
-  border-color: var(--white-18);
+  border-color: var(--border-strong);
   background: var(--white-18);
 }
 
 .prayer-reaction-choice:disabled {
   cursor: progress;
   opacity: 0.65;
+  transform: none;
 }
+
+/* ------------------------------------------------------------
+   Settings
+   ------------------------------------------------------------ */
 
 .settings-container {
   width: min(100%, 1160px);
@@ -1803,14 +1748,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 30px;
+  min-height: 28px;
   padding: 0 12px;
-  border: 1px solid var(--white-10);
+  border: 1px solid var(--border-subtle);
   border-radius: 999px;
   background: var(--white-06);
   color: var(--white-72);
-  font-size: 0.76rem;
-  font-weight: 900;
+  font-size: 0.78rem;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -1822,35 +1767,34 @@
   display: grid;
   gap: var(--space-2);
   color: var(--white-72);
-  font-size: 0.92rem;
-  font-weight: 800;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .settings-field input {
   width: 100%;
-  height: 50px;
+  height: 48px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--white-10);
-  border-radius: 12px;
-  background: var(--white-06);
-  color: var(--white);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  color: var(--text-primary);
   font: inherit;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.96rem;
+  font-weight: 500;
   outline: none;
   transition:
-    border-color 160ms ease,
-    background 160ms ease;
+    border-color var(--duration-ui) var(--ease-out),
+    background var(--duration-ui) var(--ease-out);
 }
 
 .settings-field input:focus {
   border-color: var(--white-54);
-  background: var(--white-10);
 }
 
 .settings-submit {
   width: 100%;
-  min-height: 50px;
+  min-height: 48px;
   margin-top: auto;
 }
 
@@ -1862,9 +1806,9 @@
   height: 72px;
   min-height: 0;
   padding: 6px;
-  border: 1px solid var(--white-10);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-2);
 }
 
 .settings-answer-button {
@@ -1872,37 +1816,43 @@
   min-height: 0;
   padding: 0;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--white-72);
   font: inherit;
   font-size: 0.94rem;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
   transition:
-    background 160ms ease,
-    color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .settings-answer-button:hover,
 .settings-answer-button:focus-visible {
   background: var(--white-10);
-  color: var(--white);
-  outline: none;
+  color: var(--text-primary);
+}
+
+.settings-answer-button:active {
+  transform: scale(0.98);
 }
 
 .settings-answer-button.selected {
   background: var(--white);
   color: var(--black);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
 
 .settings-answer-button:disabled {
   cursor: progress;
   opacity: 0.68;
+  transform: none;
 }
+
+/* ------------------------------------------------------------
+   Customer page
+   ------------------------------------------------------------ */
 
 .customer-container {
   width: min(100%, 1160px);
@@ -1934,7 +1884,7 @@
 
 .customer-details-list {
   display: grid;
-  gap: var(--space-2);
+  gap: 0;
   margin: 0;
 }
 
@@ -1943,62 +1893,73 @@
   grid-template-columns: minmax(110px, 0.7fr) minmax(0, 1fr);
   gap: var(--space-3);
   align-items: center;
-  min-height: 54px;
-  padding: 0 var(--space-3);
+  min-height: 50px;
+  padding: 0 var(--space-2);
   border-top: 1px solid var(--white-06);
 }
 
+.customer-details-list div:first-child {
+  border-top: 0;
+}
+
 .customer-details-list dt {
-  color: var(--white-54);
-  font-size: var(--table-head-size);
-  font-weight: 800;
-  text-transform: uppercase;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .customer-details-list dd {
   margin: 0;
-  color: var(--white);
+  color: var(--text-primary);
   font-size: var(--table-body-size);
-  font-weight: var(--table-body-weight);
-  line-height: 1.25;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .customer-prayer-list {
   display: grid;
   gap: 0;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .customer-prayer-item {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-columns: 64px minmax(0, 1fr);
   gap: var(--space-4);
-  align-items: center;
+  align-items: start;
   min-height: var(--table-row-min-height);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-3);
   border-top: 1px solid var(--white-06);
   background: transparent;
-  transition: background 160ms ease;
 }
 
-.customer-prayer-item:hover {
-  background: rgba(255, 255, 255, 0.038);
+.customer-prayer-item:first-child {
+  border-top: 0;
 }
 
 .customer-prayer-item span {
-  color: var(--white-54);
-  font-size: var(--table-body-size);
-  font-weight: var(--table-strong-weight);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.55;
 }
 
 .customer-prayer-item p {
   margin: 0;
-  color: var(--white-72);
+  max-width: 72ch;
+  color: #c6cacd;
   font-size: var(--table-body-size);
-  font-weight: var(--table-body-weight);
-  line-height: 1.35;
+  font-weight: 500;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
+
+/* ------------------------------------------------------------
+   Statistics
+   ------------------------------------------------------------ */
 
 .statistics-section {
   align-items: flex-start;
@@ -2025,76 +1986,38 @@
 }
 
 .statistics-insight {
-  position: relative;
-  --glow-x: 50%;
-  --glow-y: 50%;
-  min-height: 164px;
-  overflow: hidden;
+  min-height: 150px;
   margin-bottom: 0;
   padding: var(--space-4);
-  isolation: isolate;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
 }
 
-.statistics-insight::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 220ms ease;
+.statistics-insight-hard {
+  box-shadow: inset 3px 0 0 var(--red-soft);
 }
 
-.statistics-insight-hard::before {
-  background:
-    radial-gradient(circle 260px at var(--glow-x) var(--glow-y), rgba(255, 210, 210, 0.18), transparent 62%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035));
-}
-
-.statistics-insight-easy::before {
-  background:
-    radial-gradient(circle 260px at var(--glow-x) var(--glow-y), rgba(210, 255, 235, 0.18), transparent 62%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035));
-}
-
-.statistics-insight:hover,
-.statistics-insight:focus-within {
-  border-color: var(--white-18);
-  background: var(--white-06);
-  transform: translateY(-1px);
-}
-
-.statistics-insight:hover::before,
-.statistics-insight:focus-within::before {
-  opacity: 0.92;
+.statistics-insight-easy {
+  box-shadow: inset 3px 0 0 var(--green-soft);
 }
 
 .statistics-insight-value {
-  max-width: 11ch;
-  margin: var(--space-4) 0 var(--space-2);
-  color: var(--white);
-  font-size: clamp(1.65rem, 3vw, 2.35rem);
-  font-weight: 900;
-  line-height: 1;
+  max-width: 14ch;
+  margin: var(--space-3) 0 var(--space-2);
+  color: var(--text-primary);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
 }
 
 .statistics-insight-caption {
   margin: 0;
-  color: var(--white-54);
-  font-size: 0.9rem;
-  font-weight: 750;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
 }
 
 .statistics-chart-card {
   margin-bottom: 0;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
-}
-
-.statistics-chart-card:hover,
-.statistics-chart-card:focus-within {
-  border-color: var(--white-18);
-  background: rgba(255, 255, 255, 0.075);
-  transform: translateY(-1px);
 }
 
 .statistics-chart {
@@ -2107,17 +2030,15 @@
   grid-template-columns: 42px minmax(0, 1fr) 30px;
   align-items: center;
   gap: var(--space-3);
-  min-height: 28px;
-  border-radius: 10px;
+  min-height: 26px;
 }
 
 .statistics-bar-label,
 .statistics-bar-value {
-  color: var(--white-54);
+  color: var(--text-muted);
   font-size: 0.8rem;
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  transition: color 160ms ease;
 }
 
 .statistics-bar-value {
@@ -2125,14 +2046,9 @@
   text-align: right;
 }
 
-.statistics-bar-row:hover .statistics-bar-label,
-.statistics-bar-row:hover .statistics-bar-value {
-  color: var(--white);
-}
-
 .statistics-bar-track {
   display: block;
-  height: 10px;
+  height: 8px;
   overflow: hidden;
   border-radius: 999px;
   background: var(--white-06);
@@ -2144,36 +2060,19 @@
   height: 100%;
   min-width: 0;
   border-radius: inherit;
-  transition: width 240ms ease, background 160ms ease;
+  transition: width var(--duration-panel) var(--ease-out);
 }
 
 .statistics-chart-no .statistics-bar-fill {
-  background: linear-gradient(90deg, rgba(178, 92, 92, 0.58), rgba(220, 146, 146, 0.68));
-}
-
-.statistics-chart-no .statistics-bar-row:hover .statistics-bar-fill {
-  background: linear-gradient(90deg, rgba(218, 128, 128, 0.76), rgba(244, 188, 188, 0.86));
+  background: var(--red-soft);
 }
 
 .statistics-chart-yes .statistics-bar-fill {
-  background: linear-gradient(90deg, rgba(78, 166, 124, 0.58), rgba(138, 218, 177, 0.68));
-}
-
-.statistics-chart-yes .statistics-bar-row:hover .statistics-bar-fill {
-  background: linear-gradient(90deg, rgba(128, 218, 172, 0.76), rgba(190, 246, 218, 0.86));
+  background: var(--green-soft);
 }
 
 .statistics-donut-card {
   margin-bottom: 0;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
-}
-
-.statistics-donut-card:hover,
-.statistics-donut-card:focus-within {
-  border-color: var(--white-18);
-  background: rgba(255, 255, 255, 0.075);
-  transform: translateY(-1px);
-  box-shadow: 0 28px 76px rgba(0, 0, 0, 0.3);
 }
 
 .statistics-donut-layout {
@@ -2191,12 +2090,9 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(20, 20, 20, 0.96) 0 48%, transparent 49%),
+    radial-gradient(circle, var(--surface-1) 0 48%, transparent 49%),
     conic-gradient(var(--donut-primary) 0 var(--donut-main), var(--donut-secondary) var(--donut-main) 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 18px 42px rgba(0, 0, 0, 0.28);
-  transition: box-shadow 220ms ease, transform 220ms ease, filter 220ms ease;
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
 }
 
 .statistics-donut::after {
@@ -2206,37 +2102,17 @@
 .statistics-donut span {
   position: relative;
   z-index: 1;
-  color: var(--white);
-  font-size: 1.55rem;
-  font-weight: 900;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 800;
   line-height: 1;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.statistics-donut-card:hover .statistics-donut,
-.statistics-donut-card:focus-within .statistics-donut {
-  filter: saturate(1.08);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 24px 58px rgba(0, 0, 0, 0.34),
-    0 0 38px rgba(190, 246, 218, 0.08);
-}
-
-.statistics-donut-card:hover .statistics-donut span,
-.statistics-donut-card:focus-within .statistics-donut span {
-  color: var(--white);
+  font-variant-numeric: tabular-nums;
 }
 
 .statistics-donut-time,
 .statistics-donut-answer {
-  --donut-primary: rgba(78, 166, 124, 0.58);
-  --donut-secondary: rgba(178, 92, 92, 0.58);
-}
-
-.statistics-donut-card:hover .statistics-donut,
-.statistics-donut-card:focus-within .statistics-donut {
-  --donut-primary: rgba(128, 218, 172, 0.76);
-  --donut-secondary: rgba(218, 128, 128, 0.76);
+  --donut-primary: var(--green-soft);
+  --donut-secondary: var(--red-soft);
 }
 
 .statistics-donut-legend {
@@ -2249,19 +2125,26 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: 38px;
+  min-height: 36px;
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--white-06);
-  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.statistics-donut-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .statistics-donut-row span,
 .statistics-donut-row strong {
   color: var(--white-72);
   font-size: 0.9rem;
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  transition: color 160ms ease;
+}
+
+.statistics-donut-row strong {
+  color: var(--text-primary);
 }
 
 .statistics-donut-row::before {
@@ -2270,32 +2153,6 @@
   height: 10px;
   border-radius: 50%;
   background: var(--donut-default);
-  box-shadow: 0 0 14px color-mix(in srgb, var(--donut-default) 55%, transparent);
-  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
-}
-
-.statistics-donut-card:hover .statistics-donut-row,
-.statistics-donut-card:focus-within .statistics-donut-row {
-  border-color: var(--white-10);
-}
-
-.statistics-donut-row:hover {
-  transform: translateX(2px);
-}
-
-.statistics-donut-row:hover span,
-.statistics-donut-row:hover strong,
-.statistics-donut-card:hover .statistics-donut-row strong,
-.statistics-donut-card:focus-within .statistics-donut-row strong {
-  color: var(--white);
-}
-
-.statistics-donut-row:hover::before,
-.statistics-donut-card:hover .statistics-donut-row::before,
-.statistics-donut-card:focus-within .statistics-donut-row::before {
-  background: var(--donut-accent);
-  box-shadow: 0 0 24px var(--donut-accent);
-  transform: scale(1.12);
 }
 
 .statistics-donut-row span {
@@ -2304,15 +2161,17 @@
 
 .statistics-donut-row-yes,
 .statistics-donut-row-day {
-  --donut-default: rgba(78, 166, 124, 0.58);
-  --donut-accent: rgba(128, 218, 172, 0.76);
+  --donut-default: var(--green-soft);
 }
 
 .statistics-donut-row-no,
 .statistics-donut-row-night {
-  --donut-default: rgba(178, 92, 92, 0.58);
-  --donut-accent: rgba(218, 128, 128, 0.76);
+  --donut-default: var(--red-soft);
 }
+
+/* ------------------------------------------------------------
+   Community world card
+   ------------------------------------------------------------ */
 
 .prayer-world-card {
   position: relative;
@@ -2324,26 +2183,6 @@
   margin-top: var(--space-4);
   margin-bottom: 0;
   overflow: hidden;
-  isolation: isolate;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
-}
-
-.prayer-world-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(circle at 78% 20%, rgba(210, 255, 235, 0.08), transparent 32%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.075), transparent 46%);
-  opacity: 0.86;
-}
-
-.prayer-world-card:hover,
-.prayer-world-card:focus-within {
-  border-color: var(--white-18);
-  background: rgba(255, 255, 255, 0.075);
-  transform: translateY(-1px);
 }
 
 .prayer-world-card .dashboard-card-head {
@@ -2355,11 +2194,11 @@
 }
 
 .prayer-world-card .dashboard-card-head p {
-  margin: 6px 0 0;
-  color: var(--white-54);
-  font-size: 0.84rem;
-  font-weight: 700;
-  line-height: 1.35;
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .prayer-world-highlight {
@@ -2368,10 +2207,11 @@
 
 .prayer-world-highlight p:last-child {
   margin: 0;
-  color: var(--white);
-  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  color: var(--text-primary);
+  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
 }
 
 .prayer-world-regions {
@@ -2388,10 +2228,9 @@
 
 .prayer-world-region span:first-child,
 .prayer-world-region strong {
-  color: var(--white-54);
+  color: var(--text-muted);
   font-size: 0.82rem;
-  font-weight: 800;
-  transition: color 160ms ease;
+  font-weight: 600;
 }
 
 .prayer-world-region strong {
@@ -2401,15 +2240,13 @@
 }
 
 .prayer-world-region.active span:first-child,
-.prayer-world-region.active strong,
-.prayer-world-region:hover span:first-child,
-.prayer-world-region:hover strong {
-  color: var(--white);
+.prayer-world-region.active strong {
+  color: var(--text-primary);
 }
 
 .prayer-world-region-track {
   display: block;
-  height: 7px;
+  height: 6px;
   overflow: hidden;
   border-radius: 999px;
   background: var(--white-06);
@@ -2419,17 +2256,11 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(78, 166, 124, 0.58), rgba(138, 218, 177, 0.68));
-  transition: background 160ms ease;
+  background: var(--green-soft);
 }
 
 .prayer-world-region.active .prayer-world-region-track span {
-  background: linear-gradient(90deg, rgba(100, 186, 144, 0.68), rgba(158, 232, 194, 0.78));
-}
-
-.prayer-world-region:hover .prayer-world-region-track span,
-.prayer-world-region.active:hover .prayer-world-region-track span {
-  background: linear-gradient(90deg, rgba(128, 218, 172, 0.76), rgba(190, 246, 218, 0.86));
+  background: rgba(158, 232, 194, 0.78);
 }
 
 .prayer-world-visual {
@@ -2444,28 +2275,15 @@
   width: min(292px, 78vw);
   aspect-ratio: 1;
   overflow: hidden;
-  border: 1px solid var(--white-10);
+  border: 1px solid var(--border-subtle);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.2), transparent 20%),
-    radial-gradient(circle at 58% 45%, rgba(112, 204, 160, 0.1), transparent 40%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035) 48%, rgba(0, 0, 0, 0.66)),
-    var(--black);
+    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.14), transparent 22%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 48%, rgba(0, 0, 0, 0.6)),
+    var(--bg-page);
   box-shadow:
-    inset -32px -42px 68px rgba(0, 0, 0, 0.58),
-    inset 18px 16px 36px rgba(255, 255, 255, 0.055),
-    0 26px 70px rgba(0, 0, 0, 0.38);
-  transition: border-color 180ms ease, box-shadow 220ms ease, transform 220ms ease;
-}
-
-.prayer-world-card:hover .prayer-globe {
-  border-color: var(--white-18);
-  box-shadow:
-    inset -34px -44px 72px rgba(0, 0, 0, 0.56),
-    inset 20px 18px 38px rgba(255, 255, 255, 0.065),
-    0 30px 78px rgba(0, 0, 0, 0.42),
-    0 0 42px rgba(184, 255, 224, 0.08);
-  transform: translateY(-2px) scale(1.012);
+    inset -32px -42px 68px rgba(0, 0, 0, 0.52),
+    inset 18px 16px 36px rgba(255, 255, 255, 0.045);
 }
 
 .prayer-globe::before,
@@ -2490,28 +2308,16 @@
   position: absolute;
   inset: 0;
   background:
-    repeating-linear-gradient(90deg, transparent 0 39px, rgba(255, 255, 255, 0.038) 40px, transparent 41px),
-    repeating-linear-gradient(0deg, transparent 0 39px, rgba(255, 255, 255, 0.032) 40px, transparent 41px);
-  opacity: 0.62;
-  transition: opacity 180ms ease;
-}
-
-.prayer-world-card:hover .prayer-globe-shine {
-  opacity: 0.82;
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(255, 255, 255, 0.032) 40px, transparent 41px),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(255, 255, 255, 0.028) 40px, transparent 41px);
+  opacity: 0.6;
 }
 
 .prayer-globe-land {
   position: absolute;
   display: block;
-  background: rgba(212, 255, 235, 0.13);
-  filter: blur(0.2px);
+  background: rgba(212, 255, 235, 0.12);
   opacity: 0.76;
-  transition: background 180ms ease, opacity 180ms ease, transform 220ms ease;
-}
-
-.prayer-world-card:hover .prayer-globe-land {
-  background: rgba(224, 255, 241, 0.18);
-  opacity: 0.9;
 }
 
 .prayer-globe-land-americas {
@@ -2562,179 +2368,30 @@
 .prayer-globe-point {
   position: absolute;
   z-index: 2;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: rgba(211, 255, 236, 0.92);
-  box-shadow:
-    0 0 0 5px rgba(190, 255, 226, 0.08),
-    0 0 20px rgba(190, 255, 226, 0.42);
+  background: rgba(211, 255, 236, 0.9);
+  box-shadow: 0 0 0 4px rgba(190, 255, 226, 0.08);
   transform: translate(-50%, -50%) scale(var(--point-scale, 1));
-  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
-}
-
-.prayer-world-card:hover .prayer-globe-point {
-  box-shadow:
-    0 0 0 6px rgba(190, 255, 226, 0.1),
-    0 0 24px rgba(190, 255, 226, 0.5);
-  transform: translate(-50%, -50%) scale(calc(var(--point-scale, 1) * 1.08));
 }
 
 .prayer-globe-point.active {
   background: var(--white);
-  box-shadow:
-    0 0 0 7px rgba(238, 255, 247, 0.11),
-    0 0 28px rgba(210, 255, 235, 0.58);
+  box-shadow: 0 0 0 6px rgba(238, 255, 247, 0.12);
 }
 
-.prayer-world-card:hover .prayer-globe-point.active {
-  box-shadow:
-    0 0 0 9px rgba(238, 255, 247, 0.13),
-    0 0 34px rgba(210, 255, 235, 0.66);
-}
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
 
-@media (max-width: 680px) {
-  .dashboard-page {
-    --table-body-size: 0.94rem;
-    --table-head-size: 0.72rem;
-    --table-row-padding-y: 12px;
-    --table-row-padding-x: var(--space-3);
-    --table-row-min-height: 58px;
-  }
-
-  .dashboard-actions,
-  .dashboard-current {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .dashboard-actions .dashboard-action+.dashboard-action {
-    border-left: 0;
-    border-top: 1px solid var(--white-10);
-  }
-
-  .dashboard-action {
-    min-height: 132px;
-    padding: var(--space-4);
-  }
-
-  .dashboard-current {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
-    padding: var(--space-3);
-    text-align: center;
-  }
-
-  .dashboard-timer-card {
-    padding: var(--space-3);
-  }
-
-  .dashboard-timer-copy {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .dashboard-timer-value {
-    flex: 0 0 auto;
-    font-size: 1.35rem;
-  }
-
-  .dashboard-week {
-    display: none;
-  }
-
-  .leaderboard-table {
-    font-size: var(--table-body-size);
-    table-layout: fixed;
-  }
-
-  .leaderboard-table th,
-  .leaderboard-table td {
-    padding: 10px 4px;
-  }
-
-  .leaderboard-table th:first-child,
-  .leaderboard-table td:first-child {
-    width: 34px;
-  }
-
-  .leaderboard-table th:last-child,
-  .leaderboard-table td:last-child {
-    width: 132px;
-  }
-
-  .leaderboard-head-label,
-  .leaderboard-user,
-  .leaderboard-streak {
-    gap: 6px;
-  }
-
-  .leaderboard-streak {
-    flex-wrap: nowrap;
-    gap: 6px;
-    font-size: var(--table-body-size);
-    line-height: 1.25;
-    white-space: nowrap;
-  }
-
-  .leaderboard-missed-tag {
-    width: 86px;
-    flex-basis: 86px;
-    min-height: 24px;
-    padding: 0 6px;
-    font-size: 0.54rem;
-    letter-spacing: 0;
-  }
-
-  .leaderboard-icon,
-  .leaderboard-row-icon {
-    width: 14px;
-    height: 14px;
-  }
-
+@media (max-width: 900px) {
   .info-grid,
   .prayer-grid,
-  .statistics-insights,
   .statistics-graphs,
-  .customer-grid {
+  .customer-grid,
+  .settings-grid {
     grid-template-columns: 1fr;
-  }
-
-  .statistics-section {
-    padding: var(--space-5) 0;
-  }
-
-  .statistics-insight {
-    min-height: 142px;
-  }
-
-  .statistics-donut-layout {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: left;
-  }
-
-  .statistics-donut-legend {
-    width: 100%;
-  }
-
-  .prayer-world-card {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-    min-height: 0;
-  }
-
-  .prayer-world-visual {
-    min-height: 232px;
-    order: -1;
-  }
-
-  .prayer-globe {
-    width: min(232px, 74vw);
-  }
-
-  .prayer-world-region {
-    grid-template-columns: minmax(82px, 1fr) 30px minmax(82px, 0.82fr);
-    gap: var(--space-2);
   }
 
   .info-grid {
@@ -2763,10 +2420,6 @@
     order: 4;
   }
 
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
-
   .settings-column {
     grid-template-rows: auto;
   }
@@ -2786,6 +2439,143 @@
     overflow: visible;
   }
 
+  .info-prayers .prayer-table-wrap,
+  .prayer-page .prayer-table-wrap {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .prayer-page .prayer-table thead th,
+  .info-prayers .prayer-table thead th {
+    position: static;
+  }
+
+  .statistics-donut-layout {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  .prayer-world-card {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+    min-height: 0;
+  }
+
+  .prayer-world-visual {
+    min-height: 232px;
+    order: -1;
+  }
+
+  .prayer-globe {
+    width: min(232px, 74vw);
+  }
+}
+
+@media (max-width: 680px) {
+  .dashboard-page {
+    --table-body-size: 0.9rem;
+    --table-head-size: 0.72rem;
+    --table-row-padding-y: 10px;
+    --table-row-padding-x: var(--space-2);
+    --table-row-min-height: 54px;
+  }
+
+  .dashboard-actions,
+  .dashboard-current {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-action {
+    min-height: 128px;
+    padding: var(--space-4);
+  }
+
+  .dashboard-current {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    text-align: center;
+  }
+
+  .dashboard-timer-card {
+    padding: var(--space-3);
+  }
+
+  .dashboard-timer-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .dashboard-timer-value {
+    flex: 0 0 auto;
+    font-size: 1.3rem;
+  }
+
+  .dashboard-week {
+    display: none;
+  }
+
+  /* Leaderboard: three-part hierarchy, wrapping status */
+  .leaderboard-table th:first-child,
+  .leaderboard-table td:first-child {
+    width: 36px;
+  }
+
+  .leaderboard-table:not(.prayer-table) th:last-child,
+  .leaderboard-table:not(.prayer-table) td:last-child {
+    width: auto;
+    max-width: 46%;
+    white-space: normal;
+  }
+
+  .leaderboard-head-label,
+  .leaderboard-user {
+    gap: 6px;
+  }
+
+  .leaderboard-streak {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    row-gap: 4px;
+    line-height: 1.3;
+  }
+
+  .leaderboard-icon,
+  .leaderboard-row-icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  button.leaderboard-missed-tag {
+    min-height: 40px;
+  }
+
+  .statistics-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-section {
+    padding: var(--space-5) 0;
+  }
+
+  .statistics-insight {
+    min-height: 0;
+  }
+
+  .statistics-donut-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .statistics-donut-legend {
+    width: 100%;
+  }
+
+  .prayer-world-region {
+    grid-template-columns: minmax(82px, 1fr) 30px minmax(82px, 0.82fr);
+    gap: var(--space-2);
+  }
+
   .prayer-filter-head {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -2794,9 +2584,8 @@
   }
 
   .prayer-filter-button {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
   }
 
   .prayer-filter-glyph,
@@ -2805,125 +2594,90 @@
     width: 16px;
   }
 
-  .info-prayers .prayer-table-wrap,
-  .prayer-page .prayer-table-wrap {
-    flex: 0 0 auto;
-    overflow: visible;
-  }
-
-  .info-prayers .prayer-table,
-  .info-prayers .prayer-table tbody,
-  .info-prayers .prayer-table tr,
-  .prayer-page .prayer-table,
-  .prayer-page .prayer-table tbody,
-  .prayer-page .prayer-table tr {
-    display: block;
-  }
-
-  .info-prayers .prayer-table tr,
-  .prayer-page .prayer-table tr {
-    grid-template-columns: 1fr;
-    min-height: var(--table-row-min-height);
-    padding: var(--table-row-padding-y) var(--table-row-padding-x);
-    border-radius: 12px;
-  }
-
-  .info-prayers .prayer-table tr+tr,
-  .prayer-page .prayer-table tr+tr {
-    border-top: 1px solid var(--white-06);
-  }
-
-  .info-prayers .prayer-table td,
-  .prayer-page .prayer-table td {
-    display: block;
-    width: auto;
-    padding: 3px 0;
-  }
-
-  .info-prayers .prayer-table td:first-child,
-  .prayer-page .prayer-table td:first-child {
-    width: auto;
-    font-size: var(--table-body-size);
-  }
-
-  .prayer-table .leaderboard-user {
-    font-size: var(--table-body-size);
-    font-weight: var(--table-strong-weight);
-    line-height: 1.25;
-  }
-
-  .info-prayers .prayer-table td:nth-child(2),
-  .prayer-page .prayer-table td:nth-child(2) {
-    font-size: var(--table-body-size);
-    font-weight: var(--table-body-weight);
-    line-height: 1.35;
-  }
-
-  .prayer-page .prayer-remove-button {
-    min-height: 26px;
-    padding: 3px 8px;
-    font-size: 0.72rem;
-    margin-left: 5px;
-  }
-
-  .prayer-message {
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .prayer-reactions {
-    display: flex;
-    margin: 4px 0 0;
-  }
-
-  .prayer-reaction-button {
-    min-width: 34px;
-    min-height: 26px;
-    font-size: 0.76rem;
-  }
-
   .prayer-filter-panel {
     grid-template-columns: 1fr;
   }
 
-  .prayer-message {
-    max-width: 100%;
+  /* Prayer entries become labeled stacked rows */
+  .prayer-table thead {
+    display: none;
   }
 
-  .customer-details-list div,
+  .prayer-table,
+  .prayer-table tbody,
+  .prayer-table tr,
+  .prayer-table td {
+    display: block;
+  }
+
+  .prayer-table tr {
+    position: relative;
+    padding: var(--space-3) 48px var(--space-3) 2px;
+  }
+
+  .prayer-table tr+tr {
+    border-top: 1px solid var(--white-06);
+  }
+
+  .prayer-table td {
+    width: auto;
+    min-width: 0;
+    height: auto;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .prayer-table td:first-child {
+    width: auto;
+    margin-bottom: var(--space-1);
+  }
+
+  .prayer-table td.prayer-row-actions {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    display: block;
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+  }
+
+  .prayer-row-actions .action-menu-trigger {
+    width: 40px;
+    height: 40px;
+    margin-top: 0;
+  }
+
+  .prayer-reaction-button {
+    min-height: 30px;
+  }
+
+  .customer-details-list div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: var(--space-2);
+    min-height: 0;
+  }
+
   .customer-prayer-item {
     grid-template-columns: 1fr;
+    gap: var(--space-1);
   }
 }
 
 @media (max-width: 420px) {
   .dashboard-page {
-    --table-body-size: 0.86rem;
-    --table-head-size: 0.68rem;
-    --table-row-min-height: 54px;
+    --table-body-size: 0.875rem;
+    --table-head-size: 0.72rem;
+    --table-row-min-height: 52px;
   }
 
-  .leaderboard-table th:last-child,
-  .leaderboard-table td:last-child {
-    width: 126px;
+  .leaderboard-table:not(.prayer-table) th:last-child,
+  .leaderboard-table:not(.prayer-table) td:last-child {
+    max-width: 52%;
   }
 
-  .info-prayers .prayer-table td:last-child,
-  .prayer-page .prayer-table td:nth-child(2),
-  .prayer-page .prayer-table-actions td:last-child {
-    width: auto;
-  }
-
-  .leaderboard-table,
-  .leaderboard-streak {
-    font-size: var(--table-body-size);
-  }
-
-  .leaderboard-missed-tag {
-    width: 78px;
-    flex-basis: 78px;
-    min-height: 22px;
-    padding: 0 5px;
-    font-size: 0.5rem;
+  .dashboard-action-label {
+    font-size: 2.6rem;
   }
 }

@@ -2,7 +2,7 @@
   <section class="section dashboard-section">
     <div class="container dashboard-container">
       <div class="dashboard-actions" aria-label="Daily action">
-        <button class="dashboard-action dashboard-action-yes" type="button">
+        <button class="dashboard-action dashboard-action-yes" type="button" aria-pressed="false">
           <span class="dashboard-action-copy">
             <span class="dashboard-action-label">YES</span>
             <span class="dashboard-action-subtitle">I stayed strong</span>
@@ -10,7 +10,7 @@
           <span class="dashboard-action-selected-icon" aria-hidden="true"></span>
         </button>
 
-        <button class="dashboard-action dashboard-action-no" type="button">
+        <button class="dashboard-action dashboard-action-no" type="button" aria-pressed="false">
           <span class="dashboard-action-copy">
             <span class="dashboard-action-label">NO</span>
             <span class="dashboard-action-subtitle">I struggled today</span>
@@ -73,7 +73,7 @@
             <tbody data-leaderboard-body>
               <% if (leaderboard.leaders.length) { %>
                 <% leaderboard.leaders.forEach((entry)=> { %>
-                  <tr>
+                  <tr<%- entry.id === leaderboard.current.id ? ' class="is-current"' : "" %>>
                     <td><span class="leaderboard-rank">
                         <%= entry.rank %>
                       </span></td>
@@ -98,7 +98,10 @@
                   <% }) %>
                     <% } else { %>
                       <tr>
-                        <td colspan="3" class="leaderboard-empty">No streaks yet</td>
+                        <td colspan="3" class="leaderboard-empty">
+                          <span class="table-empty-title">No streaks yet</span>
+                          <span class="table-empty-hint">Answer today's question above to start the first streak.</span>
+                        </td>
                       </tr>
                       <% } %>
             </tbody>

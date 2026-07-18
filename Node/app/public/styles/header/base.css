@@ -10,6 +10,7 @@
   --link-card-hover-border: var(--white);
   --shadow-soft: none;
   --shadow-card-hover: none;
+  --focus-ring-color: rgba(255, 255, 255, 0.55);
   width: 100%;
   background: var(--header-bg);
   border-bottom: 1px solid var(--white-10);
@@ -142,10 +143,10 @@ body.header-menu-open {
 .header-menu-button {
   display: none;
   position: relative;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: var(--white);
   cursor: pointer;
@@ -153,38 +154,37 @@ body.header-menu-open {
 
 .header-menu-button span {
   position: absolute;
-  left: 8px;
-  right: 8px;
+  left: 11px;
+  right: 11px;
   height: 1.5px;
   border-radius: 999px;
   background: currentColor;
   transition:
-    transform 0.22s ease,
-    top 0.22s ease,
-    opacity 0.22s ease;
+    transform var(--duration-ui) var(--ease-out),
+    top var(--duration-ui) var(--ease-out),
+    opacity var(--duration-ui) var(--ease-out);
 }
 
 .header-menu-button span:first-child {
-  top: 13px;
+  top: 16px;
 }
 
 .header-menu-button span:last-child {
-  top: 20px;
+  top: 23px;
 }
 
 .header-menu-button:hover,
 .header-menu-button:focus-visible {
   background: var(--white-06);
-  outline: none;
 }
 
 .header.menu-open .header-menu-button span:first-child {
-  top: 17px;
+  top: 19px;
   transform: rotate(45deg);
 }
 
 .header.menu-open .header-menu-button span:last-child {
-  top: 17px;
+  top: 19px;
   transform: rotate(-45deg);
 }
 
@@ -205,29 +205,48 @@ body.header-menu-open {
   min-height: 36px;
   padding: 0 var(--space-3);
   border: 1px solid var(--white-18);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--white-06);
   color: var(--white-72);
   font: inherit;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1;
   cursor: pointer;
   transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s ease;
+    background-color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .header-timezone-button:hover,
 .header-timezone-button:focus-visible,
 .header-timezone-button[aria-expanded="true"] {
   background: var(--white-10);
-  border-color: var(--white-18);
+  border-color: var(--border-strong);
   color: var(--white);
-  outline: none;
-  transform: translateY(-1px);
+}
+
+.header-timezone-button:active {
+  transform: scale(0.97);
+}
+
+@keyframes menu-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.header-timezone-menu {
+  transform-origin: top right;
+  animation: menu-pop var(--duration-ui) var(--ease-out);
 }
 
 .header-timezone-menu {
@@ -282,12 +301,12 @@ body.header-menu-open {
   min-height: 34px;
   padding: 0 10px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-tag);
   background: transparent;
   color: var(--white-72);
   font: inherit;
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
 }
@@ -308,7 +327,6 @@ body.header-menu-open {
 .header-timezone-option.selected {
   background: var(--white-10);
   color: var(--white);
-  outline: none;
 }
 
 .header-logout-form {
@@ -323,15 +341,15 @@ body.header-menu-open {
   width: 36px;
   height: 36px;
   border: 1px solid var(--white-18);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--white-06);
   color: var(--white-72);
   text-decoration: none;
   transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s ease;
+    background-color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .header-settings-link:visited {
@@ -342,10 +360,12 @@ body.header-menu-open {
 .header-settings-link:focus-visible,
 .header-settings-link.active {
   background: var(--white-10);
-  border-color: var(--white-18);
+  border-color: var(--border-strong);
   color: var(--white);
-  outline: none;
-  transform: translateY(-1px);
+}
+
+.header-settings-link:active {
+  transform: scale(0.97);
 }
 
 .header-settings-icon {
@@ -375,29 +395,31 @@ body.header-menu-open {
 .header-auth-link:hover,
 .header-auth-link:focus-visible {
   color: var(--text);
-  outline: none;
 }
 
 .header-auth-button {
   min-height: 36px;
   padding: 0 var(--space-3);
   border: 1px solid var(--white-18);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--white-06);
   color: var(--white-72);
   transition:
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    transform 0.18s ease;
+    background-color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .header-auth-button:hover,
 .header-auth-button:focus-visible {
   background: var(--white-10);
-  border-color: var(--white-18);
+  border-color: var(--border-strong);
   color: var(--white);
-  transform: translateY(-1px);
+}
+
+.header-auth-button:active {
+  transform: scale(0.97);
 }
 
 .header-auth-button::after {
@@ -409,16 +431,20 @@ body.header-menu-open {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 0%;
+  width: 100%;
   height: 1px;
   background: currentColor;
   opacity: 0;
-  transition: width 0.36s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s ease;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    transform var(--duration-panel) var(--ease-out),
+    opacity var(--duration-ui) var(--ease-out);
 }
 
 .header-auth-link:hover::after,
 .header-auth-link:focus-visible::after {
-  width: 100%;
+  transform: scaleX(1);
   opacity: 0.72;
 }
 
@@ -432,19 +458,24 @@ body.header-menu-open {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 0%;
+  width: 100%;
   height: 1px;
   background: currentColor;
   opacity: 0;
-  transition: width 0.36s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.28s ease;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    transform var(--duration-panel) var(--ease-out),
+    opacity var(--duration-ui) var(--ease-out);
 }
 
-.header-link:hover::after {
-  width: 100%;
+.header-link:hover::after,
+.header-link:focus-visible::after {
+  transform: scaleX(1);
   opacity: 0.72;
 }
 
 .header-link.active::after {
-  width: 100%;
+  transform: scaleX(1);
   opacity: 1;
 }

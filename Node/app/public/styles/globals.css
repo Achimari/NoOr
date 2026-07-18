@@ -1,6 +1,6 @@
 @import "./variables.css";
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 
 html,
 body,
@@ -40,7 +40,7 @@ body {
   line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -moz-osx-font-smoothing: grayscale;
   color-scheme: light;
 }
 
@@ -50,6 +50,15 @@ main {
   flex-direction: column;
   background: var(--surface);
   color: var(--text);
+}
+
+:where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+input[type="search"]:focus-visible {
+  outline: none;
 }
 
 /* Reusable Helpers */
@@ -79,7 +88,7 @@ main {
   min-height: 48px;
   padding: 0 var(--space-5);
   border: 1px solid transparent;
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--accent);
   color: var(--btn-text);
   text-decoration: none;
@@ -92,8 +101,22 @@ main {
   white-space: nowrap;
   user-select: none;
   -webkit-user-drag: none;
-  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background-color var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out);
   box-shadow: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
 }
 
 .btn-primary {
@@ -105,11 +128,10 @@ main {
 .btn-primary:focus-visible {
   background: var(--ink-72);
   color: var(--white);
-  transform: translateY(-1px);
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--focus-ring);
+  outline: 2px solid var(--focus-ring-color);
   outline-offset: 2px;
 }
 
@@ -125,5 +147,15 @@ main {
   background: var(--surface-muted);
   border-color: var(--border);
   color: var(--text);
-  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

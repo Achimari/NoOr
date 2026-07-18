@@ -49,7 +49,7 @@ rmSync(assetsDir, { force: true, recursive: true });
 mkdirSync(assetsDir, { recursive: true });
 
 const css = [
-  "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');",
+  "@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');",
   ...cssFiles.map((file) => `/* ${file} */\n${normalizeCss(readPublicFile(file))}`),
 ]
   .join("\n\n");

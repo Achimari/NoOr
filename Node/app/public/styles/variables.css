@@ -44,7 +44,17 @@
   --footer-icon-hover: var(--white);
   --shadow-soft: 0 12px 30px var(--ink-06);
   --shadow-card-hover: 0 16px 40px var(--ink-10);
-  --focus-ring: var(--ink-18);
+  --focus-ring: var(--ink-54);
+  --focus-ring-color: rgba(0, 0, 0, 0.55);
+
+  /* Dark app surfaces */
+  --bg-page: #0b0c0d;
+  --surface-1: #101214;
+  --surface-2: #15181b;
+  --text-primary: #f4f5f5;
+  --text-muted: #a4aab0;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
 
   /* Spacing */
   --space-1: 6px;
@@ -56,11 +66,28 @@
   --space-7: 40px;
   --space-8: 52px;
   --space-9: 64px;
+
+  /* Radius roles */
   --radius: 14px;
+  --radius-panel: 18px;
+  --radius-control: 10px;
+  --radius-tag: 8px;
+
   --padding: clamp(var(--space-4), 2.2vw, var(--space-6));
   --section-padding: clamp(var(--space-6), 5.2vw, var(--space-8));
   --section-padding-compact: clamp(var(--space-4), 3.2vw, var(--space-6));
 
+  /* Layers */
+  --z-dropdown: 90;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 140ms;
+  --duration-ui: 180ms;
+  --duration-panel: 240ms;
+
   /* Font */
-  --font-main: "Inter", sans-serif;
+  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
 }

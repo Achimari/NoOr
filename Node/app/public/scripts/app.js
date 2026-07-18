@@ -26,8 +26,6 @@ const prayerTimeLabel = document.querySelector("[data-prayer-time-label]");
 const prayerFilterClear = document.querySelector("[data-prayer-filter-clear]");
 const telegramConnectButton = document.querySelector(".telegram-connect-button");
 const telegramStatus = document.querySelector("[data-telegram-status]");
-const statisticsInsightCards = document.querySelectorAll(".statistics-insight");
-const dashboardActionCards = document.querySelectorAll(".dashboard-actions .dashboard-action");
 const header = document.querySelector(".header");
 const headerMenuToggle = document.querySelector("[data-header-menu-toggle]");
 const timezoneMenu = document.querySelector("[data-timezone-menu]");
@@ -46,6 +44,7 @@ let allPrayers = [];
 let prayerTimeOrder = "newest";
 let toastTimerId;
 let reactionChooserPrayerId = null;
+let prayerActionsTrigger = null;
 let missedAnswerDateKey = null;
 let settingsCurrentAnswer = null;
 let pendingSettingsAnswer = null;
@@ -73,18 +72,60 @@ async function apiFetch(url, { method = "GET", body } = {}) {
   return { ok: response.ok, status: response.status, data };
 }
 
-function bindPointerGlow(cards, xProperty, yProperty) {
-  cards.forEach((card) => {
-    card.addEventListener("pointermove", (event) => {
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty(xProperty, `${event.clientX - rect.left}px`);
-      card.style.setProperty(yProperty, `${event.clientY - rect.top}px`);
-    });
-  });
+let modalReturnFocus = null;
+
+function rememberModalTrigger() {
+  modalReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 }
 
-bindPointerGlow(statisticsInsightCards, "--glow-x", "--glow-y");
-bindPointerGlow(dashboardActionCards, "--action-glow-x", "--action-glow-y");
+function restoreModalTrigger() {
+  const target = modalReturnFocus;
+  modalReturnFocus = null;
+  if (!target) return;
+
+  if (target.isConnected) {
+    target.focus();
+    return;
+  }
+
+  const prayerId = target.dataset?.prayerId;
+  if (prayerId && target.hasAttribute?.("data-prayer-actions-open")) {
+    document.querySelector(`[data-prayer-actions-open][data-prayer-id="${prayerId}"]`)?.focus();
+    return;
+  }
+
+  if (target.hasAttribute?.("data-missed-open")) {
+    document.querySelector("[data-missed-open]")?.focus();
+  }
+}
+
+function getOpenModal() {
+  return document.querySelector(
+    "[data-prayer-reaction-chooser]:not([hidden]), [data-missed-answer-modal]:not([hidden]), [data-settings-answer-confirm-modal]:not([hidden])",
+  );
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Tab") return;
+
+  const modal = getOpenModal();
+  if (!modal) return;
+
+  const focusable = [...modal.querySelectorAll("button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")];
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  const isInside = modal.contains(document.activeElement);
+
+  if (event.shiftKey && (document.activeElement === first || !isInside)) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && (document.activeElement === last || !isInside)) {
+    event.preventDefault();
+    first.focus();
+  }
+});
 
 function setHeaderMenuOpen(isOpen) {
   if (!header || !headerMenuToggle) return;
@@ -205,7 +246,9 @@ function setSettingsAnswerState(answer) {
   }
 
   settingsAnswerOptions.forEach((button) => {
-    button.classList.toggle("selected", button.dataset.settingsAnswerOption === answer);
+    const isSelected = button.dataset.settingsAnswerOption === answer;
+    button.classList.toggle("selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
   });
 }
 
@@ -282,7 +325,7 @@ function renderLeaderboard(leaderboard) {
     ? leaderboard.leaders
         .map(
           (entry) => `
-            <tr>
+            <tr${Number(entry.id) === currentUserId ? ' class="is-current"' : ""}>
               <td><span class="leaderboard-rank">${entry.rank}</span></td>
               <td><a class="leaderboard-user user-link" href="/customer/${entry.id}">${userIcon()}${escapeHtml(entry.name)}</a></td>
               <td>
@@ -295,7 +338,7 @@ function renderLeaderboard(leaderboard) {
           `,
         )
         .join("")
-    : '<tr><td colspan="3" class="leaderboard-empty">No streaks yet</td></tr>';
+    : '<tr><td colspan="3" class="leaderboard-empty"><span class="table-empty-title">No streaks yet</span><span class="table-empty-hint">Answer today\'s question above to start the first streak.</span></td></tr>';
 }
 
 function renderMissedDaysTag(entry) {
@@ -404,6 +447,89 @@ function renderPrayerReactions(item) {
   `;
 }
 
+function actionMenuTriggerIcon() {
+  return '<svg class="ui-icon action-menu-icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>';
+}
+
+function actionMenuItemIcon(name) {
+  const paths = {
+    heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
+  };
+  return `<svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[name] || ""}</svg>`;
+}
+
+function getPrayerActionsMenu() {
+  let menu = document.querySelector("[data-prayer-actions-menu]");
+  if (menu) return menu;
+
+  menu = document.createElement("div");
+  menu.id = "prayer-actions-menu";
+  menu.className = "action-menu";
+  menu.setAttribute("data-prayer-actions-menu", "");
+  menu.setAttribute("role", "menu");
+  menu.hidden = true;
+  menu.innerHTML = `
+    <button class="action-menu-item" type="button" role="menuitem" data-prayer-menu-action="react">${actionMenuItemIcon("heart")}<span>React</span></button>
+    <button class="action-menu-item" type="button" role="menuitem" data-prayer-menu-action="answered">${actionMenuItemIcon("check")}<span>Mark as answered</span></button>
+  `;
+  document.body.append(menu);
+  return menu;
+}
+
+function positionPrayerActionsMenu(trigger, menu) {
+  const viewportGap = 8;
+  const triggerGap = 6;
+  const triggerRect = trigger.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  const left = Math.min(
+    window.innerWidth - menuRect.width - viewportGap,
+    Math.max(viewportGap, triggerRect.right - menuRect.width),
+  );
+  const spaceBelow = window.innerHeight - triggerRect.bottom;
+  const placeBelow = spaceBelow >= menuRect.height + triggerGap + viewportGap;
+  const top = placeBelow
+    ? triggerRect.bottom + triggerGap
+    : Math.max(viewportGap, triggerRect.top - menuRect.height - triggerGap);
+
+  menu.dataset.placement = placeBelow ? "bottom" : "top";
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+}
+
+function closePrayerActionsMenu({ restoreFocus = false } = {}) {
+  const menu = document.querySelector("[data-prayer-actions-menu]");
+  const trigger = prayerActionsTrigger;
+
+  if (menu) menu.hidden = true;
+  if (trigger) trigger.setAttribute("aria-expanded", "false");
+  prayerActionsTrigger = null;
+
+  if (restoreFocus && trigger?.isConnected) {
+    trigger.focus({ preventScroll: true });
+  }
+}
+
+function openPrayerActionsMenu(trigger) {
+  const menu = getPrayerActionsMenu();
+  const prayerId = trigger.dataset.prayerId;
+  const canReact = trigger.dataset.prayerCanReact === "true";
+  const canAnswer = trigger.dataset.prayerCanAnswer === "true";
+
+  closePrayerActionsMenu();
+  prayerActionsTrigger = trigger;
+  trigger.setAttribute("aria-expanded", "true");
+  menu.dataset.prayerId = prayerId;
+  menu.querySelectorAll("button").forEach((button) => {
+    button.disabled = false;
+  });
+  menu.querySelector('[data-prayer-menu-action="react"]').hidden = !canReact;
+  menu.querySelector('[data-prayer-menu-action="answered"]').hidden = !canAnswer;
+  menu.hidden = false;
+  positionPrayerActionsMenu(trigger, menu);
+  menu.querySelector("button:not([hidden])")?.focus({ preventScroll: true });
+}
+
 function getReactionChooser() {
   let chooser = document.querySelector("[data-prayer-reaction-chooser]");
   if (chooser) return chooser;
@@ -432,6 +558,7 @@ function getReactionChooser() {
 
 function openReactionChooser(prayerId) {
   if (!prayerId) return;
+  rememberModalTrigger();
   reactionChooserPrayerId = Number(prayerId);
   const chooser = getReactionChooser();
   const prayer = allPrayers.find((item) => item.id === reactionChooserPrayerId);
@@ -449,6 +576,7 @@ function openReactionChooser(prayerId) {
 
 function closeReactionChooser() {
   const chooser = document.querySelector("[data-prayer-reaction-chooser]");
+  const wasOpen = Boolean(chooser && !chooser.hidden);
   if (chooser) {
     chooser.hidden = true;
     chooser.querySelectorAll("[data-prayer-reaction]").forEach((button) => {
@@ -457,6 +585,7 @@ function closeReactionChooser() {
   }
   reactionChooserPrayerId = null;
   document.body.classList.remove("prayer-reaction-modal-open");
+  if (wasOpen) restoreModalTrigger();
 }
 
 function formatMissedDate(dateKey) {
@@ -497,6 +626,7 @@ function getMissedAnswerModal() {
 
 function openMissedAnswerModal(dateKey) {
   if (!dateKey) return;
+  rememberModalTrigger();
   missedAnswerDateKey = dateKey;
   const modal = getMissedAnswerModal();
   const title = modal.querySelector("[data-missed-title]");
@@ -510,6 +640,7 @@ function openMissedAnswerModal(dateKey) {
 
 function closeMissedAnswerModal() {
   const modal = document.querySelector("[data-missed-answer-modal]");
+  const wasOpen = Boolean(modal && !modal.hidden);
   if (modal) {
     modal.hidden = true;
     modal.querySelectorAll("[data-missed-answer]").forEach((button) => {
@@ -517,6 +648,7 @@ function closeMissedAnswerModal() {
     });
   }
   missedAnswerDateKey = null;
+  if (wasOpen) restoreModalTrigger();
 }
 
 function getSettingsAnswerConfirmModal() {
@@ -546,6 +678,7 @@ function getSettingsAnswerConfirmModal() {
 }
 
 function openSettingsAnswerConfirmModal(answer) {
+  rememberModalTrigger();
   pendingSettingsAnswer = answer;
   const modal = getSettingsAnswerConfirmModal();
   const copy = modal.querySelector("[data-settings-answer-confirm-copy]");
@@ -558,6 +691,7 @@ function openSettingsAnswerConfirmModal(answer) {
 
 function closeSettingsAnswerConfirmModal() {
   const modal = document.querySelector("[data-settings-answer-confirm-modal]");
+  const wasOpen = Boolean(modal && !modal.hidden);
   if (modal) {
     modal.hidden = true;
     modal.querySelectorAll("[data-settings-answer-confirm], [data-settings-answer-cancel]").forEach((button) => {
@@ -565,6 +699,7 @@ function closeSettingsAnswerConfirmModal() {
     });
   }
   pendingSettingsAnswer = null;
+  if (wasOpen) restoreModalTrigger();
 }
 
 function formatItemCount(count) {
@@ -598,6 +733,7 @@ function updatePrayerUserOptions(prayers) {
 function setUserMenuOpen(isOpen) {
   if (!prayerUserOptions) return;
   prayerUserOptions.hidden = !isOpen;
+  prayerUserFilter?.setAttribute("aria-expanded", String(isOpen));
 }
 
 function setTimeMenuOpen(isOpen) {
@@ -738,8 +874,10 @@ function getFilteredPrayers() {
 
 function renderPrayers(prayers, targetBody = prayersBody) {
   if (!targetBody) return;
+  closePrayerActionsMenu();
   const showActions = targetBody.dataset.prayerActions === "true";
   const showReactions = targetBody.dataset.prayerReactions === "true";
+  const showRowMenu = showActions || showReactions;
   const listType = targetBody.dataset.prayerList || "default";
   const emptyLabel = listType === "active" ? "No active prayer requests" : "No prayers yet";
 
@@ -747,25 +885,36 @@ function renderPrayers(prayers, targetBody = prayersBody) {
     prayerCount.textContent = formatItemCount(prayers.length);
   }
 
+  const emptyHint =
+    listType === "active"
+      ? "Requests you share appear here until they are answered."
+      : "Prayer requests from the community will appear here.";
+
   targetBody.innerHTML = prayers.length
     ? prayers
-        .map(
-          (item) => `
+        .map((item) => {
+          const reactions = showReactions ? renderPrayerReactions(item) : "";
+          const canAnswer = showActions && item.canMarkAnswered;
+          const rowMenu =
+            showReactions || canAnswer
+              ? `<button class="action-menu-trigger" type="button" data-prayer-actions-open data-prayer-id="${item.id}" data-prayer-can-react="${showReactions}" data-prayer-can-answer="${canAnswer}" aria-haspopup="menu" aria-expanded="false" aria-controls="prayer-actions-menu" aria-label="Open prayer actions">${actionMenuTriggerIcon()}</button>`
+              : "";
+
+          return `
             <tr>
               <td><a class="leaderboard-user user-link" href="/customer/${item.userId}">${userIcon()}${escapeHtml(item.userName)}</a></td>
               <td>
-                <div class="${showReactions ? "prayer-message" : "prayer-inline-message"}" ${showReactions ? `data-prayer-react-open="${item.id}" tabindex="0" role="button" aria-label="Choose prayer reaction"` : ""}>
-                  <span class="prayer-message-text">${escapeHtml(item.prayer)}</span>
-                  ${showActions && item.canMarkAnswered ? `<button class="prayer-remove-button" type="button" data-prayer-answered="${item.id}" aria-label="Mark prayer as answered">Answered</button>` : ""}
-                  ${showReactions ? renderPrayerReactions(item) : ""}
+                <div class="prayer-entry">
+                  <p class="prayer-message-text">${escapeHtml(item.prayer)}</p>
+                  ${reactions ? `<div class="prayer-entry-meta">${reactions}</div>` : ""}
                 </div>
               </td>
-              ${showActions ? "<td></td>" : ""}
+              ${showRowMenu ? `<td class="prayer-row-actions">${rowMenu}</td>` : ""}
             </tr>
-          `,
-        )
+          `;
+        })
         .join("")
-    : `<tr><td colspan="${2 + (showActions ? 1 : 0)}" class="leaderboard-empty">${emptyLabel}</td></tr>`;
+    : `<tr><td colspan="${2 + (showRowMenu ? 1 : 0)}" class="leaderboard-empty"><span class="table-empty-title">${emptyLabel}</span><span class="table-empty-hint">${emptyHint}</span></td></tr>`;
 }
 
 function applyPrayerFilters() {
@@ -787,6 +936,21 @@ async function loadPrayers() {
   if (!result?.ok) return;
 
   renderUserPrayerLists(result.data.prayerLists || {});
+}
+
+async function markPrayerAnswered(prayerId, control) {
+  if (!prayerId) return;
+  if (control) control.disabled = true;
+
+  const result = await apiFetch(`/api/prayers/${prayerId}/answered`, { method: "POST" });
+  if (!result?.ok) {
+    if (control) control.disabled = false;
+    showToast(result?.data.error || "Could not mark prayer as answered", "error");
+    return;
+  }
+
+  await loadPrayers();
+  showToast("Prayer marked as answered");
 }
 
 if (prayerFilterToggle && prayerFilterPanel) {
@@ -813,44 +977,42 @@ prayerUserFilter?.addEventListener("keydown", (event) => {
 });
 prayerFilterClear?.addEventListener("click", resetPrayerFilters);
 
-if (prayersBody?.dataset.prayerActions === "true") {
-  prayersBody.addEventListener("click", async (event) => {
-    const button = event.target.closest("[data-prayer-answered]");
-    if (!button) return;
-
-    button.disabled = true;
-    const result = await apiFetch(`/api/prayers/${button.dataset.prayerAnswered}/answered`, { method: "POST" });
-    if (!result) return;
-
-    if (!result.ok) {
-      button.disabled = false;
-      showToast("Could not mark prayer as answered", "error");
-      return;
-    }
-
-    await loadPrayers();
-    showToast("Prayer marked as answered");
-  });
-}
-
-if (prayersBody?.dataset.prayerReactions === "true") {
-  prayersBody.addEventListener("click", (event) => {
-    const opener = event.target.closest("[data-prayer-react-open]");
-    if (!opener) return;
-
-    event.preventDefault();
-    openReactionChooser(opener.dataset.prayerReactOpen);
-  });
-
-  prayersBody.addEventListener("keydown", (event) => {
-    const opener = event.target.closest("[data-prayer-react-open]");
-    if (!opener || (event.key !== "Enter" && event.key !== " ")) return;
-    event.preventDefault();
-    openReactionChooser(opener.dataset.prayerReactOpen);
-  });
-}
-
 document.addEventListener("click", async (event) => {
+  const actionsTrigger = event.target.closest("[data-prayer-actions-open]");
+  if (actionsTrigger) {
+    event.preventDefault();
+    const isOpen = actionsTrigger === prayerActionsTrigger;
+    if (isOpen) {
+      closePrayerActionsMenu({ restoreFocus: true });
+    } else {
+      openPrayerActionsMenu(actionsTrigger);
+    }
+    return;
+  }
+
+  const menuAction = event.target.closest("[data-prayer-menu-action]");
+  if (menuAction) {
+    const menu = menuAction.closest("[data-prayer-actions-menu]");
+    const prayerId = menu?.dataset.prayerId;
+    const trigger = prayerActionsTrigger;
+    const action = menuAction.dataset.prayerMenuAction;
+
+    closePrayerActionsMenu();
+    if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+
+    if (action === "react") {
+      openReactionChooser(prayerId);
+    } else if (action === "answered") {
+      await markPrayerAnswered(prayerId, menuAction);
+    }
+    return;
+  }
+
+  const actionsMenu = document.querySelector("[data-prayer-actions-menu]");
+  if (actionsMenu && !actionsMenu.hidden && !actionsMenu.contains(event.target)) {
+    closePrayerActionsMenu();
+  }
+
   const settingsAnswerCancel = event.target.closest("[data-settings-answer-cancel]");
   if (settingsAnswerCancel) {
     closeSettingsAnswerConfirmModal();
@@ -954,13 +1116,51 @@ document.addEventListener("click", async (event) => {
   }
 
   allPrayers = allPrayers.map((item) => (item.id === result.data.prayer.id ? result.data.prayer : item));
-  closeReactionChooser();
   applyPrayerFilters();
+  closeReactionChooser();
   showToast(isRemoving ? "Reaction removed" : "Reaction saved");
 });
 
 document.addEventListener("keydown", (event) => {
+  const actionsTrigger = event.target.closest?.("[data-prayer-actions-open]");
+  if (actionsTrigger && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+    event.preventDefault();
+    openPrayerActionsMenu(actionsTrigger);
+    if (event.key === "ArrowUp") {
+      const items = [...getPrayerActionsMenu().querySelectorAll("button:not([hidden])")];
+      items.at(-1)?.focus();
+    }
+    return;
+  }
+
+  const actionsMenu = document.querySelector("[data-prayer-actions-menu]");
+  if (actionsMenu && !actionsMenu.hidden && actionsMenu.contains(event.target)) {
+    const items = [...actionsMenu.querySelectorAll("button:not([hidden]):not([disabled])")];
+    const currentIndex = items.indexOf(document.activeElement);
+
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const nextIndex = (currentIndex + direction + items.length) % items.length;
+      items[nextIndex]?.focus();
+      return;
+    }
+
+    if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      items[event.key === "Home" ? 0 : items.length - 1]?.focus();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePrayerActionsMenu({ restoreFocus: true });
+      return;
+    }
+  }
+
   if (event.key === "Escape") {
+    closePrayerActionsMenu({ restoreFocus: true });
     setHeaderMenuOpen(false);
     setTimezoneMenuOpen(false);
     closeReactionChooser();
@@ -969,10 +1169,23 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+window.addEventListener("resize", () => closePrayerActionsMenu());
+window.addEventListener("scroll", () => closePrayerActionsMenu(), true);
+
+function setDailyActionSelection(answer) {
+  if (yesButton) {
+    yesButton.classList.toggle("selected", answer === "YES");
+    yesButton.setAttribute("aria-pressed", String(answer === "YES"));
+  }
+  if (noButton) {
+    noButton.classList.toggle("selected", answer === "NO");
+    noButton.setAttribute("aria-pressed", String(answer === "NO"));
+  }
+}
+
 async function updateLeaderboard(action) {
   const endpoint = action === "reset" ? "/api/leaderboard/reset" : "/api/leaderboard/increment";
-  yesButton?.classList.toggle("selected", action === "increment");
-  noButton?.classList.toggle("selected", action === "reset");
+  setDailyActionSelection(action === "increment" ? "YES" : "NO");
   markTodayWeekDay(action === "increment" ? "YES" : "NO");
 
   const result = await apiFetch(endpoint, { method: "POST" });
@@ -1077,8 +1290,7 @@ function setAnswerState(status) {
   const isLocked = status.canAnswer === false;
   yesButton.disabled = isLocked;
   noButton.disabled = isLocked;
-  yesButton.classList.toggle("selected", status.answer === "YES");
-  noButton.classList.toggle("selected", status.answer === "NO");
+  setDailyActionSelection(status.answer || null);
 
   if (checkInMessage && checkInTimer) {
     if (status.answeredToday && status.nextResetAt) {
@@ -1100,8 +1312,7 @@ function renderResetTimer(nextResetAt) {
     checkInTimer.hidden = true;
     yesButton.disabled = false;
     noButton.disabled = false;
-    yesButton.classList.remove("selected");
-    noButton.classList.remove("selected");
+    setDailyActionSelection(null);
     window.clearInterval(resetTimerId);
     return;
   }
