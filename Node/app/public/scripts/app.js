@@ -1351,13 +1351,14 @@ function formatTimerPart(value) {
    ------------------------------------------------------------ */
 
 const AMBIENT_VIDEO_SOURCES = [
-  { src: "/videos/ambient-sky.webm", type: "video/webm" },
   { src: "/videos/ambient-sky.mp4", type: "video/mp4" },
+  { src: "/videos/ambient-sky.webm", type: "video/webm" },
 ];
 const AMBIENT_VIDEO_POSTER = "/videos/ambient-sky.jpg";
 
 let ambientRoot = null;
 let ambientVideoElement = null;
+let ambientPlaybackRetryArmed = false;
 const ambientReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function setAmbientAnswerState(answer) {
@@ -1369,11 +1370,44 @@ function ambientPlaybackAllowed() {
   return !ambientReducedMotion.matches && !navigator.connection?.saveData && !document.hidden;
 }
 
+function disarmAmbientPlaybackRetry() {
+  if (!ambientPlaybackRetryArmed) return;
+  document.removeEventListener("pointerdown", retryAmbientPlayback);
+  document.removeEventListener("keydown", retryAmbientPlayback);
+  ambientPlaybackRetryArmed = false;
+}
+
+function armAmbientPlaybackRetry() {
+  if (ambientPlaybackRetryArmed || !ambientPlaybackAllowed()) return;
+  document.addEventListener("pointerdown", retryAmbientPlayback, { passive: true });
+  document.addEventListener("keydown", retryAmbientPlayback);
+  ambientPlaybackRetryArmed = true;
+}
+
+function requestAmbientPlayback() {
+  if (!ambientVideoElement || !ambientPlaybackAllowed()) return;
+
+  const playAttempt = ambientVideoElement.play();
+  if (!playAttempt) return;
+
+  playAttempt.then(disarmAmbientPlaybackRetry).catch(() => {
+    // Safari may reject autoplay even for muted media. Retry from
+    // the first real user gesture, which satisfies its media policy.
+    armAmbientPlaybackRetry();
+  });
+}
+
+function retryAmbientPlayback() {
+  disarmAmbientPlaybackRetry();
+  requestAmbientPlayback();
+}
+
 function syncAmbientPlayback() {
   if (!ambientVideoElement) return;
   if (ambientPlaybackAllowed()) {
-    ambientVideoElement.play()?.catch(() => {});
+    requestAmbientPlayback();
   } else {
+    disarmAmbientPlaybackRetry();
     ambientVideoElement.pause();
   }
 }
@@ -1389,7 +1423,7 @@ function initAmbientArt() {
     root.setAttribute("aria-hidden", "true");
     root.dataset.state = "neutral";
     root.innerHTML = `
-      <video class="ambient-video__media" muted loop playsinline preload="metadata" poster="${AMBIENT_VIDEO_POSTER}" tabindex="-1">
+      <video class="ambient-video__media" autoplay muted loop playsinline preload="metadata" poster="${AMBIENT_VIDEO_POSTER}" tabindex="-1">
         ${AMBIENT_VIDEO_SOURCES.map((source) => `<source src="${source.src}" type="${source.type}">`).join("\n        ")}
       </video>
       <div class="ambient-video__tint"></div>
@@ -1398,7 +1432,9 @@ function initAmbientArt() {
     `;
 
     const video = root.querySelector("video");
+    video.autoplay = true;
     video.muted = true;
+    video.playsInline = true;
     const showFallback = () => {
       root.classList.add("is-fallback");
       root.style.backgroundImage = `url(${AMBIENT_VIDEO_POSTER})`;

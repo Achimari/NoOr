@@ -7,7 +7,7 @@
     <title><%= title || "" %></title>
     <%- include("./loading-head") %>
     <% (assets.styles || []).forEach((href, index, styles) => { %>
-      <link rel="stylesheet" href="<%= href %>"<%= index === styles.length - 1 ? ' onload="window.NoOrStylesReady && window.NoOrStylesReady()"' : "" %> />
+      <link rel="stylesheet" href="<%= href %>" <% if (index === styles.length - 1) { %>onload="window.NoOrStylesReady && window.NoOrStylesReady()"<% } %> />
     <% }) %>
     <script src="<%= assets.script %>" defer></script>
   </head>
