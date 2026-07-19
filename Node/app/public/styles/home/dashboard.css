@@ -31,6 +31,110 @@
     var(--bg-page);
 }
 
+/* ------------------------------------------------------------
+   Ambient background — "Heavenly light through dark clouds"
+   One muted looping video behind dashboard content: real
+   footage of sunlight breaking through layered dark clouds.
+   Static overlay + vignette keep content readable; no motion is
+   added on top of the footage. Layer is JS-generated on
+   dashboard pages only; these rules apply once it exists.
+   ------------------------------------------------------------ */
+
+.ambient-video {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-background);
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--ambient-base);
+  background-size: cover;
+  background-position: center 40%;
+}
+
+.ambient-video__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  opacity: 0.85;
+}
+
+/* Static dark fallback when the source fails to load. */
+.ambient-video.is-fallback .ambient-video__media {
+  display: none;
+}
+
+.ambient-video__tint,
+.ambient-video__overlay,
+.ambient-video__vignette {
+  position: absolute;
+  inset: 0;
+}
+
+.ambient-video__overlay {
+  background: rgba(4, 6, 8, 0.24);
+}
+
+.ambient-video__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    rgba(2, 4, 5, 0.14) 72%,
+    rgba(2, 4, 5, 0.4) 100%
+  );
+}
+
+.ambient-video__tint {
+  opacity: 0;
+  transition:
+    opacity 1000ms var(--ease-in-out),
+    background-color 1000ms var(--ease-in-out);
+}
+
+.ambient-video[data-state="yes"] .ambient-video__tint {
+  opacity: 1;
+  background: rgba(146, 210, 176, 0.05);
+}
+
+.ambient-video[data-state="no"] .ambient-video__tint {
+  opacity: 1;
+  background: rgba(214, 156, 156, 0.05);
+}
+
+/* Stacking: video at layer 0, dashboard content isolated above.
+   Header (80), dropdowns (90), modals, and toast keep their own
+   higher layers. */
+body.has-ambient-video {
+  background: var(--ambient-base);
+}
+
+body.has-ambient-video .dashboard-page {
+  position: relative;
+  z-index: var(--z-content);
+  isolation: isolate;
+  background: transparent;
+}
+
+body.has-ambient-video .dashboard-section {
+  background: transparent;
+}
+
+/* Surfaces stay near-opaque for readability; the YES/NO area
+   may reveal slightly more atmosphere than data panels. */
+body.has-ambient-video .dashboard-card,
+body.has-ambient-video .dashboard-current,
+body.has-ambient-video .dashboard-timer-card {
+  background: rgba(16, 18, 20, 0.94);
+}
+
+body.has-ambient-video .dashboard-actions {
+  background: rgba(16, 18, 20, 0.84);
+}
+
 .dashboard-section>.container {
   margin: 0 auto;
 }
@@ -566,7 +670,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+.leaderboard-streak-value {
+  white-space: nowrap;
+}
+
+/* Rendered between value and tag; only shown in the compact mobile variant */
+.leaderboard-streak-separator {
+  display: none;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 .leaderboard-missed-tag {
+  /* Desktop keeps the pill left of the value so streak numbers stay aligned */
+  order: -1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -692,9 +809,11 @@ p.leaderboard-empty {
 .info-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
+  /* Row is at least the panel height but grows with content, so long
+     resource entries never clip while panels still stretch evenly. */
+  grid-template-rows: minmax(var(--info-panel-height), auto);
   gap: var(--space-5);
   align-items: stretch;
-  height: var(--info-panel-height);
   --info-panel-height: 700px;
 }
 
@@ -702,16 +821,17 @@ p.leaderboard-empty {
   --info-panel-height: clamp(868px, calc(100vh - 132px), 940px);
 }
 
+/* Resource row is content-sized so variable-length entries never clip;
+   the telegram row absorbs remaining column height. */
 .info-column {
   display: grid;
   gap: var(--space-5);
-  grid-template-rows: minmax(230px, 0.74fr) minmax(330px, 1fr) minmax(260px, 0.78fr);
+  grid-template-rows: minmax(220px, auto) auto minmax(240px, 1fr);
   min-height: 0;
 }
 
 .info-column .dashboard-card {
   min-height: 0;
-  overflow: hidden;
 }
 
 .info-grid .dashboard-card {
@@ -744,18 +864,113 @@ p.leaderboard-empty {
   line-height: 1.3;
 }
 
-.info-stat-grid {
-  display: grid;
+.info-resource {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
 }
 
-.info-stat-grid .dashboard-value {
-  font-size: clamp(1.2rem, 1.6vw, 1.4rem);
-  line-height: 1.2;
+.info-resource-head {
+  align-items: flex-start;
+  margin-bottom: 0;
 }
 
-.info-stat-grid .dashboard-label {
-  margin-bottom: 2px;
+.info-resource-head > div {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.info-resource .dashboard-label {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.info-resource-head h2 {
+  font-size: 1.08rem;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+.info-resource-head > span {
+  margin-top: 1px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-tag);
+  background: var(--white-06);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.info-resource-source,
+.info-resource-summary,
+.info-resource-action p {
+  margin: 0;
+}
+
+.info-resource-source {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.info-resource-summary {
+  max-width: 56ch;
+  color: var(--white-92);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.info-resource-action {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+.info-resource-action > p:last-child {
+  max-width: 56ch;
+  color: var(--white-92);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.info-resource-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: auto;
+  border-radius: var(--radius-tag);
+  color: var(--white-72);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.info-resource-link:hover,
+.info-resource-link:focus-visible {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.info-resource-link:active {
+  color: var(--white-72);
 }
 
 .telegram-card-copy {
@@ -785,10 +1000,9 @@ p.leaderboard-empty {
 }
 
 /* ------------------------------------------------------------
-   Prayer tables — real tables on desktop, stacked on mobile
+   Prayer tables — streamlined rows on desktop, stacked on mobile
    ------------------------------------------------------------ */
 
-.prayer-table th.prayer-actions-column,
 .prayer-table td.prayer-row-actions {
   width: 56px;
   min-width: 56px;
@@ -812,14 +1026,6 @@ p.leaderboard-empty {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-}
-
-.prayer-page .prayer-table thead th,
-.info-prayers .prayer-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--surface-1);
 }
 
 .prayer-table th:first-child,
@@ -2395,7 +2601,7 @@ p.leaderboard-empty {
   }
 
   .info-grid {
-    height: auto;
+    grid-template-rows: none;
   }
 
   .info-column {
@@ -2408,7 +2614,7 @@ p.leaderboard-empty {
     order: 1;
   }
 
-  .info-stats {
+  .info-resource {
     order: 2;
   }
 
@@ -2443,11 +2649,6 @@ p.leaderboard-empty {
   .prayer-page .prayer-table-wrap {
     flex: 0 0 auto;
     overflow: visible;
-  }
-
-  .prayer-page .prayer-table thead th,
-  .info-prayers .prayer-table thead th {
-    position: static;
   }
 
   .statistics-donut-layout {
@@ -2520,23 +2721,16 @@ p.leaderboard-empty {
     width: 36px;
   }
 
-  .leaderboard-table:not(.prayer-table) th:last-child,
-  .leaderboard-table:not(.prayer-table) td:last-child {
-    width: auto;
-    max-width: 46%;
-    white-space: normal;
-  }
-
   .leaderboard-head-label,
   .leaderboard-user {
     gap: 6px;
   }
 
+  /* Status column stays content-sized so the inline status never gets
+     squeezed onto two lines; long names wrap instead. */
   .leaderboard-streak {
-    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 6px;
-    row-gap: 4px;
     line-height: 1.3;
   }
 
@@ -2546,8 +2740,39 @@ p.leaderboard-empty {
     height: 15px;
   }
 
+  /* Compact inline status: "0 days · 21 missed" */
+  .leaderboard-streak-separator {
+    display: inline;
+  }
+
+  .leaderboard-missed-tag {
+    order: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .leaderboard-missed-tag:hover,
+  .leaderboard-missed-tag:focus-visible {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Full-size touch target without visual bulk */
   button.leaderboard-missed-tag {
-    min-height: 40px;
+    position: relative;
+  }
+
+  button.leaderboard-missed-tag::before {
+    content: "";
+    position: absolute;
+    inset: -13px -8px;
   }
 
   .statistics-insights {
@@ -2599,10 +2824,6 @@ p.leaderboard-empty {
   }
 
   /* Prayer entries become labeled stacked rows */
-  .prayer-table thead {
-    display: none;
-  }
-
   .prayer-table,
   .prayer-table tbody,
   .prayer-table tr,
@@ -2672,12 +2893,22 @@ p.leaderboard-empty {
     --table-row-min-height: 52px;
   }
 
-  .leaderboard-table:not(.prayer-table) th:last-child,
-  .leaderboard-table:not(.prayer-table) td:last-child {
-    max-width: 52%;
-  }
-
   .dashboard-action-label {
     font-size: 2.6rem;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Extremely narrow: allow the status group to wrap cleanly under the value */
+  .leaderboard-table:not(.prayer-table) th:last-child,
+  .leaderboard-table:not(.prayer-table) td:last-child {
+    width: auto;
+    max-width: 56%;
+    white-space: normal;
+  }
+
+  .leaderboard-streak {
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
 }

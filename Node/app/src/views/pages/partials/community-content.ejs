@@ -13,28 +13,23 @@
             <p class="info-quote-source"><%= motivationPhrase.source %></p>
           </article>
 
-          <article class="dashboard-card info-stats">
-            <header class="dashboard-card-head">
-              <h2>Your progress</h2>
+          <article class="dashboard-card info-resource">
+            <header class="dashboard-card-head info-resource-head">
+              <div>
+                <p class="dashboard-label">Practical support</p>
+                <h2><%= recoveryResource.title %></h2>
+                <p class="info-resource-source"><%= recoveryResource.source %> · <%= recoveryResource.format %></p>
+              </div>
+              <span><%= recoveryResource.estimated_read_minutes %> min</span>
             </header>
-            <div class="info-stat-grid">
-              <div>
-                <p class="dashboard-label">Name</p>
-                <p class="dashboard-value"><%= infoStats.name %></p>
-              </div>
-              <div>
-                <p class="dashboard-label">Current streak</p>
-                <p class="dashboard-value"><%= infoStats.currentStreak %> Days</p>
-              </div>
-              <div>
-                <p class="dashboard-label">Best streak</p>
-                <p class="dashboard-value"><%= infoStats.maxStreak %> Days</p>
-              </div>
-              <div>
-                <p class="dashboard-label">Today's status</p>
-                <p class="dashboard-value"><%= infoStats.todayAnswer %></p>
-              </div>
+            <p class="info-resource-summary"><%= recoveryResource.user_takeaway %></p>
+            <div class="info-resource-action">
+              <p class="dashboard-label">Try this now</p>
+              <p><%= recoveryResource.suggested_action %></p>
             </div>
+            <a class="info-resource-link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="Read <%= recoveryResource.title %> at <%= recoveryResource.source %> (opens in a new tab)">
+              Optional further reading
+            </a>
           </article>
 
           <article class="dashboard-card telegram-card info-telegram-card" data-telegram-card>

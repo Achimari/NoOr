@@ -1,4 +1,4 @@
-import { getCheckInOverview, getLeaderboardSummary } from "../services/leaderboardService.js";
+import { getLeaderboardSummary } from "../services/leaderboardService.js";
 import { getPrayers, getUserPrayers } from "../services/prayerService.js";
 import { getStatisticsSummary } from "../services/statisticsService.js";
 import { readFileSync } from "node:fs";
@@ -6,11 +6,20 @@ import { readFileSync } from "node:fs";
 const motivationPhrases = JSON.parse(
   readFileSync(new URL("../data/motivationPhrases.json", import.meta.url), "utf8"),
 );
+const recoveryResources = JSON.parse(
+  readFileSync(new URL("../data/recoveryResources.json", import.meta.url), "utf8"),
+).resources;
 
 function getRandomMotivationPhrase(lastPhraseId) {
   const availablePhrases = motivationPhrases.filter((phrase) => phrase.id !== lastPhraseId);
   const phrases = availablePhrases.length ? availablePhrases : motivationPhrases;
   return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function getRandomRecoveryResource(lastResourceId) {
+  const availableResources = recoveryResources.filter((resource) => resource.id !== lastResourceId);
+  const resources = availableResources.length ? availableResources : recoveryResources;
+  return resources[Math.floor(Math.random() * resources.length)];
 }
 
 export function renderPage({ view, pageId, titleKey }) {
@@ -22,23 +31,18 @@ export function renderPage({ view, pageId, titleKey }) {
     }
 
     if (pageId === "community") {
-      const [{ status, leaderboard }, prayers] = await Promise.all([
-        getCheckInOverview(req.user.id, req.user.timezone),
-        getPrayers(req.user.id),
-      ]);
-
-      viewData.infoStats = {
-        name: req.user.name,
-        currentStreak: leaderboard.current.value,
-        maxStreak: leaderboard.current.maxStreak,
-        todayAnswer: status.answer || "Pending",
-      };
+      viewData.prayers = await getPrayers(req.user.id);
       viewData.telegramState = {
         isTelegramLinked: Boolean(req.user.isTelegramLinked),
       };
-      viewData.prayers = prayers;
       viewData.motivationPhrase = getRandomMotivationPhrase(req.cookies?.lastMotivationPhraseId);
+      viewData.recoveryResource = getRandomRecoveryResource(req.cookies?.lastRecoveryResourceId);
       res.cookie("lastMotivationPhraseId", viewData.motivationPhrase.id, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+      });
+      res.cookie("lastRecoveryResourceId", viewData.recoveryResource.id, {
         httpOnly: true,
         sameSite: "lax",
         maxAge: 1000 * 60 * 60 * 24 * 30,

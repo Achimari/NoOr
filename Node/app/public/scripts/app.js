@@ -250,6 +250,7 @@ function setSettingsAnswerState(answer) {
     button.classList.toggle("selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
   });
+  setAmbientAnswerState(answer);
 }
 
 async function loadSettingsAnswer() {
@@ -330,8 +331,8 @@ function renderLeaderboard(leaderboard) {
               <td><a class="leaderboard-user user-link" href="/customer/${entry.id}">${userIcon()}${escapeHtml(entry.name)}</a></td>
               <td>
                 <span class="leaderboard-streak">
+                  <span class="leaderboard-streak-value">${entry.value} days</span>
                   ${renderMissedDaysTag(entry)}
-                  <span>${entry.value} days</span>
                 </span>
               </td>
             </tr>
@@ -345,13 +346,16 @@ function renderMissedDaysTag(entry) {
   const missedDays = entry?.missedDays;
   if (!missedDays || !missedDays.count) return "";
 
-  const label = `Missed days ${missedDays.count}`;
+  const separator = '<span class="leaderboard-streak-separator" aria-hidden="true">·</span>';
+  const label = `${missedDays.count} missed`;
   if (Number(entry.id) !== currentUserId) {
-    return `<span class="leaderboard-missed-tag is-static">${escapeHtml(label)}</span>`;
+    return `${separator}<span class="leaderboard-missed-tag is-static">${escapeHtml(label)}</span>`;
   }
 
+  const ariaLabel = `Answer ${missedDays.count} missed ${missedDays.count === 1 ? "day" : "days"}`;
   return `
-    <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="${escapeHtml(missedDays.nextDateKey || "")}" data-missed-count="${missedDays.count}">
+    ${separator}
+    <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="${escapeHtml(missedDays.nextDateKey || "")}" data-missed-count="${missedDays.count}" aria-label="${escapeHtml(ariaLabel)}">
       ${escapeHtml(label)}
     </button>
   `;
@@ -1181,6 +1185,7 @@ function setDailyActionSelection(answer) {
     noButton.classList.toggle("selected", answer === "NO");
     noButton.setAttribute("aria-pressed", String(answer === "NO"));
   }
+  setAmbientAnswerState(answer);
 }
 
 async function updateLeaderboard(action) {
@@ -1334,3 +1339,88 @@ function renderResetTimer(nextResetAt) {
 function formatTimerPart(value) {
   return String(value).padStart(2, "0");
 }
+
+/* ------------------------------------------------------------
+   Ambient background — "Heavenly light through dark clouds"
+   One muted looping video behind dashboard content: real
+   footage of sunlight breaking through layered dark clouds
+   (Pixabay Content License, stored locally as a 30s
+   crossfaded seamless loop). No rendering loop; JS only builds
+   the layer once, mirrors check-in state, and manages
+   play/pause for visibility, reduced motion, and Save-Data.
+   ------------------------------------------------------------ */
+
+const AMBIENT_VIDEO_SOURCES = [
+  { src: "/videos/ambient-sky.webm", type: "video/webm" },
+  { src: "/videos/ambient-sky.mp4", type: "video/mp4" },
+];
+const AMBIENT_VIDEO_POSTER = "/videos/ambient-sky.jpg";
+
+let ambientRoot = null;
+let ambientVideoElement = null;
+const ambientReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+function setAmbientAnswerState(answer) {
+  if (!ambientRoot) return;
+  ambientRoot.dataset.state = answer === "YES" ? "yes" : answer === "NO" ? "no" : "neutral";
+}
+
+function ambientPlaybackAllowed() {
+  return !ambientReducedMotion.matches && !navigator.connection?.saveData && !document.hidden;
+}
+
+function syncAmbientPlayback() {
+  if (!ambientVideoElement) return;
+  if (ambientPlaybackAllowed()) {
+    ambientVideoElement.play()?.catch(() => {});
+  } else {
+    ambientVideoElement.pause();
+  }
+}
+
+function initAmbientArt() {
+  if (ambientRoot || document.querySelector("[data-ambient-video]")) return;
+  if (!document.querySelector(".dashboard-page, .dashboard-section")) return;
+
+  try {
+    const root = document.createElement("div");
+    root.className = "ambient-video";
+    root.setAttribute("data-ambient-video", "");
+    root.setAttribute("aria-hidden", "true");
+    root.dataset.state = "neutral";
+    root.innerHTML = `
+      <video class="ambient-video__media" muted loop playsinline preload="metadata" poster="${AMBIENT_VIDEO_POSTER}" tabindex="-1">
+        ${AMBIENT_VIDEO_SOURCES.map((source) => `<source src="${source.src}" type="${source.type}">`).join("\n        ")}
+      </video>
+      <div class="ambient-video__tint"></div>
+      <div class="ambient-video__overlay"></div>
+      <div class="ambient-video__vignette"></div>
+    `;
+
+    const video = root.querySelector("video");
+    video.muted = true;
+    const showFallback = () => {
+      root.classList.add("is-fallback");
+      root.style.backgroundImage = `url(${AMBIENT_VIDEO_POSTER})`;
+    };
+    video.addEventListener("error", showFallback);
+    const sourceElements = video.querySelectorAll("source");
+    sourceElements[sourceElements.length - 1]?.addEventListener("error", showFallback);
+
+    document.body.prepend(root);
+    document.body.classList.add("has-ambient-video");
+    ambientRoot = root;
+    ambientVideoElement = video;
+
+    document.addEventListener("visibilitychange", syncAmbientPlayback);
+    ambientReducedMotion.addEventListener?.("change", syncAmbientPlayback);
+    syncAmbientPlayback();
+  } catch {
+    document.querySelector("[data-ambient-video]")?.remove();
+    document.body.classList.remove("has-ambient-video");
+    ambientRoot = null;
+    ambientVideoElement = null;
+  }
+}
+
+initAmbientArt();

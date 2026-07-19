@@ -78,7 +78,12 @@
   --section-padding-compact: clamp(var(--space-4), 3.2vw, var(--space-6));
 
   /* Layers */
+  --z-background: 0;
+  --z-content: 1;
   --z-dropdown: 90;
+
+  /* Ambient background video */
+  --ambient-base: #090b0c;
 
   /* Motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);

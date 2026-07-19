@@ -5,16 +5,7 @@
   <% const prayerListType = typeof listType === "undefined" ? "default" : listType; %>
   <% const emptyLabel = prayerListType === "active" ? "No active prayer requests" : "No prayers yet"; %>
   <% const emptyHint = prayerListType === "active" ? "Requests you share appear here until they are answered." : "Prayer requests from the community will appear here."; %>
-  <table class="leaderboard-table prayer-table <%= canShowActions ? "prayer-table-actions" : "" %> <%= canShowReactions ? "prayer-table-reactions" : "" %>">
-    <thead>
-      <tr>
-        <th scope="col">User</th>
-        <th scope="col">Prayer</th>
-        <% if (canShowRowMenu) { %>
-          <th class="prayer-actions-column" scope="col"><span class="sr-only">Actions</span></th>
-        <% } %>
-      </tr>
-    </thead>
+  <table class="leaderboard-table prayer-table <%= canShowActions ? "prayer-table-actions" : "" %> <%= canShowReactions ? "prayer-table-reactions" : "" %>" aria-label="<%= prayerListType === "active" ? "Active prayer requests" : "Community prayer requests" %>">
     <tbody data-prayers-body data-prayer-list="<%= prayerListType %>" data-prayer-actions="<%= canShowActions ? "true" : "false" %>" data-prayer-reactions="<%= canShowReactions ? "true" : "false" %>">
       <% if (prayers.length) { %>
         <% prayers.forEach((item) => { %>

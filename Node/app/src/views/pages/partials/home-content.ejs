@@ -82,16 +82,17 @@
                           <%= entry.name %></a></td>
                     <td>
                       <span class="leaderboard-streak">
+                        <span class="leaderboard-streak-value"><%= entry.value %> days</span>
                         <% if (entry.missedDays && entry.missedDays.count > 0) { %>
+                          <span class="leaderboard-streak-separator" aria-hidden="true">·</span>
                           <% if (entry.id === leaderboard.current.id) { %>
-                            <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="<%= entry.missedDays.nextDateKey %>" data-missed-count="<%= entry.missedDays.count %>">
-                              Missed days <%= entry.missedDays.count %>
+                            <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="<%= entry.missedDays.nextDateKey %>" data-missed-count="<%= entry.missedDays.count %>" aria-label="Answer <%= entry.missedDays.count %> missed <%= entry.missedDays.count === 1 ? "day" : "days" %>">
+                              <%= entry.missedDays.count %> missed
                             </button>
                           <% } else { %>
-                            <span class="leaderboard-missed-tag is-static">Missed days <%= entry.missedDays.count %></span>
+                            <span class="leaderboard-missed-tag is-static"><%= entry.missedDays.count %> missed</span>
                           <% } %>
                         <% } %>
-                        <span><%= entry.value %> days</span>
                       </span>
                     </td>
                   </tr>
