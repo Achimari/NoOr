@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 FROM node:24-bookworm-slim AS base
 
 WORKDIR /app
@@ -9,11 +11,12 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm,sharing=locked \
+  npm ci --omit=dev --no-audit --no-fund --prefer-offline
 
 COPY prisma ./prisma
 COPY prisma.config.ts ./
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 COPY public ./public
 COPY src ./src

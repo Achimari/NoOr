@@ -149,7 +149,7 @@ Start the app:
 
 ```sh
 cd /opt/noor
-npm run docker:prod:start
+sh scripts/docker-prod-start.sh
 ```
 
 If the droplet already has this repo, update and deploy with:
@@ -157,7 +157,7 @@ If the droplet already has this repo, update and deploy with:
 ```sh
 cd /opt/noor
 git pull --ff-only
-npm run docker:prod:start
+sh scripts/docker-prod-start.sh
 ```
 
 One-command install and start is also supported after `.env` is ready:
@@ -168,6 +168,18 @@ REPO_URL=https://github.com/your-name/your-repo.git START_APP=true sh scripts/di
 
 The script intentionally refuses to start while `.env` still contains
 `change-me` placeholders.
+
+On droplets with less than 2 GB of RAM and swap combined, the install script
+creates a persistent 2 GB `/swapfile-noor` so dependency installation is not
+killed by the kernel. Override the size with `SWAP_SIZE_MB`, or opt out with
+`DISABLE_SWAP=true` when the server already has another memory policy.
+
+If a build appears to pause at `npm ci`, the `uuid` deprecation lines are
+warnings, not errors. Check whether the kernel killed the build with:
+
+```sh
+sudo journalctl -k --since "15 minutes ago" | grep -i -E "out of memory|killed process"
+```
 
 ## Backup And Restore
 
