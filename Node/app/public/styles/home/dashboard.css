@@ -2084,8 +2084,57 @@ p.leaderboard-empty {
   height: 100%;
 }
 
+.customer-statements,
 .customer-prayers {
   grid-column: 1 / -1;
+}
+
+.customer-statement-table th:first-child,
+.customer-statement-table td:first-child {
+  width: auto;
+}
+
+.customer-statement-table th:last-child,
+.customer-statement-table td:last-child {
+  width: 1%;
+  text-align: right;
+}
+
+.customer-statement-date {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.customer-answer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-tag);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.customer-answer-yes {
+  border-color: rgba(128, 218, 172, 0.28);
+  background: rgba(128, 218, 172, 0.1);
+  color: var(--accent-green);
+}
+
+.customer-answer-no {
+  border-color: rgba(218, 128, 128, 0.28);
+  background: rgba(218, 128, 128, 0.1);
+  color: var(--accent-red);
+}
+
+.customer-answer-missed {
+  border-color: rgba(222, 198, 146, 0.28);
+  background: rgba(222, 198, 146, 0.1);
+  color: rgb(238, 216, 170);
 }
 
 .customer-details-list {

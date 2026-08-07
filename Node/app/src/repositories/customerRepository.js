@@ -16,9 +16,17 @@ export async function findCustomerDetailsById(id) {
         },
       },
       checkInHistory: {
+        orderBy: {
+          dateKey: "desc",
+        },
         select: {
           dateKey: true,
           answer: true,
+        },
+      },
+      missedDays: {
+        select: {
+          dates: true,
         },
       },
       prayers: {

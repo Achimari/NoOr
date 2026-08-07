@@ -61,6 +61,48 @@
           </dl>
         </article>
 
+        <section class="dashboard-card customer-statements">
+          <header class="dashboard-card-head">
+            <h2>Check-in history</h2>
+            <span><%= customer.statements.length %> <%= customer.statements.length === 1 ? "entry" : "entries" %></span>
+          </header>
+
+          <div class="leaderboard-table-wrap customer-statement-table-wrap">
+            <table class="leaderboard-table customer-statement-table" aria-label="Check-in history">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (customer.statements.length) { %>
+                  <% customer.statements.forEach((item) => { %>
+                    <% const statementDate = new Date(`${item.dateKey}T12:00:00.000Z`); %>
+                    <tr>
+                      <td>
+                        <time class="customer-statement-date" datetime="<%= item.dateKey %>">
+                          <%= statementDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) %>
+                        </time>
+                      </td>
+                      <td>
+                        <span class="customer-answer customer-answer-<%= item.answer.toLowerCase() %>"><%= item.answer %></span>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="2" class="leaderboard-empty">
+                      <span class="table-empty-title">No check-ins yet</span>
+                      <span class="table-empty-hint">This member's answers and missed days will appear here.</span>
+                    </td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <section class="dashboard-card customer-prayers">
           <header class="dashboard-card-head">
             <h2>Prayer requests</h2>

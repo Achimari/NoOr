@@ -6,6 +6,23 @@ function formatTelegramUsername(username) {
   return username ? `@${username.replace(/^@/, "")}` : null;
 }
 
+function buildStatements(row) {
+  const statementsByDate = new Map(
+    (row.missedDays?.dates || []).map((dateKey) => [dateKey, { dateKey, answer: "MISSED" }]),
+  );
+
+  for (const item of row.checkInHistory || []) {
+    statementsByDate.set(item.dateKey, {
+      dateKey: item.dateKey,
+      answer: item.answer,
+    });
+  }
+
+  return [...statementsByDate.values()].sort((first, second) => (
+    second.dateKey.localeCompare(first.dateKey)
+  ));
+}
+
 function sanitizeCustomer(row) {
   return {
     id: row.id,
@@ -16,6 +33,7 @@ function sanitizeCustomer(row) {
     maxStreak: calculateMaxStreak(row.checkInHistory || []),
     todayAnswer: row.checkIn?.answer || null,
     todayDateKey: row.checkIn?.dateKey || null,
+    statements: buildStatements(row),
     prayers: row.prayers.map((item) => ({
       id: item.id,
       prayer: item.prayer,
