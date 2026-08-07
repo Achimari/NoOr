@@ -3,6 +3,7 @@ import { env } from "./config/env.js";
 import { connectWithRetry, prisma } from "./prisma/client.js";
 import { startTelegramBot, stopTelegramBot } from "./services/telegramBotService.js";
 import { startTelegramNotificationScheduler, stopTelegramNotificationScheduler } from "./services/telegramNotificationScheduler.js";
+import { startMissedDaysScheduler, stopMissedDaysScheduler } from "./services/missedDaysScheduler.js";
 import { logger } from "./utils/logger.js";
 
 const app = createApp();
@@ -10,6 +11,7 @@ const app = createApp();
 async function startServer() {
   await connectWithRetry();
   await startTelegramBot();
+  await startMissedDaysScheduler();
   startTelegramNotificationScheduler();
 
   const server = app.listen(env.PORT, () => {
@@ -19,6 +21,7 @@ async function startServer() {
   const shutdown = async (signal) => {
     logger.info({ signal }, "Graceful shutdown started");
     server.close(async () => {
+      stopMissedDaysScheduler();
       stopTelegramNotificationScheduler();
       await stopTelegramBot();
       await prisma.$disconnect();

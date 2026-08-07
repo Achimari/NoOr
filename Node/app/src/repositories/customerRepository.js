@@ -6,6 +6,7 @@ export async function findCustomerDetailsById(id) {
     select: {
       id: true,
       name: true,
+      timezone: true,
       isTelegramLinked: true,
       createdAt: true,
       updatedAt: true,

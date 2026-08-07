@@ -2,8 +2,8 @@ import {
   addMissedCheckInDates,
   createCheckIn,
   findCheckInHistoryByDateKeys,
-  findCheckInById,
   findMissedDaysByUserId,
+  findUserCheckInState,
   resolveMissedCheckIn,
   updateCheckInForDate,
 } from "../repositories/checkInRepository.js";
@@ -79,12 +79,13 @@ export async function getWeeklyCheckInDays(userId, timezone) {
   }));
 }
 
-export async function markMissedDaysAsNo(userId, timezone) {
-  const dateKey = getTodayDateKey(new Date(), timezone);
-  const checkIn = await findCheckInById(userId);
-  const lastDateKey = checkIn?.dateKey || (checkIn?.user?.createdAt ? getTodayDateKey(checkIn.user.createdAt, timezone) : null);
-  const missedDateKeys = getMissedDateKeys(lastDateKey, dateKey, {
-    includeLastDate: !checkIn?.dateKey,
+export async function markMissedDaysAsNo(userId, timezone, now = new Date()) {
+  const state = await findUserCheckInState(userId);
+  const checkIn = state?.checkIn || null;
+  const dateKey = getTodayDateKey(now, timezone);
+  const createdDateKey = state?.createdAt ? getTodayDateKey(state.createdAt, timezone) : null;
+  const missedDateKeys = getMissedDateKeys(createdDateKey, dateKey, {
+    includeLastDate: true,
   });
 
   await addMissedCheckInDates({ userId, dateKeys: missedDateKeys });
@@ -95,7 +96,7 @@ export async function markMissedDaysAsNo(userId, timezone) {
 export async function getCheckInStatus(userId, timezone, { syncMissedDays = true, weekDays } = {}) {
   const checkIn = syncMissedDays
     ? await markMissedDaysAsNo(userId, timezone)
-    : await findCheckInById(userId);
+    : (await findUserCheckInState(userId))?.checkIn || null;
 
   const dateKey = getTodayDateKey(new Date(), timezone);
   const nextResetAt = getNextResetAt(new Date(), timezone).toISOString();

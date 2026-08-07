@@ -1,6 +1,7 @@
 import { findCustomerDetailsById } from "../repositories/customerRepository.js";
 import { calculateCurrentStreak, calculateMaxStreak } from "../repositories/checkInRepository.js";
 import { AppError } from "../utils/appError.js";
+import { getTodayDateKey } from "../utils/dateKey.js";
 
 function formatTelegramUsername(username) {
   return username ? `@${username.replace(/^@/, "")}` : null;
@@ -24,14 +25,16 @@ function buildStatements(row) {
 }
 
 function sanitizeCustomer(row) {
+  const todayDateKey = getTodayDateKey(new Date(), row.timezone);
+
   return {
     id: row.id,
     name: row.name,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-    currentStreak: calculateCurrentStreak(row.checkInHistory || []),
+    currentStreak: calculateCurrentStreak(row.checkInHistory || [], todayDateKey),
     maxStreak: calculateMaxStreak(row.checkInHistory || []),
-    todayAnswer: row.checkIn?.answer || null,
+    todayAnswer: row.checkIn?.dateKey === todayDateKey ? row.checkIn.answer : null,
     todayDateKey: row.checkIn?.dateKey || null,
     statements: buildStatements(row),
     prayers: row.prayers.map((item) => ({

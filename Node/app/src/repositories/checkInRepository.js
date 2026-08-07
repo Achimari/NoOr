@@ -1,14 +1,41 @@
 import { prisma } from "../prisma/client.js";
 
-export async function findCheckInById(id) {
-  return prisma.checkIn.findUnique({
+export async function findUserCheckInState(id) {
+  return prisma.auth.findUnique({
     where: { id },
-    include: {
-      user: {
+    select: {
+      createdAt: true,
+      checkIn: {
         select: {
-          createdAt: true,
+          dateKey: true,
+          answer: true,
         },
       },
+    },
+  });
+}
+
+export async function findUsersForMissedDaysSync() {
+  return prisma.auth.findMany({
+    select: {
+      id: true,
+      timezone: true,
+      missedDaysSyncDateKey: true,
+    },
+    orderBy: {
+      id: "asc",
+    },
+  });
+}
+
+export async function markUserMissedDaysSynced(id, dateKey) {
+  return prisma.auth.update({
+    where: { id },
+    data: {
+      missedDaysSyncDateKey: dateKey,
+    },
+    select: {
+      id: true,
     },
   });
 }
@@ -57,6 +84,7 @@ export async function findUsersWithCheckInHistory() {
     select: {
       id: true,
       name: true,
+      timezone: true,
       checkInHistory: {
         select: {
           dateKey: true,
@@ -85,9 +113,16 @@ function nextDateKey(dateKey) {
   return formatDateKey(date);
 }
 
-export function calculateCurrentStreak(historyRows) {
+export function calculateCurrentStreak(historyRows, todayDateKey = null) {
   const rows = [...historyRows].sort((first, second) => second.dateKey.localeCompare(first.dateKey));
   if (!rows.length || rows[0].answer !== "YES") return 0;
+
+  if (todayDateKey) {
+    const yesterdayDateKey = previousDateKey(todayDateKey);
+    if (rows[0].dateKey !== todayDateKey && rows[0].dateKey !== yesterdayDateKey) {
+      return 0;
+    }
+  }
 
   let expectedDateKey = rows[0].dateKey;
   let streak = 0;

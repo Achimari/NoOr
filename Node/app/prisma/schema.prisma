@@ -12,6 +12,7 @@ model Auth {
   passwordHash          String
   timezone              String                 @default("Europe/Riga")
   isTelegramLinked      Boolean                @default(false) @map("is_telegram_linked")
+  missedDaysSyncDateKey String?                @map("missed_days_sync_date_key")
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   sessions              Session[]

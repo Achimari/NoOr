@@ -28,13 +28,14 @@ function sanitizeLeaderboardEntry(row, index, missedDaysByUserId) {
   };
 }
 
-function toLeaderboardRow(user) {
+function toLeaderboardRow(user, now) {
   const historyRows = user.checkInHistory || [];
+  const todayDateKey = getTodayDateKey(now, user.timezone);
 
   return {
     id: user.id,
     name: user.name,
-    value: calculateCurrentStreak(historyRows),
+    value: calculateCurrentStreak(historyRows, todayDateKey),
     maxStreak: calculateMaxStreak(historyRows),
   };
 }
@@ -61,6 +62,8 @@ function getOverallBestStreak(rows) {
 }
 
 export async function getLeaderboardSummary(userId, timezone, { syncMissedDays = true, weekDays } = {}) {
+  const now = new Date();
+
   if (syncMissedDays) {
     await markMissedDaysAsNo(userId, timezone);
   }
@@ -70,17 +73,18 @@ export async function getLeaderboardSummary(userId, timezone, { syncMissedDays =
     weekDays || getWeeklyCheckInDays(userId, timezone),
   ]);
   const currentHistoryRows = users.find((user) => user.id === userId)?.checkInHistory || [];
-  const leaderboardRows = users.map(toLeaderboardRow).sort(sortLeaderboardRows);
+  const leaderboardRows = users.map((user) => toLeaderboardRow(user, now)).sort(sortLeaderboardRows);
   const userIds = [...new Set([userId, ...leaderboardRows.map((row) => row.id)])];
   const missedRows = await findMissedDaysByUserIds(userIds);
   const missedDaysByUserId = new Map(missedRows.map((row) => [row.id, row]));
+  const todayDateKey = getTodayDateKey(now, timezone);
 
   return {
     current: {
       id: userId,
-      value: calculateCurrentStreak(currentHistoryRows),
+      value: calculateCurrentStreak(currentHistoryRows, todayDateKey),
       maxStreak: calculateMaxStreak(currentHistoryRows),
-      todayDateKey: getTodayDateKey(new Date(), timezone),
+      todayDateKey,
       weekDays: resolvedWeekDays,
       missedDays: sanitizeMissedDays(missedDaysByUserId.get(userId)),
     },
