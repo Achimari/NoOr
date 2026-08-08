@@ -8,7 +8,7 @@ import {
 import { createDailyCheckIn, getCheckInStatus, getWeeklyCheckInDays, markMissedDaysAsNo } from "./checkInService.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
-const INACTIVE_TAG_MIN_DAYS = 2;
+const INACTIVE_TAG_MIN_DAYS = 1;
 
 function sanitizeMissedDays(row) {
   const dates = [...(row?.dates || [])].sort();

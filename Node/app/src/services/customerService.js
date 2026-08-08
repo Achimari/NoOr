@@ -7,7 +7,7 @@ import {
 import { AppError } from "../utils/appError.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
-const INACTIVE_TAG_MIN_DAYS = 2;
+const INACTIVE_TAG_MIN_DAYS = 1;
 
 function formatTelegramUsername(username) {
   return username ? `@${username.replace(/^@/, "")}` : null;

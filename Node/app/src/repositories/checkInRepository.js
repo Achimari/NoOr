@@ -173,7 +173,14 @@ export function calculateInactiveDays(historyRows, todayDateKey, fallbackDateKey
     return 0;
   }
 
-  return Math.max(0, Math.floor((today.getTime() - lastActivity.getTime()) / 86_400_000));
+  const calendarDaysSinceActivity = Math.floor(
+    (today.getTime() - lastActivity.getTime()) / 86_400_000,
+  );
+  const completedInactiveDays = latestDateKey
+    ? calendarDaysSinceActivity - 1
+    : calendarDaysSinceActivity;
+
+  return Math.max(0, completedInactiveDays);
 }
 
 async function updateCurrentCheckIn(tx, { userId, dateKey, answer }) {
