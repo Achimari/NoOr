@@ -656,6 +656,28 @@ body.has-ambient-video .dashboard-actions {
   justify-content: flex-end;
 }
 
+.leaderboard-user-cell {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px var(--space-2);
+}
+
+.leaderboard-inactive-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 var(--space-2);
+  border: 1px solid rgba(218, 128, 128, 0.24);
+  border-radius: var(--radius-tag);
+  background: rgba(218, 128, 128, 0.08);
+  color: #e6aaaa;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .leaderboard-rank {
   color: var(--text-muted);
   font-weight: 600;
@@ -2068,6 +2090,13 @@ p.leaderboard-empty {
   margin-bottom: var(--space-5);
 }
 
+.customer-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
 .customer-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2802,6 +2831,22 @@ p.leaderboard-empty {
     background: transparent;
     font-size: 0.8rem;
     font-weight: 500;
+  }
+
+  .leaderboard-inactive-tag {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0;
+    font-weight: 500;
+  }
+
+  .leaderboard-inactive-tag::after {
+    content: attr(data-mobile-label);
+    font-size: 0.8rem;
+    line-height: 1.3;
   }
 
   .leaderboard-missed-tag:hover,

@@ -3,7 +3,12 @@
     <div class="container customer-container">
       <header class="dashboard-head customer-head">
         <p class="dashboard-kicker">Customer details</p>
-        <h1 class="dashboard-title"><%= customer.name %></h1>
+        <div class="customer-title-row">
+          <h1 class="dashboard-title"><%= customer.name %></h1>
+          <% if (customer.isInactive) { %>
+            <span class="leaderboard-inactive-tag" data-mobile-label="<%= customer.inactiveDays %>d inactive">Inactive for <%= customer.inactiveDays %> <%= customer.inactiveDays === 1 ? "day" : "days" %></span>
+          <% } %>
+        </div>
       </header>
 
       <div class="customer-grid">

@@ -328,7 +328,12 @@ function renderLeaderboard(leaderboard) {
           (entry) => `
             <tr${Number(entry.id) === currentUserId ? ' class="is-current"' : ""}>
               <td><span class="leaderboard-rank">${entry.rank}</span></td>
-              <td><a class="leaderboard-user user-link" href="/customer/${entry.id}">${userIcon()}${escapeHtml(entry.name)}</a></td>
+              <td>
+                <span class="leaderboard-user-cell">
+                  <a class="leaderboard-user user-link" href="/customer/${entry.id}">${userIcon()}${escapeHtml(entry.name)}</a>
+                  ${renderInactiveTag(entry)}
+                </span>
+              </td>
               <td>
                 <span class="leaderboard-streak">
                   <span class="leaderboard-streak-value">${entry.value} days</span>
@@ -340,6 +345,13 @@ function renderLeaderboard(leaderboard) {
         )
         .join("")
     : '<tr><td colspan="3" class="leaderboard-empty"><span class="table-empty-title">No streaks yet</span><span class="table-empty-hint">Answer today\'s question above to start the first streak.</span></td></tr>';
+}
+
+function renderInactiveTag(entry) {
+  if (!entry?.isInactive || !entry.inactiveDays) return "";
+
+  const unit = entry.inactiveDays === 1 ? "day" : "days";
+  return `<span class="leaderboard-inactive-tag" data-mobile-label="${entry.inactiveDays}d inactive">Inactive for ${entry.inactiveDays} ${unit}</span>`;
 }
 
 function renderMissedDaysTag(entry) {

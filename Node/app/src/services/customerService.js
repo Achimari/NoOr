@@ -1,7 +1,13 @@
 import { findCustomerDetailsById } from "../repositories/customerRepository.js";
-import { calculateCurrentStreak, calculateMaxStreak } from "../repositories/checkInRepository.js";
+import {
+  calculateCurrentStreak,
+  calculateInactiveDays,
+  calculateMaxStreak,
+} from "../repositories/checkInRepository.js";
 import { AppError } from "../utils/appError.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
+
+const INACTIVE_TAG_MIN_DAYS = 2;
 
 function formatTelegramUsername(username) {
   return username ? `@${username.replace(/^@/, "")}` : null;
@@ -26,14 +32,20 @@ function buildStatements(row) {
 
 function sanitizeCustomer(row) {
   const todayDateKey = getTodayDateKey(new Date(), row.timezone);
+  const createdDateKey = getTodayDateKey(row.createdAt, row.timezone);
+  const inactiveDays = calculateInactiveDays(row.checkInHistory || [], todayDateKey, createdDateKey);
 
   return {
     id: row.id,
     name: row.name,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-    currentStreak: calculateCurrentStreak(row.checkInHistory || [], todayDateKey),
+    currentStreak: inactiveDays >= INACTIVE_TAG_MIN_DAYS
+      ? 0
+      : calculateCurrentStreak(row.checkInHistory || [], todayDateKey),
     maxStreak: calculateMaxStreak(row.checkInHistory || []),
+    inactiveDays,
+    isInactive: inactiveDays >= INACTIVE_TAG_MIN_DAYS,
     todayAnswer: row.checkIn?.dateKey === todayDateKey ? row.checkIn.answer : null,
     todayDateKey: row.checkIn?.dateKey || null,
     statements: buildStatements(row),

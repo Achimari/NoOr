@@ -85,6 +85,7 @@ export async function findUsersWithCheckInHistory() {
       id: true,
       name: true,
       timezone: true,
+      createdAt: true,
       checkInHistory: {
         select: {
           dateKey: true,
@@ -156,6 +157,23 @@ export function calculateMaxStreak(historyRows) {
   }
 
   return maxStreak;
+}
+
+export function calculateInactiveDays(historyRows, todayDateKey, fallbackDateKey = null) {
+  const latestDateKey = (historyRows || []).reduce((latest, row) => (
+    row?.dateKey && (!latest || row.dateKey > latest) ? row.dateKey : latest
+  ), null);
+  const lastActivityDateKey = latestDateKey || fallbackDateKey;
+  const today = lastActivityDateKey ? new Date(`${todayDateKey}T12:00:00.000Z`) : null;
+  const lastActivity = lastActivityDateKey
+    ? new Date(`${lastActivityDateKey}T12:00:00.000Z`)
+    : null;
+
+  if (!today || !lastActivity || Number.isNaN(today.getTime()) || Number.isNaN(lastActivity.getTime())) {
+    return 0;
+  }
+
+  return Math.max(0, Math.floor((today.getTime() - lastActivity.getTime()) / 86_400_000));
 }
 
 async function updateCurrentCheckIn(tx, { userId, dateKey, answer }) {

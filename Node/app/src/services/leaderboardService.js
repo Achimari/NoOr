@@ -1,4 +1,5 @@
 import {
+  calculateInactiveDays,
   calculateCurrentStreak,
   calculateMaxStreak,
   findMissedDaysByUserIds,
@@ -6,6 +7,8 @@ import {
 } from "../repositories/checkInRepository.js";
 import { createDailyCheckIn, getCheckInStatus, getWeeklyCheckInDays, markMissedDaysAsNo } from "./checkInService.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
+
+const INACTIVE_TAG_MIN_DAYS = 2;
 
 function sanitizeMissedDays(row) {
   const dates = [...(row?.dates || [])].sort();
@@ -24,6 +27,8 @@ function sanitizeLeaderboardEntry(row, index, missedDaysByUserId) {
     name: row.name,
     value: row.value,
     maxStreak: row.maxStreak || 0,
+    inactiveDays: row.inactiveDays,
+    isInactive: row.inactiveDays >= INACTIVE_TAG_MIN_DAYS,
     missedDays: sanitizeMissedDays(missedDaysByUserId.get(row.id)),
   };
 }
@@ -31,12 +36,17 @@ function sanitizeLeaderboardEntry(row, index, missedDaysByUserId) {
 function toLeaderboardRow(user, now) {
   const historyRows = user.checkInHistory || [];
   const todayDateKey = getTodayDateKey(now, user.timezone);
+  const createdDateKey = getTodayDateKey(user.createdAt, user.timezone);
+  const inactiveDays = calculateInactiveDays(historyRows, todayDateKey, createdDateKey);
 
   return {
     id: user.id,
     name: user.name,
-    value: calculateCurrentStreak(historyRows, todayDateKey),
+    value: inactiveDays >= INACTIVE_TAG_MIN_DAYS
+      ? 0
+      : calculateCurrentStreak(historyRows, todayDateKey),
     maxStreak: calculateMaxStreak(historyRows),
+    inactiveDays,
   };
 }
 

@@ -77,9 +77,16 @@
                     <td><span class="leaderboard-rank">
                         <%= entry.rank %>
                       </span></td>
-                    <td><a class="leaderboard-user user-link" href="/customer/<%= entry.id %>"><%-
-                          include("../../components/ui/icon", { name: "user" , className: "leaderboard-row-icon" }) %>
-                          <%= entry.name %></a></td>
+                    <td>
+                      <span class="leaderboard-user-cell">
+                        <a class="leaderboard-user user-link" href="/customer/<%= entry.id %>"><%-
+                            include("../../components/ui/icon", { name: "user" , className: "leaderboard-row-icon" }) %>
+                            <%= entry.name %></a>
+                        <% if (entry.isInactive) { %>
+                          <span class="leaderboard-inactive-tag" data-mobile-label="<%= entry.inactiveDays %>d inactive">Inactive for <%= entry.inactiveDays %> <%= entry.inactiveDays === 1 ? "day" : "days" %></span>
+                        <% } %>
+                      </span>
+                    </td>
                     <td>
                       <span class="leaderboard-streak">
                         <span class="leaderboard-streak-value"><%= entry.value %> days</span>
