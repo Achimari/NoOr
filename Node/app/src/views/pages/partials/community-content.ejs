@@ -1,94 +1,96 @@
-<main class="dashboard-page community-page">
-  <section class="section dashboard-section">
-    <div class="container info-container">
-      <div class="info-grid">
-        <div class="info-column">
-          <article class="dashboard-card info-motivation">
-            <p class="dashboard-label">Daily encouragement</p>
-            <blockquote>
+<main id="main-content" tabindex="-1" class="dashboard-page community-page">
+  <div class="page-shell">
+
+    <header class="page-head">
+      <h1 class="page-head-title">Community</h1>
+      <p class="page-head-lede">Find today's encouragement, practical support, and prayers from the community.</p>
+    </header>
+
+    <section class="page-section section-frame section-frame--ruled community-editorial" aria-labelledby="community-encouragement-title">
+      <div class="community-editorial-grid">
+        <div class="community-encouragement">
+          <h2 class="section-head-title" id="community-encouragement-title">Encouragement</h2>
+
+          <figure class="community-quote">
+            <blockquote class="t-reading">
               <% (motivationPhrase.text || "").split("\n").forEach((line, index, lines) => { %>
                 <%= line %><% if (index < lines.length - 1) { %><br /><% } %>
               <% }) %>
             </blockquote>
-            <p class="info-quote-source"><%= motivationPhrase.source %></p>
-          </article>
-
-          <article class="dashboard-card info-resource">
-            <header class="dashboard-card-head info-resource-head">
-              <div>
-                <p class="dashboard-label">Practical support</p>
-                <h2><%= recoveryResource.title %></h2>
-                <p class="info-resource-source"><%= recoveryResource.source %> · <%= recoveryResource.format %></p>
-              </div>
-              <span><%= recoveryResource.estimated_read_minutes %> min</span>
-            </header>
-            <p class="info-resource-summary"><%= recoveryResource.user_takeaway %></p>
-            <div class="info-resource-action">
-              <p class="dashboard-label">Try this now</p>
-              <p><%= recoveryResource.suggested_action %></p>
-            </div>
-            <a class="info-resource-link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="Read <%= recoveryResource.title %> at <%= recoveryResource.source %> (opens in a new tab)">
-              Optional further reading
-            </a>
-          </article>
-
-          <article class="dashboard-card telegram-card info-telegram-card" data-telegram-card>
-            <header class="dashboard-card-head">
-              <h2>Telegram</h2>
-              <span data-telegram-state>
-                <%= telegramState.isTelegramLinked ? "Linked" : "Not linked" %>
-              </span>
-            </header>
-            <p class="dashboard-label telegram-card-copy">
-              Link Telegram to receive reminders and prayer lists.
-            </p>
-            <%- include("../../components/ui/button", { tag: "button" , type: "button" , variant:
-              telegramState.isTelegramLinked ? "secondary" : "primary" , className: "telegram-connect-button" , label:
-              telegramState.isTelegramLinked ? "Reconnect bot" : "Link Telegram bot" }) %>
-            <p class="dashboard-answer-status prayer-form-status" data-telegram-status aria-live="polite"></p>
-          </article>
+            <figcaption class="community-quote-source"><%= motivationPhrase.source %></figcaption>
+          </figure>
         </div>
 
-        <section class="dashboard-card info-prayers">
-          <header class="dashboard-card-head prayer-filter-head">
-            <div class="prayer-panel-copy">
-              <h2>Community prayer requests</h2>
-              <p>Read requests from the community and add your support.</p>
-            </div>
-            <button class="prayer-filter-button" type="button" data-prayer-filter-toggle aria-expanded="false" aria-controls="prayer-filter-panel" aria-label="Filter prayers">
-              <span class="prayer-filter-glyph" aria-hidden="true"></span>
-            </button>
-          </header>
+        <article class="community-resource">
+          <h3 class="t-component-title"><%= recoveryResource.title %></h3>
+          <p class="community-resource-meta">
+            <%= recoveryResource.source %> · <%= recoveryResource.format %> · <%= recoveryResource.estimated_read_minutes %> min read
+          </p>
+          <p class="community-resource-summary"><%= recoveryResource.user_takeaway %></p>
 
-          <div class="prayer-filter-panel" id="prayer-filter-panel" data-prayer-filter-panel hidden>
-            <label class="prayer-filter-field">
-              <span>User</span>
-              <span class="prayer-filter-combo">
-                <input class="prayer-filter-control" type="search" placeholder="Search user" data-prayer-user-filter autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false">
-                <span class="prayer-filter-menu" data-prayer-user-options hidden></span>
-              </span>
-            </label>
-            <div class="prayer-filter-field">
-              <span>Time</span>
-              <div class="prayer-select">
-                <button class="prayer-filter-control prayer-select-trigger" type="button" data-prayer-time-toggle aria-expanded="false">
-                  <span data-prayer-time-label>Newest first</span>
-                  <span class="prayer-select-chevron" aria-hidden="true"></span>
-                </button>
-                <div class="prayer-filter-menu" data-prayer-time-menu hidden>
-                  <button type="button" data-prayer-time-option="newest">Newest first</button>
-                  <button type="button" data-prayer-time-option="oldest">Oldest first</button>
-                </div>
-              </div>
-            </div>
-            <button class="prayer-filter-clear" type="button" data-prayer-filter-clear>Clear</button>
-          </div>
+          <p class="community-resource-action">
+            <span class="community-resource-action-label">Try this now</span>
+            <%= recoveryResource.suggested_action %>
+          </p>
 
-          <%- include("./prayers-table", { prayers, showActions: false, showReactions: true, listType: "community" }) %>
-        </section>
+          <p class="community-resource-more">
+            <a class="link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="Read <%= recoveryResource.title %> at <%= recoveryResource.source %> (opens in a new tab)">Optional further reading</a>
+          </p>
+        </article>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="page-section section-frame section-frame--ruled community-requests" aria-labelledby="community-prayers-title">
+      <div class="section-head">
+        <h2 class="section-head-title" id="community-prayers-title">Prayer requests</h2>
+      </div>
+      <p class="section-lede">Read community requests and let people know you are praying with them.</p>
+
+      <div class="prayer-filter-panel" id="prayer-filter-panel" data-prayer-filter-panel>
+        <label class="prayer-filter-field">
+          <span>User</span>
+          <span class="prayer-filter-combo">
+            <input class="prayer-filter-control" type="search" placeholder="Search user…" data-prayer-user-filter autocomplete="off" spellcheck="false" aria-expanded="false" aria-controls="prayer-user-options">
+            <span class="prayer-filter-menu" id="prayer-user-options" data-prayer-user-options hidden></span>
+          </span>
+        </label>
+        <div class="prayer-filter-field">
+          <span id="prayer-time-label">Time</span>
+          <div class="prayer-select">
+            <button class="prayer-filter-control prayer-select-trigger" type="button" data-prayer-time-toggle aria-expanded="false" aria-controls="prayer-time-menu" aria-labelledby="prayer-time-label prayer-time-value">
+              <span id="prayer-time-value" data-prayer-time-label>Newest first</span>
+              <span class="prayer-select-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="prayer-filter-menu" id="prayer-time-menu" data-prayer-time-menu hidden>
+              <button type="button" data-prayer-time-option="newest">Newest first</button>
+              <button type="button" data-prayer-time-option="oldest">Oldest first</button>
+            </div>
+          </div>
+        </div>
+        <button class="prayer-filter-clear" type="button" data-prayer-filter-clear>Clear</button>
+      </div>
+
+      <%- include("./prayers-table", { prayers, showActions: false, showReactions: true, listType: "community" }) %>
+    </section>
+
+    <section class="page-section community-telegram" data-telegram-card aria-labelledby="community-telegram-title">
+      <h2 class="settings-group-title" id="community-telegram-title">Telegram</h2>
+
+      <div class="surface-panel">
+        <div class="settings-row">
+          <span class="settings-row-label">
+            <span class="field-label">Reminders and prayer lists</span>
+            <span class="field-hint">Connect Telegram for reminders and the latest prayer list. Status: <span data-telegram-state><%= telegramState.isTelegramLinked ? "linked" : "not linked" %></span>.</span>
+          </span>
+          <span class="settings-row-control">
+            <button class="ui-button ui-button--secondary telegram-connect-button" type="button"><%= telegramState.isTelegramLinked ? "Reconnect bot" : "Link Telegram bot" %></button>
+          </span>
+        </div>
+      </div>
+      <p class="prayer-form-status" data-telegram-status role="status" aria-live="polite"></p>
+    </section>
+
+  </div>
 
   <%- include("../../components/layout/footer") %>
 </main>

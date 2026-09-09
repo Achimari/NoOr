@@ -1,150 +1,273 @@
-<main class="dashboard-page statistics-page">
-  <section class="section dashboard-section statistics-section">
-    <div class="container statistics-container">
-      <section class="statistics-insights" aria-label="Statistics insights">
-        <article class="dashboard-card statistics-insight statistics-insight-hard">
-          <p class="dashboard-label">Hardest day</p>
-          <p class="statistics-insight-value"><%= statistics.hardestDay.label %></p>
-          <p class="statistics-insight-caption"><%= statistics.hardestDay.caption %></p>
-        </article>
+<%
+  const streakViews = [
+    { slug: "strong", key: "recovery", label: "Strong" },
+    { slug: "bible",  key: "reading",  label: "Bible"  },
+    { slug: "tasks",  key: "goals",    label: "Tasks"  },
+  ];
+  const views = streakViews.map((view) => ({ ...view, board: leaderboards[view.key] }));
+  const active = views.find((view) => view.slug === activeStreak.slug) || views[0];
+  const activeBoard = active.board;
 
-        <article class="dashboard-card statistics-insight statistics-insight-easy">
-          <p class="dashboard-label">Easiest day</p>
-          <p class="statistics-insight-value"><%= statistics.easiestDay.label %></p>
-          <p class="statistics-insight-caption"><%= statistics.easiestDay.caption %></p>
-        </article>
-      </section>
+  const dayWord = (value) => (value === 1 ? "day" : "days");
+  const plural = (value, one, many) => `${value} ${value === 1 ? one : many}`;
+  const totalAnswers = statistics.totals.answers;
+  const yesShare = statistics.answerDistributionChart.find((a) => a.id === "yes")?.sharePercentage || 0;
+  const mineYesShare = statistics.currentUserAnswerDistributionChart.find((a) => a.id === "yes")?.sharePercentage || 0;
+  const mineTotal = statistics.currentUserAnswerDistributionChart.reduce((sum, a) => sum + a.value, 0);
 
-      <section class="statistics-graphs" aria-label="Answer charts">
-        <article class="dashboard-card statistics-chart-card">
-          <header class="dashboard-card-head">
-            <h2>No answers</h2>
-            <span><%= statistics.totals.no %> total</span>
-          </header>
-          <div class="statistics-chart statistics-chart-no">
-            <% statistics.noChart.forEach((day) => { %>
-              <div class="statistics-bar-row">
-                <span class="statistics-bar-label"><%= day.label %></span>
-                <span class="statistics-bar-track" aria-hidden="true">
-                  <span class="statistics-bar-fill" style="width: <%= day.percentage %>%"></span>
-                </span>
-                <span class="statistics-bar-value"><%= day.value %></span>
-              </div>
-            <% }) %>
-          </div>
-        </article>
+  const escape = (value) => String(value)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
-        <article class="dashboard-card statistics-chart-card">
-          <header class="dashboard-card-head">
-            <h2>Yes answers</h2>
-            <span><%= statistics.totals.yes %> total</span>
-          </header>
-          <div class="statistics-chart statistics-chart-yes">
-            <% statistics.yesChart.forEach((day) => { %>
-              <div class="statistics-bar-row">
-                <span class="statistics-bar-label"><%= day.label %></span>
-                <span class="statistics-bar-track" aria-hidden="true">
-                  <span class="statistics-bar-fill" style="width: <%= day.percentage %>%"></span>
-                </span>
-                <span class="statistics-bar-value"><%= day.value %></span>
-              </div>
-            <% }) %>
-          </div>
-        </article>
-      </section>
+  const split = ({ rows, total, id, caption }) => {
+    const yes = rows.find((row) => row.id === "yes") || { value: 0, sharePercentage: 0 };
+    const no = rows.find((row) => row.id === "no") || { value: 0, sharePercentage: 0 };
+    const ratio = (row) => (total > 0 ? row.value / total : 0);
 
-      <section class="dashboard-card prayer-world-card" aria-label="Our community">
-        <div class="prayer-world-copy">
-          <header class="dashboard-card-head">
-            <div>
-              <h2>Our community</h2>
-              <p>Based on user time zones</p>
-            </div>
-            <span><%= statistics.prayerWorld.totalUsers %> users</span>
-          </header>
-
-          <div class="prayer-world-highlight">
-            <p class="dashboard-label">Most active city</p>
-            <p><%= statistics.prayerWorld.activeRegion %></p>
-          </div>
-
-          <div class="prayer-world-regions">
-            <% statistics.prayerWorld.regions.forEach((region) => { %>
-              <div class="prayer-world-region<%= region.isActive ? " active" : "" %>">
-                <span><%= region.label %></span>
-                <strong><%= region.count %></strong>
-                <span class="prayer-world-region-track" aria-hidden="true">
-                  <span style="width: <%= Math.max(region.percentage, region.count > 0 ? 8 : 0) %>%"></span>
-                </span>
-              </div>
-            <% }) %>
-          </div>
+    return `
+      <div class="split" data-split="${escape(id)}" data-empty="${total === 0}">
+        <div class="split-bar" aria-hidden="true">
+          <span class="split-bar-segment split-bar-segment--yes" style="--bar-scale: ${ratio(yes)}"></span>
+          <span class="split-bar-segment split-bar-segment--no" style="--bar-scale: ${ratio(no)}"></span>
         </div>
+        <ul class="split-legend">
+          <li class="split-legend-item split-legend-item--yes">
+            <span class="split-legend-label">Yes</span>
+            <span class="split-legend-value">${escape(yes.value)}</span>
+            <span class="split-legend-share">${escape(yes.sharePercentage)}%</span>
+          </li>
+          <li class="split-legend-item split-legend-item--no">
+            <span class="split-legend-label">No</span>
+            <span class="split-legend-value">${escape(no.value)}</span>
+            <span class="split-legend-share">${escape(no.sharePercentage)}%</span>
+          </li>
+          <li class="split-legend-item split-legend-item--total">
+            <span class="split-legend-label">Total</span>
+            <span class="split-legend-value">${escape(total)}</span>
+          </li>
+        </ul>
+        <p class="split-caption">${escape(caption)}</p>
+      </div>
+    `;
+  };
+%>
+<main id="main-content" tabindex="-1" class="dashboard-page statistics-page progress-page" data-recovery-leaderboard data-current-user-id="<%= leaderboards.recovery.currentUserId %>">
+  <div class="page-shell">
 
-        <div class="prayer-world-visual" aria-hidden="true">
-          <div class="prayer-globe">
-            <span class="prayer-globe-shine"></span>
-            <span class="prayer-globe-land prayer-globe-land-americas"></span>
-            <span class="prayer-globe-land prayer-globe-land-europe"></span>
-            <span class="prayer-globe-land prayer-globe-land-africa"></span>
-            <span class="prayer-globe-land prayer-globe-land-asia"></span>
-            <span class="prayer-globe-land prayer-globe-land-oceania"></span>
-            <% statistics.prayerWorld.regions.forEach((region) => { %>
-              <% if (region.count > 0) { %>
-                <span class="prayer-globe-point<%= region.isActive ? " active" : "" %>" style="left: <%= region.x %>%; top: <%= region.y %>%; --point-scale: <%= region.pointScale %>"></span>
+    <header class="page-head">
+      <h1 class="page-head-title">Progress</h1>
+      <p class="page-head-lede">Track your streaks and compare answer patterns across the community.</p>
+    </header>
+
+    <section class="page-section progress-standing" aria-labelledby="streak-summary-title">
+      <h2 class="sr-only" id="streak-summary-title">Current streaks</h2>
+      <ul class="stat-line progress-summary">
+        <% views.forEach((view) => { %>
+          <li class="stat-line-item" data-streak-summary="<%= view.slug %>">
+            <span class="stat-line-label"><%= view.label %></span>
+            <span class="stat-line-value"><%= view.board.overallBest?.value || 0 %> <%= dayWord(view.board.overallBest?.value || 0) %></span>
+            <span class="stat-line-note">Best · <%= view.board.overallBest?.name || "No record yet" %></span>
+          </li>
+        <% }) %>
+      </ul>
+    </section>
+
+    <section class="page-section section-frame section-frame--ruled" aria-labelledby="leaderboard-title">
+      <div class="section-head">
+        <h2 class="section-head-title" id="leaderboard-title">Streak leaderboard</h2>
+        <span class="section-head-note"><%= plural(activeBoard.leaders.length, "user", "users") %></span>
+      </div>
+      <p class="section-lede">Compare current streaks across the community. Each one follows that member's time zone.</p>
+
+      <nav class="segmented progress-segmented" aria-label="Choose a streak leaderboard">
+        <% views.forEach((view) => { %>
+          <% if (view.slug === active.slug) { %>
+            <span class="segmented-option" aria-current="page"><%= view.label %></span>
+          <% } else { %>
+            <a class="segmented-option" href="/statistics?streak=<%= view.slug %>"><%= view.label %></a>
+          <% } %>
+        <% }) %>
+      </nav>
+
+      <article
+        class="progress-board"
+        data-streak-board="<%= active.key %>"
+        data-streak-board-label="<%= active.label %> streak"
+      >
+        <div class="data-table-wrap">
+          <table class="data-table data-table--stack">
+            <caption class="sr-only"><%= activeStreak.caption %></caption>
+            <thead>
+              <tr>
+                <th scope="col" class="data-table-rank">Rank</th>
+                <th scope="col">Name</th>
+                <th scope="col" class="data-table-figure">Streak</th>
+              </tr>
+            </thead>
+            <tbody id="streak-board-<%= active.key %>-body" data-streak-board-body data-leaderboard-body>
+              <% if (activeBoard.leaders.length) { %>
+                <% activeBoard.leaders.forEach((entry, index) => { %>
+                  <tr<%- entry.id === activeBoard.currentUserId ? ' data-current-user' : "" %><%- index >= 5 ? " hidden" : "" %>>
+                    <td class="data-table-rank"><%= entry.rank %></td>
+                    <td>
+                      <a class="leaderboard-user user-link" href="/customer/<%= entry.id %>">
+                        <span class="data-table-name"><%= entry.name %></span>
+                      </a>
+                      <% if (entry.id === activeBoard.currentUserId) { %>
+                        <span class="data-table-you">You</span>
+                      <% } %>
+                    </td>
+                    <td class="data-table-figure">
+                      <%= entry.value %> <%= dayWord(entry.value) %>
+                      <% if (entry.missedDays && entry.missedDays.count > 0) { %>
+
+                        <span class="progress-missed"><%= entry.missedDays.count %> missed</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="3">
+                    <div class="empty-state">
+                      <p class="empty-state-title"><%= activeStreak.empty %></p>
+                      <p class="empty-state-note"><%= activeStreak.emptyHint %></p>
+                    </div>
+                  </td>
+                </tr>
               <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <button
+          class="ui-button ui-button--secondary progress-more"
+          type="button"
+          data-streak-board-toggle
+          aria-controls="streak-board-<%= active.key %>-body"
+          aria-expanded="false"
+          <%- activeBoard.leaders.length > 5 ? "" : "hidden" %>
+        >View more</button>
+        <p class="sr-only" data-streak-board-status role="status" aria-live="polite"></p>
+      </article>
+    </section>
+
+    <section class="page-section section-frame section-frame--ruled progress-answers" aria-labelledby="answers-title">
+      <h2 class="section-head-title" id="answers-title">Answer patterns</h2>
+      <p class="section-lede">Compare your Yes and No answers with the community as a whole.</p>
+
+    <div class="pattern-group" data-personal-patterns aria-labelledby="personal-patterns-title">
+      <div class="section-head">
+        <h3 class="t-component-title" id="personal-patterns-title">Your patterns</h3>
+        <span class="section-head-note"><%= plural(mineTotal, "answer", "answers") %></span>
+      </div>
+
+      <%- split({
+        rows: statistics.currentUserAnswerDistributionChart,
+        total: mineTotal,
+        id: "mine",
+        caption: mineTotal === 0
+          ? "Nothing recorded yet. Your first answer starts the picture."
+          : `${mineYesShare}% of your answers are Yes.`,
+      }) %>
+    </div>
+
+    <div class="pattern-group" data-community-patterns aria-labelledby="community-patterns-title">
+      <div class="section-head">
+        <h3 class="t-component-title" id="community-patterns-title">The community</h3>
+        <span class="section-head-note"><%= plural(statistics.prayerWorld.totalUsers, "user", "users") %></span>
+      </div>
+
+      <%- split({
+        rows: statistics.answerDistributionChart,
+        total: totalAnswers,
+        id: "community",
+        caption: totalAnswers === 0
+          ? "No answers recorded yet."
+          : `${yesShare}% of all answers are Yes.`,
+      }) %>
+
+      <div class="pattern-block">
+        <div class="section-head">
+          <h3 class="t-component-title">Answers by weekday</h3>
+          <span class="section-head-note"><%= yesShare %>% Yes of <%= totalAnswers %></span>
+        </div>
+        <p class="section-lede">Highest Yes rate: <%= statistics.easiestDay.label %> (<%= statistics.easiestDay.caption %>). Lowest: <%= statistics.hardestDay.label %> (<%= statistics.hardestDay.caption %>).</p>
+
+        <ul class="weekday-legend">
+          <li class="weekday-legend-item weekday-legend-item--yes">Yes</li>
+          <li class="weekday-legend-item weekday-legend-item--no">No</li>
+        </ul>
+
+        <ul class="weekday-chart">
+          <% statistics.yesChart.forEach((day, index) => { %>
+            <% const no = statistics.noChart[index] || { value: 0, percentage: 0 }; %>
+            <li class="weekday-row" style="--reveal-index: <%= index %>">
+              <span class="weekday-label"><%= day.longLabel || day.label %></span>
+              <span class="weekday-bars" aria-hidden="true">
+                <span class="weekday-track">
+                  <span class="weekday-bar weekday-bar-yes" style="--bar-scale: <%= Math.max(0, Math.min(100, day.percentage)) / 100 %>"></span>
+                </span>
+                <span class="weekday-track">
+                  <span class="weekday-bar weekday-bar-no" style="--bar-scale: <%= Math.max(0, Math.min(100, no.percentage)) / 100 %>"></span>
+                </span>
+              </span>
+              <span class="weekday-figures">
+                <span class="weekday-figure weekday-figure-yes"><%= day.value %> Yes</span>
+                <span class="weekday-figure weekday-figure-no"><%= no.value %> No</span>
+              </span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <div class="pattern-block prayer-world" data-prayer-world>
+        <div class="section-head">
+          <h3 class="t-component-title">Community time zones</h3>
+          <span class="section-head-note">Most active · <%= statistics.prayerWorld.activeRegion %></span>
+        </div>
+        <p class="section-lede">Grouped from the time zone each member selected. Achimari does not track anyone's location.</p>
+
+        <div class="prayer-world-layout">
+          <ul class="prayer-world-regions">
+            <% statistics.prayerWorld.regions.forEach((region, index) => { %>
+              <li class="prayer-world-region<%= region.isActive ? " is-active" : "" %>" style="--reveal-index: <%= index %>">
+                <span class="prayer-world-region-name"><%= region.label %></span>
+                <span class="prayer-world-region-track" aria-hidden="true">
+                  <span class="prayer-world-region-fill" style="--bar-scale: <%= Math.max(0, Math.min(100, region.percentage)) / 100 %>"></span>
+                </span>
+                <span class="prayer-world-region-count"><%= region.count %></span>
+              </li>
             <% }) %>
+            <% if (!statistics.prayerWorld.regions.length) { %>
+              <li class="prayer-world-region prayer-world-region--empty">
+                <span class="prayer-world-region-name">No time zones recorded yet</span>
+              </li>
+            <% } %>
+          </ul>
+
+          <div class="prayer-world-visual" aria-hidden="true">
+            <div class="prayer-globe">
+              <span class="prayer-globe-shine"></span>
+              <span class="prayer-globe-land prayer-globe-land-americas"></span>
+              <span class="prayer-globe-land prayer-globe-land-europe"></span>
+              <span class="prayer-globe-land prayer-globe-land-africa"></span>
+              <span class="prayer-globe-land prayer-globe-land-asia"></span>
+              <span class="prayer-globe-land prayer-globe-land-oceania"></span>
+              <% statistics.prayerWorld.regions.filter((region) => region.count > 0).forEach((region, index) => { %>
+                <span
+                  class="prayer-globe-point<%= region.isActive ? " is-active" : "" %>"
+                  style="left: <%= region.x %>%; top: <%= region.y %>%; --point-scale: <%= region.pointScale %>; --reveal-index: <%= index %>"
+                ></span>
+              <% }) %>
+            </div>
           </div>
         </div>
-      </section>
-
-      <section class="statistics-graphs statistics-patterns" aria-label="Answer patterns">
-        <% const currentUserYesShare = statistics.currentUserAnswerDistributionChart.find((answer) => answer.id === "yes")?.sharePercentage || 0; %>
-        <% const currentUserAnswers = statistics.currentUserAnswerDistributionChart.reduce((total, answer) => total + answer.value, 0); %>
-        <% const yesShare = statistics.answerDistributionChart.find((answer) => answer.id === "yes")?.sharePercentage || 0; %>
-
-        <article class="dashboard-card statistics-donut-card">
-          <header class="dashboard-card-head">
-            <h2>Your answers</h2>
-            <span><%= currentUserAnswers %> total</span>
-          </header>
-          <div class="statistics-donut-layout">
-            <div class="statistics-donut statistics-donut-answer" style="--donut-main: <%= currentUserYesShare %>%">
-              <span><%= currentUserYesShare %>%</span>
-            </div>
-            <div class="statistics-donut-legend">
-              <% statistics.currentUserAnswerDistributionChart.forEach((answer) => { %>
-                <div class="statistics-donut-row statistics-donut-row-<%= answer.tone %>">
-                  <span><%= answer.label %></span>
-                  <strong><%= answer.value %></strong>
-                </div>
-              <% }) %>
-            </div>
-          </div>
-        </article>
-
-        <article class="dashboard-card statistics-donut-card">
-          <header class="dashboard-card-head">
-            <h2>Yes or no</h2>
-            <span><%= statistics.totals.answers %> total</span>
-          </header>
-          <div class="statistics-donut-layout">
-            <div class="statistics-donut statistics-donut-answer" style="--donut-main: <%= yesShare %>%">
-              <span><%= yesShare %>%</span>
-            </div>
-            <div class="statistics-donut-legend">
-              <% statistics.answerDistributionChart.forEach((answer) => { %>
-                <div class="statistics-donut-row statistics-donut-row-<%= answer.tone %>">
-                  <span><%= answer.label %></span>
-                  <strong><%= answer.value %></strong>
-                </div>
-              <% }) %>
-            </div>
-          </div>
-        </article>
-      </section>
+      </div>
     </div>
-  </section>
+    </section>
+
+  </div>
 
   <%- include("../../components/layout/footer") %>
 </main>

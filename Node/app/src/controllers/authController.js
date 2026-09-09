@@ -7,6 +7,7 @@ function renderLogin(res, status = 200, data = {}) {
     pageId: "login",
     title: res.locals.t("auth.login.title"),
     errors: data.errors || [],
+    fieldErrors: data.fieldErrors || {},
     values: data.values || {},
   });
 }
@@ -16,6 +17,7 @@ function renderOnboarding(res, status = 200, data = {}) {
     pageId: "onboarding",
     title: res.locals.t("auth.onboarding.title"),
     errors: data.errors || [],
+    fieldErrors: data.fieldErrors || {},
     values: data.values || {},
   });
 }
@@ -34,7 +36,7 @@ export function getOnboarding(req, res) {
 
 export async function postLogin(req, res) {
   if (req.validationErrors) {
-    return renderLogin(res, 400, { errors: req.validationErrors, values: req.body });
+    return renderLogin(res, 400, { errors: req.validationErrors, fieldErrors: req.validationFieldErrors, values: req.body });
   }
 
   try {
@@ -58,7 +60,7 @@ export async function postLogout(req, res) {
 export async function registerApi(req, res) {
   if (req.validationErrors) {
     if (wantsHtml(req)) {
-      return renderOnboarding(res, 400, { errors: req.validationErrors, values: req.body });
+      return renderOnboarding(res, 400, { errors: req.validationErrors, fieldErrors: req.validationFieldErrors, values: req.body });
     }
 
     return res.status(400).json({ errors: req.validationErrors });

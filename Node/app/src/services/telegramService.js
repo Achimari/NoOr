@@ -101,7 +101,7 @@ async function findLinkedUserByChat(chatId) {
   return connection;
 }
 
-async function sendTelegramMenu(chatId, text = "NoOr is ready. Choose an action:") {
+async function sendTelegramMenu(chatId, text = "Achimari is ready. Choose an action:") {
   const activeBot = getTelegramBot();
   if (!activeBot) return;
 
@@ -139,7 +139,7 @@ function formatPrayers(prayers) {
     return `${index + 1}. ${item.userName} needs prayer for: ${item.prayer}`;
   });
 
-  const suffix = prayers.length > 10 ? `\n\nAnd ${prayers.length - 10} more in NoOr.` : "";
+  const suffix = prayers.length > 10 ? `\n\nAnd ${prayers.length - 10} more in Achimari.` : "";
   return `Pray today:\n\n${lines.join("\n")}${suffix}`;
 }
 
@@ -166,7 +166,7 @@ async function sendWebsiteLink(chatId) {
     return;
   }
 
-  await activeBot.sendMessage(chatId, `Open NoOr:\n${websiteUrl}`, {
+  await activeBot.sendMessage(chatId, `Open Achimari:\n${websiteUrl}`, {
     reply_markup: menuKeyboard(),
   });
 }
@@ -205,7 +205,7 @@ export async function handleTelegramStart({ chat, from, token }) {
         return;
       }
 
-      await activeBot.sendMessage(chat.id, "Open NoOr → Community → Link Telegram bot, then press Start from that link.");
+      await activeBot.sendMessage(chat.id, "Open Achimari → Community → Link Telegram bot, then press Start from that link.");
       return;
     }
 
@@ -258,7 +258,7 @@ export async function handleTelegramAction(query) {
 
     const connection = await findLinkedUserByChat(chatId);
     if (!connection) {
-      await activeBot.sendMessage(chatId, "Telegram is not linked yet. Open NoOr → Community → Link Telegram bot.");
+      await activeBot.sendMessage(chatId, "Telegram is not linked yet. Open Achimari → Community → Link Telegram bot.");
       return;
     }
 
@@ -343,7 +343,7 @@ export async function handleTelegramMessage(message) {
     const connection = await findLinkedUserByChat(chatId);
     if (!connection || connection.userId !== pendingUserId) {
       pendingPrayerChats.delete(chatIdFrom(chatId));
-      await activeBot.sendMessage(chatId, "Telegram is not linked anymore. Open NoOr → Community → Link Telegram bot.");
+      await activeBot.sendMessage(chatId, "Telegram is not linked anymore. Open Achimari → Community → Link Telegram bot.");
       return;
     }
 

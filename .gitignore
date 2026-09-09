@@ -1,1 +1,8 @@
 .DS_Store
+.docs
+.agents/
+.claude/
+.playwright-mcp/
+skills-lock.json
+.claude
+Node/app/CONSTRAINTS.md

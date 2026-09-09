@@ -1,0 +1,102 @@
+
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.field-label {
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.field-hint {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.field-input,
+.field-textarea,
+.field-select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3) var(--space-3);
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  transition:
+    border-color var(--duration-ui) var(--ease-out),
+    box-shadow var(--duration-ui) var(--ease-out);
+}
+
+.field-textarea {
+  min-height: calc(var(--tap-min) * 2.5);
+  resize: vertical;
+
+  overflow-wrap: anywhere;
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: var(--ink-quiet);
+}
+
+.field-input:disabled,
+.field-textarea:disabled,
+.field-select:disabled {
+  background: var(--surface-subtle);
+  color: var(--ink-muted);
+  cursor: not-allowed;
+}
+
+.field-input[aria-invalid="true"],
+.field-textarea[aria-invalid="true"],
+.field-select[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--danger);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.field-row:focus-within .field-label {
+  color: var(--brand);
+}
+
+.field-textarea--writing {
+  max-width: var(--measure-reading);
+  min-height: calc(var(--tap-min) * 4);
+  font-family: var(--font-reading);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+@media (prefers-contrast: more) {
+  .field-input,
+  .field-textarea,
+  .field-select {
+    border-color: var(--ink);
+  }
+}

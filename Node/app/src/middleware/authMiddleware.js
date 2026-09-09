@@ -31,6 +31,18 @@ function rejectUnauthenticated(req, res) {
   return res.redirect("/login");
 }
 
+export async function resolveOptionalUser(req) {
+  const token = req.cookies?.[authCookieName];
+  if (!token) return null;
+
+  try {
+    const session = await getSessionByToken(token);
+    return session?.user || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function requireAuth(req, res, next) {
   const token = req.cookies?.[authCookieName];
 

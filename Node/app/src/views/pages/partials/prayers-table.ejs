@@ -1,49 +1,77 @@
-<div class="leaderboard-table-wrap prayer-table-wrap">
-  <% const canShowActions = typeof showActions !== "undefined" && showActions; %>
-  <% const canShowReactions = typeof showReactions !== "undefined" && showReactions; %>
-  <% const canShowRowMenu = canShowActions || canShowReactions; %>
-  <% const prayerListType = typeof listType === "undefined" ? "default" : listType; %>
-  <% const emptyLabel = prayerListType === "active" ? "No active prayer requests" : "No prayers yet"; %>
-  <% const emptyHint = prayerListType === "active" ? "Requests you share appear here until they are answered." : "Prayer requests from the community will appear here."; %>
-  <table class="leaderboard-table prayer-table <%= canShowActions ? "prayer-table-actions" : "" %> <%= canShowReactions ? "prayer-table-reactions" : "" %>" aria-label="<%= prayerListType === "active" ? "Active prayer requests" : "Community prayer requests" %>">
-    <tbody data-prayers-body data-prayer-list="<%= prayerListType %>" data-prayer-actions="<%= canShowActions ? "true" : "false" %>" data-prayer-reactions="<%= canShowReactions ? "true" : "false" %>">
-      <% if (prayers.length) { %>
-        <% prayers.forEach((item) => { %>
-          <tr data-prayer-row data-prayer-id="<%= item.id %>" data-prayer-user-id="<%= item.userId %>" data-prayer-user-name="<%= item.userName %>" data-prayer-text="<%= item.prayer %>" data-prayer-can-mark-answered="<%= item.canMarkAnswered ? "true" : "false" %>" data-prayer-reaction-counts="<%= encodeURIComponent(JSON.stringify(item.reactions || [])) %>" data-prayer-current-reaction="<%= item.currentReaction || "" %>">
-            <td><a class="leaderboard-user user-link" href="/customer/<%= item.userId %>"><%- include("../../components/ui/icon", { name: "user", className: "leaderboard-row-icon" }) %><%= item.userName %></a></td>
-            <td>
-              <div class="prayer-entry">
-                <p class="prayer-message-text"><%= item.prayer %></p>
-                <% if (canShowReactions && (item.reactions || []).some((reaction) => reaction.count > 0)) { %>
-                  <div class="prayer-entry-meta">
-                    <div class="prayer-reactions" data-prayer-reaction-group="<%= item.id %>" aria-label="Prayer reactions">
-                      <% (item.reactions || []).filter((reaction) => reaction.count > 0).forEach((reaction) => { %>
-                        <span class="prayer-reaction-button <%= item.currentReaction === reaction.emoji ? "selected" : "" %>" aria-label="<%= item.currentReaction === reaction.emoji ? "Your reaction" : "Reaction" %>">
-                          <span aria-hidden="true"><%= reaction.emoji %></span><span><%= reaction.count %></span>
-                        </span>
-                      <% }) %>
-                    </div>
-                  </div>
-                <% } %>
-              </div>
-            </td>
-            <% if (canShowRowMenu) { %>
-              <td class="prayer-row-actions">
-                <% if (canShowReactions || (canShowActions && item.canMarkAnswered)) { %>
-                  <button class="action-menu-trigger" type="button" data-prayer-actions-open data-prayer-id="<%= item.id %>" data-prayer-can-react="<%= canShowReactions ? "true" : "false" %>" data-prayer-can-answer="<%= canShowActions && item.canMarkAnswered ? "true" : "false" %>" aria-haspopup="menu" aria-expanded="false" aria-controls="prayer-actions-menu" aria-label="Open prayer actions"><%- include("../../components/ui/icon", { name: "more-horizontal", className: "action-menu-icon" }) %></button>
-                <% } %>
-              </td>
+<%
+  const canShowActions = typeof showActions !== "undefined" && showActions;
+  const canShowReactions = typeof showReactions !== "undefined" && showReactions;
+  const canShowRowMenu = canShowActions || canShowReactions;
+  const prayerListType = typeof listType === "undefined" ? "default" : listType;
+  const emptyLabel = prayerListType === "active" ? "No active prayer requests" : "No prayers yet";
+  const emptyHint = prayerListType === "active"
+    ? "Requests you share appear here until they are answered."
+    : "Prayer requests from the community will appear here.";
+  const listLabel = prayerListType === "active" ? "Active prayer requests" : "Community prayer requests";
+%>
+<div class="prayer-feed-wrap">
+  <ul
+    class="prayer-feed"
+    aria-label="<%= listLabel %>"
+    data-prayers-body
+    data-prayer-list="<%= prayerListType %>"
+    data-prayer-actions="<%= canShowActions ? "true" : "false" %>"
+    data-prayer-reactions="<%= canShowReactions ? "true" : "false" %>"
+  >
+    <% if (prayers.length) { %>
+      <% prayers.forEach((item) => { %>
+        <li
+          class="prayer-item"
+          data-prayer-row
+          data-prayer-id="<%= item.id %>"
+          data-prayer-user-id="<%= item.userId %>"
+          data-prayer-user-name="<%= item.userName %>"
+          data-prayer-text="<%= item.prayer %>"
+          data-prayer-can-mark-answered="<%= item.canMarkAnswered ? "true" : "false" %>"
+          data-prayer-reaction-counts="<%= encodeURIComponent(JSON.stringify(item.reactions || [])) %>"
+          data-prayer-current-reaction="<%= item.currentReaction || "" %>"
+        >
+          <div class="prayer-item-head">
+            <a class="leaderboard-user user-link prayer-item-author" href="/customer/<%= item.userId %>"><%= item.userName %></a>
+            <% if (canShowRowMenu && (canShowReactions || (canShowActions && item.canMarkAnswered))) { %>
+              <button
+                class="action-menu-trigger prayer-item-menu"
+                type="button"
+                data-prayer-actions-open
+                data-prayer-id="<%= item.id %>"
+                data-prayer-can-react="<%= canShowReactions ? "true" : "false" %>"
+                data-prayer-can-answer="<%= canShowActions && item.canMarkAnswered ? "true" : "false" %>"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-controls="prayer-actions-menu"
+                aria-label="Open prayer actions"
+              ><%- include("../../components/ui/icon", { name: "more-horizontal", className: "action-menu-icon" }) %></button>
             <% } %>
-          </tr>
-        <% }) %>
-      <% } else { %>
-        <tr>
-          <td colspan="<%= 2 + (canShowRowMenu ? 1 : 0) %>" class="leaderboard-empty">
-            <span class="table-empty-title"><%= emptyLabel %></span>
-            <span class="table-empty-hint"><%= emptyHint %></span>
-          </td>
-        </tr>
-      <% } %>
-    </tbody>
-  </table>
+          </div>
+
+          <p class="prayer-message-text"><%= item.prayer %></p>
+
+          <% if (canShowReactions && (item.reactions || []).some((reaction) => reaction.count > 0)) { %>
+            <div class="prayer-entry-meta">
+              <div class="prayer-reactions" role="group" data-prayer-reaction-group="<%= item.id %>" aria-label="Prayer reactions">
+                <% (item.reactions || []).filter((reaction) => reaction.count > 0).forEach((reaction) => { %>
+                  <span class="prayer-reaction-button <%= item.currentReaction === reaction.emoji ? "selected" : "" %>">
+                    <span aria-hidden="true"><%= reaction.emoji %></span><span><%= reaction.count %></span>
+                    <span class="visually-hidden"><%= item.currentReaction === reaction.emoji ? "Your reaction" : "Reaction" %></span>
+                  </span>
+                <% }) %>
+              </div>
+            </div>
+          <% } %>
+        </li>
+      <% }) %>
+    <% } else { %>
+      <li class="prayer-item prayer-item--empty">
+        <div class="empty-state">
+          <p class="empty-state-title"><%= emptyLabel %></p>
+          <p class="empty-state-note"><%= emptyHint %></p>
+        </div>
+      </li>
+    <% } %>
+  </ul>
 </div>

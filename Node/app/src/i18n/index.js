@@ -37,6 +37,7 @@ export function createViewLocals(req) {
   return {
     currentPath: req.path,
     locale,
+    dateLocale: dict.localeTag || locale,
     supportedLocales,
     languages: t("header.languages", {}),
     t,

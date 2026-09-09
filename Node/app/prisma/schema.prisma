@@ -7,14 +7,14 @@ datasource db {
 }
 
 model Auth {
-  id                    Int                    @id @default(autoincrement())
-  name                  String                 @unique
+  id                    Int                       @id @default(autoincrement())
+  name                  String                    @unique
   passwordHash          String
-  timezone              String                 @default("Europe/Riga")
-  isTelegramLinked      Boolean                @default(false) @map("is_telegram_linked")
-  missedDaysSyncDateKey String?                @map("missed_days_sync_date_key")
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
+  timezone              String                    @default("Europe/Riga")
+  isTelegramLinked      Boolean                   @default(false) @map("is_telegram_linked")
+  missedDaysSyncDateKey String?                   @map("missed_days_sync_date_key")
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
   sessions              Session[]
   checkIn               CheckIn?
   checkInHistory        CheckInHistory[]
@@ -24,6 +24,16 @@ model Auth {
   telegramConnection    TelegramConnection?
   telegramConnectTokens TelegramConnectToken[]
   telegramNotifications TelegramNotificationLog[]
+  readingCheckIns       ReadingCheckIn[]
+  dailyGoals            DailyGoal[]
+  dailyGoalCheckIns     DailyGoalCheckIn[]
+  gameProfile           GameProfile?
+  statRewards           StatReward[]
+  spellUnlocks          SpellUnlock[]
+  pveProgress           PveProgress[]
+  matchQueueEntries     MatchQueueEntry[]
+  battleParticipants    BattleParticipant[]
+  achievementUnlocks    AchievementUnlock[]
 }
 
 model Session {
@@ -70,13 +80,72 @@ model MissedDays {
   @@map("missed_days")
 }
 
+model DailyGoal {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  dateKey     String    @map("date_key")
+  text        String
+  position    Int
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        Auth      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dateKey, position])
+  @@index([userId, dateKey])
+  @@map("daily_goals")
+}
+
+model DailyGoalCheckIn {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  dateKey   String   @map("date_key")
+  answer    String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dateKey])
+  @@index([dateKey])
+  @@map("daily_goal_check_ins")
+}
+
+model ReadingCheckIn {
+  id         Int              @id @default(autoincrement())
+  userId     Int              @map("user_id")
+  dateKey    String           @map("date_key")
+  answer     String
+  reflection String?
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  user       Auth             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passages   ReadingPassage[]
+
+  @@unique([userId, dateKey])
+  @@index([dateKey])
+  @@map("reading_check_ins")
+}
+
+model ReadingPassage {
+  id               Int            @id @default(autoincrement())
+  readingCheckInId Int            @map("reading_check_in_id")
+  bookCode         String         @map("book_code")
+  chapter          Int
+  startVerse       Int            @map("start_verse")
+  endVerse         Int            @map("end_verse")
+  position         Int
+  readingCheckIn   ReadingCheckIn @relation(fields: [readingCheckInId], references: [id], onDelete: Cascade)
+
+  @@index([readingCheckInId])
+  @@map("reading_passages")
+}
+
 model Prayer {
-  id        Int              @id @default(autoincrement())
-  userId    Int
-  prayer    String
-  answeredAt DateTime?       @map("answered_at")
-  user      Auth             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reactions PrayerReaction[]
+  id         Int              @id @default(autoincrement())
+  userId     Int
+  prayer     String
+  answeredAt DateTime?        @map("answered_at")
+  user       Auth             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions  PrayerReaction[]
 
   @@index([userId])
   @@index([answeredAt])
@@ -137,4 +206,151 @@ model TelegramNotificationLog {
   @@unique([userId, notificationType, dateKey])
   @@index([dateKey])
   @@map("telegram_notification_logs")
+}
+
+model GameProfile {
+  id                        Int       @id
+  baseStrength              Int       @default(0) @map("base_strength")
+  baseDexterity             Int       @default(0) @map("base_dexterity")
+  baseIntelligence          Int       @default(0) @map("base_intelligence")
+  allocationConfirmedAt     DateTime? @map("allocation_confirmed_at")
+  allocationLockedAt        DateTime? @map("allocation_locked_at")
+  emblemKey                 String    @default("dawn") @map("emblem_key")
+  accentKey                 String    @default("neutral") @map("accent_key")
+  shareTodayGoals           Boolean   @default(false) @map("share_today_goals")
+  shareTodayBibleReflection Boolean   @default(false) @map("share_today_bible_reflection")
+  equippedSpellKeys         String[]  @default([]) @map("equipped_spell_keys")
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime  @updatedAt @map("updated_at")
+  user                      Auth      @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  @@map("game_profiles")
+}
+
+model StatReward {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  stat      String
+  source    String
+  dateKey   String   @map("date_key")
+  amount    Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, stat, source, dateKey])
+  @@index([userId])
+  @@index([userId, dateKey])
+  @@map("stat_rewards")
+}
+
+model SpellUnlock {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  spellKey   String   @map("spell_key")
+  unlockedAt DateTime @default(now()) @map("unlocked_at")
+  user       Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, spellKey])
+  @@index([userId])
+  @@map("spell_unlocks")
+}
+
+model PveProgress {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  encounterKey String    @map("encounter_key")
+  status       String    @default("ACTIVE")
+  bestTurns    Int?      @map("best_turns")
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         Auth      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, encounterKey])
+  @@map("pve_progress")
+}
+
+model MatchQueueEntry {
+  id                Int      @id @default(autoincrement())
+  userId            Int      @map("user_id")
+  activeQueueUserId Int?     @unique @map("active_queue_user_id")
+  status            String   @default("SEARCHING")
+  rating            Int
+  battleId          Int?     @map("battle_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  expiresAt         DateTime @map("expires_at")
+  user              Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, rating])
+  @@index([userId])
+  @@map("match_queue_entries")
+}
+
+model Battle {
+  id             Int                 @id @default(autoincrement())
+  mode           String
+  status         String              @default("ACTIVE")
+  version        Int                 @default(0)
+  formulaVersion Int                 @map("formula_version")
+  encounterKey   String?             @map("encounter_key")
+  winnerUserId   Int?                @map("winner_user_id")
+  state          Json
+  lastActionAt   DateTime            @default(now()) @map("last_action_at")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+  completedAt    DateTime?           @map("completed_at")
+  participants   BattleParticipant[]
+  actions        BattleAction[]
+
+  @@index([status])
+  @@map("battles")
+}
+
+model BattleParticipant {
+  id                Int     @id @default(autoincrement())
+  battleId          Int     @map("battle_id")
+  userId            Int?    @map("user_id")
+  activePvpUserId   Int?    @unique @map("active_pvp_user_id")
+  side              String
+  isBoss            Boolean @default(false) @map("is_boss")
+  characterSnapshot Json    @map("character_snapshot")
+  spellSnapshot     Json    @map("spell_snapshot")
+  result            String?
+  battle            Battle  @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  user              Auth?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([battleId, side])
+  @@index([userId])
+  @@map("battle_participants")
+}
+
+model BattleAction {
+  id             Int      @id @default(autoincrement())
+  battleId       Int      @map("battle_id")
+  sequence       Int
+  actorSide      String   @map("actor_side")
+  actionType     String   @map("action_type")
+  payload        Json
+  result         Json
+  idempotencyKey String   @map("idempotency_key")
+  createdAt      DateTime @default(now()) @map("created_at")
+  battle         Battle   @relation(fields: [battleId], references: [id], onDelete: Cascade)
+
+  @@unique([battleId, idempotencyKey])
+  @@unique([battleId, sequence])
+  @@map("battle_actions")
+}
+
+model AchievementUnlock {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  achievementKey String   @map("achievement_key")
+  unlockedAt     DateTime @default(now()) @map("unlocked_at")
+  user           Auth     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementKey])
+  @@index([userId, unlockedAt])
+  @@map("achievement_unlocks")
 }

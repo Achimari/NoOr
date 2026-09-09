@@ -1,6 +1,6 @@
-# NoOr Node App
+# Achimari Node App
 
-NoOr is an Express, EJS, Prisma, and PostgreSQL app with authentication,
+Achimari is an Express, EJS, Prisma, and PostgreSQL app with authentication,
 check-ins, leaderboard tracking, prayer requests, and Telegram bot linking.
 
 ## Requirements

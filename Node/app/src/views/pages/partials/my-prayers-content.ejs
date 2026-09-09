@@ -1,34 +1,47 @@
-<main class="dashboard-page prayer-page" data-prayer-page>
-  <section class="section dashboard-section">
-    <div class="container info-container">
+<main id="main-content" tabindex="-1" class="dashboard-page prayer-page" data-prayer-page>
+  <div class="page-shell">
 
-      <div class="info-grid prayer-grid">
-        <form class="dashboard-card prayer-form" data-prayer-form>
-          <div class="prayer-card-intro">
-            <h2>Share a prayer request</h2>
-            <p>Add a clear request for the community. You can mark it answered later.</p>
-          </div>
-          <label class="auth-field prayer-field">
-            <span>Prayer request</span>
-            <textarea name="prayer" rows="7" maxlength="500" placeholder="" required></textarea>
-          </label>
-          <button class="btn btn-primary auth-submit" type="submit">Share request</button>
-          <p class="dashboard-answer-status prayer-form-status" data-prayer-status aria-live="polite"></p>
-        </form>
+    <header class="page-head">
+      <h1 class="page-head-title">My prayers</h1>
+      <p class="page-head-lede">Review the requests you have shared and mark them answered when the time comes.</p>
+    </header>
 
-        <section class="dashboard-card prayer-list-card">
-          <header class="dashboard-card-head">
-            <h2>Active prayer requests</h2>
-            <span data-active-prayer-count>
-              <%= prayerLists.active.length %> items
-            </span>
-          </header>
-          <%- include("./prayers-table", { prayers: prayerLists.active, showActions: showPrayerActions,
-            listType: "active" }) %>
-        </section>
+    <section class="page-section section-frame section-frame--ruled" aria-labelledby="prayer-composer-title">
+      <h2 class="section-head-title" id="prayer-composer-title">Share a prayer request</h2>
+      <p class="section-lede">Your request will be visible to everyone in the community. Share only what you are comfortable making public.</p>
+
+      <form class="prayer-composer" data-prayer-form novalidate>
+        <div class="field">
+          <label class="field-label" for="prayer-composer-input">Prayer request</label>
+          <textarea
+            class="field-textarea field-textarea--writing"
+            id="prayer-composer-input"
+            name="prayer"
+            rows="6"
+            maxlength="500"
+            required
+          ></textarea>
+          <span class="field-hint">Up to 500 characters. Visible to everyone in the community.</span>
+        </div>
+
+        <div class="ui-button-group prayer-composer-actions">
+          <button class="ui-button ui-button--primary" type="submit">Share request</button>
+          <p class="prayer-form-status" data-prayer-status role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="page-section section-frame section-frame--ruled" aria-labelledby="prayer-active-title">
+      <div class="section-head">
+        <h2 class="section-head-title" id="prayer-active-title">Active requests</h2>
+        <span class="section-head-note" data-active-prayer-count><%= prayerLists.active.length %> items</span>
       </div>
-    </div>
-  </section>
+
+      <%- include("./prayers-table", { prayers: prayerLists.active, showActions: showPrayerActions,
+        listType: "active" }) %>
+    </section>
+
+  </div>
 
   <%- include("../../components/layout/footer") %>
 </main>

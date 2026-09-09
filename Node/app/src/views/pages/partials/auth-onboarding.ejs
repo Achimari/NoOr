@@ -1,11 +1,18 @@
-<main class="auth-page">
+<%
+  const formErrors = typeof errors === "undefined" ? [] : errors;
+  const byField = typeof fieldErrors === "undefined" || !fieldErrors ? {} : fieldErrors;
+  const submitted = typeof values === "undefined" || !values ? {} : values;
+  const attributed = new Set(Object.values(byField).flat());
+  const generalErrors = formErrors.filter((message) => !attributed.has(message));
+%>
+<main id="main-content" tabindex="-1" class="auth-page">
   <section class="section auth-section">
     <div class="container auth-container">
-      <div class="auth-brand" aria-label="NoOr">
-        <img src="/Logo.png" alt="NoOr" draggable="false" />
+      <div class="auth-brand">
+        <%- include("../../components/ui/brand-mark", { tone: "chrome", size: "lead" }) %>
       </div>
 
-      <form class="auth-card" action="/auth/register" method="post">
+      <form class="auth-card" action="/auth/register" method="post" novalidate>
         <header class="auth-head">
           <h1 class="auth-title"><%= t("auth.onboarding.title") %></h1>
           <% if (t("auth.onboarding.subtitle")) { %>
@@ -13,45 +20,70 @@
           <% } %>
         </header>
 
-        <% if (typeof errors !== "undefined" && errors.length) { %>
+        <% if (generalErrors.length) { %>
           <div class="auth-errors" role="alert">
-            <% errors.forEach((error) => { %>
+            <% generalErrors.forEach((error) => { %>
               <p><%= error %></p>
             <% }) %>
           </div>
         <% } %>
 
-        <label class="auth-field">
-          <span><%= t("auth.onboarding.nameLabel") %></span>
-          <input type="text" name="name" autocomplete="name" value="<%= typeof values !== "undefined" ? values.name || "" : "" %>" required />
-        </label>
+        <div class="field auth-field">
+          <label class="field-label" for="onboarding-name"><%= t("auth.onboarding.nameLabel") %></label>
+          <input
+            class="field-input"
+            id="onboarding-name"
+            type="text"
+            name="name"
+            autocomplete="name"
+            spellcheck="false"
+            value="<%= submitted.name || "" %>"
+            <% if ((byField.name || []).length) { %>aria-invalid="true" aria-describedby="onboarding-name-error"<% } %>
+            required
+          />
+          <% if ((byField.name || []).length) { %>
+            <p class="field-error" id="onboarding-name-error"><%= byField.name.join(" ") %></p>
+          <% } %>
+        </div>
 
-        <label class="auth-field">
-          <span><%= t("auth.onboarding.passwordLabel") %></span>
-          <input type="password" name="password" autocomplete="new-password" required />
-        </label>
+        <div class="field auth-field">
+          <label class="field-label" for="onboarding-password"><%= t("auth.onboarding.passwordLabel") %></label>
+          <input
+            class="field-input"
+            id="onboarding-password"
+            type="password"
+            name="password"
+            autocomplete="new-password"
+            minlength="8"
+            aria-describedby="password-hint<%= (byField.password || []).length ? " onboarding-password-error" : "" %>"
+            <% if ((byField.password || []).length) { %>aria-invalid="true"<% } %>
+            required
+          />
+          <p class="field-hint" id="password-hint"><%= t("auth.onboarding.passwordHint") %></p>
+          <% if ((byField.password || []).length) { %>
+            <p class="field-error" id="onboarding-password-error"><%= byField.password.join(" ") %></p>
+          <% } %>
+        </div>
 
-        <label class="auth-field">
-          <span><%= t("auth.onboarding.confirmPasswordLabel") %></span>
-          <input type="password" name="passwordConfirmation" autocomplete="new-password" required />
-        </label>
+        <div class="field auth-field">
+          <label class="field-label" for="onboarding-password-confirm"><%= t("auth.onboarding.confirmPasswordLabel") %></label>
+          <input
+            class="field-input"
+            id="onboarding-password-confirm"
+            type="password"
+            name="passwordConfirmation"
+            autocomplete="new-password"
+            <% if ((byField.passwordConfirmation || []).length) { %>aria-invalid="true" aria-describedby="onboarding-confirm-error"<% } %>
+            required
+          />
+          <% if ((byField.passwordConfirmation || []).length) { %>
+            <p class="field-error" id="onboarding-confirm-error"><%= byField.passwordConfirmation.join(" ") %></p>
+          <% } %>
+        </div>
 
         <div class="auth-actions">
-          <%- include("../../components/ui/button", {
-            tag: "button",
-            type: "submit",
-            variant: "primary",
-            className: "auth-submit",
-            label: t("auth.onboarding.submit")
-          }) %>
-
-          <%- include("../../components/ui/button", {
-            tag: "a",
-            href: "/login",
-            variant: "secondary",
-            className: "auth-secondary",
-            label: t("auth.onboarding.loginLink")
-          }) %>
+          <button class="ui-button ui-button--primary auth-submit" type="submit"><%= t("auth.onboarding.submit") %></button>
+          <a class="ui-button ui-button--secondary auth-secondary" href="/login"><%= t("auth.onboarding.loginLink") %></a>
         </div>
       </form>
     </div>

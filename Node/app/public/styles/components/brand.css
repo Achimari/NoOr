@@ -1,0 +1,54 @@
+
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  color: inherit;
+}
+
+.brand-symbol {
+  flex: none;
+  width: 1.45em;
+  height: 1.45em;
+  transform: translateY(-0.03em);
+}
+
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-synthesis: var(--font-synthesis-branded);
+  font-size: 1.3125rem;
+  line-height: 1.4;
+
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.brand-lockup--chrome {
+  color: var(--white);
+}
+
+.brand-lockup--paper {
+  color: var(--ink);
+}
+
+.brand-lockup--lead .brand-wordmark {
+  font-size: 1.75rem;
+}
+
+@media (max-width: 480px) {
+  .brand-wordmark {
+    font-size: 1.125rem;
+  }
+
+  .brand-lockup--lead .brand-wordmark {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand-wordmark {
+    letter-spacing: 0;
+  }
+}

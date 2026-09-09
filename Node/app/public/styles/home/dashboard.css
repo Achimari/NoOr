@@ -1,8 +1,4 @@
-/* ============================================================
-   NoOr app surfaces — dark data product system
-   Roles: page #0b0c0d, surface #101214, elevated #15181b
-   Radius: panels 18px, controls 10-12px, tags 6-8px
-   ============================================================ */
+
 
 .dashboard-page {
   --table-body-size: 0.95rem;
@@ -10,14 +6,15 @@
   --table-row-padding-y: 10px;
   --table-row-padding-x: var(--space-4);
   --table-row-min-height: 58px;
-  --accent-green: rgb(190, 246, 218);
-  --accent-red: rgb(244, 188, 188);
-  --green-soft: rgba(128, 218, 172, 0.55);
-  --red-soft: rgba(218, 128, 128, 0.55);
-  --row-hover: rgba(255, 255, 255, 0.03);
-  --row-current: rgba(255, 255, 255, 0.05);
-  --focus-ring-color: rgba(255, 255, 255, 0.55);
-  background: var(--bg-page);
+
+  --accent-green: var(--success);
+  --accent-red: var(--danger);
+  --green-soft: var(--success);
+  --red-soft: var(--danger);
+  --row-hover: var(--ink-06);
+  --row-current: var(--ink-10);
+
+  background: transparent;
   color: var(--text-primary);
 }
 
@@ -25,309 +22,8 @@
   flex: 1;
   display: flex;
   align-items: flex-start;
-  min-height: calc(100vh - 74px);
-  background:
-    radial-gradient(ellipse 90% 40% at 50% 0%, rgba(255, 255, 255, 0.045), transparent 68%),
-    var(--bg-page);
-}
-
-/* ------------------------------------------------------------
-   Ambient background — "Heavenly light through dark clouds"
-   One muted looping video behind dashboard content: real
-   footage of sunlight breaking through layered dark clouds.
-   Static overlay + vignette keep content readable; no motion is
-   added on top of the footage. Layer is JS-generated on
-   dashboard pages only; these rules apply once it exists.
-   ------------------------------------------------------------ */
-
-.ambient-video {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-background);
-  overflow: hidden;
-  pointer-events: none;
-  background: var(--ambient-base);
-  background-size: cover;
-  background-position: center 40%;
-}
-
-.ambient-video__media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
-  object-position: center 40%;
-  opacity: 0.85;
-}
-
-/* Static dark fallback when the source fails to load. */
-.ambient-video.is-fallback .ambient-video__media {
-  display: none;
-}
-
-.ambient-video__tint,
-.ambient-video__overlay,
-.ambient-video__vignette {
-  position: absolute;
-  inset: 0;
-}
-
-.ambient-video__overlay {
-  background: rgba(4, 6, 8, 0.24);
-}
-
-.ambient-video__vignette {
-  background: radial-gradient(
-    ellipse at center,
-    transparent 30%,
-    rgba(2, 4, 5, 0.14) 72%,
-    rgba(2, 4, 5, 0.4) 100%
-  );
-}
-
-.ambient-video__tint {
-  opacity: 0;
-  transition:
-    opacity 1000ms var(--ease-in-out),
-    background-color 1000ms var(--ease-in-out);
-}
-
-.ambient-video[data-state="yes"] .ambient-video__tint {
-  opacity: 1;
-  background: rgba(146, 210, 176, 0.05);
-}
-
-.ambient-video[data-state="no"] .ambient-video__tint {
-  opacity: 1;
-  background: rgba(214, 156, 156, 0.05);
-}
-
-/* Stacking: video at layer 0, dashboard content isolated above.
-   Header (80), dropdowns (90), modals, and toast keep their own
-   higher layers. */
-body.has-ambient-video {
-  background: var(--ambient-base);
-}
-
-body.has-ambient-video .dashboard-page {
-  position: relative;
-  z-index: var(--z-content);
-  isolation: isolate;
+  min-height: calc(100vh - var(--header-height));
   background: transparent;
-}
-
-body.has-ambient-video .dashboard-section {
-  background: transparent;
-}
-
-/* Surfaces stay near-opaque for readability; the YES/NO area
-   may reveal slightly more atmosphere than data panels. */
-body.has-ambient-video .dashboard-card,
-body.has-ambient-video .dashboard-current,
-body.has-ambient-video .dashboard-timer-card {
-  background: rgba(16, 18, 20, 0.94);
-}
-
-body.has-ambient-video .dashboard-actions {
-  background: rgba(16, 18, 20, 0.84);
-}
-
-.dashboard-section>.container {
-  margin: 0 auto;
-}
-
-.dashboard-container {
-  width: min(100%, 1160px);
-}
-
-.home-page .dashboard-head,
-.home-page .dashboard-answer-status {
-  width: min(100%, 760px);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.home-page .dashboard-current {
-  width: 100%;
-}
-
-.dashboard-head {
-  text-align: center;
-  margin-bottom: var(--space-5);
-}
-
-.dashboard-kicker {
-  margin: 0 0 var(--space-1);
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.dashboard-title {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
-}
-
-/* ------------------------------------------------------------
-   YES / NO decision area — the one surface that keeps gradients
-   ------------------------------------------------------------ */
-
-.dashboard-actions {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  width: 100%;
-  margin-bottom: var(--space-4);
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-panel);
-  background: var(--surface-1);
-}
-
-.dashboard-action {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  min-height: 172px;
-  padding: var(--space-6);
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--text-primary);
-  font: inherit;
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background var(--duration-ui) var(--ease-out),
-    color var(--duration-ui) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.dashboard-action+.dashboard-action {
-  border-left: 1px solid var(--border-subtle);
-}
-
-.dashboard-action-copy {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  margin: 0 auto;
-}
-
-.dashboard-action-label {
-  color: var(--text-primary);
-  font-size: clamp(3.2rem, 5.6vw, 4.8rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.01em;
-}
-
-.dashboard-action-subtitle {
-  color: var(--text-muted);
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
-  font-weight: 500;
-  line-height: 1.3;
-  transition: color var(--duration-ui) var(--ease-out);
-}
-
-.dashboard-action-selected-icon {
-  display: none;
-}
-
-.dashboard-action-yes {
-  background: linear-gradient(180deg, rgba(128, 218, 172, 0.08), rgba(128, 218, 172, 0.03));
-}
-
-.dashboard-action-no {
-  background: linear-gradient(180deg, rgba(218, 128, 128, 0.08), rgba(218, 128, 128, 0.03));
-}
-
-.dashboard-action-yes:hover,
-.dashboard-action-yes:focus-visible {
-  background: linear-gradient(180deg, rgba(128, 218, 172, 0.16), rgba(128, 218, 172, 0.06));
-}
-
-.dashboard-action-no:hover,
-.dashboard-action-no:focus-visible {
-  background: linear-gradient(180deg, rgba(218, 128, 128, 0.16), rgba(218, 128, 128, 0.06));
-}
-
-.dashboard-action:hover .dashboard-action-subtitle,
-.dashboard-action:focus-visible .dashboard-action-subtitle {
-  color: var(--text-primary);
-}
-
-.dashboard-action:active {
-  transform: scale(0.98);
-}
-
-.dashboard-action-yes.selected {
-  background: linear-gradient(180deg, rgba(146, 226, 184, 0.94), rgba(190, 246, 218, 0.9));
-  color: var(--black);
-}
-
-.dashboard-action-no.selected {
-  background: linear-gradient(180deg, rgba(224, 142, 142, 0.94), rgba(244, 188, 188, 0.9));
-  color: var(--black);
-}
-
-.dashboard-action.selected .dashboard-action-label,
-.dashboard-action.selected .dashboard-action-subtitle {
-  color: var(--black);
-}
-
-.dashboard-action.selected .dashboard-action-subtitle {
-  opacity: 0.72;
-}
-
-.dashboard-action:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-  transform: none;
-}
-
-.dashboard-action.selected:disabled {
-  opacity: 1;
-}
-
-/* ------------------------------------------------------------
-   Buttons on dark surfaces
-   ------------------------------------------------------------ */
-
-.dashboard-page .btn-primary {
-  background: var(--white);
-  color: var(--black);
-  border-color: var(--white);
-}
-
-.dashboard-page .btn-primary:hover,
-.dashboard-page .btn-primary:focus-visible {
-  background: var(--white-92);
-  color: var(--black);
-  border-color: var(--white-92);
-}
-
-.dashboard-page .btn-secondary {
-  background: var(--white-06);
-  border-color: var(--border-subtle);
-  color: var(--text-primary);
-}
-
-.dashboard-page .btn-secondary:hover,
-.dashboard-page .btn-secondary:focus-visible {
-  background: var(--white-10);
-  border-color: var(--border-strong);
-  color: var(--white);
 }
 
 .dashboard-answer-status {
@@ -335,7 +31,7 @@ body.has-ambient-video .dashboard-actions {
   margin: 0 0 var(--space-4);
   color: var(--text-muted);
   font-size: 0.88rem;
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
 }
 
@@ -343,81 +39,21 @@ body.has-ambient-video .dashboard-actions {
   display: none;
 }
 
-/* ------------------------------------------------------------
-   Timer card
-   ------------------------------------------------------------ */
-
-.dashboard-timer-label {
-  margin: 0 0 var(--space-1);
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.dashboard-timer-value {
-  color: var(--text-primary);
-  font-size: 1.6rem;
-  font-weight: 700;
-  line-height: 1.08;
-  font-variant-numeric: tabular-nums;
-}
-
-.dashboard-timer-card {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0 0 var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-panel);
-  background: var(--surface-1);
-}
-
-.dashboard-timer-card[hidden] {
-  display: none;
-}
-
-.dashboard-timer-copy {
-  display: flex;
-  gap: var(--space-4);
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dashboard-timer-track {
-  height: 6px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--white-10);
-}
-
-.dashboard-timer-progress {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--white-72);
-  transition: width 1s linear;
-}
-
-/* ------------------------------------------------------------
-   Toast
-   ------------------------------------------------------------ */
-
 .app-toast {
   position: fixed;
   left: var(--space-4);
   bottom: var(--space-4);
-  z-index: 100;
+  z-index: var(--z-menu);
   max-width: min(360px, calc(100vw - 2 * var(--space-4)));
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-control);
   background: var(--surface-2);
   color: var(--text-primary);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+  box-shadow: var(--shadow-panel);
   font-size: 0.9rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-weight: 400;
+  line-height: 1.4;
   opacity: 0;
   pointer-events: none;
   transform: translateY(8px);
@@ -434,10 +70,6 @@ body.has-ambient-video .dashboard-actions {
 .app-toast[data-variant="error"] {
   border-color: var(--red-soft);
 }
-
-/* ------------------------------------------------------------
-   Cards — flat surfaces, no decorative motion
-   ------------------------------------------------------------ */
 
 .dashboard-current,
 .dashboard-card {
@@ -462,24 +94,24 @@ body.has-ambient-video .dashboard-actions {
 .dashboard-label {
   margin: 0 0 var(--space-1);
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-  line-height: 1.3;
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .dashboard-value {
   margin: 0;
   color: var(--text-primary);
   font-size: 1.45rem;
-  font-weight: 700;
-  line-height: 1.12;
-  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
 }
 
 .dashboard-value-unit {
   color: var(--text-muted);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .home-page .dashboard-current .dashboard-value {
@@ -490,38 +122,6 @@ body.has-ambient-video .dashboard-actions {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.dashboard-week {
-  display: grid;
-  grid-template-columns: repeat(7, 38px);
-  gap: var(--space-3);
-  justify-content: start;
-}
-
-.dashboard-day {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 50%;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.dashboard-day.active {
-  background: var(--white);
-  color: var(--black);
-  border-color: var(--white);
-}
-
-.dashboard-day.missed {
-  border-color: var(--border-strong);
-  background: var(--white-10);
-  color: var(--text-primary);
 }
 
 .dashboard-card {
@@ -540,25 +140,21 @@ body.has-ambient-video .dashboard-actions {
   margin: 0;
   color: var(--text-primary);
   font-size: 1.2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.005em;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
 }
 
 .dashboard-card-head span {
   color: var(--text-muted);
   font-size: 0.88rem;
-  font-weight: 500;
+  font-weight: 400;
   white-space: nowrap;
 }
 
 .home-page .dashboard-card .dashboard-card-head {
   margin-bottom: var(--space-3);
 }
-
-/* ------------------------------------------------------------
-   Data tables — shared system (leaderboard + prayers)
-   ------------------------------------------------------------ */
 
 .leaderboard-table-wrap {
   overflow-x: auto;
@@ -585,15 +181,15 @@ body.has-ambient-video .dashboard-actions {
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-muted);
   font-size: var(--table-head-size);
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
 .leaderboard-table td {
   height: var(--table-row-min-height);
-  font-weight: 500;
-  border-top: 1px solid var(--white-06);
+  font-weight: 400;
+  border-top: 1px solid var(--border-subtle);
   transition: background var(--duration-fast) var(--ease-out);
 }
 
@@ -634,7 +230,7 @@ body.has-ambient-video .dashboard-actions {
 }
 
 .leaderboard-table tbody tr.is-current td:first-child {
-  box-shadow: inset 2px 0 0 var(--white-72);
+  box-shadow: inset 2px 0 0 var(--action);
 }
 
 .leaderboard-table tbody tr.is-current .leaderboard-rank {
@@ -648,7 +244,11 @@ body.has-ambient-video .dashboard-actions {
   align-items: center;
   gap: var(--space-2);
   min-height: 32px;
-  line-height: 1.3;
+  line-height: 1.4;
+}
+
+a.leaderboard-user {
+  min-height: var(--tap-min);
 }
 
 .leaderboard-head-label-right,
@@ -668,43 +268,40 @@ body.has-ambient-video .dashboard-actions {
   align-items: center;
   min-height: 28px;
   padding: 0 var(--space-2);
-  border: 1px solid rgba(218, 128, 128, 0.24);
+  border: 1px solid var(--danger-line);
   border-radius: var(--radius-tag);
-  background: rgba(218, 128, 128, 0.08);
-  color: #e6aaaa;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.2;
+  background: var(--danger-tint);
+  color: var(--danger);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
   white-space: nowrap;
 }
 
 .leaderboard-rank {
   color: var(--text-muted);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-weight: 400;
 }
 
 .leaderboard-streak {
   width: 100%;
   gap: var(--space-3);
   font-size: var(--table-body-size);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-weight: 400;
 }
 
 .leaderboard-streak-value {
   white-space: nowrap;
 }
 
-/* Rendered between value and tag; only shown in the compact mobile variant */
 .leaderboard-streak-separator {
   display: none;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .leaderboard-missed-tag {
-  /* Desktop keeps the pill left of the value so streak numbers stay aligned */
+
   order: -1;
   display: inline-flex;
   align-items: center;
@@ -713,12 +310,12 @@ body.has-ambient-video .dashboard-actions {
   padding: 0 var(--space-2);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
-  background: var(--white-06);
+  background: var(--ink-06);
   color: var(--text-muted);
   font: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1.2;
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
   white-space: nowrap;
   cursor: pointer;
   transition:
@@ -731,7 +328,7 @@ body.has-ambient-video .dashboard-actions {
 .leaderboard-missed-tag:hover,
 .leaderboard-missed-tag:focus-visible {
   border-color: var(--border-strong);
-  background: var(--white-10);
+  background: var(--ink-10);
   color: var(--text-primary);
 }
 
@@ -768,29 +365,16 @@ body.has-ambient-video .dashboard-actions {
   min-width: 0;
   max-width: 100%;
   width: fit-content;
-  color: var(--text-primary);
-  text-decoration: none;
   overflow-wrap: anywhere;
   border-radius: 6px;
-  transition: color var(--duration-ui) var(--ease-out);
 }
 
-.user-link:hover,
-.user-link:focus-visible {
-  color: var(--white);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--white-54);
-}
-
-.user-link:hover .leaderboard-row-icon,
-.user-link:focus-visible .leaderboard-row-icon {
-  color: var(--text-primary);
-}
-
-/* Table empty states */
 .leaderboard-table td.leaderboard-empty {
   height: auto;
+
+  width: auto;
+  min-width: 0;
+  white-space: normal;
   padding: var(--space-7) var(--space-4);
   text-align: center;
   color: var(--text-muted);
@@ -807,7 +391,7 @@ p.leaderboard-empty {
   display: block;
   color: var(--text-primary);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.4;
 }
 
@@ -815,24 +399,19 @@ p.leaderboard-empty {
   display: block;
   margin-top: 4px;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: var(--text-micro);
+  font-weight: 400;
   line-height: 1.45;
 }
 
-/* ------------------------------------------------------------
-   Info grid (community page + shared panels)
-   ------------------------------------------------------------ */
-
 .info-container {
-  width: min(100%, 1160px);
+  width: min(100%, var(--measure-wide));
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
-  /* Row is at least the panel height but grows with content, so long
-     resource entries never clip while panels still stretch evenly. */
+
   grid-template-rows: minmax(var(--info-panel-height), auto);
   gap: var(--space-5);
   align-items: stretch;
@@ -843,8 +422,6 @@ p.leaderboard-empty {
   --info-panel-height: clamp(868px, calc(100vh - 132px), 940px);
 }
 
-/* Resource row is content-sized so variable-length entries never clip;
-   the telegram row absorbs remaining column height. */
 .info-column {
   display: grid;
   gap: var(--space-5);
@@ -872,18 +449,18 @@ p.leaderboard-empty {
   color: var(--text-primary);
   max-width: 24ch;
   font-size: clamp(1.15rem, 1.7vw, 1.5rem);
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.005em;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
   overflow-wrap: anywhere;
 }
 
 .info-quote-source {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-  line-height: 1.3;
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .info-resource {
@@ -906,15 +483,15 @@ p.leaderboard-empty {
 .info-resource .dashboard-label {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .info-resource-head h2 {
   font-size: 1.08rem;
-  line-height: 1.35;
+  line-height: 1.4;
   text-wrap: balance;
 }
 
@@ -923,11 +500,10 @@ p.leaderboard-empty {
   padding: 4px 8px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
-  background: var(--white-06);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
+  background: var(--ink-06);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .info-resource-source,
@@ -939,16 +515,16 @@ p.leaderboard-empty {
 .info-resource-source {
   margin-top: 2px;
   color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 500;
+  font-size: var(--text-micro);
+  font-weight: 400;
   line-height: 1.4;
 }
 
 .info-resource-summary {
   max-width: 56ch;
-  color: var(--white-92);
+  color: var(--text-primary);
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.55;
 }
 
@@ -963,9 +539,9 @@ p.leaderboard-empty {
 
 .info-resource-action > p:last-child {
   max-width: 56ch;
-  color: var(--white-92);
+  color: var(--text-primary);
   font-size: 0.88rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.5;
 }
 
@@ -974,12 +550,13 @@ p.leaderboard-empty {
   align-items: center;
   gap: 6px;
   width: fit-content;
+  min-height: var(--tap-min);
   margin-top: auto;
   border-radius: var(--radius-tag);
-  color: var(--white-72);
-  font-size: 0.84rem;
-  font-weight: 600;
-  line-height: 1.3;
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-out);
 }
@@ -992,14 +569,14 @@ p.leaderboard-empty {
 }
 
 .info-resource-link:active {
-  color: var(--white-72);
+  color: var(--text-muted);
 }
 
 .telegram-card-copy {
   margin: 0;
   max-width: 34ch;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.55;
 }
 
@@ -1009,143 +586,24 @@ p.leaderboard-empty {
   margin-top: auto;
   border-radius: 12px;
   font-size: 0.96rem;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .info-telegram-card {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  align-content: space-between;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--space-4);
   margin-bottom: 0;
   padding: var(--space-5);
 }
 
-/* ------------------------------------------------------------
-   Prayer tables — streamlined rows on desktop, stacked on mobile
-   ------------------------------------------------------------ */
-
-.prayer-table td.prayer-row-actions {
-  width: 56px;
-  min-width: 56px;
-  padding-left: 0;
-  padding-right: var(--space-3);
-  text-align: right;
-}
-
-.prayer-row-actions .action-menu-trigger {
-  margin-top: -6px;
-}
-
-.prayer-table-wrap {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.prayer-page .prayer-table-wrap,
-.info-prayers .prayer-table-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-}
-
-.prayer-table th:first-child,
-.prayer-table td:first-child {
-  width: 190px;
-  min-width: 150px;
-}
-
-.prayer-table th:nth-child(2),
-.prayer-table td:nth-child(2) {
-  width: auto;
-  text-align: left;
-  white-space: normal;
-}
-
-.prayer-table td {
-  height: auto;
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-3);
-  vertical-align: top;
-}
-
-.prayer-table .leaderboard-user {
-  min-height: 0;
-  font-size: 0.9rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
-
-.prayer-table .leaderboard-row-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.prayer-entry {
-  display: grid;
-  gap: var(--space-2);
-  justify-items: start;
-}
-
-.prayer-message-text {
-  margin: 0;
-  max-width: 64ch;
-  color: #c6cacd;
-  font-size: var(--table-body-size);
-  font-weight: 500;
-  line-height: 1.55;
-  overflow-wrap: anywhere;
-}
-
-.prayer-entry-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-
-.prayer-reactions {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.prayer-reaction-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-width: 38px;
-  min-height: 28px;
-  padding: 2px 8px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-tag);
-  background: var(--white-06);
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.prayer-reaction-button.selected {
-  border-color: var(--border-strong);
-  background: var(--white-10);
-  color: var(--text-primary);
-}
-
-/* ------------------------------------------------------------
-   Action menu — reusable row-action pattern (trigger + menu)
-   ------------------------------------------------------------ */
-
 .action-menu-trigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--tap-min);
+  height: var(--tap-min);
   padding: 0;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
@@ -1168,13 +626,13 @@ p.leaderboard-empty {
 
 .action-menu-trigger:hover,
 .action-menu-trigger:focus-visible {
-  background: var(--white-06);
+  background: var(--ink-06);
   border-color: var(--border-subtle);
   color: var(--text-primary);
 }
 
 .action-menu-trigger[aria-expanded="true"] {
-  background: var(--white-10);
+  background: var(--ink-10);
   border-color: var(--border-strong);
   color: var(--text-primary);
 }
@@ -1200,7 +658,7 @@ p.leaderboard-empty {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-control);
   background: var(--surface-2);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-card-hover);
   transform-origin: top right;
   animation: action-menu-in var(--duration-ui) var(--ease-out);
 }
@@ -1226,8 +684,8 @@ p.leaderboard-empty {
   background: transparent;
   color: var(--text-muted);
   font: inherit;
-  font-size: 0.86rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: 400;
   text-align: left;
   cursor: pointer;
   transition:
@@ -1247,7 +705,7 @@ p.leaderboard-empty {
 
 .action-menu-item:hover,
 .action-menu-item:focus-visible {
-  background: var(--white-06);
+  background: var(--ink-06);
   color: var(--text-primary);
 }
 
@@ -1282,433 +740,12 @@ p.leaderboard-empty {
   }
 }
 
-/* ------------------------------------------------------------
-   Prayer form (my prayers page)
-   ------------------------------------------------------------ */
-
-.prayer-grid {
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  align-items: start;
-  gap: var(--space-5);
-  --prayer-panel-height: 470px;
-}
-
-.prayer-form {
-  display: grid;
-  grid-template-rows: auto minmax(190px, 1fr) auto;
-  gap: var(--space-4);
-  height: var(--prayer-panel-height);
-  padding: var(--space-5);
-}
-
-.prayer-card-intro {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.prayer-card-intro h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.005em;
-}
-
-.prayer-card-intro p {
-  margin: 0;
-  color: var(--text-muted);
-  max-width: 40ch;
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.prayer-field {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-2);
-  margin-bottom: 0;
-  padding: var(--space-4);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text-primary);
-  min-height: 0;
-  cursor: text;
-  transition: border-color var(--duration-ui) var(--ease-out);
-}
-
-.prayer-field>span {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.prayer-field:focus-within {
-  border-color: var(--white-54);
-}
-
-.prayer-field:focus-within>span {
-  color: var(--text-primary);
-}
-
-.prayer-field textarea {
-  width: 100%;
-  resize: none;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.55;
-  outline: none;
-  caret-color: var(--white);
-}
-
-.prayer-field textarea::placeholder {
-  color: var(--text-muted);
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.prayer-field textarea:focus {
-  outline: none;
-}
-
-.prayer-form .auth-submit {
-  width: 100%;
-  min-height: 52px;
-  border-radius: 12px;
-  font-size: 0.96rem;
-  font-weight: 700;
-}
-
-.prayer-form-status {
-  display: none;
-}
-
-.prayer-list-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: var(--prayer-panel-height);
-}
-
-.prayer-list-card .dashboard-card-head {
-  flex: 0 0 auto;
-  align-items: flex-start;
-  margin-bottom: var(--space-4);
-}
-
-.prayer-list-card .dashboard-card-head div {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.info-prayers .dashboard-card-head {
-  align-items: flex-start;
-}
-
-.info-prayers .dashboard-card-head div {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.info-prayers {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* ------------------------------------------------------------
-   Prayer filters — header stays visible, panel expands below
-   ------------------------------------------------------------ */
-
-.prayer-filter-head {
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-}
-
-.prayer-panel-copy {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.prayer-panel-copy h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.005em;
-}
-
-.prayer-panel-copy p {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.prayer-filter-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
-  background: var(--white-06);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition:
-    background-color var(--duration-ui) var(--ease-out),
-    border-color var(--duration-ui) var(--ease-out),
-    color var(--duration-ui) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.prayer-filter-button:hover,
-.prayer-filter-button:focus-visible,
-.prayer-filter-button[aria-expanded="true"] {
-  background: var(--white-10);
-  border-color: var(--border-strong);
-  color: var(--text-primary);
-}
-
-.prayer-filter-button:active {
-  transform: scale(0.97);
-}
-
-.prayer-filter-glyph,
-.prayer-filter-glyph::before,
-.prayer-filter-glyph::after {
-  display: block;
-  width: 18px;
-  height: 2px;
-  border-radius: 999px;
-  background: currentColor;
-}
-
-.prayer-filter-glyph {
-  position: relative;
-}
-
-.prayer-filter-glyph::before,
-.prayer-filter-glyph::after {
-  content: "";
-  position: absolute;
-  left: 0;
-}
-
-.prayer-filter-glyph::before {
-  top: -6px;
-}
-
-.prayer-filter-glyph::after {
-  top: 6px;
-}
-
-@keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.prayer-filter-panel {
-  display: grid;
-  grid-template-columns: minmax(190px, 1fr) minmax(150px, 0.62fr) auto;
-  gap: var(--space-3);
-  align-items: end;
-  margin: 0 0 var(--space-4);
-  padding: var(--space-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  background: var(--surface-2);
-  animation: panel-in var(--duration-panel) var(--ease-drawer);
-}
-
-.prayer-filter-panel[hidden] {
-  display: none;
-}
-
-.prayer-filter-field {
-  position: relative;
-  display: grid;
-  gap: var(--space-1);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.prayer-filter-combo,
-.prayer-select {
-  position: relative;
-  display: block;
-}
-
-.prayer-filter-control {
-  min-height: 44px;
-  width: 100%;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
-  background: var(--surface-1);
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition:
-    background-color var(--duration-ui) var(--ease-out),
-    border-color var(--duration-ui) var(--ease-out);
-}
-
-.prayer-filter-control::placeholder {
-  color: var(--text-muted);
-}
-
-.prayer-filter-control:hover,
-.prayer-filter-control:focus,
-.prayer-select-trigger[aria-expanded="true"] {
-  background: var(--surface-2);
-  border-color: var(--white-54);
-}
-
-.prayer-select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  cursor: pointer;
-  text-align: left;
-}
-
-.prayer-select-chevron {
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  opacity: 0.72;
-  transform: rotate(45deg) translateY(-2px);
-  transition: transform var(--duration-ui) var(--ease-out);
-}
-
-.prayer-select-trigger[aria-expanded="true"] .prayer-select-chevron {
-  transform: rotate(225deg) translateY(-2px);
-}
-
-.prayer-filter-menu {
-  position: absolute;
-  top: calc(100% + var(--space-1));
-  left: 0;
-  right: 0;
-  z-index: 5;
-  max-height: 190px;
-  overflow-y: auto;
-  padding: var(--space-2);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-control);
-  background: var(--surface-2);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.36);
-  transform-origin: top left;
-  animation: panel-in var(--duration-ui) var(--ease-out);
-}
-
-.prayer-filter-menu[hidden] {
-  display: none;
-}
-
-.prayer-filter-menu button {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-height: 44px;
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-tag);
-  background: transparent;
-  color: var(--white-72);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
-}
-
-.prayer-filter-menu button+button {
-  margin-top: 2px;
-}
-
-.prayer-filter-menu button:hover,
-.prayer-filter-menu button:focus-visible,
-.prayer-filter-menu button.selected {
-  background: var(--white-10);
-  color: var(--text-primary);
-}
-
-.prayer-filter-empty {
-  display: block;
-  padding: var(--space-2);
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.prayer-filter-clear {
-  min-height: 44px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--white-72);
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
-}
-
-.prayer-filter-clear:hover,
-.prayer-filter-clear:focus-visible {
-  background: var(--white-06);
-  border-color: var(--border-strong);
-  color: var(--text-primary);
-}
-
-/* ------------------------------------------------------------
-   Modals — backdrop fade + dialog scale, focus kept inside
-   ------------------------------------------------------------ */
-
 .prayer-reaction-modal[hidden],
 .missed-answer-modal[hidden],
 .settings-confirm-modal[hidden] {
   display: none;
+  opacity: 0;
+  transition-duration: var(--duration-ui);
 }
 
 .prayer-reaction-modal,
@@ -1716,32 +753,49 @@ p.leaderboard-empty {
 .settings-confirm-modal {
   position: fixed;
   inset: 0;
-  z-index: 40;
+
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   padding: var(--space-4);
 }
 
-@keyframes backdrop-in {
-  from {
-    opacity: 0;
-  }
+.prayer-reaction-modal,
+.missed-answer-modal,
+.settings-confirm-modal,
+.reading-modal {
+  opacity: 1;
+  transition:
+    opacity var(--duration-panel) var(--ease-out),
+    display var(--duration-panel) allow-discrete;
+}
 
-  to {
-    opacity: 1;
+@starting-style {
+  .prayer-reaction-modal,
+  .missed-answer-modal,
+  .settings-confirm-modal,
+  .reading-modal {
+    opacity: 0;
   }
 }
 
-@keyframes dialog-in {
-  from {
+@starting-style {
+  .prayer-reaction-dialog,
+  .missed-answer-dialog,
+  .settings-confirm-dialog,
+  .reading-modal-dialog {
     opacity: 0;
     transform: scale(0.96);
   }
+}
 
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.prayer-reaction-modal[hidden] .prayer-reaction-dialog,
+.missed-answer-modal[hidden] .missed-answer-dialog,
+.settings-confirm-modal[hidden] .settings-confirm-dialog,
+.reading-modal[hidden] .reading-modal-dialog {
+  opacity: 0;
+  transform: scale(0.96);
+  transition-duration: var(--duration-ui);
 }
 
 .prayer-reaction-backdrop,
@@ -1749,9 +803,9 @@ p.leaderboard-empty {
 .settings-confirm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.56);
+  background: rgba(13, 13, 13, 0.44);
   backdrop-filter: blur(4px);
-  animation: backdrop-in 220ms var(--ease-out);
+  transition: opacity var(--duration-panel) var(--ease-out);
 }
 
 .prayer-reaction-dialog,
@@ -1761,8 +815,10 @@ p.leaderboard-empty {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-panel);
   background: var(--surface-2);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
-  animation: dialog-in 220ms var(--ease-out);
+  box-shadow: var(--shadow-pop);
+  transition:
+    transform var(--duration-panel) var(--ease-out),
+    opacity var(--duration-panel) var(--ease-out);
 }
 
 .prayer-reaction-dialog {
@@ -1791,15 +847,15 @@ p.leaderboard-empty {
   margin: 0;
   color: var(--text-primary);
   font-size: 1.12rem;
-  font-weight: 700;
-  line-height: 1.25;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .settings-confirm-head p:last-child {
   margin: 0;
-  color: var(--white-72);
+  color: var(--text-muted);
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.45;
 }
 
@@ -1810,53 +866,6 @@ p.leaderboard-empty {
   gap: var(--space-3);
 }
 
-.settings-confirm-button {
-  min-height: 48px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
-  background: var(--white-06);
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    background var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.settings-confirm-save {
-  background: var(--white);
-  border-color: var(--white);
-  color: var(--black);
-}
-
-.settings-confirm-button:hover,
-.settings-confirm-button:focus-visible {
-  background: var(--white-10);
-  border-color: var(--border-strong);
-  color: var(--text-primary);
-}
-
-.settings-confirm-save:hover,
-.settings-confirm-save:focus-visible {
-  background: var(--white-92);
-  border-color: var(--white-92);
-  color: var(--black);
-}
-
-.settings-confirm-button:active {
-  transform: scale(0.98);
-}
-
-.settings-confirm-button:disabled {
-  cursor: progress;
-  opacity: 0.68;
-  transform: none;
-}
-
 .missed-answer-actions .dashboard-action {
   justify-content: center;
   min-height: 52px;
@@ -1864,29 +873,29 @@ p.leaderboard-empty {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-control);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 400;
   text-align: center;
 }
 
 .missed-answer-actions .dashboard-action-yes {
-  background: var(--white);
-  color: var(--black);
+  background: var(--action);
+  color: var(--on-action);
 }
 
 .missed-answer-actions .dashboard-action-no {
-  background: var(--white-06);
+  background: var(--ink-06);
   color: var(--text-primary);
 }
 
 .missed-answer-actions .dashboard-action:hover,
 .missed-answer-actions .dashboard-action:focus-visible {
-  background: var(--white-10);
+  background: var(--ink-10);
 }
 
 .missed-answer-actions .dashboard-action-yes:hover,
 .missed-answer-actions .dashboard-action-yes:focus-visible {
-  background: var(--white-92);
-  color: var(--black);
+  background: var(--action-hover);
+  color: var(--on-action);
 }
 
 .prayer-reaction-choice {
@@ -1907,19 +916,25 @@ p.leaderboard-empty {
     transform var(--duration-fast) var(--ease-out);
 }
 
-.prayer-reaction-choice:hover,
+@media (hover: hover) and (pointer: fine) {
+  .prayer-reaction-choice:hover:not(:disabled):not([aria-pressed="true"]) {
+    border-color: var(--border-subtle);
+    background: var(--ink-10);
+  }
+}
+
 .prayer-reaction-choice:focus-visible {
   border-color: var(--border-subtle);
-  background: var(--white-10);
+  background: var(--ink-10);
 }
 
-.prayer-reaction-choice:active {
-  transform: scale(0.95);
+.prayer-reaction-choice:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
-.prayer-reaction-choice.selected {
+.prayer-reaction-choice[aria-pressed="true"] {
   border-color: var(--border-strong);
-  background: var(--white-18);
+  background: var(--ink-18);
 }
 
 .prayer-reaction-choice:disabled {
@@ -1928,162 +943,8 @@ p.leaderboard-empty {
   transform: none;
 }
 
-/* ------------------------------------------------------------
-   Settings
-   ------------------------------------------------------------ */
-
-.settings-container {
-  width: min(100%, 1160px);
-}
-
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-5);
-  align-items: stretch;
-}
-
-.settings-column {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-5);
-  height: 100%;
-}
-
-.settings-card {
-  display: grid;
-  gap: var(--space-4);
-  height: 100%;
-  margin-bottom: 0;
-}
-
-.settings-card .dashboard-card-head {
-  margin-bottom: 0;
-}
-
-.settings-answer-card {
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-4);
-  padding: var(--space-4);
-  align-content: stretch;
-}
-
-.settings-answer-head {
-  align-items: flex-start;
-}
-
-.settings-answer-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 28px;
-  padding: 0 12px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 999px;
-  background: var(--white-06);
-  color: var(--white-72);
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.settings-form {
-  align-content: start;
-}
-
-.settings-field {
-  display: grid;
-  gap: var(--space-2);
-  color: var(--white-72);
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.settings-field input {
-  width: 100%;
-  height: 48px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
-  background: var(--surface-2);
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 0.96rem;
-  font-weight: 500;
-  outline: none;
-  transition:
-    border-color var(--duration-ui) var(--ease-out),
-    background var(--duration-ui) var(--ease-out);
-}
-
-.settings-field input:focus {
-  border-color: var(--white-54);
-}
-
-.settings-submit {
-  width: 100%;
-  min-height: 48px;
-  margin-top: auto;
-}
-
-.settings-answer-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  align-self: center;
-  height: 72px;
-  min-height: 0;
-  padding: 6px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  background: var(--surface-2);
-}
-
-.settings-answer-button {
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--white-72);
-  font: inherit;
-  font-size: 0.94rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    background var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.settings-answer-button:hover,
-.settings-answer-button:focus-visible {
-  background: var(--white-10);
-  color: var(--text-primary);
-}
-
-.settings-answer-button:active {
-  transform: scale(0.98);
-}
-
-.settings-answer-button.selected {
-  background: var(--white);
-  color: var(--black);
-}
-
-.settings-answer-button:disabled {
-  cursor: progress;
-  opacity: 0.68;
-  transform: none;
-}
-
-/* ------------------------------------------------------------
-   Customer page
-   ------------------------------------------------------------ */
-
 .customer-container {
-  width: min(100%, 1160px);
+  min-width: 0;
 }
 
 .customer-head {
@@ -2131,7 +992,6 @@ p.leaderboard-empty {
 
 .customer-statement-date {
   color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
 }
 
 .customer-answer {
@@ -2143,27 +1003,28 @@ p.leaderboard-empty {
   padding: 0 var(--space-3);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: var(--text-micro);
+  font-weight: 400;
   letter-spacing: 0.04em;
 }
 
 .customer-answer-yes {
-  border-color: rgba(128, 218, 172, 0.28);
-  background: rgba(128, 218, 172, 0.1);
+  border-color: var(--success-line);
+  background: var(--success-tint);
   color: var(--accent-green);
 }
 
 .customer-answer-no {
-  border-color: rgba(218, 128, 128, 0.28);
-  background: rgba(218, 128, 128, 0.1);
+  border-color: var(--danger-line);
+  background: var(--danger-tint);
   color: var(--accent-red);
 }
 
 .customer-answer-missed {
-  border-color: rgba(222, 198, 146, 0.28);
-  background: rgba(222, 198, 146, 0.1);
-  color: rgb(238, 216, 170);
+
+  border-color: var(--border-strong);
+  background: var(--paper-quiet);
+  color: var(--ink);
 }
 
 .customer-details-list {
@@ -2179,7 +1040,7 @@ p.leaderboard-empty {
   align-items: center;
   min-height: 50px;
   padding: 0 var(--space-2);
-  border-top: 1px solid var(--white-06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .customer-details-list div:first-child {
@@ -2188,16 +1049,16 @@ p.leaderboard-empty {
 
 .customer-details-list dt {
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: var(--text-micro);
+  font-weight: 400;
 }
 
 .customer-details-list dd {
   margin: 0;
   color: var(--text-primary);
   font-size: var(--table-body-size);
-  font-weight: 600;
-  line-height: 1.3;
+  font-weight: 400;
+  line-height: 1.4;
   overflow-wrap: anywhere;
 }
 
@@ -2215,7 +1076,7 @@ p.leaderboard-empty {
   align-items: start;
   min-height: var(--table-row-min-height);
   padding: var(--space-3) var(--space-3);
-  border-top: 1px solid var(--white-06);
+  border-top: 1px solid var(--border-subtle);
   background: transparent;
 }
 
@@ -2225,449 +1086,20 @@ p.leaderboard-empty {
 
 .customer-prayer-item span {
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-size: var(--text-micro);
+  font-weight: 400;
   line-height: 1.55;
 }
 
 .customer-prayer-item p {
   margin: 0;
   max-width: 72ch;
-  color: #c6cacd;
+  color: var(--text-muted);
   font-size: var(--table-body-size);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
-
-/* ------------------------------------------------------------
-   Statistics
-   ------------------------------------------------------------ */
-
-.statistics-section {
-  align-items: flex-start;
-  padding: var(--space-6) 0;
-}
-
-.statistics-container {
-  width: min(100%, 1160px);
-}
-
-.statistics-insights,
-.statistics-graphs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.statistics-insights {
-  margin-bottom: var(--space-4);
-}
-
-.statistics-patterns {
-  margin-top: var(--space-4);
-}
-
-.statistics-insight {
-  min-height: 150px;
-  margin-bottom: 0;
-  padding: var(--space-4);
-}
-
-.statistics-insight-hard {
-  box-shadow: inset 3px 0 0 var(--red-soft);
-}
-
-.statistics-insight-easy {
-  box-shadow: inset 3px 0 0 var(--green-soft);
-}
-
-.statistics-insight-value {
-  max-width: 14ch;
-  margin: var(--space-3) 0 var(--space-2);
-  color: var(--text-primary);
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-}
-
-.statistics-insight-caption {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 500;
-}
-
-.statistics-chart-card {
-  margin-bottom: 0;
-}
-
-.statistics-chart {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.statistics-bar-row {
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 30px;
-  align-items: center;
-  gap: var(--space-3);
-  min-height: 26px;
-}
-
-.statistics-bar-label,
-.statistics-bar-value {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.statistics-bar-value {
-  color: var(--white-72);
-  text-align: right;
-}
-
-.statistics-bar-track {
-  display: block;
-  height: 8px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--white-06);
-}
-
-.statistics-bar-fill {
-  display: block;
-  width: 0;
-  height: 100%;
-  min-width: 0;
-  border-radius: inherit;
-  transition: width var(--duration-panel) var(--ease-out);
-}
-
-.statistics-chart-no .statistics-bar-fill {
-  background: var(--red-soft);
-}
-
-.statistics-chart-yes .statistics-bar-fill {
-  background: var(--green-soft);
-}
-
-.statistics-donut-card {
-  margin-bottom: 0;
-}
-
-.statistics-donut-layout {
-  display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-5);
-}
-
-.statistics-donut {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 150px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, var(--surface-1) 0 48%, transparent 49%),
-    conic-gradient(var(--donut-primary) 0 var(--donut-main), var(--donut-secondary) var(--donut-main) 100%);
-  box-shadow: inset 0 0 0 1px var(--border-subtle);
-}
-
-.statistics-donut::after {
-  display: none;
-}
-
-.statistics-donut span {
-  position: relative;
-  z-index: 1;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.statistics-donut-time,
-.statistics-donut-answer {
-  --donut-primary: var(--green-soft);
-  --donut-secondary: var(--red-soft);
-}
-
-.statistics-donut-legend {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.statistics-donut-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  min-height: 36px;
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--white-06);
-}
-
-.statistics-donut-row:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.statistics-donut-row span,
-.statistics-donut-row strong {
-  color: var(--white-72);
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.statistics-donut-row strong {
-  color: var(--text-primary);
-}
-
-.statistics-donut-row::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--donut-default);
-}
-
-.statistics-donut-row span {
-  margin-right: auto;
-}
-
-.statistics-donut-row-yes,
-.statistics-donut-row-day {
-  --donut-default: var(--green-soft);
-}
-
-.statistics-donut-row-no,
-.statistics-donut-row-night {
-  --donut-default: var(--red-soft);
-}
-
-/* ------------------------------------------------------------
-   Community world card
-   ------------------------------------------------------------ */
-
-.prayer-world-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.92fr);
-  align-items: center;
-  gap: var(--space-5);
-  min-height: 360px;
-  margin-top: var(--space-4);
-  margin-bottom: 0;
-  overflow: hidden;
-}
-
-.prayer-world-card .dashboard-card-head {
-  align-items: flex-start;
-}
-
-.prayer-world-card .dashboard-card-head div {
-  min-width: 0;
-}
-
-.prayer-world-card .dashboard-card-head p {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.prayer-world-highlight {
-  margin: var(--space-5) 0 var(--space-4);
-}
-
-.prayer-world-highlight p:last-child {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: clamp(1.4rem, 2.4vw, 1.9rem);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-}
-
-.prayer-world-regions {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.prayer-world-region {
-  display: grid;
-  grid-template-columns: minmax(96px, 1fr) 34px minmax(96px, 0.85fr);
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.prayer-world-region span:first-child,
-.prayer-world-region strong {
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.prayer-world-region strong {
-  color: var(--white-72);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.prayer-world-region.active span:first-child,
-.prayer-world-region.active strong {
-  color: var(--text-primary);
-}
-
-.prayer-world-region-track {
-  display: block;
-  height: 6px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--white-06);
-}
-
-.prayer-world-region-track span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--green-soft);
-}
-
-.prayer-world-region.active .prayer-world-region-track span {
-  background: rgba(158, 232, 194, 0.78);
-}
-
-.prayer-world-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 292px;
-}
-
-.prayer-globe {
-  position: relative;
-  width: min(292px, 78vw);
-  aspect-ratio: 1;
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.14), transparent 22%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 48%, rgba(0, 0, 0, 0.6)),
-    var(--bg-page);
-  box-shadow:
-    inset -32px -42px 68px rgba(0, 0, 0, 0.52),
-    inset 18px 16px 36px rgba(255, 255, 255, 0.045);
-}
-
-.prayer-globe::before,
-.prayer-globe::after {
-  content: "";
-  position: absolute;
-  inset: 15%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.prayer-globe::before {
-  transform: scaleX(0.42);
-}
-
-.prayer-globe::after {
-  transform: scaleY(0.42);
-}
-
-.prayer-globe-shine {
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 39px, rgba(255, 255, 255, 0.032) 40px, transparent 41px),
-    repeating-linear-gradient(0deg, transparent 0 39px, rgba(255, 255, 255, 0.028) 40px, transparent 41px);
-  opacity: 0.6;
-}
-
-.prayer-globe-land {
-  position: absolute;
-  display: block;
-  background: rgba(212, 255, 235, 0.12);
-  opacity: 0.76;
-}
-
-.prayer-globe-land-americas {
-  left: 18%;
-  top: 25%;
-  width: 24%;
-  height: 42%;
-  border-radius: 58% 38% 48% 46%;
-  clip-path: polygon(34% 0, 74% 8%, 86% 24%, 64% 35%, 78% 50%, 56% 67%, 62% 100%, 38% 84%, 30% 62%, 12% 48%, 22% 28%);
-}
-
-.prayer-globe-land-europe {
-  left: 47%;
-  top: 27%;
-  width: 16%;
-  height: 16%;
-  border-radius: 44% 52% 38% 48%;
-  clip-path: polygon(12% 28%, 42% 4%, 78% 18%, 98% 48%, 66% 70%, 30% 62%);
-}
-
-.prayer-globe-land-africa {
-  left: 48%;
-  top: 42%;
-  width: 18%;
-  height: 32%;
-  border-radius: 48% 42% 58% 44%;
-  clip-path: polygon(34% 0, 78% 12%, 94% 42%, 70% 100%, 42% 88%, 18% 54%);
-}
-
-.prayer-globe-land-asia {
-  left: 60%;
-  top: 28%;
-  width: 30%;
-  height: 35%;
-  border-radius: 45% 55% 42% 52%;
-  clip-path: polygon(4% 22%, 34% 0, 82% 10%, 100% 34%, 76% 50%, 88% 74%, 52% 92%, 34% 62%, 8% 58%);
-}
-
-.prayer-globe-land-oceania {
-  left: 72%;
-  top: 66%;
-  width: 17%;
-  height: 13%;
-  border-radius: 50%;
-  clip-path: polygon(14% 42%, 44% 8%, 84% 22%, 96% 58%, 54% 88%, 18% 74%);
-}
-
-.prayer-globe-point {
-  position: absolute;
-  z-index: 2;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(211, 255, 236, 0.9);
-  box-shadow: 0 0 0 4px rgba(190, 255, 226, 0.08);
-  transform: translate(-50%, -50%) scale(var(--point-scale, 1));
-}
-
-.prayer-globe-point.active {
-  background: var(--white);
-  box-shadow: 0 0 0 6px rgba(238, 255, 247, 0.12);
-}
-
-/* ------------------------------------------------------------
-   Responsive
-   ------------------------------------------------------------ */
 
 @media (max-width: 900px) {
   .info-grid,
@@ -2772,7 +1204,8 @@ p.leaderboard-empty {
     grid-template-columns: 1fr;
     gap: var(--space-3);
     padding: var(--space-4);
-    text-align: center;
+
+    text-align: left;
   }
 
   .dashboard-timer-card {
@@ -2789,11 +1222,6 @@ p.leaderboard-empty {
     font-size: 1.3rem;
   }
 
-  .dashboard-week {
-    display: none;
-  }
-
-  /* Leaderboard: three-part hierarchy, wrapping status */
   .leaderboard-table th:first-child,
   .leaderboard-table td:first-child {
     width: 36px;
@@ -2804,12 +1232,10 @@ p.leaderboard-empty {
     gap: 6px;
   }
 
-  /* Status column stays content-sized so the inline status never gets
-     squeezed onto two lines; long names wrap instead. */
   .leaderboard-streak {
     justify-content: flex-end;
     gap: 6px;
-    line-height: 1.3;
+    line-height: 1.4;
   }
 
   .leaderboard-icon,
@@ -2818,19 +1244,19 @@ p.leaderboard-empty {
     height: 15px;
   }
 
-  /* Compact inline status: "0 days · 21 missed" */
   .leaderboard-streak-separator {
     display: inline;
   }
 
   .leaderboard-missed-tag {
     order: 0;
-    min-height: 0;
+
+    min-height: var(--tap-min);
     padding: 0;
     border: 0;
     background: transparent;
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: var(--text-micro);
+    font-weight: 400;
   }
 
   .leaderboard-inactive-tag {
@@ -2840,13 +1266,13 @@ p.leaderboard-empty {
     background: transparent;
     color: var(--text-muted);
     font-size: 0;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .leaderboard-inactive-tag::after {
     content: attr(data-mobile-label);
-    font-size: 0.8rem;
-    line-height: 1.3;
+    font-size: var(--text-micro);
+    line-height: 1.4;
   }
 
   .leaderboard-missed-tag:hover,
@@ -2858,7 +1284,6 @@ p.leaderboard-empty {
     text-underline-offset: 3px;
   }
 
-  /* Full-size touch target without visual bulk */
   button.leaderboard-missed-tag {
     position: relative;
   }
@@ -2902,22 +1327,6 @@ p.leaderboard-empty {
     column-gap: var(--space-3);
   }
 
-  .prayer-filter-button {
-    width: 40px;
-    height: 40px;
-  }
-
-  .prayer-filter-glyph,
-  .prayer-filter-glyph::before,
-  .prayer-filter-glyph::after {
-    width: 16px;
-  }
-
-  .prayer-filter-panel {
-    grid-template-columns: 1fr;
-  }
-
-  /* Prayer entries become labeled stacked rows */
   .prayer-table,
   .prayer-table tbody,
   .prayer-table tr,
@@ -2931,7 +1340,7 @@ p.leaderboard-empty {
   }
 
   .prayer-table tr+tr {
-    border-top: 1px solid var(--white-06);
+    border-top: 1px solid var(--border-subtle);
   }
 
   .prayer-table td {
@@ -2958,8 +1367,8 @@ p.leaderboard-empty {
   }
 
   .prayer-row-actions .action-menu-trigger {
-    width: 40px;
-    height: 40px;
+    width: var(--tap-min);
+    height: var(--tap-min);
     margin-top: 0;
   }
 
@@ -2978,6 +1387,61 @@ p.leaderboard-empty {
     grid-template-columns: 1fr;
     gap: var(--space-1);
   }
+
+  .reading-passage-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reading-modal {
+    padding: var(--space-3);
+  }
+
+  .reading-modal-dialog {
+    max-height: 92vh;
+  }
+
+  .reading-modal-form {
+    padding: var(--space-4);
+  }
+
+  .reading-passage-remove {
+    min-height: 44px;
+    padding: 0 var(--space-3);
+  }
+
+  .daily-goal-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-3);
+    row-gap: var(--space-1);
+  }
+
+  .daily-goal-text {
+    grid-column: 2;
+    min-height: 0;
+    padding-top: 2px;
+  }
+
+  .daily-goal-checkbox {
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: 3px;
+  }
+
+  .daily-goal-actions {
+    grid-column: 2;
+    justify-content: flex-end;
+  }
+
+  .daily-goals-add {
+    justify-self: stretch;
+  }
+
+  .streak-board-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
 }
 
 @media (max-width: 420px) {
@@ -2989,11 +1453,12 @@ p.leaderboard-empty {
 
   .dashboard-action-label {
     font-size: 2.6rem;
+    letter-spacing: 0;
   }
 }
 
 @media (max-width: 360px) {
-  /* Extremely narrow: allow the status group to wrap cleanly under the value */
+
   .leaderboard-table:not(.prayer-table) th:last-child,
   .leaderboard-table:not(.prayer-table) td:last-child {
     width: auto;

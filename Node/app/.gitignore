@@ -24,3 +24,6 @@ dist/
 coverage/
 .prisma/
 public/assets/
+test-results/
+
+docs

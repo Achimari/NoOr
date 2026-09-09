@@ -1,4 +1,4 @@
-/* ================= HERO ================= */
+
 .hero {
   background: transparent;
   padding: var(--section-padding) 0;
@@ -6,7 +6,7 @@
 }
 
 .hero-main {
-  min-height: calc(66vh - 74px);
+  min-height: calc(66vh - var(--header-height));
   display: flex;
   align-items: center;
   position: relative;
@@ -69,13 +69,6 @@
   width: 100%;
   text-align: center;
   padding: 13px var(--space-4);
-}
-
-.hero-actions .btn-secondary {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--text);
-  box-shadow: none;
 }
 
 .hero-invite-card {

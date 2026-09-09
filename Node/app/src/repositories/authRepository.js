@@ -98,6 +98,12 @@ export async function findActiveSessionByHash(sessionTokenHash) {
           isTelegramLinked: true,
           timezone: true,
           createdAt: true,
+          gameProfile: {
+            select: {
+              emblemKey: true,
+              accentKey: true,
+            },
+          },
         },
       },
     },

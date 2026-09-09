@@ -1,0 +1,63 @@
+
+  <div class="reading-modal" data-reading-modal hidden>
+    <div class="reading-modal-backdrop" data-reading-close></div>
+    <div class="reading-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="reading-modal-title">
+      <form class="reading-modal-form" data-reading-form novalidate>
+        <header class="reading-modal-head">
+          <div>
+            <p class="dashboard-label">Daily reading</p>
+            <h2 id="reading-modal-title">What did you read?</h2>
+          </div>
+          <button class="reading-modal-close" type="button" data-reading-close aria-label="Close without saving">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </header>
+
+        <div class="reading-modal-body">
+          <ul class="reading-passage-list" data-reading-passage-list></ul>
+
+          <p class="reading-modal-error" data-reading-error role="alert" aria-live="assertive" hidden></p>
+
+          <button class="ui-button ui-button--quiet reading-add-passage" type="button" data-reading-add-passage>Add another passage</button>
+
+          <div class="reading-field reading-reflection">
+            <label for="reading-reflection">What did you understand? <span class="reading-optional">Optional</span></label>
+            <textarea id="reading-reflection" name="reflection" data-reading-reflection rows="4" maxlength="2000" aria-describedby="reading-reflection-count"></textarea>
+            <p class="reading-reflection-count" id="reading-reflection-count"><span data-reading-reflection-count>0</span> / 2000 characters</p>
+          </div>
+        </div>
+
+        <div class="reading-modal-actions">
+          <button class="ui-button ui-button--secondary" type="button" data-reading-close>Cancel</button>
+          <button class="ui-button ui-button--primary" type="submit" data-reading-save>Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <template data-reading-passage-template>
+    <li class="reading-passage" data-reading-passage>
+      <div class="reading-passage-head">
+        <p class="reading-passage-title" data-reading-passage-title></p>
+        <button class="reading-passage-remove" type="button" data-reading-remove-passage>Remove</button>
+      </div>
+      <div class="reading-passage-grid">
+        <div class="reading-field">
+          <label data-reading-label="book">Book</label>
+          <select data-reading-select="book"></select>
+        </div>
+        <div class="reading-field">
+          <label data-reading-label="chapter">Chapter</label>
+          <select data-reading-select="chapter"></select>
+        </div>
+        <div class="reading-field">
+          <label data-reading-label="startVerse">From verse</label>
+          <select data-reading-select="startVerse"></select>
+        </div>
+        <div class="reading-field">
+          <label data-reading-label="endVerse">To verse</label>
+          <select data-reading-select="endVerse"></select>
+        </div>
+      </div>
+    </li>
+  </template>

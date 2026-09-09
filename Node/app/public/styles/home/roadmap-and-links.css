@@ -1,4 +1,4 @@
-/* ================= ABOUT ROADMAP ================= */
+
 .about-roadmap {
   position: relative;
 }
@@ -176,14 +176,18 @@
 .hover-lift-card {
   --lift-offset: 0px;
   transform: translate3d(0, var(--lift-offset), 0);
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
-  will-change: transform;
+  transition:
+    transform var(--duration-panel) var(--ease-out),
+    box-shadow var(--duration-panel) var(--ease-out),
+    border-color var(--duration-panel) var(--ease-out);
 }
 
-.hover-lift-card:hover {
-  transform: translate3d(0, calc(var(--lift-offset) - 3px), 0);
-  border-color: var(--link-card-hover-border);
-  box-shadow: var(--shadow-card-hover);
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift-card:hover {
+    transform: translate3d(0, calc(var(--lift-offset) - 3px), 0);
+    border-color: var(--link-card-hover-border);
+    box-shadow: var(--shadow-card-hover);
+  }
 }
 
 .home-verse {
@@ -280,12 +284,17 @@
   color: var(--link-card-text);
   font-weight: 500;
   scroll-snap-align: start;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color var(--duration-ui) var(--ease-out),
+    box-shadow var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
-.useful-link-card:hover {
-  border-color: var(--link-card-hover-border);
-  box-shadow: 0 4px 10px var(--link-card-hover-shadow);
+@media (hover: hover) and (pointer: fine) {
+  .useful-link-card:hover {
+    border-color: var(--link-card-hover-border);
+    box-shadow: 0 4px 10px var(--link-card-hover-shadow);
+  }
 }
 
 .useful-link-logo-box {

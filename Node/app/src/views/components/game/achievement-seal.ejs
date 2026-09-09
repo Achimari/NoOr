@@ -1,0 +1,67 @@
+<%
+
+const sealIcons = [
+  "first-step", "open-book", "reflection", "five-checks", "character",
+  "three-part-day", "strong", "tasks", "library", "spell", "spellbook",
+  "doubt", "focus", "rise", "three-trials", "spar",
+];
+const icon = sealIcons.includes(iconKey) ? iconKey : "fallback";
+const sealStatus = ["EARNED", "IN_PROGRESS", "NOT_STARTED"].includes(status) ? status : "NOT_STARTED";
+const sealPercent = Math.min(100, Math.max(0, Number(percent) || 0));
+const sealSize = typeof size === "undefined" ? "md" : size;
+const ringLength = 2 * Math.PI * 21;
+const ringOffset = ringLength * (1 - sealPercent / 100);
+const showRing = typeof withRing === "undefined" ? true : Boolean(withRing);
+%>
+<span
+  class="ach-seal ach-seal-<%= sealSize %>"
+  data-status="<%= sealStatus %>"
+  data-icon="<%= icon %>"
+  style="--ach-ring-length: <%= ringLength.toFixed(3) %>; --ach-ring-offset: <%= ringOffset.toFixed(3) %>;"
+  aria-hidden="true"
+>
+  <svg class="ach-seal-svg" viewBox="0 0 48 48" fill="none" focusable="false">
+    <circle class="ach-seal-body" cx="24" cy="24" r="18.5" />
+    <% if (showRing) { %>
+      <circle class="ach-seal-track" cx="24" cy="24" r="21" />
+      <circle class="ach-seal-ring" cx="24" cy="24" r="21" transform="rotate(-90 24 24)" />
+    <% } %>
+    <g class="ach-seal-mark" transform="translate(12 12)" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <% if (icon === "first-step") { %>
+        <path d="M3 18h18" /><circle cx="7" cy="12" r="2.6" fill="currentColor" stroke="none" /><path d="M11.5 12h4.5M18.5 12H20" />
+      <% } else if (icon === "open-book") { %>
+        <path d="M12 6.5C10 4.9 7.4 4.2 4 4.6v13.2c3.4-.4 6 .3 8 1.9 2-1.6 4.6-2.3 8-1.9V4.6c-3.4-.4-6 .3-8 1.9Z" /><path d="M12 6.5v13.2" />
+      <% } else if (icon === "reflection") { %>
+        <path d="M12 3.5 7.5 10h9L12 3.5Z" /><path d="M3.5 12h17" /><path d="M8.6 15.4h6.8" stroke-dasharray="2 2.6" /><path d="M10.2 18.4h3.6" stroke-dasharray="2 2.6" />
+      <% } else if (icon === "five-checks") { %>
+        <path d="M12 3.4 20.2 9.4 17.1 19.2H6.9L3.8 9.4 12 3.4Z" /><path d="m8.6 11.8 2.6 2.7 4.4-4.6" />
+      <% } else if (icon === "character") { %>
+        <circle cx="12" cy="8" r="3.4" /><path d="M5.4 19.6a6.6 6.6 0 0 1 13.2 0" /><path d="M12 11.4v2" />
+      <% } else if (icon === "three-part-day") { %>
+        <circle cx="12" cy="12" r="8.6" /><path d="M12 3.4V12l7.4 4.3M12 12 4.6 16.3" />
+      <% } else if (icon === "strong") { %>
+        <path d="M12 3.6 12 20.4" /><path d="M6.4 9.4A7.2 7.2 0 0 0 12 20.4a7.2 7.2 0 0 0 5.6-11" /><path d="m8.4 7.4 3.6-3.8 3.6 3.8" />
+      <% } else if (icon === "tasks") { %>
+        <path d="M9.4 6.4h11M9.4 12h11M9.4 17.6h11" /><path d="m3.6 6.2 1.6 1.6 2.6-3M3.6 11.8l1.6 1.6 2.6-3" /><circle cx="5.2" cy="17.6" r="1.5" />
+      <% } else if (icon === "library") { %>
+        <path d="M4.4 19.4V7.6h3.4v11.8ZM10.3 19.4V4.6h3.4v14.8ZM16.2 19.4V9.4h3.4v10Z" /><path d="M3.4 19.4h17.2" />
+      <% } else if (icon === "spell") { %>
+        <circle cx="12" cy="12" r="4.2" /><path d="M12 3.4v3.2M12 17.4v3.2M3.4 12h3.2M17.4 12h3.2M6.3 6.3l2.3 2.3M15.4 15.4l2.3 2.3M17.7 6.3l-2.3 2.3M8.6 15.4l-2.3 2.3" />
+      <% } else if (icon === "spellbook") { %>
+        <path d="M5 5.4h9.6a2.6 2.6 0 0 1 2.6 2.6v11.4H7.6A2.6 2.6 0 0 1 5 16.8Z" /><path d="M7.6 19.4h11.4V8" /><path d="M9.4 10.4h4.4M9.4 13.4h4.4" />
+      <% } else if (icon === "doubt") { %>
+        <circle cx="12" cy="12" r="8.6" stroke-dasharray="3.4 3.2" /><path d="M6.6 17.4 17.4 6.6" />
+      <% } else if (icon === "focus") { %>
+        <circle cx="12" cy="12" r="8.6" /><circle cx="12" cy="12" r="4.4" /><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+      <% } else if (icon === "rise") { %>
+        <path d="M4 19.6h16" /><path d="M12 16.4V5.2" /><path d="m7.4 9.6 4.6-4.6 4.6 4.6" />
+      <% } else if (icon === "three-trials") { %>
+        <path d="M12 3.4 15.4 9H8.6L12 3.4Z" /><path d="M6.4 12.4 9.8 18H3L6.4 12.4Z" /><path d="M17.6 12.4 21 18h-6.8l3.4-5.6Z" />
+      <% } else if (icon === "spar") { %>
+        <path d="M9.4 4.6A8.4 8.4 0 0 0 9.4 19.4" /><path d="M14.6 4.6a8.4 8.4 0 0 1 0 14.8" /><path d="M12 10.4v3.2" />
+      <% } else { %>
+        <circle cx="12" cy="12" r="7.4" /><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
+      <% } %>
+    </g>
+  </svg>
+</span>

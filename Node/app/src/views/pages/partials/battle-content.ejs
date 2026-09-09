@@ -1,0 +1,246 @@
+<main
+  id="main-content"
+  tabindex="-1"
+  class="dashboard-page battle-page"
+  data-battle-page
+  data-active-battle="<%= pve.activeBattleId || "" %>"
+  data-battle-focus="<%= pve.activeBattleId ? "true" : "false" %>"
+>
+
+  <div class="battle-entry" data-battle-entry>
+    <div class="page-shell battle-container">
+      <header class="page-head battle-head">
+        <h1 class="page-head-title battle-title">Battle</h1>
+        <p class="page-head-lede battle-intro">
+          Choose your next encounter. Battles never change your daily record.
+        </p>
+      </header>
+
+      <%
+
+        const encounters = pve.encounters;
+        const nextTrial = encounters.find((encounter) => encounter.unlocked && !encounter.completed) || null;
+        const sparIsNextStep = !nextTrial;
+      %>
+
+      <div class="battle-entry-layout" data-battle-modes<%= pve.activeBattleId ? " hidden" : "" %>>
+        <% if (!character.allocation.confirmed) { %>
+          <section class="section-frame surface-panel surface-pad battle-setup" aria-labelledby="battle-setup-title">
+            <p class="battle-setup-note">Required before battle</p>
+            <h2 id="battle-setup-title">Set your base points</h2>
+            <p>
+              Set your ten permanent base points before your first fight.
+              Daily practice adds to them.
+            </p>
+            <div class="section-actions">
+              <a class="ui-button ui-button--primary" href="/profile">Go to My Profile</a>
+            </div>
+          </section>
+        <% } %>
+
+        <section class="section-frame section-frame--ruled battle-choice" aria-labelledby="battle-choice-title">
+          <h2 id="battle-choice-title" class="battle-choice-title">Choose a battle</h2>
+
+          <div class="battle-choice-grid">
+            <section class="battle-mode battle-mode--trials" data-region="trials" aria-labelledby="pve-title">
+              <header class="battle-mode-head">
+                <h3 id="pve-title" class="battle-mode-title">Trials</h3>
+                <p class="battle-mode-note"><%= encounters.length %> in order</p>
+              </header>
+              <p class="battle-mode-text">
+                Your solo course. Read each announced move, learn the pattern,
+                and choose your response.
+              </p>
+
+              <ol class="battle-encounters">
+                <% encounters.forEach((encounter, index) => { %>
+                  <%
+                    const isNext = nextTrial !== null && encounter.key === nextTrial.key;
+                    const previous = index > 0 ? encounters[index - 1] : null;
+                  %>
+                  <li class="battle-encounter" data-encounter="<%= encounter.key %>" data-state="<%= encounter.completed ? "completed" : (encounter.unlocked ? "open" : "locked") %>"<%- isNext ? ' data-next="true"' : "" %>>
+                    <span class="battle-encounter-marker" aria-hidden="true"><%= encounter.order %></span>
+                    <div class="battle-encounter-content">
+                      <div class="battle-encounter-head">
+                        <span class="battle-encounter-name"><%= encounter.name %></span>
+                        <span class="battle-encounter-state">
+                          <% if (encounter.completed) { %>
+                            Completed<%= encounter.bestTurns ? ` in ${encounter.bestTurns} turns` : "" %>
+                          <% } else if (encounter.unlocked) { %>
+                            Open
+                          <% } else { %>
+                            Locked
+                          <% } %>
+                        </span>
+                      </div>
+
+                      <% if (isNext) { %>
+                        <p class="battle-encounter-blurb"><%= encounter.blurb %></p>
+                      <% } %>
+
+                      <% if (!encounter.unlocked) { %>
+                        <p class="battle-note">Finish <%= previous ? previous.name : "the previous trial" %> first.</p>
+                      <% } else if (character.allocation.confirmed) { %>
+                        <button class="ui-button ui-button--<%= isNext ? "primary" : "quiet" %>" type="button" data-pve-start="<%= encounter.key %>">
+                          <%= encounter.completed ? "Face again" : "Begin trial" %>
+                        </button>
+                      <% } %>
+                    </div>
+                  </li>
+                <% }) %>
+              </ol>
+            </section>
+
+            <section class="battle-mode battle-mode--sparring" data-region="spar" aria-labelledby="pvp-title">
+              <header class="battle-mode-head">
+                <h3 id="pvp-title" class="battle-mode-title">Friendly spar</h3>
+                <p class="battle-mode-note">Live match</p>
+              </header>
+              <p class="battle-mode-text">
+                Match with another member. Sparring affects no rank, record,
+                reward, or penalty.
+              </p>
+
+              <div class="battle-queue" data-queue-panel data-queue-state="IDLE">
+                <p class="battle-queue-status" data-queue-status role="status" aria-live="polite">
+                  Not searching.
+                </p>
+                <div class="battle-queue-actions ui-button-group">
+                  <% if (character.allocation.confirmed) { %>
+                    <button class="ui-button ui-button--<%= sparIsNextStep ? "primary" : "secondary" %>" type="button" data-queue-join>Find opponent</button>
+                    <button class="ui-button ui-button--secondary" type="button" data-queue-cancel hidden>Cancel search</button>
+                  <% } %>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <% if (character.allocation.confirmed) { %>
+
+          <section class="battle-readiness" data-region="readiness" aria-labelledby="battle-readiness-title">
+            <h2 id="battle-readiness-title" class="battle-readiness-title">Ready for battle</h2>
+            <dl class="battle-readiness-values">
+              <div class="battle-readiness-value" data-character-stat="rating">
+                <dt>Combat rating</dt>
+                <dd><%= character.rating %></dd>
+              </div>
+              <div class="battle-readiness-value" data-character-stat="health">
+                <dt>Health</dt>
+                <dd><%= character.derived.maxHealth %></dd>
+              </div>
+              <div class="battle-readiness-value" data-character-stat="damage">
+                <dt>Damage</dt>
+                <dd><%= character.derived.basicDamage %></dd>
+              </div>
+              <div class="battle-readiness-value" data-character-stat="mana">
+                <dt>Mana</dt>
+                <dd><%= character.derived.maxMana %></dd>
+              </div>
+              <div class="battle-readiness-value" data-character-stat="spells">
+                <dt>Spells</dt>
+                <dd><%= character.spellCount %></dd>
+              </div>
+            </dl>
+            <a class="battle-readiness-link" href="/profile">View full loadout</a>
+          </section>
+        <% } %>
+      </div>
+    </div>
+    <%- include("../../components/layout/footer") %>
+  </div>
+
+  <p class="battle-boot" data-battle-boot role="status">Loading battle…</p>
+
+  <section class="battle-active" data-battle-active hidden aria-labelledby="active-title">
+    <h2 id="active-title" class="visually-hidden">Active battle</h2>
+
+    <div class="battle-stage" data-battle-stage data-battle-resolving="false" data-battle-paused="false">
+      <div class="battle-scene" data-battle-scene>
+        <span class="battle-ground" aria-hidden="true"></span>
+        <%- include("../../components/game/battle-figure", { side: "them" }) %>
+        <%- include("../../components/game/battle-figure", { side: "you" }) %>
+      </div>
+
+      <%- include("../../components/game/battle-hud", { side: "you" }) %>
+      <%- include("../../components/game/battle-hud", { side: "them" }) %>
+
+      <p class="battle-banner" data-action-banner hidden aria-hidden="true"></p>
+
+      <p class="battle-phase-banner" data-phase-banner hidden role="status"></p>
+
+      <p class="visually-hidden" data-battle-announcer role="status" aria-live="polite"></p>
+
+      <div class="battle-system" data-battle-system>
+        <p class="battle-error" data-battle-error role="alert" hidden></p>
+        <p class="battle-connection" data-battle-connection hidden>Reconnecting…</p>
+      </div>
+    </div>
+
+    <div class="battle-dock" data-battle-dock>
+      <div class="battle-dock-inner">
+        <div class="battle-dock-actions" role="group" aria-label="Battle actions">
+          <button class="battle-move" type="button" data-action="ATTACK" aria-describedby="move-reason-ATTACK">
+            <%- include("../../components/game/battle-glyph", { name: "attack" }) %>
+            <span class="battle-move-label">Attack</span>
+          </button>
+          <button class="battle-move" type="button" data-action="DEFEND" aria-describedby="move-reason-DEFEND">
+            <%- include("../../components/game/battle-glyph", { name: "guard" }) %>
+            <span class="battle-move-label">Guard</span>
+          </button>
+          <button class="battle-move" type="button" data-action="BREAK" aria-describedby="move-reason-BREAK" hidden>
+            <%- include("../../components/game/battle-glyph", { name: "break" }) %>
+            <span class="battle-move-label">Break</span>
+          </button>
+          <button class="battle-move" type="button" data-action="SURGE" aria-describedby="move-reason-SURGE" hidden>
+            <%- include("../../components/game/battle-glyph", { name: "surge" }) %>
+            <span class="battle-move-label">Surge</span>
+          </button>
+
+          <span class="visually-hidden" id="move-reason-ATTACK" data-move-reason="ATTACK"></span>
+          <span class="visually-hidden" id="move-reason-DEFEND" data-move-reason="DEFEND"></span>
+          <span class="visually-hidden" id="move-reason-BREAK" data-move-reason="BREAK"></span>
+          <span class="visually-hidden" id="move-reason-SURGE" data-move-reason="SURGE"></span>
+        </div>
+
+        <div class="battle-dock-side">
+          <details class="battle-tray" data-spell-tray>
+            <summary class="battle-tray-summary">
+              <%- include("../../components/game/battle-glyph", { name: "spells" }) %>
+              <span class="battle-move-label">Spells</span>
+            </summary>
+            <div class="battle-tray-body">
+              <div class="battle-spells" data-spell-actions></div>
+              <p class="battle-tray-empty" data-spell-empty hidden>No spells unlocked yet.</p>
+            </div>
+          </details>
+
+          <details class="battle-tray battle-tray-quiet" data-more-tray>
+            <summary class="battle-tray-summary">
+              <%- include("../../components/game/battle-glyph", { name: "more" }) %>
+              <span class="battle-move-label">More</span>
+            </summary>
+            <div class="battle-tray-body">
+              <p class="battle-hint" data-surge-hint hidden></p>
+              <button class="battle-quiet-action" type="button" data-action="FORFEIT" hidden>Forfeit</button>
+              <a class="battle-quiet-action" href="/battle" data-battle-leave hidden>Leave battle</a>
+              <details class="battle-history" data-battle-history>
+                <summary>History</summary>
+                <ol class="battle-log" data-battle-log></ol>
+              </details>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div class="battle-outcome" data-battle-outcome hidden>
+      <div class="battle-outcome-card" role="alertdialog" aria-labelledby="battle-outcome-title" aria-describedby="battle-outcome-text">
+        <p class="battle-outcome-kicker" data-outcome-kicker>Battle over</p>
+        <h3 class="battle-outcome-title" id="battle-outcome-title" data-outcome-title>Victory</h3>
+        <p class="battle-outcome-text" id="battle-outcome-text" data-outcome-text></p>
+        <a class="battle-outcome-action" href="/battle" data-outcome-action>Return to trials</a>
+      </div>
+    </div>
+  </section>
+</main>

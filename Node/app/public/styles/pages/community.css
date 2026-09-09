@@ -1,0 +1,361 @@
+
+
+.community-page {
+  background: transparent;
+}
+
+.community-editorial-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  column-gap: var(--gap-region);
+  align-items: start;
+}
+
+.community-encouragement {
+  display: grid;
+  gap: var(--gap-related);
+  min-width: 0;
+}
+
+.community-quote {
+  margin: 0;
+  padding-inline-start: var(--space-4);
+  border-inline-start: 2px solid var(--brand);
+}
+
+.community-quote blockquote {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.community-quote-source {
+  margin-block-start: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.community-resource {
+  min-width: 0;
+  padding-inline-start: var(--gap-sibling);
+  border-inline-start: 1px solid var(--rule);
+}
+
+.community-resource > .t-component-title {
+  margin: 0;
+}
+
+.community-resource > * + * {
+  margin-block-start: var(--space-3);
+}
+
+.community-resource-meta {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.community-resource-summary {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.community-resource-action {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: 1px solid var(--separator);
+  background: var(--surface-subtle);
+  border-radius: var(--radius-row);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.community-resource-action-label {
+  display: block;
+  margin-block-end: 2px;
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.prayer-filter-head {
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.prayer-panel-copy {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.prayer-panel-copy h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.prayer-panel-copy p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.prayer-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) minmax(150px, 0.62fr) auto;
+  gap: var(--space-3);
+  align-items: end;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-2);
+  animation: panel-in var(--duration-panel) var(--ease-drawer);
+}
+
+.prayer-filter-field {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+}
+
+.prayer-filter-combo,
+.prayer-select {
+  position: relative;
+  display: block;
+}
+
+.prayer-filter-control {
+  min-height: 44px;
+  width: 100%;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition:
+    background-color var(--duration-ui) var(--ease-out),
+    border-color var(--duration-ui) var(--ease-out);
+}
+
+.prayer-filter-control::placeholder {
+  color: var(--text-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button.prayer-filter-control:hover {
+    background: var(--surface-2);
+    border-color: var(--ink-muted);
+  }
+}
+
+.prayer-filter-control:focus-visible {
+  background: var(--surface-2);
+}
+
+.prayer-select-trigger[aria-expanded="true"] {
+  background: var(--surface-2);
+  border-color: var(--ink-muted);
+  color: var(--text-primary);
+}
+
+.prayer-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.prayer-select-trigger:active {
+  transform: scale(0.97);
+}
+
+.prayer-select-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  opacity: 0.72;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--duration-ui) var(--ease-out);
+}
+
+.prayer-select-trigger[aria-expanded="true"] .prayer-select-chevron {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+.prayer-filter-menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  z-index: 5;
+  max-height: 190px;
+  overflow-y: auto;
+  padding: var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  box-shadow: var(--shadow-card-hover);
+  transform-origin: top left;
+  animation: panel-in var(--duration-ui) var(--ease-out);
+}
+
+.prayer-filter-menu[hidden] {
+  display: none;
+}
+
+.prayer-filter-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-tag);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.prayer-filter-menu button+button {
+  margin-top: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .prayer-filter-menu button:hover:not([aria-current]) {
+    background: var(--ink-06);
+    color: var(--text-primary);
+  }
+}
+
+.prayer-filter-menu button:focus-visible {
+  color: var(--text-primary);
+}
+
+.prayer-filter-menu button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.prayer-filter-menu button[aria-current] {
+  background: var(--ink-10);
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+.prayer-filter-empty {
+  display: block;
+  padding: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+}
+
+.prayer-filter-clear {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.prayer-filter-clear:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .prayer-filter-clear:hover {
+    background: var(--ink-06);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+}
+
+.prayer-filter-clear:focus-visible {
+  background: var(--ink-06);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.community-telegram {
+  margin-block-start: var(--gap-region);
+  padding: var(--space-5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+  background: var(--paper-muted);
+}
+
+.community-telegram .settings-group-title {
+  font-size: var(--text-subtitle);
+}
+
+@media (max-width: 800px) {
+  .community-editorial-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--gap-sibling);
+  }
+
+  .prayer-filter-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .community-resource {
+    padding-block-start: var(--gap-related);
+    padding-inline-start: 0;
+    border-block-start: 1px solid var(--rule);
+    border-inline-start: 0;
+  }
+}

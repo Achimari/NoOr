@@ -33,11 +33,16 @@ function getTopDay(days, field) {
   }, null);
 }
 
+function toBarPercentage(value, maxValue) {
+  if (value <= 0 || maxValue <= 0) return 0;
+  return Math.max(6, Math.round((value / maxValue) * 100));
+}
+
 function buildChartRows(days, field, maxValue) {
   return days.map((day) => ({
     ...day,
     value: day[field],
-    percentage: maxValue > 0 ? Math.max(6, Math.round((day[field] / maxValue) * 100)) : 0,
+    percentage: toBarPercentage(day[field], maxValue),
   }));
 }
 
@@ -46,7 +51,7 @@ function buildDistributionRows(rows, maxValue) {
 
   return rows.map((row) => ({
     ...row,
-    percentage: maxValue > 0 ? Math.max(6, Math.round((row.value / maxValue) * 100)) : 0,
+    percentage: toBarPercentage(row.value, maxValue),
     sharePercentage: totalValue > 0 ? Math.round((row.value / totalValue) * 100) : 0,
   }));
 }

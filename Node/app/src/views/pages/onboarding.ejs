@@ -1,5 +1,5 @@
 <%- include("../components/layout/auth-document", {
   title,
   pageId,
-  body: include("./partials/auth-onboarding")
+  body: include("./partials/auth-onboarding", { errors, fieldErrors, values })
 }) %>

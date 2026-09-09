@@ -1,0 +1,170 @@
+<%
+
+const summary = achievements.summary;
+const filters = [
+  { value: "all", label: "All", count: summary.all },
+  { value: "EARNED", label: "Earned", count: summary.earned },
+  { value: "IN_PROGRESS", label: "In progress", count: summary.inProgress },
+  { value: "NOT_STARTED", label: "Not started", count: summary.notStarted },
+];
+const stateLabels = { EARNED: "Earned", IN_PROGRESS: "In progress", NOT_STARTED: "Not started" };
+const seal = (item, options) => include("../../components/game/achievement-seal", {
+  iconKey: item.iconKey,
+  status: item.status,
+  percent: item.percent,
+  ...options,
+});
+%>
+<main
+  id="main-content"
+  tabindex="-1"
+  class="dashboard-page achievements-page"
+  data-achievements
+  data-accent="<%= achievements.accentKey %>"
+>
+  <div class="page-shell achievements-container">
+
+      <header class="page-head achievements-hero">
+        <h1 class="page-head-title achievements-title">Achievements</h1>
+        <p class="page-head-lede achievements-lede">Milestones earned through your daily practice and battles.</p>
+        <div class="achievements-hero-progress">
+          <p class="achievements-count">
+            <strong><%= summary.earned %></strong> of <%= achievements.total %> earned
+          </p>
+          <progress
+            class="achievements-meter"
+            max="<%= achievements.total %>"
+            value="<%= summary.earned %>"
+            aria-label="<%= summary.earned %> of <%= achievements.total %> achievements earned"
+          ><%= summary.percent %>%</progress>
+        </div>
+      </header>
+
+      <div class="achievements-overview">
+
+        <% if (achievements.latest) { %>
+        <section class="achievements-latest" aria-labelledby="achievements-latest-title">
+          <h2 class="achievements-panel-title" id="achievements-latest-title">Latest earned</h2>
+            <div class="achievements-latest-body">
+              <%- seal(achievements.latest, { size: "lg" }) %>
+              <div class="achievements-latest-text">
+                <p class="achievements-latest-name"><%= achievements.latest.name %></p>
+                <p class="achievements-latest-requirement"><%= achievements.latest.description %></p>
+                <p class="achievements-latest-date">
+                  Earned <time datetime="<%= achievements.latest.unlockedAt %>"><%= achievements.latest.unlockedAtLabel %></time>
+                </p>
+              </div>
+            </div>
+        </section>
+        <% } %>
+
+        <section class="achievements-next" aria-labelledby="achievements-next-title">
+          <h2 class="achievements-panel-title" id="achievements-next-title">Closest next</h2>
+          <% if (!achievements.latest) { %>
+            <p class="achievements-empty">
+              Nothing earned yet. The first three below are the closest ones to you,
+              and every requirement on this page is written out in full.
+            </p>
+          <% } %>
+          <% if (!achievements.closestNext.length) { %>
+            <p class="achievements-empty">
+              Every achievement in the catalog is earned. Nothing here expires and
+              nothing is taken away, so this page is now simply your record.
+            </p>
+          <% } %>
+          <ul class="achievements-next-list">
+            <% achievements.closestNext.forEach((item) => { %>
+              <li class="achievements-next-item" data-achievement-next>
+                <%- seal(item, { size: "sm" }) %>
+                <div class="achievements-next-text">
+                  <p class="achievements-next-name"><%= item.name %></p>
+                  <p class="achievements-next-meta">
+                    <span class="achievements-figure"><%= item.current %> / <%= item.target %></span>
+                    <a class="achievements-next-link" href="<%= item.href %>"><%= item.nextStep %></a>
+                  </p>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        </section>
+      </div>
+
+      <div class="achievements-filters" role="group" aria-label="Filter achievements by state">
+        <% filters.forEach((filter, index) => { %>
+          <button
+            class="achievements-filter"
+            type="button"
+            data-achievement-filter="<%= filter.value %>"
+            aria-pressed="<%= index === 0 ? "true" : "false" %>"
+          >
+            <%= filter.label %> <span class="achievements-filter-count"><%= filter.count %></span>
+          </button>
+        <% }) %>
+      </div>
+
+      <p class="achievements-result" role="status" aria-live="polite" data-achievements-status>
+        Showing all <%= summary.all %> achievements.
+      </p>
+
+      <% achievements.categories.forEach((category) => { %>
+        <section
+          class="achievements-category"
+          data-achievement-category="<%= category.key %>"
+          aria-labelledby="achievements-category-<%= category.key %>"
+        >
+          <header class="achievements-category-head">
+            <h2 class="achievements-category-title" id="achievements-category-<%= category.key %>"><%= category.name %></h2>
+            <p class="achievements-category-count"><%= category.earnedCount %> of <%= category.total %> earned</p>
+          </header>
+
+          <div class="achievements-grid">
+            <% category.items.forEach((item, index) => { %>
+              <article
+                class="achievements-card"
+                data-achievement-card
+                data-achievement-key="<%= item.key %>"
+                data-status="<%= item.status %>"
+                style="--ach-card-index: <%= index %>;"
+              >
+                <%- seal(item, { size: "md" }) %>
+                <div class="achievements-card-body">
+                  <h3 class="achievements-card-name"><%= item.name %></h3>
+                  <% if (item.tierLabel) { %>
+                    <p class="achievements-card-tier"><%= item.tierLabel %></p>
+                  <% } %>
+                  <p class="achievements-card-requirement"><%= item.description %></p>
+
+                  <p class="achievements-card-state">
+                    <span class="achievements-state-mark" aria-hidden="true"></span>
+                    <span class="achievements-state-word"><%= stateLabels[item.status] %></span>
+                    <% if (item.status === "EARNED" && item.unlockedAt) { %>
+                      <time class="achievements-card-date" datetime="<%= item.unlockedAt %>"><%= item.unlockedAtLabel %></time>
+                    <% } %>
+                  </p>
+
+                  <% if (item.isProgressive) { %>
+                    <p class="achievements-card-progress">
+                      <span class="achievements-figure"><%= item.current %> / <%= item.target %></span>
+                      <progress
+                        class="achievements-card-meter"
+                        max="<%= item.target %>"
+                        value="<%= item.current %>"
+                        aria-label="<%= item.name %>: <%= item.current %> of <%= item.target %>"
+                      ><%= item.percent %>%</progress>
+                    </p>
+                  <% } %>
+
+                  <% if (item.status !== "EARNED") { %>
+                    <a class="achievements-card-link" href="<%= item.href %>"><%= item.nextStep %></a>
+                  <% } %>
+                </div>
+              </article>
+            <% }) %>
+          </div>
+        </section>
+      <% }) %>
+
+  </div>
+
+  <%- include("../../components/layout/footer") %>
+</main>

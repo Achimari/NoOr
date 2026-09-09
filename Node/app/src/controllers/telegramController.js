@@ -6,6 +6,6 @@ export async function getTelegramConnectLink(req, res) {
 }
 
 export async function sendTelegramTestNotification(req, res) {
-  await sendTelegramNotification(req.user.id, "NoOr test notification.");
+  await sendTelegramNotification(req.user.id, "Achimari test notification.");
   return res.json({ success: true });
 }

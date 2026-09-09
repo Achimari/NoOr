@@ -1,6 +1,12 @@
-<main class="dashboard-page customer-page">
-  <section class="section dashboard-section">
-    <div class="container customer-container">
+<%
+  const customerDate = new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+%>
+<main id="main-content" tabindex="-1" class="dashboard-page customer-page">
+  <div class="page-shell customer-container">
       <header class="dashboard-head customer-head">
         <p class="dashboard-kicker">Customer details</p>
         <div class="customer-title-row">
@@ -24,7 +30,7 @@
             </div>
             <div>
               <dt>Created</dt>
-              <dd><%= customer.createdAt.toLocaleDateString("en-GB") %></dd>
+              <dd><%= customerDate.format(customer.createdAt) %></dd>
             </div>
             <div>
               <dt>Current streak</dt>
@@ -61,7 +67,7 @@
             </div>
             <div>
               <dt>Linked date</dt>
-              <dd><%= customer.telegram.connectedAt ? customer.telegram.connectedAt.toLocaleDateString("en-GB") : "Not linked" %></dd>
+              <dd><%= customer.telegram.connectedAt ? customerDate.format(customer.telegram.connectedAt) : "Not linked" %></dd>
             </div>
           </dl>
         </article>
@@ -87,7 +93,7 @@
                     <tr>
                       <td>
                         <time class="customer-statement-date" datetime="<%= item.dateKey %>">
-                          <%= statementDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) %>
+                          <%= statementDate.toLocaleDateString(locale, { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) %>
                         </time>
                       </td>
                       <td>
@@ -131,8 +137,7 @@
           <% } %>
         </section>
       </div>
-    </div>
-  </section>
+  </div>
 
   <%- include("../../components/layout/footer") %>
 </main>

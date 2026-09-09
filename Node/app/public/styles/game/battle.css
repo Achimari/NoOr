@@ -1,0 +1,390 @@
+
+
+body[data-page="battle"]:has([data-battle-page][data-battle-focus="false"]) > main {
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--horizon-height) - var(--horizon-fade)),
+    var(--paper) var(--horizon-height)
+  );
+}
+
+.battle-container {
+  padding-block-start: 0;
+}
+
+.battle-head {
+  max-width: var(--measure-reading);
+}
+
+.battle-entry-layout {
+  display: grid;
+  align-content: start;
+  gap: var(--gap-sibling);
+}
+
+.battle-entry-layout[hidden] {
+  display: none;
+}
+
+.battle-choice-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-synthesis: var(--font-synthesis-branded);
+  font-size: var(--text-title);
+  font-weight: 400;
+  line-height: var(--leading-title);
+  letter-spacing: 0;
+}
+
+.battle-choice > .battle-choice-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+
+  align-items: stretch;
+  gap: var(--gap-sibling);
+  margin-block-start: var(--space-5);
+}
+
+.battle-mode {
+  min-width: 0;
+}
+
+.battle-mode--sparring {
+  padding-inline-start: var(--gap-sibling);
+  border-inline-start: 1px solid var(--rule);
+}
+
+.battle-mode-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+}
+
+.battle-mode-note,
+.battle-setup-note {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.battle-mode-title,
+.battle-setup h2 {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-synthesis: var(--font-synthesis-branded);
+  font-size: var(--text-subtitle);
+  font-weight: 400;
+  line-height: var(--leading-title);
+  letter-spacing: 0;
+}
+
+.battle-mode-text,
+.battle-setup p {
+  max-width: 58ch;
+  margin: var(--space-2) 0 0;
+  color: var(--ink-muted);
+  font-family: var(--font-body);
+  font-synthesis: var(--font-synthesis-branded);
+  font-size: var(--text-meta);
+  line-height: var(--leading-meta);
+  text-wrap: pretty;
+}
+
+.battle-encounters {
+  position: relative;
+  display: grid;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.battle-encounter {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tap-min) minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-block: var(--space-3);
+  border-block-start: 1px solid var(--rule);
+}
+
+.battle-encounter[data-next="true"] {
+  padding-block: var(--space-4);
+}
+
+.battle-encounter:last-child {
+  border-block-end: 1px solid var(--rule);
+}
+
+.battle-encounter:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(var(--space-3) + var(--tap-min));
+  inset-block-end: calc(var(--space-3) * -1);
+  inset-inline-start: calc(var(--tap-min) / 2 - 0.5px);
+  width: 1px;
+  background: var(--rule-strong);
+}
+
+.battle-encounter[data-next="true"]:not(:last-child)::after {
+  inset-block-start: calc(var(--space-4) + var(--tap-min));
+  inset-block-end: calc(var(--space-4) * -1);
+}
+
+.battle-encounter-marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--text-micro);
+  font-weight: 400;
+}
+
+.battle-encounter[data-state="completed"] .battle-encounter-marker {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.battle-encounter[data-next="true"] .battle-encounter-marker {
+  border: 2px solid var(--ink);
+  color: var(--ink);
+}
+
+.battle-encounter[data-state="locked"] .battle-encounter-marker {
+  color: var(--ink-quiet);
+}
+
+.battle-encounter-content {
+  min-width: 0;
+  padding-block-start: calc((var(--tap-min) - 1.25rem) / 2);
+}
+
+.battle-encounter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.battle-encounter-name {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.battle-encounter-state {
+  flex: 0 1 auto;
+  min-width: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.battle-encounter[data-state="completed"] .battle-encounter-state {
+  color: var(--success);
+}
+
+.battle-encounter[data-state="locked"] .battle-encounter-name {
+  color: var(--ink-muted);
+}
+
+.battle-encounter-blurb,
+.battle-note {
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.battle-encounter-blurb {
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+.battle-note {
+  margin: var(--space-1) 0 0;
+}
+
+.battle-encounter .ui-button--quiet {
+  margin-block-start: var(--space-1);
+  margin-inline-start: calc(var(--space-3) * -1);
+}
+
+.battle-queue {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+.battle-queue-status {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-micro);
+  line-height: 1.5;
+}
+
+.battle-queue-actions {
+  justify-content: flex-start;
+}
+
+.battle-readiness {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-row);
+  background: var(--paper-muted);
+}
+
+.battle-readiness-title {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-muted);
+  font-family: var(--font-ui);
+  font-synthesis: var(--font-synthesis-branded);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.battle-readiness-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  min-width: 0;
+  margin: 0;
+}
+
+.battle-readiness-value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.battle-readiness-value dt {
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.battle-readiness-value dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.battle-readiness-link {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  min-height: var(--tap-min);
+  color: var(--brand);
+  font-size: var(--text-micro);
+  text-decoration-color: color-mix(in srgb, var(--brand) 38%, transparent);
+  text-underline-offset: 0.18em;
+  transition: color var(--duration-ui) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .battle-readiness-link:hover {
+    color: var(--brand-hover);
+    text-decoration-color: currentColor;
+  }
+}
+
+.battle-readiness-link:focus-visible {
+  color: var(--brand-hover);
+  text-decoration-color: currentColor;
+}
+
+.battle-setup h2 {
+  margin-block-start: var(--space-1);
+}
+
+.battle-setup .section-actions {
+  margin-block-start: var(--space-4);
+}
+
+@media (max-width: 880px) {
+  .battle-choice > .battle-choice-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .battle-mode--sparring {
+    padding-inline-start: 0;
+    padding-block-start: var(--space-5);
+    border-inline-start: 0;
+    border-block-start: 1px solid var(--rule);
+  }
+}
+
+@media (max-width: 560px) {
+  .battle-readiness {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: var(--space-4);
+  }
+
+  .battle-readiness-link {
+    justify-self: start;
+  }
+
+  .battle-readiness-values {
+    gap: var(--space-2) var(--space-4);
+  }
+}
+
+@media (max-width: 520px) {
+  .battle-encounter {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .battle-encounter-marker {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .battle-encounter:not(:last-child)::after {
+    inset-block-start: calc(var(--space-3) + 2.25rem);
+    inset-inline-start: calc(1.125rem - 0.5px);
+  }
+
+  .battle-encounter[data-next="true"]:not(:last-child)::after {
+    inset-block-start: calc(var(--space-4) + 2.25rem);
+  }
+}
+
+.battle-page .page-head {
+  padding-block-start: var(--space-5);
+}

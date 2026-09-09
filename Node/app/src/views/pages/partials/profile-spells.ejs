@@ -1,0 +1,141 @@
+<% if (profile.isOwner) { %>
+  <section class="profile-spells" id="spells" data-explore aria-labelledby="profile-spells-title">
+    <div class="dashboard-card explore-summary profile-spells-overview">
+      <header class="dashboard-card-head profile-spells-head">
+        <div>
+          <h2 id="profile-spells-title">Spells</h2>
+          <p class="profile-note">
+            Bible reading earns Intelligence and increases mana. A reflection also
+            earns Wisdom, which unlocks spells permanently without being spent.
+          </p>
+        </div>
+      </header>
+
+      <dl class="explore-figures">
+        <div class="explore-figure">
+          <dt>Intelligence</dt>
+          <dd data-explore-intelligence><%= profile.stats.intelligence %></dd>
+        </div>
+        <div class="explore-figure">
+          <dt>Mana</dt>
+          <dd data-explore-mana><%= profile.derived.maxMana %></dd>
+        </div>
+        <div class="explore-figure">
+          <dt>Wisdom this month</dt>
+          <dd data-explore-wisdom><%= profile.stats.wisdom %></dd>
+        </div>
+        <div class="explore-figure">
+          <dt>Spells learned</dt>
+          <dd><span data-explore-unlocked><%= profile.spells.unlockedCount %></span> of <%= profile.spells.catalog.length %></dd>
+        </div>
+        <div class="explore-figure">
+          <dt>Carried into battle</dt>
+          <dd data-loadout-count><%= (profile.spells.equipped || []).length %> of <%= profile.spells.limit || 3 %> equipped</dd>
+        </div>
+      </dl>
+
+      <% if (profile.spells.unlockedCount > 0) { %>
+        <p class="profile-note profile-loadout-note">
+          Equip up to <%= profile.spells.limit || 3 %> learned spells for battle.
+          The rest remain learned and can be swapped in at any time.
+        </p>
+      <% } %>
+
+      <% if (!profile.allocation.confirmed) { %>
+        <p class="profile-note profile-spells-setup">
+          Confirm your base points above before learning a spell.
+        </p>
+      <% } %>
+    </div>
+
+    <div class="explore-path">
+      <h3 class="explore-section-title">Spell path</h3>
+
+      <ol class="explore-list">
+        <% profile.spells.catalog.forEach((spell, index) => { %>
+          <li
+            class="explore-item"
+            data-spell="<%= spell.key %>"
+            data-state="<%= spell.unlocked ? "unlocked" : (spell.available ? "available" : "locked") %>"
+            <% if (spell.unlocked) { %>data-equipped="<%= spell.equipped ? "true" : "false" %>"<% } %>
+          >
+            <div class="explore-marker" aria-hidden="true"><%= index + 1 %></div>
+
+            <details class="explore-card">
+              <summary class="explore-summary-row">
+                <span class="explore-summary-text">
+                  <span class="explore-spell-name"><%= spell.name %></span>
+                  <span class="explore-spell-summary"><%= spell.summary %></span>
+                </span>
+                <span class="explore-state" data-spell-state>
+                  <% if (spell.unlocked && spell.equipped) { %>
+                    Carried into battle
+                  <% } else if (spell.unlocked) { %>
+                    Learned
+                  <% } else if (spell.available && profile.allocation.confirmed) { %>
+                    Ready to learn
+                  <% } else if (spell.available) { %>
+                    Confirm base points
+                  <% } else { %>
+                    Needs <%= spell.wisdomRemaining %> more Wisdom
+                  <% } %>
+                </span>
+                <span class="explore-chevron" aria-hidden="true"></span>
+              </summary>
+
+              <div class="explore-card-body">
+                <dl class="explore-spell-meta">
+                  <div><dt>Mana cost</dt><dd><%= spell.manaCost %></dd></div>
+                  <div><dt>Wisdom needed</dt><dd><%= spell.wisdomRequired %></dd></div>
+                  <div><dt>Target</dt><dd><%= spell.target === "SELF" ? "Yourself" : "Opponent" %></dd></div>
+                  <% if (spell.cooldownTurns) { %>
+                    <div><dt>Cooldown</dt><dd><%= spell.cooldownTurns %> <%= spell.cooldownTurns === 1 ? "turn" : "turns" %></dd></div>
+                  <% } %>
+                </dl>
+
+                <p class="explore-spell-tactic"><%= spell.tactic %></p>
+
+                <div class="explore-actions">
+                  <% if (spell.unlocked) { %>
+                    <%
+                    const loadoutFull = (profile.spells.equipped || []).length >= (profile.spells.limit || 3);
+                    const blocked = !spell.equipped && loadoutFull;
+                    %>
+                    <button
+                      class="explore-button explore-loadout-toggle"
+                      type="button"
+                      data-loadout-toggle="<%= spell.key %>"
+                      aria-pressed="<%= spell.equipped ? "true" : "false" %>"
+                      aria-describedby="loadout-note-<%= spell.key %>"
+                      <%= blocked ? "disabled" : "" %>
+                    ><%= spell.equipped ? "Unequip" : "Equip" %></button>
+                    <p class="explore-note" id="loadout-note-<%= spell.key %>" data-spell-note>
+                      <%= spell.equipped
+                        ? "This spell is carried into your next battle."
+                        : blocked
+                          ? "Unequip one first: you can carry three."
+                          : "Learned. Equip it to carry it into your next battle." %>
+                    </p>
+                  <% } else if (spell.available && profile.allocation.confirmed) { %>
+                    <button class="explore-button explore-button-primary" type="button" data-spell-unlock="<%= spell.key %>">
+                      Learn <%= spell.name %>
+                    </button>
+                  <% } else if (spell.available) { %>
+                    <p class="explore-note" data-spell-note>Confirm your base points above first.</p>
+                  <% } else { %>
+                    <p class="explore-note" data-spell-note>
+                      Write a reflection with your Bible reading to earn more Wisdom.
+                    </p>
+                  <% } %>
+                </div>
+              </div>
+            </details>
+          </li>
+        <% }) %>
+      </ol>
+
+      <p class="explore-error" data-explore-error role="alert" hidden></p>
+      <p class="visually-hidden" data-explore-status role="status" aria-live="polite"></p>
+    </div>
+  </section>
+<% } %>

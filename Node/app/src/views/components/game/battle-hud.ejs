@@ -1,0 +1,69 @@
+<%
+
+const isYou = side === "you";
+%>
+<div class="battle-hud battle-hud-<%= side %>" data-hud="<%= side %>">
+  <div class="battle-plate">
+    <span class="battle-plate-emblem" aria-hidden="true">
+      <%- include("./battle-glyph", { name: isYou ? "lantern" : "cloud" }) %>
+    </span>
+
+    <div class="battle-plate-body">
+      <p class="battle-plate-name" data-<%= side %>-name><%= isYou ? "You" : "Opponent" %></p>
+
+      <div class="battle-meter">
+        <span class="battle-meter-label">HP</span>
+        <span class="battle-meter-value">
+          <span class="battle-meter-now" data-<%= side %>-health>0</span><span class="battle-meter-sep">/</span><span data-<%= side %>-maxhealth>0</span>
+        </span>
+      </div>
+      <div class="battle-track battle-track-health" data-danger="false" aria-hidden="true">
+        <span class="battle-track-lag" data-<%= side %>-health-lag></span>
+        <span class="battle-track-fill" data-<%= side %>-health-bar></span>
+      </div>
+
+      <% if (isYou) { %>
+        <div class="battle-meter battle-meter-quiet">
+          <span class="battle-meter-label">Mana</span>
+          <span class="battle-meter-value">
+            <span data-you-mana>0</span><span class="battle-meter-sep">/</span><span data-you-maxmana>0</span>
+          </span>
+        </div>
+        <div class="battle-track battle-track-mana" aria-hidden="true">
+          <span class="battle-track-fill" data-you-mana-bar></span>
+        </div>
+      <% } %>
+
+      <div class="battle-resolve" data-<%= side %>-resolve-group hidden>
+        <div class="battle-meter battle-meter-quiet">
+          <span class="battle-meter-label">Resolve</span>
+          <span class="battle-meter-value">
+            <span data-<%= side %>-resolve>0</span><span class="battle-meter-sep">/</span><span data-<%= side %>-maxresolve>100</span>
+          </span>
+        </div>
+        <div class="battle-track battle-track-resolve" aria-hidden="true">
+          <span class="battle-track-fill" data-<%= side %>-resolve-bar></span>
+        </div>
+      </div>
+
+      <ul class="battle-status" data-<%= side %>-status></ul>
+    </div>
+  </div>
+
+  <% if (isYou) { %>
+    <p class="battle-turn-chip" data-turn-chip hidden>Your turn</p>
+  <% } else { %>
+
+    <details class="battle-intent" data-battle-intent hidden>
+      <summary class="battle-intent-chip">
+        <span class="battle-intent-mark" data-intent-mark aria-hidden="true"></span>
+        <span class="battle-intent-text">
+          <span class="battle-intent-label" data-intent-label></span>
+          <span class="battle-intent-preview" data-intent-preview></span>
+        </span>
+        <span class="battle-intent-severity" data-intent-severity></span>
+      </summary>
+      <p class="battle-intent-counter" data-intent-counter></p>
+    </details>
+  <% } %>
+</div>

@@ -1,0 +1,614 @@
+<main id="main-content" tabindex="-1" class="dashboard-page help-page">
+  <div class="page-shell help-container">
+
+      <header class="help-head">
+        <h1 class="help-title">Help</h1>
+        <p class="help-intro">
+          What Achimari records, how a day becomes a character, and exactly what
+          other people can see.
+        </p>
+      </header>
+
+      <nav class="help-toc" aria-labelledby="help-toc-title">
+        <h2 id="help-toc-title" class="help-toc-title">On this page</h2>
+        <ol class="help-toc-list">
+          <li><a href="#what-noor-does">What Achimari does</a></li>
+          <li><a href="#daily-check-in">Daily recovery check-in</a></li>
+          <li><a href="#catch-up">Catching up on days you missed</a></li>
+          <li><a href="#bible">Bible reading, passages and reflections</a></li>
+          <li><a href="#tasks">Daily tasks and the five-task rule</a></li>
+          <li><a href="#stats">How each stat is earned</a></li>
+          <li><a href="#allocation">Your ten base points</a></li>
+          <li><a href="#streaks">What each streak counts</a></li>
+          <li><a href="#achievements">Achievements</a></li>
+          <li><a href="#profile">Your profile and appearance</a></li>
+          <li><a href="#privacy">Privacy: what others can see</a></li>
+          <li><a href="#spells">Spells, learning and what you carry</a></li>
+          <li><a href="#combat">Health, damage, speed, mana and turn order</a></li>
+          <li><a href="#follow-ups">Reading a move: Exposed and Riposte</a></li>
+          <li><a href="#pve">PvE Trials</a></li>
+          <li><a href="#pvp">PvP Sparring</a></li>
+          <li><a href="#timezone">Region and time zone</a></li>
+          <li><a href="#settings">Settings and editing today's answers</a></li>
+          <li><a href="#accessibility">Accessibility and reduced motion</a></li>
+          <li><a href="#trouble">Troubleshooting and getting help</a></li>
+        </ol>
+      </nav>
+
+      <div class="help-article">
+        <section class="help-section" id="what-noor-does">
+          <h2>What Achimari does</h2>
+          <p>
+            Achimari helps you keep three daily practices: staying strong in recovery,
+            reading your Bible, and finishing what you planned. It records what you
+            actually did, shows your history honestly, and turns that history into
+            a character you can take into a tactical trial.
+          </p>
+          <p>
+            The game layer never changes the record. Nothing you do in a battle
+            alters a check-in, a task or a reflection, and nothing you do in a
+            battle earns a stat.
+          </p>
+        </section>
+
+        <section class="help-section" id="daily-check-in">
+          <h2>Daily recovery check-in</h2>
+          <p>
+            Once each day the app asks whether you stayed strong. Answering stores
+            a yes or a no against that day. Today opens the three questions in one
+            place: the recovery check, the reading check, and the tasks you planned.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/daily-check-in.webp" alt="The Today page: the heading and the date over a band of sky, a three-part summary reading Strong Yes, Bible Yes and Tasks 5 of 5 done, then the Strong question with YES selected and filled green, the time until the next answer, and the Bible reading question below it." loading="lazy" width="1280" height="800" />
+            <figcaption>Today, with all three practices recorded and the summary at the top.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="catch-up">
+          <h2>Catching up on days you missed</h2>
+          <p>
+            If a day went by without an answer, it is not lost. A <strong>Catch
+            up</strong> card appears at the top of Today listing the days you have
+            left unfinished, oldest first, a few at a time, with a count of how
+            many remain. Each row is one activity on one date, so a day where you
+            recorded your recovery answer but not your reading offers only the
+            reading.
+          </p>
+          <p>
+            Only a day with <em>no record at all</em> for an activity is offered.
+            A day you answered no, or a day whose tasks you left unfinished, is
+            history rather than a gap, and it is never offered again. Today is
+            never treated as missed while it is still running.
+          </p>
+          <p>
+            Answering a missed day earns exactly the stats that day qualifies
+            for, counted in the month that day belongs to — not the month you
+            answered it in.
+          </p>
+        </section>
+
+        <section class="help-section" id="bible">
+          <h2>Bible reading, passages and reflections</h2>
+          <p>
+            The reading check asks whether you read today. If you answer yes, you
+            choose the passages you read — book, chapter and a verse range, as many
+            passages as you like — and may write a short reflection. The reflection
+            is yours: nobody judges it, and its content is never scored. Only
+            whether you wrote one at all is ever looked at.
+          </p>
+        </section>
+
+        <section class="help-section" id="tasks">
+          <h2>Daily tasks and the five-task rule</h2>
+          <p>
+            You can plan up to <%= help.requiredGoals %> tasks a day and tick them
+            off as you finish. Two different things count them, and it is worth
+            knowing the difference:
+          </p>
+          <ul class="help-list">
+            <li>
+              <strong>The Tasks streak</strong> counts any day where you finished
+              everything you planned, even if that was two tasks.
+            </li>
+            <li>
+              <strong>Dexterity</strong> is stricter: it needs a full day of
+              <%= help.requiredGoals %> tasks with all <%= help.requiredGoals %>
+              complete. Four out of four finishes your day but earns no Dexterity.
+            </li>
+          </ul>
+        </section>
+
+        <section class="help-section" id="stats">
+          <h2>How each stat is earned</h2>
+          <p>
+            Each stat is earned at most once per day, and only from what you
+            actually recorded for that day.
+          </p>
+          <p>
+            Earned stats are a monthly figure. On the first day of each month
+            they start again at zero, and build back up from that month's days.
+            Your <%= help.basePoints %> base points are permanent and are never
+            touched by this, and nothing is deleted: every day you recorded stays
+            on your record.
+          </p>
+          <div class="help-table-wrap">
+            <table class="help-table">
+              <caption class="visually-hidden">How each character stat is earned</caption>
+              <thead>
+                <tr><th scope="col">Stat</th><th scope="col">Earned when</th><th scope="col">What it affects</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Strength</th><td>Your recovery answer for that day was yes.</td><td>Health and damage</td></tr>
+                <tr><th scope="row">Dexterity</th><td>You planned <%= help.requiredGoals %> tasks that day and completed all <%= help.requiredGoals %>.</td><td>How often you act</td></tr>
+                <tr><th scope="row">Intelligence</th><td>Your Bible reading answer for that day was yes.</td><td>Mana, and how strongly your spells land</td></tr>
+                <tr><th scope="row">Wisdom</th><td>You answered yes to reading and wrote a reflection with it.</td><td>Unlocks spells</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            If you change an answer, the stat changes with it. Switching today's
+            recovery answer from yes to no gives that point back; writing a
+            reflection you had deleted earns the Wisdom point again. Points are
+            tied to the day they came from, so changing your time zone never
+            duplicates or loses them.
+          </p>
+        </section>
+
+        <section class="help-section" id="allocation">
+          <h2>Your ten base points</h2>
+          <p>
+            Everyone starts with <%= help.basePoints %> points to spend across
+            Strength, Dexterity and Intelligence on My Profile. Wisdom cannot
+            receive base points: it is only ever earned by reflecting on what you
+            read.
+          </p>
+          <p>
+            You can change your <%= help.basePoints %> points freely until you
+            start your first battle. Starting a battle locks them, and there is no
+            way to reset them afterwards, so spend them the way you want to play.
+            Points you earn from your days are added on top of the locked base.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/profile.webp" alt="My Profile: the name and emblem over a band of sky, then two columns — Base points with minus and plus steppers for Strength, Dexterity and Intelligence and a note of what each earned this month, beside Character, which lists the four stats with their totals and the health, damage, speed, mana and spells-unlocked figures they produce." loading="lazy" width="1280" height="800" />
+            <figcaption>My Profile: base points on the left, the character they produce on the right.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="streaks">
+          <h2>What each streak counts</h2>
+          <ul class="help-list">
+            <li><strong>Strong streak</strong> — consecutive days you answered yes to the recovery check.</li>
+            <li><strong>Bible streak</strong> — consecutive days you answered yes to the reading check.</li>
+            <li><strong>Tasks streak</strong> — consecutive days you finished every task you planned.</li>
+          </ul>
+          <p>
+            Each streak opens to show its current run, your best run, how many days
+            qualified, how many you recorded at all, and how many days you were
+            inactive — followed by every recorded day with its answer.
+          </p>
+          <p>
+            Today stays open: an unfinished today does not break a streak until the
+            day ends. Every streak is counted in your own time zone.
+          </p>
+        </section>
+
+        <section class="help-section" id="achievements">
+          <h2>Achievements</h2>
+          <p>
+            There are <%= help.achievements.total %> achievements, reached from the
+            account menu or from My Profile. They are <strong>recognition
+            only</strong>: an achievement grants no stat, no Wisdom, no spell, no
+            rating and no advantage of any kind in a battle, and nothing on the
+            page ranks you against another person.
+          </p>
+          <ul class="help-list">
+            <% help.achievements.categories.forEach((category) => { %>
+              <li><strong><%= category.name %></strong> — <%= category.description %></li>
+            <% }) %>
+          </ul>
+          <p>
+            Every requirement is written out in full, and each one shows how far
+            along it you are, so nothing is hidden behind a question mark. The page
+            also names the three you are closest to and links straight to the place
+            you would make progress on them. Only the server decides that something
+            is earned, and an earned achievement is permanent.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/achievements.webp" alt="The Achievements page: a heading over a band of sky with 7 of 26 earned and a progress bar, then Latest earned showing First Step with its requirement and date beside Closest next listing Strong Start, Three Days Reading and Plans in Motion with their progress, then filter chips for All, Earned, In progress and Not started above the Foundations category." loading="lazy" width="1280" height="800" />
+            <figcaption>Achievements: what you earned last, what you are closest to, and every requirement in full.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="profile">
+          <h2>Your profile and appearance</h2>
+          <p>
+            Your profile lives at <code>/profile</code>, and other people see it at
+            <code>/profile/</code> followed by your id. You can choose an emblem
+            and an accent colour from a fixed set. There are no uploads. Older
+            links to <code>/customer/</code> and <code>/explore</code> still work:
+            they now open the profile.
+          </p>
+        </section>
+
+        <section class="help-section" id="privacy">
+          <h2>Privacy: what others can see</h2>
+          <p>Anyone signed in can see, on your profile:</p>
+          <ul class="help-list">
+            <li>Your name, emblem and accent.</li>
+            <li>Your four stats and your health, damage, speed and mana.</li>
+            <li>How many spells you have unlocked — but not which ones, and not what you carry into battle.</li>
+            <li>
+              Your three streaks: the current and best run, the day counts, and
+              every day you recorded with its yes or no.
+            </li>
+          </ul>
+          <p>They cannot see:</p>
+          <ul class="help-list">
+            <li>Your achievements. They are private, and a profile that is not yours shows no link to them.</li>
+            <li>Your time zone, your Telegram connection, or anything about your account.</li>
+            <li>Your prayers.</li>
+            <li>
+              Your task text or your reflection, <strong>unless you switch sharing
+              on yourself</strong>. Both switches start off.
+            </li>
+          </ul>
+          <p>
+            While a switch is off, other people see the word <strong>Private</strong>
+            and nothing else — not how many tasks you planned, not what percentage
+            you finished, and not which passages you chose.
+          </p>
+        </section>
+
+        <section class="help-section" id="spells">
+          <h2>Spells, learning and what you carry</h2>
+          <p>
+            The Spells section in My Profile shows every spell in order of the
+            Wisdom it needs. When you have enough Wisdom, a Learn button appears.
+          </p>
+          <p>
+            Wisdom is a threshold, not a currency: unlocking a spell does not spend
+            it, and an unlocked spell stays unlocked forever. If you later delete a
+            reflection, that Wisdom point goes away but the spell you already
+            learned remains yours. The same is true of the monthly reset — your
+            Wisdom starts again at zero each month, and every spell you have
+            already learned stays learned. What a new month changes is only which
+            spell you can qualify for next, so a spell is earned inside one month.
+          </p>
+
+          <h3>Carrying <%= help.spellLimit %> into a battle</h3>
+          <p>
+            Learning a spell and taking it into a fight are two different things.
+            You may carry at most <strong><%= help.spellLimit %></strong> of your
+            learned spells at a time, and only those are available in a battle.
+            The rest stay learned and can be swapped in whenever you like — there
+            is no cost to changing your mind, and nothing is lost by unequipping.
+          </p>
+          <p>
+            A battle freezes what you carry at the moment it starts, so equipping
+            a spell mid-fight changes nothing about the fight you are already in.
+            Sparring also weighs the spells you carry, not the ones you have
+            merely collected, when it looks for an opponent of similar strength.
+          </p>
+
+          <div class="help-table-wrap">
+            <table class="help-table">
+              <caption class="visually-hidden">The spells and what they need</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Spell</th>
+                  <th scope="col">Wisdom</th>
+                  <th scope="col">Mana</th>
+                  <th scope="col">Cooldown</th>
+                  <th scope="col">Effect</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% help.spells.forEach((spell) => { %>
+                  <tr>
+                    <th scope="row"><%= spell.name %></th>
+                    <td><%= spell.wisdomRequired %></td>
+                    <td><%= spell.manaCost %></td>
+                    <td>
+                      <% if (spell.cooldownTurns) { %>
+                        <%= spell.cooldownTurns %> <%= spell.cooldownTurns === 1 ? "turn" : "turns" %>
+                      <% } else { %>
+                        None
+                      <% } %>
+                    </td>
+                    <td><%= spell.summary %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            A cooldown counts <em>your own</em> turns, not the opponent's, so a
+            <%= help.spells[0].cooldownTurns %>-turn cooldown means the spell is
+            unavailable for your next
+            <%= help.spells[0].cooldownTurns %> decisions. Mana alone made the best
+            spell you could afford worth repeating until the bar ran dry; a
+            cooldown makes casting it a question of when.
+          </p>
+          <p>
+            The numbers in the table are the baseline. In a trial, a spell's effect
+            grows with the Intelligence your character had when the battle began,
+            so a spell you learned early does not quietly become worthless as you
+            grow.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/spells.webp" alt="The Spells section of My Profile: Intelligence, mana, Wisdom this month, spells learned as 1 of 7 and Carried into battle as 1 of 3 equipped, then the numbered spell path with Steady Breath opened to show its mana cost, Wisdom needed, target, a 2-turn cooldown, a line of tactical advice and an Unequip button." loading="lazy" width="1280" height="800" />
+            <figcaption>The spell path, with one spell opened to show its cost, its cooldown and whether it is carried.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="combat">
+          <h2>Health, damage, speed, mana and turn order</h2>
+          <ul class="help-list">
+            <li>Health is <%= help.combat.BASE_HEALTH %> plus <%= help.combat.HEALTH_PER_STRENGTH %> for each point of Strength.</li>
+            <li>Damage is <%= help.combat.BASE_DAMAGE %> plus <%= help.combat.DAMAGE_PER_STRENGTH %> for each point of Strength.</li>
+            <li>Mana is <%= help.combat.BASE_MANA %> plus <%= help.combat.MANA_PER_INTELLIGENCE %> for each point of Intelligence.</li>
+            <li>Speed is your Dexterity, and never less than <%= help.combat.MIN_SPEED %>.</li>
+          </ul>
+          <p>
+            Turns are not strictly alternating. Each side fills a gauge at its own
+            speed and acts when the gauge is full, then pays it down. Twice the
+            Dexterity means roughly twice as many turns, and a much faster
+            character can act twice in a row. The battle screen shows the next few
+            turns so this is never a mystery.
+          </p>
+          <p>
+            Spells cost mana, and health and mana both start every battle full.
+            Resolve does not: it starts at zero and is built during the battle.
+          </p>
+
+          <h3>The four actions</h3>
+          <div class="help-table-wrap">
+            <table class="help-table">
+              <caption class="visually-hidden">The four battle actions</caption>
+              <thead>
+                <tr><th scope="col">Action</th><th scope="col">What it does</th><th scope="col">Resolve</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Attack</th>
+                  <td>Your basic damage. Reliable, and never the wrong answer.</td>
+                  <td>+<%= help.combat.RESOLVE_ON_ATTACK %></td>
+                </tr>
+                <tr>
+                  <th scope="row">Guard</th>
+                  <td>Halves the next hit you take, then wears off. It does not stack.</td>
+                  <td>+<%= help.combat.RESOLVE_ON_GUARD_ABSORB %>, but only if it actually absorbs a hit</td>
+                </tr>
+                <tr>
+                  <th scope="row">Break</th>
+                  <td>
+                    Removes a guard before it can absorb anything and hits for
+                    <%= Math.round(help.combat.BREAK_GUARDED_MULTIPLIER * 100) %>%.
+                    Against someone who is not guarding it is only
+                    <%= Math.round(help.combat.BREAK_UNGUARDED_MULTIPLIER * 100) %>%.
+                  </td>
+                  <td>+<%= help.combat.RESOLVE_ON_BREAK %></td>
+                </tr>
+                <tr>
+                  <th scope="row">Surge</th>
+                  <td>
+                    Hits for <%= Math.round(help.combat.SURGE_MULTIPLIER * 100) %>%.
+                    A guard still halves it, so it is strongest when it is not expected.
+                  </td>
+                  <td>&minus;<%= help.combat.SURGE_COST %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Resolve runs from 0 to <%= help.combat.RESOLVE_MAX %> and its only use
+            is Surge. That is what makes each turn a choice: guarding is right when
+            you expect a hit and wasted when you do not, Break answers a guard and
+            is weak against anything else, and a full Resolve bar is visible to
+            your opponent, so a Surge can be read and answered.
+          </p>
+          <p>
+            A shield from a spell can absorb at most
+            <%= Math.round(help.combat.SHIELD_CAP_RATIO * 100) %>% of the maximum
+            health of whoever receives it, so it can never grow past being a
+            decision. A burn that is cast again keeps the stronger amount per turn
+            and refreshes its duration rather than starting a second burn: two
+            burns never tick at once.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/battle.webp" alt="A trial in progress against the sky: your character on the left with health, mana and Resolve bars, The Doubt on the right with its own bars and an Exposed chip beneath them, a Your turn marker, an announced next move reading Bracing, halves the next hit it takes, marked Light, and the command dock with Attack, Guard, Break, Surge, Spells and More." loading="lazy" width="1280" height="800" />
+            <figcaption>A trial in progress: both sets of figures, the trial's announced next move, and one command dock.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="follow-ups">
+          <h2>Reading a move: Exposed and Riposte</h2>
+          <p>
+            A read that lands earns a follow-up rather than ending at the damage
+            number. There are two, both shown as a small chip beside the character
+            that holds one.
+          </p>
+          <div class="help-table-wrap">
+            <table class="help-table">
+              <caption class="visually-hidden">The two follow-up charges</caption>
+              <thead>
+                <tr><th scope="col">Charge</th><th scope="col">Earned by</th><th scope="col">Spent on</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Exposed</th>
+                  <td>A Break that actually finds a guard. The charge lands on the one who guarded.</td>
+                  <td>
+                    The next direct hit against them, for
+                    <%= Math.round(help.combat.EXPOSED_MULTIPLIER * 100) %>%.
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Riposte</th>
+                  <td>A guard that actually absorbs a hit. The charge lands on the defender.</td>
+                  <td>
+                    Their next basic Attack, for
+                    <%= Math.round(help.combat.RIPOSTE_MULTIPLIER * 100) %>%.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Neither ever stacks: earning one you already hold refreshes it and
+            nothing more. Each is spent by one kind of action only — a Riposte
+            waits for a basic Attack and is not spent by a Break, a Surge or a
+            spell — and a lingering burn never consumes either. When both apply to
+            the same hit, both multipliers count.
+          </p>
+          <p>
+            Guarding into nothing still costs you a turn, and a Break into an open
+            stance is still weak. The follow-ups reward the read, not the habit.
+          </p>
+        </section>
+
+        <section class="help-section" id="pve">
+          <h2>PvE Trials</h2>
+          <p>
+            Three trials, in order, against things that get in the way rather than
+            against people:
+          </p>
+          <ul class="help-list">
+            <% help.encounters.forEach((encounter) => { %>
+              <li><strong><%= encounter.name %></strong> — <%= encounter.blurb %></li>
+            <% }) %>
+          </ul>
+          <p>
+            Each stays locked until you have finished the one before it, and each
+            teaches something different: the first the guard and its answer, the
+            second pressure and the cost of guarding out of habit, the third
+            banking Resolve and spending it at the right moment. A finished trial
+            can always be faced again.
+          </p>
+
+          <h3>Announced moves</h3>
+          <p>
+            A trial says what it will do next, in words: a name for the move, how
+            heavy it is, the damage it would deal if you do nothing, and the honest
+            counter. What is shown is what happens — the trial checks that it can
+            afford a move before announcing it, so an announced Surge is one it has
+            the Resolve for and an announced spell is one it has the mana and the
+            cooldown for. It never re-reads your choice and swaps the move after
+            announcing it.
+          </p>
+          <p>
+            The pattern also changes as the trial weakens. Above
+            <%= Math.round(help.phases.pressure * 100) %>% health it fights one
+            way; at or below <%= Math.round(help.phases.pressure * 100) %>% it
+            presses harder, and the last trial has a final stance at or below
+            <%= Math.round(help.phases.lastStand * 100) %>% that it announces
+            before it spends everything on one heavy blow — which a guard still
+            halves. Each change is called out once, when it happens.
+          </p>
+          <p>
+            A trial obeys exactly the rules you do, Resolve and cooldowns
+            included, and it holds no hidden state. It is set slightly above your
+            current strength when you start it, within limits for that chapter, so
+            an early trial genuinely becomes easier as you grow. However it is
+            built, it is never more than
+            <%= help.combat.BOSS_SPEED_RATIO_CAP %> times your speed, so it cannot
+            bury you in turns before you have made a decision.
+            Reopening or refreshing a trial keeps the same opponent: it never
+            rerolls an easier one. A battle also keeps the character you had when
+            it started, so a new month cannot change a battle already under way.
+            Trials give no stats, no items and no currency.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/battle-entry.webp" alt="The Battle page: a heading over a band of sky, then Choose a battle with the three trials in a numbered course — The Doubt marked Completed in 15 turns with a Face again option, The Distraction marked Open with a Begin trial button, and The Discouragement marked Locked reading Finish The Distraction first — beside a Friendly spar panel with a Find opponent button." loading="lazy" width="1280" height="800" />
+            <figcaption>The Battle page: the trials in order, and sparring alongside them.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="pvp">
+          <h2>PvP Sparring</h2>
+          <p>
+            Press Find opponent and you enter a queue. Achimari looks for someone of
+            similar strength and widens that range the longer you wait. Strength
+            here counts the spells you actually carry, not everything you have
+            learned. You can cancel at any time while searching, and the search
+            times out on its own after about
+            <%= help.pvp.queueTimeoutMinutes %> minutes if nobody suitable appears.
+          </p>
+          <p>
+            When two people match, the server creates one battle and takes a
+            snapshot of both characters, so progress made during the match changes
+            nothing. Unlike a trial, a sparring partner never announces their next
+            move. You act only when it is your turn. If you close the page and
+            come back, you return to the same battle exactly where it was.
+          </p>
+          <% if (!help.tactics.inSparring) { %>
+            <p>
+              Sparring deliberately runs one ruleset behind the trials. Guard,
+              Break, Surge, Resolve and spells all work exactly as described above,
+              but the follow-up charges, spell cooldowns and Intelligence-scaled
+              spell effects are trial-only for now: they were verified against a
+              single-player harness, and fairness between two people needs a check
+              that has not been run yet.
+            </p>
+          <% } %>
+          <p>
+            You can forfeit at any point, which hands your opponent the win. If you
+            leave a turn unanswered for more than about
+            <%= help.pvp.actionTimeoutSeconds %> seconds, the match ends the same
+            way. Sparring is friendly: there is no ranking, no public record and
+            nothing to win but the match.
+          </p>
+        </section>
+
+        <section class="help-section" id="timezone">
+          <h2>Region and time zone</h2>
+          <p>
+            Your day starts and ends in your own time zone, which you set from the
+            account menu. Everything is counted in that zone, including streaks.
+            Changing it affects which day is "today" from that moment on; it never
+            rewrites days you already recorded, and it never changes stats you
+            already earned.
+          </p>
+          <figure class="help-figure">
+            <img src="/images/help/account-menu.webp" alt="The account menu open below the profile identity button at the right of the header, listing My Profile and Achievements, a Region / time zone section showing the current zone as a button, then Settings, Help and Logout." loading="lazy" width="1280" height="800" />
+            <figcaption>The account menu, opened from the profile identity button in the header.</figcaption>
+          </figure>
+        </section>
+
+        <section class="help-section" id="settings">
+          <h2>Settings and editing today's answers</h2>
+          <p>
+            Settings holds your nickname, your password, and today's recovery and
+            Bible answers. Changing today's answer updates the stat it earned, in
+            both directions.
+          </p>
+        </section>
+
+        <section class="help-section" id="accessibility">
+          <h2>Accessibility and reduced motion</h2>
+          <ul class="help-list">
+            <li>Every page works with the keyboard alone. Panels return focus to the control that opened them, and Escape closes them.</li>
+            <li>Health, mana, results, battle statuses and privacy states are always written in words, never shown by colour alone.</li>
+            <li>If your system asks for reduced motion, animations are removed rather than merely shortened.</li>
+            <li>If your system asks for reduced transparency, translucent panels become solid.</li>
+            <li>The layout is built for narrow phones as well as wide screens.</li>
+          </ul>
+        </section>
+
+        <section class="help-section" id="trouble">
+          <h2>Troubleshooting and getting help</h2>
+          <ul class="help-list">
+            <li><strong>A stat did not appear.</strong> Check the day it should have come from. Dexterity in particular needs a full <%= help.requiredGoals %> tasks, all complete.</li>
+            <li><strong>My points will not change.</strong> They lock permanently when you start your first battle.</li>
+            <li><strong>A spell is missing in a battle.</strong> Only the <%= help.spellLimit %> you were carrying when the battle began are available, and a spell you have just cast waits out its cooldown.</li>
+            <li><strong>A trial is locked.</strong> Finish the trial before it. The three are a course, taken in order.</li>
+            <li><strong>A battle says it moved on.</strong> Someone acted before your request arrived. The page reloads the real state; nothing was lost.</li>
+            <li><strong>Searching never finds anyone.</strong> Nobody else is queued right now. The search widens automatically, then times out so you can try later.</li>
+            <li><strong>Something looks wrong.</strong> Reload first. If it persists, contact whoever runs your Achimari instance, and never share your password with anyone, including them.</li>
+          </ul>
+        </section>
+      </div>
+
+  </div>
+  <%- include("../../components/layout/footer") %>
+</main>

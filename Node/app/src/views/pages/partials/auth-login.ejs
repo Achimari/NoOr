@@ -1,11 +1,18 @@
-<main class="auth-page">
+<%
+  const formErrors = typeof errors === "undefined" ? [] : errors;
+  const byField = typeof fieldErrors === "undefined" || !fieldErrors ? {} : fieldErrors;
+  const submitted = typeof values === "undefined" || !values ? {} : values;
+  const attributed = new Set(Object.values(byField).flat());
+  const generalErrors = formErrors.filter((message) => !attributed.has(message));
+%>
+<main id="main-content" tabindex="-1" class="auth-page">
   <section class="section auth-section">
     <div class="container auth-container">
-      <div class="auth-brand" aria-label="NoOr">
-        <img src="/Logo.png" alt="NoOr" draggable="false" />
+      <div class="auth-brand">
+        <%- include("../../components/ui/brand-mark", { tone: "chrome", size: "lead" }) %>
       </div>
 
-      <form class="auth-card" action="/login" method="post">
+      <form class="auth-card" action="/login" method="post" novalidate>
         <header class="auth-head">
           <h1 class="auth-title"><%= t("auth.login.title") %></h1>
           <% if (t("auth.login.subtitle")) { %>
@@ -13,40 +20,52 @@
           <% } %>
         </header>
 
-        <% if (typeof errors !== "undefined" && errors.length) { %>
+        <% if (generalErrors.length) { %>
           <div class="auth-errors" role="alert">
-            <% errors.forEach((error) => { %>
+            <% generalErrors.forEach((error) => { %>
               <p><%= error %></p>
             <% }) %>
           </div>
         <% } %>
 
-        <label class="auth-field">
-          <span><%= t("auth.login.loginLabel") %></span>
-          <input type="text" name="login" autocomplete="username" value="<%= typeof values !== "undefined" ? values.login || "" : "" %>" required />
-        </label>
+        <div class="field auth-field">
+          <label class="field-label" for="login-name"><%= t("auth.login.loginLabel") %></label>
+          <input
+            class="field-input"
+            id="login-name"
+            type="text"
+            name="login"
+            autocomplete="username"
+            spellcheck="false"
+            autocapitalize="none"
+            value="<%= submitted.login || "" %>"
+            <% if ((byField.name || byField.login || []).length) { %>aria-invalid="true" aria-describedby="login-name-error"<% } %>
+            required
+          />
+          <% if ((byField.name || byField.login || []).length) { %>
+            <p class="field-error" id="login-name-error"><%= (byField.name || byField.login).join(" ") %></p>
+          <% } %>
+        </div>
 
-        <label class="auth-field">
-          <span><%= t("auth.login.passwordLabel") %></span>
-          <input type="password" name="password" autocomplete="current-password" required />
-        </label>
+        <div class="field auth-field">
+          <label class="field-label" for="login-password"><%= t("auth.login.passwordLabel") %></label>
+          <input
+            class="field-input"
+            id="login-password"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            <% if ((byField.password || []).length) { %>aria-invalid="true" aria-describedby="login-password-error"<% } %>
+            required
+          />
+          <% if ((byField.password || []).length) { %>
+            <p class="field-error" id="login-password-error"><%= byField.password.join(" ") %></p>
+          <% } %>
+        </div>
 
         <div class="auth-actions">
-          <%- include("../../components/ui/button", {
-            tag: "button",
-            type: "submit",
-            variant: "primary",
-            className: "auth-submit",
-            label: t("auth.login.submit")
-          }) %>
-
-          <%- include("../../components/ui/button", {
-            tag: "a",
-            href: "/onboarding",
-            variant: "secondary",
-            className: "auth-secondary",
-            label: t("auth.login.onboardingLink")
-          }) %>
+          <button class="ui-button ui-button--primary auth-submit" type="submit"><%= t("auth.login.submit") %></button>
+          <a class="ui-button ui-button--secondary auth-secondary" href="/onboarding"><%= t("auth.login.onboardingLink") %></a>
         </div>
       </form>
     </div>

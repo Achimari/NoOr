@@ -1,4 +1,4 @@
-/* ================= HOME PAGE DENSITY ================= */
+
 .home-page .section {
   padding: clamp(var(--space-5), 4.2vw, 46px) 0;
 }

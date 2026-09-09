@@ -1,6 +1,10 @@
+import { getDailyCheckInPageData } from "../services/checkInService.js";
 import { getLeaderboardSummary } from "../services/leaderboardService.js";
+import { getStreakLeaderboards } from "../services/streakLeaderboardService.js";
 import { getPrayers, getUserPrayers } from "../services/prayerService.js";
 import { getStatisticsSummary } from "../services/statisticsService.js";
+import { resolveStreakView } from "../domain/streakViews.js";
+import { getMissedActivities } from "../services/missedActivityService.js";
 import { readFileSync } from "node:fs";
 
 const motivationPhrases = JSON.parse(
@@ -27,7 +31,8 @@ export function renderPage({ view, pageId, titleKey }) {
     const viewData = {};
 
     if (pageId === "daily-check-in") {
-      viewData.leaderboard = await getLeaderboardSummary(req.user.id, req.user.timezone);
+      viewData.checkIn = await getDailyCheckInPageData(req.user.id, req.user.timezone);
+      viewData.missedActivities = await getMissedActivities(req.user.id, req.user.timezone);
     }
 
     if (pageId === "community") {
@@ -55,7 +60,23 @@ export function renderPage({ view, pageId, titleKey }) {
     }
 
     if (pageId === "statistics") {
-      viewData.statistics = await getStatisticsSummary(req.user.id);
+      const [statistics, recovery, streaks] = await Promise.all([
+        getStatisticsSummary(req.user.id),
+        getLeaderboardSummary(req.user.id, req.user.timezone),
+        getStreakLeaderboards(req.user.id),
+      ]);
+
+      viewData.statistics = statistics;
+      viewData.activeStreak = resolveStreakView(req.query.streak);
+      viewData.leaderboards = {
+        recovery: {
+          currentUserId: recovery.current.id,
+          overallBest: recovery.overallBest,
+          leaders: recovery.leaders,
+        },
+        reading: streaks.reading,
+        goals: streaks.goals,
+      };
     }
 
     res.render(`pages/${view}`, {

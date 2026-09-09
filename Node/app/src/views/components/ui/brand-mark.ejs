@@ -1,0 +1,9 @@
+<%
+
+  const brandTone = typeof tone === "undefined" ? "chrome" : tone;
+  const brandSize = typeof size === "undefined" ? "" : size;
+%>
+<span class="brand-lockup brand-lockup--<%= brandTone %><%= brandSize ? ` brand-lockup--${brandSize}` : "" %>">
+  <%- include("./brand-symbol", { className: "brand-symbol" }) %>
+  <span class="brand-wordmark">Achimari</span>
+</span>

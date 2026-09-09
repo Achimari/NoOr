@@ -1,0 +1,109 @@
+
+
+.ui-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgba(29, 29, 31, 0.40);
+  opacity: 0;
+  transition: opacity var(--duration-panel) var(--ease-out);
+}
+
+.ui-dialog-backdrop[data-open="true"] {
+  opacity: 1;
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .ui-dialog-backdrop {
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+}
+
+.ui-dialog {
+  width: 100%;
+  max-width: var(--measure-dialog);
+  max-height: min(85vh, 46rem);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-panel);
+
+  background: var(--surface);
+  box-shadow: var(--shadow-dialog);
+
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity var(--duration-panel) var(--ease-out),
+    transform var(--duration-panel) var(--ease-out);
+}
+
+.ui-dialog-backdrop[data-open="true"] .ui-dialog {
+  opacity: 1;
+  transform: none;
+}
+
+.ui-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-3);
+}
+
+.ui-dialog-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.ui-dialog-body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--space-5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ui-dialog-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+@media (max-width: 560px), (max-height: 480px) {
+  .ui-dialog-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .ui-dialog {
+    max-width: none;
+    max-height: 92vh;
+    border-start-start-radius: var(--radius-feature);
+    border-start-end-radius: var(--radius-feature);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+    transform: translateY(24px);
+
+    padding-block-end: env(safe-area-inset-bottom);
+    padding-inline-start: env(safe-area-inset-left);
+    padding-inline-end: env(safe-area-inset-right);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-dialog {
+    transform: none;
+  }
+}

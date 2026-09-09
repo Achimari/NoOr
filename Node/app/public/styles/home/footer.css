@@ -1,9 +1,9 @@
-/* ================= FOOTER ================= */
+
 .section.footer-info {
   padding: clamp(14px, 2.1vw, 20px) 0;
   margin-top: auto;
   background: var(--footer-bg);
-  border-top: 1px solid var(--white-10);
+  border-top: 1px solid var(--ink);
   color: var(--footer-text);
 }
 
@@ -23,7 +23,8 @@
 .footer-tagline {
   flex: 1 1 auto;
   margin: 0;
-  color: var(--white-54);
+
+  color: var(--footer-text);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.35;
@@ -46,17 +47,21 @@
   text-decoration: none;
   font-size: 26px;
   border-radius: 8px;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
-.footer-social:hover {
-  color: var(--footer-icon-hover);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .footer-social:hover {
+    color: var(--footer-icon-hover);
+    transform: translateY(-1px);
+  }
 }
 
 .footer-social:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+
+  outline-color: var(--focus-ring-on-deep);
 }
 
 .footer-text {

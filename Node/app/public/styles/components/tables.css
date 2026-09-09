@@ -1,0 +1,167 @@
+
+
+.data-table-wrap {
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table caption {
+  padding: var(--space-3) var(--space-4);
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  text-align: start;
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: start;
+  vertical-align: middle;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-block-end: 1px solid var(--separator);
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.data-table tbody tr + tr th,
+.data-table tbody tr + tr td {
+  border-block-start: 1px solid var(--separator);
+}
+
+.data-table tbody td {
+  color: var(--ink);
+  font-size: 0.9375rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .data-table tbody tr:hover td,
+  .data-table tbody tr:hover th {
+    background: var(--ink-06);
+  }
+}
+
+.data-table tbody tr:focus-within td,
+.data-table tbody tr:focus-within th {
+  background: var(--ink-06);
+}
+
+.data-table a {
+  color: var(--brand);
+  font-weight: 400;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .data-table a:hover {
+    color: var(--brand-hover);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+}
+
+.data-table a:focus-visible {
+  color: var(--brand-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.data-table tr[data-current-user] td,
+.data-table tr[data-current-user] th {
+  background: var(--surface-subtle);
+}
+
+.data-table-you {
+  margin-inline-start: var(--space-2);
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.data-table-name {
+  display: block;
+  min-width: 0;
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-table-rank {
+  width: 3rem;
+  color: var(--ink-muted);
+}
+
+.data-table-figure {
+  text-align: end;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .data-table--stack thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .data-table--stack tbody tr {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .data-table--stack tbody tr + tr {
+    border-block-start: 1px solid var(--separator);
+  }
+
+  .data-table--stack tbody th,
+  .data-table--stack tbody td {
+    padding: 0;
+    border: 0;
+  }
+
+  .data-table--stack .data-table-name {
+    max-width: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .data-table-wrap {
+    border-color: var(--ink);
+  }
+
+  .data-table thead th,
+  .data-table tbody tr + tr td,
+  .data-table tbody tr + tr th {
+    border-color: var(--ink-muted);
+  }
+}

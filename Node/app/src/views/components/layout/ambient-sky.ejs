@@ -1,0 +1,67 @@
+
+<div class="app-sky ambient-video" data-app-sky data-ambient-video data-state="neutral" aria-hidden="true">
+  <video class="ambient-video__media app-sky__media" muted loop playsinline preload="none" poster="/videos/ambient-sky.jpg" tabindex="-1">
+    <source data-src="/videos/ambient-sky.webm" type="video/webm" />
+    <source data-src="/videos/ambient-sky.mp4" type="video/mp4" />
+  </video>
+  <div class="ambient-video__tint"></div>
+  <div class="ambient-video__vignette"></div>
+</div>
+<script>
+  (function () {
+    var script = document.currentScript;
+    var sky = script && script.previousElementSibling;
+    var video = sky && sky.querySelector("video");
+    if (!sky || !video) return;
+
+    var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    var connection = navigator.connection;
+    var sourcesLoaded = false;
+
+    function playbackAllowed() {
+      return !reducedMotion.matches && !connection?.saveData && !document.hidden;
+    }
+
+    function loadSources() {
+      if (sourcesLoaded) return;
+      video.querySelectorAll("source[data-src]").forEach(function (source) {
+        source.src = source.dataset.src;
+      });
+      sourcesLoaded = true;
+      video.load();
+    }
+
+    function showFallback() {
+      sky.classList.add("is-fallback");
+      video.pause();
+    }
+
+    function syncPlayback() {
+      if (!playbackAllowed()) {
+        video.pause();
+        return;
+      }
+
+      loadSources();
+      var playback = video.play();
+      if (playback && typeof playback.catch === "function") {
+        playback.catch(function () {
+          sky.classList.add("is-paused");
+        });
+      }
+    }
+
+    video.addEventListener("playing", function () {
+      sky.classList.remove("is-paused", "is-fallback");
+    });
+    video.addEventListener("error", showFallback);
+    var sources = video.querySelectorAll("source");
+    sources[sources.length - 1]?.addEventListener("error", showFallback);
+    document.addEventListener("visibilitychange", syncPlayback);
+    reducedMotion.addEventListener?.("change", syncPlayback);
+    connection?.addEventListener?.("change", syncPlayback);
+
+    window.addEventListener?.("pageshow", syncPlayback);
+    syncPlayback();
+  })();
+</script>

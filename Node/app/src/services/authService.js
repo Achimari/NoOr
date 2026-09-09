@@ -15,17 +15,32 @@ import {
   updateAuthUserPasswordHash,
   updateAuthUserTimezone,
 } from "../repositories/authRepository.js";
+import {
+  DEFAULT_ACCENT_KEY,
+  DEFAULT_EMBLEM_KEY,
+  PRESET_ACCENTS,
+  PRESET_EMBLEMS,
+} from "../domain/constants.js";
 import { getSafeTimezone, isSupportedTimezone } from "../utils/timezones.js";
 
 const SALT_ROUNDS = 12;
 
-function sanitizeUser(user) {
+export function sanitizeUser(user) {
+  const emblemKey = PRESET_EMBLEMS.some(({ key }) => key === user.gameProfile?.emblemKey)
+    ? user.gameProfile.emblemKey
+    : DEFAULT_EMBLEM_KEY;
+  const accentKey = PRESET_ACCENTS.some(({ key }) => key === user.gameProfile?.accentKey)
+    ? user.gameProfile.accentKey
+    : DEFAULT_ACCENT_KEY;
+
   return {
     id: user.id,
     name: user.name,
     isTelegramLinked: user.isTelegramLinked,
     timezone: getSafeTimezone(user.timezone),
     createdAt: user.createdAt,
+    emblemKey,
+    accentKey,
   };
 }
 

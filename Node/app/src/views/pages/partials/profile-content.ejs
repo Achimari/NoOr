@@ -1,0 +1,285 @@
+<%
+  const statOrder = [
+    { key: "strength", label: "Strength", note: "Health and damage" },
+    { key: "dexterity", label: "Dexterity", note: "How often you act" },
+    { key: "intelligence", label: "Intelligence", note: "Mana" },
+    { key: "wisdom", label: "Wisdom", note: "Unlocks spells", earnedOnly: true },
+  ];
+  const streakOrder = [profile.streaks.recovery, profile.streaks.reading, profile.streaks.goals];
+  const needsAllocation = profile.isOwner && !profile.allocation.confirmed;
+%>
+<main id="main-content" tabindex="-1" class="dashboard-page profile-page" data-profile data-profile-id="<%= profile.id %>" data-accent="<%= profile.accentKey %>" data-owner="<%= profile.isOwner ? "true" : "false" %>">
+  <div class="page-shell profile-container">
+
+      <header class="profile-head">
+        <span class="profile-emblem" data-emblem="<%= profile.emblemKey %>" aria-hidden="true"></span>
+        <div class="profile-head-text">
+          <h1 class="profile-name"><%= profile.name %></h1>
+          <p class="profile-subtitle">
+            <% if (profile.isOwner) { %>
+              Your daily practice shapes this character.
+            <% } else { %>
+              Public profile
+            <% } %>
+          </p>
+        </div>
+        <% if (profile.isOwner) { %>
+
+          <nav class="profile-head-links" aria-label="Your record">
+            <a class="profile-head-link" href="#spells">Spells</a>
+            <a class="profile-head-link" href="/achievements">Achievements</a>
+          </nav>
+        <% } %>
+      </header>
+
+      <% if (needsAllocation) { %>
+        <section class="dashboard-card profile-setup" aria-labelledby="allocation-title">
+          <header class="dashboard-card-head">
+            <h2 id="allocation-title">Set your ten base points</h2>
+          </header>
+          <p class="profile-setup-text">
+            Distribute exactly ten permanent points across Strength, Dexterity and
+            Intelligence. Wisdom is earned through Bible reflections and cannot
+            receive base points. You can revise this choice until your first battle.
+          </p>
+        </section>
+      <% } %>
+
+      <div class="profile-split">
+      <% if (profile.isOwner) { %>
+        <section class="profile-pane profile-allocation" data-allocation aria-labelledby="points-title">
+          <header class="dashboard-card-head profile-card-head">
+            <h2 id="points-title">Base points</h2>
+            <p class="profile-points-remaining" data-allocation-remaining role="status">
+              <%= profile.allocation.locked ? "Locked" : "0 points left" %>
+            </p>
+          </header>
+
+          <% if (profile.allocation.locked) { %>
+            <p class="profile-note" data-allocation-locked-note>
+              Your base points were locked when you began your first battle.
+              Points earned this month are added to them.
+            </p>
+          <% } %>
+
+          <p class="profile-note">
+            Base points are permanent. Earned points reset at the start of each
+            month, while your daily history and learned spells remain.
+          </p>
+
+          <div class="profile-allocation-grid">
+            <% ["strength", "dexterity", "intelligence"].forEach((stat) => { %>
+              <div class="profile-allocation-row">
+                <label class="profile-allocation-label" for="allocate-<%= stat %>">
+                  <%= stat.charAt(0).toUpperCase() + stat.slice(1) %>
+                </label>
+                <div class="profile-allocation-control">
+                  <button class="profile-step" type="button" data-allocation-step="-1" data-allocation-stat="<%= stat %>" aria-label="Remove a point from <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>>&minus;</button>
+                  <input
+                    class="profile-allocation-input"
+                    id="allocate-<%= stat %>"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="10"
+                    step="1"
+                    value="<%= profile.base[stat] %>"
+                    data-allocation-input="<%= stat %>"
+                    <%= profile.allocation.locked ? "disabled" : "" %>
+                  />
+                  <button class="profile-step" type="button" data-allocation-step="1" data-allocation-stat="<%= stat %>" aria-label="Add a point to <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>>+</button>
+                </div>
+                <p class="profile-allocation-earned">+<%= profile.earned[stat] %> earned this month</p>
+              </div>
+            <% }) %>
+          </div>
+
+          <% if (!profile.allocation.locked) { %>
+            <div class="profile-allocation-actions">
+              <button class="ui-button ui-button--primary" type="button" data-allocation-save>
+                <%= profile.allocation.confirmed ? "Save points" : "Confirm points" %>
+              </button>
+              <button class="ui-button ui-button--secondary" type="button" data-allocation-reset>Reset</button>
+            </div>
+            <p class="profile-error" data-allocation-error role="alert" hidden></p>
+          <% } %>
+        </section>
+      <% } %>
+
+      <section class="profile-pane profile-stats" aria-labelledby="stats-title">
+        <header class="dashboard-card-head">
+          <h2 id="stats-title">Character</h2>
+        </header>
+
+        <p class="profile-note">
+          Permanent base points plus points earned this month.
+        </p>
+
+        <ul class="profile-stat-list">
+          <% statOrder.forEach((stat) => { %>
+            <li class="profile-stat">
+              <span class="profile-stat-label"><%= stat.label %></span>
+              <span class="profile-stat-value" data-stat-total="<%= stat.key %>"><%= profile.stats[stat.key] %></span>
+              <span class="profile-stat-note"><%= stat.note %><%= stat.earnedOnly ? " — earned this month only" : "" %></span>
+            </li>
+          <% }) %>
+        </ul>
+
+        <dl class="profile-derived">
+          <div class="profile-derived-item">
+            <dt>Health</dt>
+            <dd data-derived="maxHealth"><%= profile.derived.maxHealth %></dd>
+          </div>
+          <div class="profile-derived-item">
+            <dt>Damage</dt>
+            <dd data-derived="basicDamage"><%= profile.derived.basicDamage %></dd>
+          </div>
+          <div class="profile-derived-item">
+            <dt>Speed</dt>
+            <dd data-derived="speed"><%= profile.derived.speed %></dd>
+          </div>
+          <div class="profile-derived-item">
+            <dt>Mana</dt>
+            <dd data-derived="maxMana"><%= profile.derived.maxMana %></dd>
+          </div>
+          <div class="profile-derived-item">
+            <dt>Spells unlocked</dt>
+            <dd><%= profile.spells.unlockedCount %></dd>
+          </div>
+        </dl>
+      </section>
+      </div>
+
+      <%- include("./profile-spells", { profile }) %>
+
+      <% if (profile.isOwner) { %>
+
+        <div class="profile-split">
+        <section class="profile-pane profile-presentation" aria-labelledby="presentation-title">
+          <header class="dashboard-card-head">
+            <h2 id="presentation-title">Appearance</h2>
+          </header>
+
+          <fieldset class="profile-fieldset">
+            <legend class="profile-legend">Emblem</legend>
+            <div class="profile-preset-grid">
+              <% profile.presets.emblems.forEach((emblem) => { %>
+                <label class="profile-preset">
+                  <input type="radio" name="emblemKey" value="<%= emblem.key %>" data-preset-input <%= profile.emblemKey === emblem.key ? "checked" : "" %> />
+                  <span class="profile-preset-swatch" data-emblem="<%= emblem.key %>" aria-hidden="true"></span>
+                  <span class="profile-preset-label"><%= emblem.label %></span>
+                </label>
+              <% }) %>
+            </div>
+          </fieldset>
+
+          <fieldset class="profile-fieldset">
+            <legend class="profile-legend">Accent</legend>
+            <div class="profile-preset-grid profile-preset-grid-accents">
+              <% profile.presets.accents.forEach((accent) => { %>
+                <label class="profile-preset">
+                  <input type="radio" name="accentKey" value="<%= accent.key %>" data-preset-input <%= profile.accentKey === accent.key ? "checked" : "" %> />
+                  <span class="profile-preset-swatch profile-accent-swatch" data-accent-swatch="<%= accent.key %>" aria-hidden="true"></span>
+                  <span class="profile-preset-label"><%= accent.label %></span>
+                </label>
+              <% }) %>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="profile-pane profile-privacy" aria-labelledby="privacy-title">
+          <header class="dashboard-card-head">
+            <h2 id="privacy-title">Privacy</h2>
+          </header>
+          <p class="profile-note">
+            Sharing is off by default. When an item is private, other members see
+            only “Private”—never counts, percentages, passages, or reflections.
+          </p>
+
+          <div class="profile-toggle-list">
+            <label class="profile-toggle">
+              <input type="checkbox" data-privacy-input="shareTodayGoals" <%= profile.sharing.todayGoals ? "checked" : "" %> />
+              <span class="profile-toggle-text">
+                <span class="profile-toggle-title">Share today's tasks</span>
+                <span class="profile-toggle-note">Shows what you planned today and which items are done.</span>
+              </span>
+            </label>
+
+            <label class="profile-toggle">
+              <input type="checkbox" data-privacy-input="shareTodayBibleReflection" <%= profile.sharing.todayBibleReflection ? "checked" : "" %> />
+              <span class="profile-toggle-text">
+                <span class="profile-toggle-title">Share today's Bible reflection</span>
+                <span class="profile-toggle-note">Shows the passages you chose and what you wrote.</span>
+              </span>
+            </label>
+          </div>
+          <p class="profile-error" data-privacy-error role="alert" hidden></p>
+        </section>
+        </div>
+      <% } %>
+
+      <%- include("./profile-today", { profile, today }) %>
+
+      <section class="profile-streaks" aria-labelledby="streaks-title">
+        <h2 id="streaks-title" class="profile-section-title">Streaks</h2>
+
+        <div class="dashboard-card profile-disclosure-group">
+        <% streakOrder.forEach((streak) => { %>
+          <details class="profile-streak" data-streak-panel="<%= streak.id %>">
+            <summary class="profile-streak-summary">
+              <span class="profile-streak-label"><%= streak.label %></span>
+              <span class="profile-streak-current">
+                <%= streak.current %> <%= streak.current === 1 ? "day" : "days" %> now
+              </span>
+              <span class="profile-streak-best">best <%= streak.best %></span>
+              <% if (streak.isInactive) { %>
+                <span class="profile-streak-inactive"><%= streak.inactiveDays %> <%= streak.inactiveDays === 1 ? "day" : "days" %> inactive</span>
+              <% } %>
+            </summary>
+
+            <div class="profile-streak-body">
+              <p class="profile-streak-description"><%= streak.description %></p>
+
+              <dl class="profile-streak-figures">
+                <div><dt>Current</dt><dd><%= streak.current %></dd></div>
+                <div><dt>Best</dt><dd><%= streak.best %></dd></div>
+                <div><dt>Qualifying days</dt><dd><%= streak.qualifyingDays %></dd></div>
+                <div><dt>Days recorded</dt><dd><%= streak.recordedDays %></dd></div>
+                <div><dt>Inactive days</dt><dd><%= streak.inactiveDays %></dd></div>
+              </dl>
+
+              <% if (streak.days.length) { %>
+                <div class="leaderboard-table-wrap">
+                  <table class="leaderboard-table profile-streak-table">
+                    <caption class="visually-hidden">All recorded days for <%= streak.label %></caption>
+                    <thead>
+                      <tr><th scope="col">Day</th><th scope="col">Answer</th></tr>
+                    </thead>
+                    <tbody>
+                      <% streak.days.forEach((day) => { %>
+                        <tr>
+                          <th scope="row">
+                            <time class="profile-streak-date" datetime="<%= day.dateKey %>"><%= day.dateKey %><%= day.isToday ? " (today)" : "" %></time>
+                          </th>
+                          <td>
+                            <span class="profile-day-result" data-result="<%= day.answer.toLowerCase() %>">
+                              <%= day.answer === "YES" ? "Yes" : "No" %>
+                            </span>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              <% } else { %>
+                <p class="profile-empty">No days recorded yet.</p>
+              <% } %>
+            </div>
+          </details>
+        <% }) %>
+        </div>
+      </section>
+
+  </div>
+  <%- include("../../components/layout/footer") %>
+</main>

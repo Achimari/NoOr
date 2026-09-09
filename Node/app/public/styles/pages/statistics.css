@@ -1,0 +1,516 @@
+
+
+.progress-page {
+  background: transparent;
+}
+
+.progress-summary {
+  list-style: none;
+}
+
+.progress-segmented {
+  margin-block-end: 0;
+  border-block-end: 1px solid var(--rule);
+}
+
+.progress-board {
+  display: grid;
+  gap: var(--space-4);
+
+  justify-items: stretch;
+}
+
+.progress-more {
+
+  justify-self: start;
+}
+
+.progress-missed {
+  display: inline-block;
+  margin-inline-start: var(--space-2);
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.split {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+.split-bar {
+  position: relative;
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-capsule);
+
+  background: var(--surface-subtle);
+}
+
+.split-bar-segment {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(var(--bar-scale, 0));
+}
+
+.split-bar-segment--yes {
+  background: var(--success);
+  transform-origin: left center;
+}
+
+.split-bar-segment--no {
+  background: var(--danger);
+  transform-origin: right center;
+}
+
+.split-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.split-legend-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+}
+
+.split-legend-item::before {
+  content: "";
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--ink-quiet);
+}
+
+.split-legend-item--yes::before {
+  background: var(--success);
+}
+
+.split-legend-item--no::before {
+  background: var(--danger);
+}
+
+.split-legend-item--total::before {
+  background: var(--surface-subtle);
+  border: 1px solid var(--separator);
+}
+
+.split-legend-label {
+  color: var(--ink-muted);
+}
+
+.split-legend-value {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.split-legend-share {
+  color: var(--ink-muted);
+}
+
+.split-caption {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+}
+
+.split[data-empty="true"] .split-bar-segment {
+  transform: scaleX(0);
+}
+
+.pattern-block {
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--rule);
+}
+
+.pattern-group + .pattern-group {
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--rule);
+}
+
+.progress-standing {
+  margin-block-end: var(--space-6);
+}
+
+.weekday-legend {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.weekday-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.weekday-legend-item::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.weekday-legend-item--yes::before {
+  background: var(--success);
+}
+
+.weekday-legend-item--no::before {
+  background: var(--danger);
+}
+
+.weekday-chart {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weekday-row {
+  display: grid;
+
+  grid-template-columns: 5.5rem minmax(0, 26rem) auto;
+  justify-content: start;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  min-width: 0;
+}
+
+.weekday-label {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 700px) {
+
+  .weekday-label {
+    overflow: hidden;
+    max-width: 2.6em;
+    white-space: nowrap;
+  }
+}
+
+.weekday-bars {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.weekday-track {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-capsule);
+  background: var(--surface-subtle);
+}
+
+.weekday-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+
+  transform: scaleX(var(--bar-scale, 0));
+  transform-origin: left center;
+}
+
+.weekday-bar-yes {
+  background: var(--success);
+}
+
+.weekday-bar-no {
+  background: var(--danger);
+}
+
+.weekday-figures {
+  display: flex;
+  gap: var(--space-3);
+  white-space: nowrap;
+  font-size: var(--text-micro);
+}
+
+.weekday-figure-yes {
+  color: var(--success);
+}
+
+.weekday-figure-no {
+  color: var(--danger);
+}
+
+@media (max-width: 560px) {
+  .weekday-row {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    row-gap: var(--space-1);
+  }
+
+  .weekday-figures {
+    grid-column: 2;
+  }
+}
+
+.prayer-world-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 292px);
+  align-items: center;
+  gap: var(--space-6);
+  margin-block-start: var(--space-4);
+}
+
+.prayer-world-regions {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prayer-world-region {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(64px, 10rem) 2.5rem;
+  justify-content: start;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  min-height: 32px;
+}
+
+.prayer-world-region-name {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.prayer-world-region-count {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  text-align: right;
+}
+
+.prayer-world-region.is-active .prayer-world-region-name,
+.prayer-world-region.is-active .prayer-world-region-count {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.prayer-world-region--empty {
+  grid-template-columns: 1fr;
+}
+
+.prayer-world-region-track {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-capsule);
+  background: var(--surface-subtle);
+}
+
+.prayer-world-region-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ink-quiet);
+  transform: scaleX(var(--bar-scale, 0));
+  transform-origin: left center;
+}
+
+.prayer-world-region.is-active .prayer-world-region-fill {
+  background: var(--ink);
+}
+
+.prayer-world-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.prayer-globe {
+  position: relative;
+  width: min(292px, 78vw);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.20), transparent 24%),
+    linear-gradient(135deg, #3a3a3a 0%, #232323 48%, #0d0d0d 100%);
+  box-shadow:
+    inset -32px -42px 68px rgba(0, 0, 0, 0.5),
+    inset 18px 16px 36px rgba(255, 255, 255, 0.06);
+}
+
+.prayer-globe::before,
+.prayer-globe::after {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.prayer-globe::before {
+  transform: scaleX(0.42);
+}
+
+.prayer-globe::after {
+  transform: scaleY(0.42);
+}
+
+.prayer-globe-shine {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(255, 255, 255, 0.032) 40px, transparent 41px),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(255, 255, 255, 0.028) 40px, transparent 41px);
+  opacity: 0.6;
+}
+
+.prayer-globe-land {
+  position: absolute;
+  display: block;
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 0.76;
+}
+
+.prayer-globe-land-americas {
+  left: 18%;
+  top: 25%;
+  width: 24%;
+  height: 42%;
+  border-radius: 58% 38% 48% 46%;
+  clip-path: polygon(34% 0, 74% 8%, 86% 24%, 64% 35%, 78% 50%, 56% 67%, 62% 100%, 38% 84%, 30% 62%, 12% 48%, 22% 28%);
+}
+
+.prayer-globe-land-europe {
+  left: 47%;
+  top: 27%;
+  width: 16%;
+  height: 16%;
+  border-radius: 44% 52% 38% 48%;
+  clip-path: polygon(12% 28%, 42% 4%, 78% 18%, 98% 48%, 66% 70%, 30% 62%);
+}
+
+.prayer-globe-land-africa {
+  left: 48%;
+  top: 42%;
+  width: 18%;
+  height: 32%;
+  border-radius: 48% 42% 58% 44%;
+  clip-path: polygon(34% 0, 78% 12%, 94% 42%, 70% 100%, 42% 88%, 18% 54%);
+}
+
+.prayer-globe-land-asia {
+  left: 60%;
+  top: 28%;
+  width: 30%;
+  height: 35%;
+  border-radius: 45% 55% 42% 52%;
+  clip-path: polygon(4% 22%, 34% 0, 82% 10%, 100% 34%, 76% 50%, 88% 74%, 52% 92%, 34% 62%, 8% 58%);
+}
+
+.prayer-globe-land-oceania {
+  left: 72%;
+  top: 66%;
+  width: 17%;
+  height: 13%;
+  border-radius: 50%;
+  clip-path: polygon(14% 42%, 44% 8%, 84% 22%, 96% 58%, 54% 88%, 18% 74%);
+}
+
+.prayer-globe-point {
+  position: absolute;
+  z-index: 2;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink-quiet) 55%, var(--white));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink-quiet) 22%, transparent);
+  transform: translate(-50%, -50%) scale(var(--point-scale, 1));
+}
+
+.prayer-globe-point.is-active {
+  background: var(--white);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--ink-quiet) 30%, transparent);
+}
+
+@media (max-width: 880px) {
+  .prayer-world-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prayer-world-visual {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .prayer-world-region {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .prayer-world-region-track {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .weekday-bar-yes,
+  .weekday-figure-yes {
+    color: var(--ink);
+  }
+}
+
+@keyframes weekday-bar-reveal {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes globe-point-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+.weekday-bar,
+.prayer-world-region-fill {
+  animation: weekday-bar-reveal var(--duration-panel) var(--ease-out) both;
+
+  animation-delay: min(calc(var(--reveal-index, 0) * 40ms), 240ms);
+}
+
+.prayer-globe-point {
+  animation: globe-point-in 180ms var(--ease-out) both;
+  animation-delay: min(calc(var(--reveal-index, 0) * 35ms), 240ms);
+}
+
+.weekday-row,
+.prayer-world-region {
+  --reveal-index: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .weekday-bar,
+  .prayer-world-region-fill,
+  .prayer-globe-point {
+    animation: none;
+  }
+}

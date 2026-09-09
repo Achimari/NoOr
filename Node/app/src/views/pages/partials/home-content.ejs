@@ -1,13 +1,59 @@
-<main class="home-page dashboard-page" data-leaderboard data-current-user-id="<%= leaderboard.current.id %>">
-  <section class="section dashboard-section">
-    <div class="container dashboard-container">
-      <div class="dashboard-actions" aria-label="Daily action">
+<%
+  const [todayYear, todayMonth, todayDay] = String(checkIn.todayDateKey || "").split("-").map(Number);
+  const todayDate = todayYear ? new Date(Date.UTC(todayYear, todayMonth - 1, todayDay)) : null;
+  const dayLocale = typeof dateLocale === "undefined" || !dateLocale ? "en" : dateLocale;
+  const missed = typeof missedActivities === "undefined" || !missedActivities
+    ? { total: 0, items: [] }
+    : missedActivities;
+  const todayLabel = todayDate
+    ? new Intl.DateTimeFormat(dayLocale, {
+        weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+      }).format(todayDate)
+    : "";
+%>
+<main id="main-content" tabindex="-1" class="home-page dashboard-page today-page" data-daily-check-in data-current-user-id="<%= checkIn.id %>">
+
+  <div class="horizon" data-horizon data-state="neutral">
+    <div class="horizon-content">
+
+      <div class="today-dateline">
+        <h1 class="page-head-title today-title">Today</h1>
+        <p class="today-date">
+          <time datetime="<%= checkIn.todayDateKey %>"><%= todayLabel %></time>
+        </p>
+      </div>
+
+      <ul class="practice-ledger" data-practice-ledger aria-label="Today's progress">
+        <li class="practice-ledger-item">
+          <span class="practice-ledger-name">Strong</span>
+          <span class="practice-ledger-status" data-practice-status="strong">Not answered</span>
+        </li>
+        <li class="practice-ledger-item" data-practice-ledger-bible>
+          <span class="practice-ledger-name">Bible</span>
+          <span class="practice-ledger-status" data-practice-status="bible">Not answered</span>
+        </li>
+        <li class="practice-ledger-item">
+          <span class="practice-ledger-name">Tasks</span>
+          <span class="practice-ledger-status" data-practice-status="tasks">None yet</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-shell today-shell">
+
+    <%- include("./catch-up", { missedActivities: missed, dateLocale: dayLocale }) %>
+
+    <section class="practice section-frame section-frame--ruled" data-waypoint="open" aria-labelledby="practice-strong-title">
+      <h2 class="practice-title" id="practice-strong-title">Strong</h2>
+      <p class="practice-lede">Did you stay strong today?</p>
+
+      <div class="dashboard-actions" role="group" aria-label="Daily action">
         <button class="dashboard-action dashboard-action-yes" type="button" aria-pressed="false">
           <span class="dashboard-action-copy">
             <span class="dashboard-action-label">YES</span>
             <span class="dashboard-action-subtitle">I stayed strong</span>
           </span>
-          <span class="dashboard-action-selected-icon" aria-hidden="true"></span>
         </button>
 
         <button class="dashboard-action dashboard-action-no" type="button" aria-pressed="false">
@@ -15,31 +61,11 @@
             <span class="dashboard-action-label">NO</span>
             <span class="dashboard-action-subtitle">I struggled today</span>
           </span>
-          <span class="dashboard-action-selected-icon" aria-hidden="true"></span>
         </button>
       </div>
 
-      <article class="dashboard-current" aria-live="polite">
-        <div>
-          <p class="dashboard-label">Best score</p>
-          <p class="dashboard-value"><span data-overall-best-value>
-              <%= leaderboard.overallBest?.value || 0 %>
-            </span><span class="dashboard-value-unit"> Days</span></p>
-        </div>
-        <div>
-          <p class="dashboard-label">Score holder</p>
-          <p class="dashboard-value dashboard-holder-name" data-overall-best-name>
-            <%= leaderboard.overallBest?.name || "No record yet" %>
-          </p>
-        </div>
-        <div class="dashboard-week" data-current-date-key="<%= leaderboard.current.todayDateKey %>" aria-hidden="true">
-          <% (leaderboard.current.weekDays || []).forEach((day)=> { %>
-            <span class="dashboard-day<%= day.successful ? " active" : "" %><%= day.missed ? " missed" : "" %>" data-week-day="<%= day.dateKey %>" data-week-answer="<%= day.answer || "" %>" data-week-missed="<%= day.missed ? "true" : "false" %>"><%= day.label %></span>
-            <% }) %>
-        </div>
-      </article>
-
-      <aside class="dashboard-timer-card" data-check-in-timer hidden aria-live="polite">
+      <div class="practice-availability">
+      <div class="dashboard-timer-card" data-check-in-timer hidden aria-live="polite">
         <div class="dashboard-timer-copy">
           <div>
             <p class="dashboard-timer-label">Next answer</p>
@@ -49,76 +75,116 @@
         <div class="dashboard-timer-track" role="progressbar" aria-label="Progress toward next answer" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <span class="dashboard-timer-progress" data-check-in-progress></span>
         </div>
-      </aside>
+      </div>
+      </div>
+    </section>
 
-      <section class="dashboard-card">
-        <header class="dashboard-card-head">
-          <h2>Leaderboard</h2>
-          <span data-table-count>
-            <%= leaderboard.leaders.length %> users
+    <section class="practice reading-check section-frame section-frame--ruled" data-waypoint="open" data-reading-check tabindex="-1" aria-labelledby="practice-bible-title">
+      <h2 class="practice-title" id="practice-bible-title">Bible reading</h2>
+      <p class="practice-lede">Did you read the Bible today?</p>
+
+      <div class="dashboard-actions reading-check-actions" data-reading-actions role="group" aria-label="Did you read the Bible today?">
+        <button class="dashboard-action dashboard-action-yes reading-action reading-action-yes" type="button" data-reading-answer="YES" aria-pressed="false" aria-haspopup="dialog">
+          <span class="dashboard-action-copy">
+            <span class="dashboard-action-label">YES</span>
+            <span class="dashboard-action-subtitle">I read the Bible</span>
           </span>
-        </header>
+        </button>
+        <button class="dashboard-action dashboard-action-no reading-action reading-action-no" type="button" data-reading-answer="NO" aria-pressed="false">
+          <span class="dashboard-action-copy">
+            <span class="dashboard-action-label">NO</span>
+            <span class="dashboard-action-subtitle">I did not read today</span>
+          </span>
+        </button>
+      </div>
 
-        <div class="leaderboard-table-wrap">
-          <table class="leaderboard-table">
-            <thead>
-              <tr>
-                <th scope="col"><span class="leaderboard-head-label"><%- include("../../components/ui/icon", {
-                      name: "trophy" , className: "leaderboard-icon" }) %></span></th>
-                <th scope="col"><span class="leaderboard-head-label"><%- include("../../components/ui/icon", {
-                      name: "user" , className: "leaderboard-icon" }) %>Name</span></th>
-                <th scope="col"><span class="leaderboard-head-label leaderboard-head-label-right">Streak</span></th>
-              </tr>
-            </thead>
-            <tbody data-leaderboard-body>
-              <% if (leaderboard.leaders.length) { %>
-                <% leaderboard.leaders.forEach((entry)=> { %>
-                  <tr<%- entry.id === leaderboard.current.id ? ' class="is-current"' : "" %>>
-                    <td><span class="leaderboard-rank">
-                        <%= entry.rank %>
-                      </span></td>
-                    <td>
-                      <span class="leaderboard-user-cell">
-                        <a class="leaderboard-user user-link" href="/customer/<%= entry.id %>"><%-
-                            include("../../components/ui/icon", { name: "user" , className: "leaderboard-row-icon" }) %>
-                            <%= entry.name %></a>
-                        <% if (entry.isInactive) { %>
-                          <span class="leaderboard-inactive-tag" data-mobile-label="<%= entry.inactiveDays %>d inactive">Inactive for <%= entry.inactiveDays %> <%= entry.inactiveDays === 1 ? "day" : "days" %></span>
-                        <% } %>
-                      </span>
-                    </td>
-                    <td>
-                      <span class="leaderboard-streak">
-                        <span class="leaderboard-streak-value"><%= entry.value %> days</span>
-                        <% if (entry.missedDays && entry.missedDays.count > 0) { %>
-                          <span class="leaderboard-streak-separator" aria-hidden="true">·</span>
-                          <% if (entry.id === leaderboard.current.id) { %>
-                            <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="<%= entry.missedDays.nextDateKey %>" data-missed-count="<%= entry.missedDays.count %>" aria-label="Answer <%= entry.missedDays.count %> missed <%= entry.missedDays.count === 1 ? "day" : "days" %>">
-                              <%= entry.missedDays.count %> missed
-                            </button>
-                          <% } else { %>
-                            <span class="leaderboard-missed-tag is-static"><%= entry.missedDays.count %> missed</span>
-                          <% } %>
-                        <% } %>
-                      </span>
-                    </td>
-                  </tr>
-                  <% }) %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="3" class="leaderboard-empty">
-                          <span class="table-empty-title">No streaks yet</span>
-                          <span class="table-empty-hint">Answer today's question above to start the first streak.</span>
-                        </td>
-                      </tr>
-                      <% } %>
-            </tbody>
-          </table>
+      <div class="reading-check-summary" data-reading-summary hidden>
+        <p class="reading-summary-answer">
+          <span class="reading-summary-badge" data-reading-summary-badge></span>
+          <span class="reading-summary-note" data-reading-summary-note></span>
+        </p>
+        <ul class="reading-summary-refs" data-reading-summary-refs></ul>
+      </div>
+
+      <div class="practice-availability">
+      <div class="dashboard-timer-card reading-check-timer" data-reading-timer hidden aria-live="polite">
+        <div class="dashboard-timer-copy">
+          <div>
+            <p class="dashboard-timer-label">Next reading answer</p>
+          </div>
+          <span class="dashboard-timer-value" data-reading-timer-message>00:00:00</span>
         </div>
-      </section>
+        <div class="dashboard-timer-track" role="progressbar" aria-label="Progress toward the next reading answer" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span class="dashboard-timer-progress" data-reading-timer-progress></span>
+        </div>
+      </div>
+      </div>
+    </section>
 
-    </div>
-  </section>
+    <section class="practice daily-goals section-frame section-frame--ruled" data-waypoint="open" data-daily-goals tabindex="-1" aria-labelledby="daily-goals-title">
+      <div class="practice-head">
+        <h2 class="practice-title" id="daily-goals-title">Tasks</h2>
+        <span class="daily-goals-count" data-daily-goal-count>0 of 5</span>
+      </div>
+      <p class="practice-lede">Plan up to five tasks for today. Check them off as you finish.</p>
+
+      <div class="daily-goals-body">
+        <ul class="daily-goals-list" data-daily-goal-list aria-labelledby="daily-goals-title"></ul>
+
+        <p class="daily-goals-empty" data-daily-goal-empty>No tasks planned yet.</p>
+
+        <p class="daily-goals-progress" data-daily-goal-progress role="status" aria-live="polite"></p>
+
+        <form class="daily-goals-composer" data-daily-goal-composer hidden novalidate>
+          <div class="daily-goal-field">
+            <label for="daily-goal-new-input">New task</label>
+            <input class="daily-goal-input" id="daily-goal-new-input" type="text" name="text" maxlength="200" autocomplete="off" enterkeyhint="done" data-daily-goal-input />
+          </div>
+          <div class="daily-goal-form-actions">
+            <button class="ui-button ui-button--primary" type="submit" data-daily-goal-save>Add</button>
+            <button class="ui-button ui-button--quiet" type="button" data-daily-goal-cancel>Cancel</button>
+          </div>
+        </form>
+
+        <button class="daily-goals-add" type="button" data-daily-goal-add>Add task</button>
+      </div>
+    </section>
+
+  </div>
+
+  <%- include("./reading-modal") %>
+
+  <template data-daily-goal-template>
+    <li class="daily-goal" data-daily-goal>
+      <div class="daily-goal-row">
+        <input class="daily-goal-checkbox" type="checkbox" data-daily-goal-checkbox />
+        <label class="daily-goal-text" data-daily-goal-label></label>
+        <div class="daily-goal-actions" data-daily-goal-actions>
+          <button class="daily-goal-action" type="button" data-daily-goal-edit>Edit</button>
+          <button class="daily-goal-action" type="button" data-daily-goal-remove>Remove</button>
+        </div>
+      </div>
+
+      <form class="daily-goal-edit" data-daily-goal-edit-form hidden novalidate>
+        <div class="daily-goal-field">
+          <label data-daily-goal-edit-label>Edit task</label>
+          <input class="daily-goal-input" type="text" name="text" maxlength="200" autocomplete="off" enterkeyhint="done" data-daily-goal-edit-input />
+        </div>
+        <div class="daily-goal-form-actions">
+          <button class="ui-button ui-button--primary" type="submit" data-daily-goal-edit-save>Save</button>
+          <button class="ui-button ui-button--quiet" type="button" data-daily-goal-edit-cancel>Cancel</button>
+        </div>
+      </form>
+
+      <div class="daily-goal-confirm" data-daily-goal-confirm hidden>
+        <p class="daily-goal-confirm-copy">Remove this task?</p>
+        <div class="daily-goal-form-actions">
+          <button class="ui-button ui-button--danger" type="button" data-daily-goal-remove-confirm>Remove</button>
+          <button class="ui-button ui-button--secondary" type="button" data-daily-goal-remove-cancel>Keep</button>
+        </div>
+      </div>
+    </li>
+  </template>
 
   <%- include("../../components/layout/footer") %>
 </main>

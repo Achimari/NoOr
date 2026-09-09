@@ -8,7 +8,8 @@ import {
   updateCheckInForDate,
 } from "../repositories/checkInRepository.js";
 import { AppError } from "../utils/appError.js";
-import { getNextResetAt, getTodayDateKey } from "../utils/dateKey.js";
+import { getNextResetAt, getTodayDateKey, isCalendarDateKey } from "../utils/dateKey.js";
+import { reconcileRewardsForDate } from "./progressionService.js";
 
 const WEEK_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -132,13 +133,19 @@ export async function createDailyCheckIn(userId, answer, timezone) {
   if (!checkIn) {
     throw new AppError("Already answered today", 409);
   }
+
+  await reconcileRewardsForDate(userId, dateKey);
 }
 
 export async function answerMissedDay(userId, { dateKey, answer, timezone }) {
   await markMissedDaysAsNo(userId, timezone);
 
-  if (!dateKey || !["YES", "NO"].includes(answer)) {
+  if (!isCalendarDateKey(dateKey) || !["YES", "NO"].includes(answer)) {
     throw new AppError("Choose a missed day answer", 400);
+  }
+
+  if (dateKey >= getTodayDateKey(new Date(), timezone)) {
+    throw new AppError("You can only complete a day that has already ended", 400);
   }
 
   const missedDays = await findMissedDaysByUserId(userId);
@@ -147,6 +154,8 @@ export async function answerMissedDay(userId, { dateKey, answer, timezone }) {
   }
 
   await resolveMissedCheckIn({ userId, dateKey, answer });
+
+  await reconcileRewardsForDate(userId, dateKey);
 }
 
 export async function updateTodayCheckIn(userId, { answer, timezone }) {
@@ -158,4 +167,19 @@ export async function updateTodayCheckIn(userId, { answer, timezone }) {
 
   const dateKey = getTodayDateKey(new Date(), timezone);
   await updateCheckInForDate({ userId, dateKey, answer });
+
+  await reconcileRewardsForDate(userId, dateKey);
+}
+
+export async function getDailyCheckInPageData(userId, timezone) {
+  await markMissedDaysAsNo(userId, timezone);
+
+  const weekDays = await getWeeklyCheckInDays(userId, timezone);
+  const status = await getCheckInStatus(userId, timezone, { syncMissedDays: false, weekDays });
+
+  return {
+    id: userId,
+    todayDateKey: status.dateKey,
+    weekDays: status.weekDays,
+  };
 }

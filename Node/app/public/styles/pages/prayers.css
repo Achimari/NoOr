@@ -1,0 +1,159 @@
+
+
+.prayer-page {
+  background: transparent;
+}
+
+.prayer-composer {
+  display: grid;
+  gap: var(--space-4);
+  max-width: var(--measure-reading);
+}
+
+.prayer-composer-actions {
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.prayer-grid {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: var(--space-5);
+  --prayer-panel-height: 470px;
+}
+
+.prayer-form {
+  display: grid;
+  grid-template-rows: auto minmax(190px, 1fr) auto;
+  gap: var(--space-4);
+
+  min-height: var(--prayer-panel-height);
+  padding: var(--space-5);
+}
+
+.prayer-card-intro {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.prayer-card-intro h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.prayer-card-intro p {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 40ch;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.prayer-field {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-2);
+  margin-bottom: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--border-control);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  min-height: 0;
+  cursor: text;
+  transition: border-color var(--duration-ui) var(--ease-out);
+}
+
+.prayer-field>span {
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.prayer-field:focus-within {
+  border-color: var(--text-muted);
+}
+
+.prayer-field:focus-within>span {
+  color: var(--text-primary);
+}
+
+.prayer-field textarea {
+  width: 100%;
+
+  min-width: 0;
+  resize: none;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+  caret-color: var(--white);
+}
+
+.prayer-field textarea::placeholder {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.prayer-form .auth-submit {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 12px;
+  font-size: 0.96rem;
+  font-weight: 400;
+}
+
+.prayer-form-status {
+  display: none;
+}
+
+.prayer-list-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  min-height: var(--prayer-panel-height);
+}
+
+.prayer-list-card .dashboard-card-head {
+  flex: 0 0 auto;
+  align-items: flex-start;
+  margin-bottom: var(--space-4);
+}
+
+.prayer-list-card .dashboard-card-head div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.info-prayers .dashboard-card-head {
+  align-items: flex-start;
+}
+
+.info-prayers .dashboard-card-head div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.info-prayers {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}

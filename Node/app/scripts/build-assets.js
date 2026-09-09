@@ -2,26 +2,12 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { pageBundles, sharedScripts, sharedStyles } from "../src/config/assetSources.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const root = path.resolve(path.dirname(__filename), "..");
 const publicDir = path.join(root, "public");
 const assetsDir = path.join(publicDir, "assets");
-
-const cssFiles = [
-  "styles/variables.css",
-  "styles/globals.css",
-  "styles/header/base.css",
-  "styles/header/responsive.css",
-  "styles/home/hero.css",
-  "styles/home/dashboard.css",
-  "styles/home/sections.css",
-  "styles/home/home-layout.css",
-  "styles/home/roadmap-and-links.css",
-  "styles/home/auth.css",
-  "styles/home/footer.css",
-  "styles/home/responsive.css",
-];
 
 function readPublicFile(relativePath) {
   return readFileSync(path.join(publicDir, relativePath), "utf8");
@@ -48,19 +34,41 @@ function writeHashedAsset(prefix, extension, content) {
 rmSync(assetsDir, { force: true, recursive: true });
 mkdirSync(assetsDir, { recursive: true });
 
-const css = [
-  "@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');",
-  ...cssFiles.map((file) => `/* ${file} */\n${normalizeCss(readPublicFile(file))}`),
-]
+const css = sharedStyles
+  .map((file) => `/* ${file} */\n${normalizeCss(readPublicFile(file))}`)
   .join("\n\n");
-const js = readPublicFile("scripts/app.js");
+const js = sharedScripts
+  .map((file) => `/* ${file} */\n${readPublicFile(file)}`)
+  .join("\n;\n");
 
 const manifest = {
   css: writeHashedAsset("app", "css", css),
   js: writeHashedAsset("app", "js", js),
+  pages: {},
 };
+
+for (const [pageId, bundle] of Object.entries(pageBundles)) {
+  const entry = {};
+
+  if (bundle.styles?.length) {
+    const pageCss = bundle.styles
+      .map((file) => `/* ${file} */\n${normalizeCss(readPublicFile(file))}`)
+      .join("\n\n");
+    entry.css = writeHashedAsset(pageId, "css", pageCss);
+  }
+
+  if (bundle.script) {
+    entry.js = writeHashedAsset(pageId, "js", readPublicFile(bundle.script));
+  }
+
+  manifest.pages[pageId] = entry;
+}
 
 writeFileSync(path.join(assetsDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(`Built ${manifest.css}`);
 console.log(`Built ${manifest.js}`);
+for (const [pageId, entry] of Object.entries(manifest.pages)) {
+  if (entry.css) console.log(`Built ${entry.css}`);
+  if (entry.js) console.log(`Built ${entry.js}`);
+}

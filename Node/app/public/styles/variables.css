@@ -1,98 +1,213 @@
+
+
+@font-face {
+  font-family: "Achimari Hand";
+  src: url("/fonts/achimari-hand/AchimariHand-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --black: #000000;
+
   --white: #ffffff;
-  --ink-92: rgba(0, 0, 0, 0.92);
-  --ink-72: rgba(0, 0, 0, 0.72);
-  --ink-54: rgba(0, 0, 0, 0.54);
-  --ink-18: rgba(0, 0, 0, 0.18);
-  --ink-10: rgba(0, 0, 0, 0.10);
-  --ink-06: rgba(0, 0, 0, 0.06);
-  --white-92: rgba(255, 255, 255, 0.92);
-  --white-72: rgba(255, 255, 255, 0.72);
-  --white-54: rgba(255, 255, 255, 0.54);
-  --white-18: rgba(255, 255, 255, 0.18);
-  --white-10: rgba(255, 255, 255, 0.10);
-  --white-06: rgba(255, 255, 255, 0.06);
-  --accent: var(--black);
-  --accent-hover: var(--ink-72);
-  --btn-text: var(--white);
-  --bg: var(--black);
-  --surface: var(--white);
-  --surface-elevated: var(--white);
-  --surface-soft: var(--ink-06);
-  --surface-muted: var(--ink-10);
-  --text: var(--black);
-  --text-secondary: var(--ink-54);
-  --border: var(--ink-18);
-  --header-bg: var(--black);
-  --header-active: var(--white);
-  --logo-title: var(--white);
-  --hero-bg: var(--white);
-  --icon-bg: var(--ink-06);
-  --icon-text: var(--black);
-  --link: var(--black);
-  --link-hover: var(--ink-72);
-  --track-thumb: var(--ink-18);
-  --link-card-text: var(--black);
-  --link-card-hover-border: var(--black);
-  --link-card-hover-shadow: var(--ink-10);
-  --favicon-chip-bg: var(--ink-06);
-  --favicon-chip-border: var(--ink-18);
-  --list-border: var(--ink-10);
-  --footer-bg: var(--black);
-  --footer-text: var(--white-72);
-  --footer-icon-hover: var(--white);
-  --shadow-soft: 0 12px 30px var(--ink-06);
-  --shadow-card-hover: 0 16px 40px var(--ink-10);
-  --focus-ring: var(--ink-54);
-  --focus-ring-color: rgba(0, 0, 0, 0.55);
 
-  /* Dark app surfaces */
-  --bg-page: #0b0c0d;
-  --surface-1: #101214;
-  --surface-2: #15181b;
-  --text-primary: #f4f5f5;
-  --text-muted: #a4aab0;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --paper: #ffffff;
+  --paper-muted: #f2f2ef;
+  --canvas: #fcfcfa;
 
-  /* Spacing */
-  --space-1: 6px;
-  --space-2: 10px;
-  --space-3: 14px;
-  --space-4: 18px;
+  --ink: #111111;
+  --ink-raised: #242424;
+  --ink-muted: #5c5c58;
+  --ink-quiet: #8a8a84;
+
+  --rule: #d2d2cc;
+  --rule-strong: #8a8a84;
+
+  --surface: var(--paper);
+  --surface-subtle: var(--paper-muted);
+  --ink-secondary: var(--ink-muted);
+  --separator: var(--rule);
+
+  --brand: #315f73;
+  --brand-hover: #244b5c;
+
+  --success: #14713c;
+  --success-soft: #e9f4ed;
+  --danger: #b3261e;
+  --danger-soft: #fbebea;
+
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    Helvetica, Arial, sans-serif;
+  --font-ui: "Achimari Hand", var(--font-system);
+  --font-display: "Achimari Hand", var(--font-system);
+  --font-body: "Achimari Hand", var(--font-system);
+  --font-reading: "Achimari Hand", var(--font-system);
+
+  --font-synthesis-branded: none;
+
+  --text-display: 2.5rem;
+  --text-title: 1.625rem;
+  --text-subtitle: 1.1875rem;
+  --text-body: 1.0625rem;
+  --text-meta: 0.9375rem;
+  --text-micro: 0.875rem;
+
+  --leading-display: 1.4;
+  --leading-title: 1.4;
+  --leading-body: 1.55;
+  --leading-meta: 1.45;
+
+  --radius-row: 8px;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --radius-feature: 24px;
+  --radius-capsule: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
-  --space-7: 40px;
-  --space-8: 52px;
-  --space-9: 64px;
-
-  /* Radius roles */
-  --radius: 14px;
-  --radius-panel: 18px;
-  --radius-control: 10px;
-  --radius-tag: 8px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
 
   --padding: clamp(var(--space-4), 2.2vw, var(--space-6));
   --section-padding: clamp(var(--space-6), 5.2vw, var(--space-8));
   --section-padding-compact: clamp(var(--space-4), 3.2vw, var(--space-6));
 
-  /* Layers */
-  --z-background: 0;
-  --z-content: 1;
-  --z-dropdown: 90;
+  --section-gap: clamp(var(--space-6), 4.5vw, var(--space-8));
 
-  /* Ambient background video */
-  --ambient-base: #090b0c;
+  --gap-related: var(--space-3);
+  --gap-sibling: var(--space-6);
+  --gap-region: var(--space-7);
 
-  /* Motion */
+  --measure-wide: 1160px;
+  --measure-focus: 820px;
+  --measure-reading: 680px;
+  --measure-dialog: 520px;
+
+  --tap-min: 44px;
+
+  --shadow-float: 0 12px 36px rgba(0, 0, 0, 0.12);
+  --shadow-dialog: 0 24px 64px rgba(0, 0, 0, 0.18);
+
+  --chrome: var(--ink);
+  --chrome-raised: var(--ink-raised);
+  --header-height: 56px;
+  --header-height-compact: 52px;
+
+  --header-bg: rgba(17, 17, 17, 0.84);
+  --header-bg-solid: var(--chrome);
+  --header-active: var(--white);
+  --header-active-line: var(--white);
+  --logo-title: var(--white);
+  --footer-bg: var(--chrome);
+  --footer-text: rgba(255, 255, 255, 0.72);
+  --footer-icon-hover: var(--white);
+  --glass-blur: blur(20px) saturate(1.6);
+
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-press: 120ms;
   --duration-fast: 140ms;
-  --duration-ui: 180ms;
-  --duration-panel: 240ms;
+  --duration-ui: 160ms;
+  --duration-panel: 220ms;
 
-  /* Font */
-  --font-main: "Manrope", system-ui, -apple-system, sans-serif;
+  --ambient-base: #d9d9d9;
+  --ambient-filter: grayscale(1) contrast(1.06) brightness(1.24);
+  --ambient-scrim: rgba(255, 255, 255, 0.40);
+
+  --sky-scrim: rgba(255, 255, 255, 0.62);
+  --ambient-vignette: rgba(17, 17, 17, 0.10);
+
+  --horizon-height: clamp(176px, 21vh, 236px);
+
+  --horizon-fade: 72px;
+
+  --focus-ring-color: var(--brand);
+  --focus-ring-on-deep: var(--white);
+
+  --z-background: 0;
+  --z-sky: 0;
+  --z-content: 1;
+  --z-sticky: 80;
+  --z-dropdown: 90;
+  --z-menu: 100;
+  --z-modal: 300;
+  --z-page-transition: 400;
+  --z-skip-link: 500;
+
+  --ink-92: rgba(17, 17, 17, 0.92);
+  --ink-72: rgba(17, 17, 17, 0.72);
+  --ink-54: rgba(17, 17, 17, 0.54);
+  --ink-18: var(--separator);
+  --ink-10: rgba(17, 17, 17, 0.08);
+  --ink-06: rgba(17, 17, 17, 0.045);
+
+  --white-92: rgba(255, 255, 255, 0.92);
+  --white-72: rgba(255, 255, 255, 0.78);
+  --white-54: rgba(255, 255, 255, 0.58);
+  --white-18: rgba(255, 255, 255, 0.22);
+  --white-10: rgba(255, 255, 255, 0.13);
+  --white-06: rgba(255, 255, 255, 0.08);
+
+  --paper-quiet: var(--surface-subtle);
+
+  --action: var(--ink);
+  --action-hover: var(--ink-raised);
+  --on-action: var(--white);
+  --accent: var(--action);
+  --accent-hover: var(--action-hover);
+  --btn-text: var(--on-action);
+
+  --success-tint: var(--success-soft);
+  --success-line: rgba(20, 113, 60, 0.42);
+  --danger-tint: var(--danger-soft);
+  --danger-line: rgba(179, 38, 30, 0.36);
+
+  --bg: var(--canvas);
+  --bg-page: var(--canvas);
+  --surface-1: var(--surface);
+  --surface-2: var(--canvas);
+  --surface-elevated: var(--surface);
+  --surface-soft: var(--ink-06);
+  --surface-muted: var(--ink-10);
+  --icon-text: var(--ink);
+
+  --text: var(--ink);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-muted);
+  --text-muted: var(--ink-muted);
+
+  --border: var(--separator);
+  --border-subtle: var(--separator);
+  --border-strong: var(--rule-strong);
+  --border-control: var(--rule-strong);
+  --list-border: var(--ink-10);
+  --track-thumb: var(--separator);
+
+  --link: var(--brand);
+  --link-card-text: var(--ink);
+  --link-card-hover-border: var(--ink);
+  --link-card-hover-shadow: var(--shadow-ink-10);
+  --favicon-chip-bg: var(--ink-06);
+  --favicon-chip-border: var(--separator);
+
+  --shadow-ink-10: rgba(17, 17, 17, 0.07);
+  --shadow-ink-18: rgba(17, 17, 17, 0.12);
+  --shadow-soft: none;
+  --shadow-card-hover: none;
+  --shadow-panel: var(--shadow-float);
+  --shadow-pop: var(--shadow-dialog);
+  --edge-light: none;
+
+  --glass-1: var(--surface);
+
+  --radius: var(--radius-panel);
+  --radius-tag: var(--radius-row);
+
 }

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build:assets": "node scripts/build-assets.js",
+    "test": "node --test --test-reporter=spec \"test/**/*.test.js\"",
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "prisma:generate": "prisma generate",

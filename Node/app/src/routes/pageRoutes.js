@@ -1,6 +1,14 @@
 import { Router } from "express";
-import { renderCustomerDetails } from "../controllers/customerController.js";
+import {
+  redirectExploreToProfile,
+  redirectLegacyCustomer,
+  renderOwnProfile,
+  renderPublicProfile,
+} from "../controllers/profilePageController.js";
 import { renderPage } from "../controllers/pageController.js";
+import { renderAchievementsPage } from "../controllers/achievementController.js";
+import { renderBattlePage } from "../controllers/battleController.js";
+import { renderHelpPage } from "../controllers/helpController.js";
 import {
   renderSettingsPage,
   updateCurrentUserName,
@@ -13,7 +21,13 @@ import { nicknameSchema, passwordChangeSchema } from "../validators/userSettings
 
 const router = Router();
 
-router.get("/customer/:id", requireAuth, asyncHandler(renderCustomerDetails));
+router.get("/customer/:id", requireAuth, redirectLegacyCustomer);
+router.get("/profile", requireAuth, asyncHandler(renderOwnProfile));
+router.get("/profile/:id", requireAuth, asyncHandler(renderPublicProfile));
+router.get("/explore", requireAuth, redirectExploreToProfile);
+router.get("/achievements", requireAuth, asyncHandler(renderAchievementsPage()));
+router.get("/battle", requireAuth, asyncHandler(renderBattlePage));
+router.get("/help", requireAuth, renderHelpPage);
 router.get("/settings", requireAuth, renderSettingsPage);
 router.post("/settings/nickname", requireAuth, validateBody(nicknameSchema), asyncHandler(updateCurrentUserName));
 router.post("/settings/password", requireAuth, validateBody(passwordChangeSchema), asyncHandler(updateCurrentUserPassword));

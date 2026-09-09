@@ -1,71 +1,113 @@
-<main class="dashboard-page settings-page" data-settings-toast="<%= toastMessage || "" %>" data-settings-toast-variant="<%= toastVariant || "default" %>">
-  <section class="section dashboard-section">
-    <div class="container settings-container">
-      <div class="settings-grid">
-        <div class="settings-column">
-          <form class="dashboard-card settings-card settings-form" action="/settings/nickname" method="post">
-            <header class="dashboard-card-head">
-              <h2>Nickname</h2>
-            </header>
+<main id="main-content" tabindex="-1" class="dashboard-page settings-page" data-settings-toast="<%= toastMessage || "" %>" data-settings-toast-variant="<%= toastVariant || "default" %>">
+  <div class="page-shell">
 
-            <label class="settings-field">
-              <span>Nickname</span>
-              <input type="text" name="name" autocomplete="name" value="<%= values.name || auth.name %>" required />
-            </label>
+    <header class="page-head">
+      <h1 class="page-head-title">Settings</h1>
+      <p class="page-head-lede">Manage your account and correct today's recorded answers.</p>
+    </header>
 
-            <%- include("../../components/ui/button", {
-              tag: "button",
-              type: "submit",
-              variant: "primary",
-              className: "settings-submit",
-              label: "Save nickname"
-            }) %>
-          </form>
+    <section class="settings-group" aria-labelledby="settings-account-title">
+      <h2 class="settings-group-title" id="settings-account-title">Account</h2>
 
-          <section class="dashboard-card settings-card settings-answer-card" data-settings-answer>
-            <header class="dashboard-card-head settings-answer-head">
-              <h2>Today's answer</h2>
-              <span class="settings-answer-status" data-settings-answer-current>Loading</span>
-            </header>
+      <form class="settings-form" action="/settings/nickname" method="post">
+        <div class="settings-row">
+          <span class="settings-row-label">
+            <label class="field-label" for="settings-nickname">Nickname</label>
+            <span class="field-hint">The name other members see on leaderboards and prayers.</span>
+          </span>
+          <span class="settings-row-control">
+            <input
+              class="field-input settings-input"
+              id="settings-nickname"
+              type="text"
+              name="name"
+              autocomplete="name"
+              spellcheck="false"
+              value="<%= values.name || auth.name %>"
+              required
+            />
+          </span>
+        </div>
+        <div class="settings-row settings-row--actions">
+          <button class="ui-button ui-button--primary" type="submit">Save nickname</button>
+        </div>
+      </form>
+    </section>
 
-            <div class="settings-answer-actions" aria-label="Change today's answer">
-              <button class="settings-answer-button settings-answer-yes" type="button" data-settings-answer-option="YES" aria-pressed="false">YES</button>
-              <button class="settings-answer-button settings-answer-no" type="button" data-settings-answer-option="NO" aria-pressed="false">NO</button>
-            </div>
-          </section>
+    <section class="settings-group" aria-labelledby="settings-password-title">
+      <h2 class="settings-group-title" id="settings-password-title">Password</h2>
+      <p class="settings-group-note">Changing your password does not sign out your other sessions.</p>
+
+      <form class="settings-form" action="/settings/password" method="post">
+        <div class="settings-row">
+          <span class="settings-row-label">
+            <label class="field-label" for="settings-current-password">Current password</label>
+          </span>
+          <span class="settings-row-control">
+            <input class="field-input settings-input" id="settings-current-password" type="password" name="currentPassword" autocomplete="current-password" required />
+          </span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">
+            <label class="field-label" for="settings-new-password">New password</label>
+            <span class="field-hint">At least 8 characters.</span>
+          </span>
+          <span class="settings-row-control">
+            <input class="field-input settings-input" id="settings-new-password" type="password" name="password" autocomplete="new-password" minlength="8" required />
+          </span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-row-label">
+            <label class="field-label" for="settings-confirm-password">Confirm new password</label>
+          </span>
+          <span class="settings-row-control">
+            <input class="field-input settings-input" id="settings-confirm-password" type="password" name="passwordConfirmation" autocomplete="new-password" minlength="8" required />
+          </span>
+        </div>
+        <div class="settings-row settings-row--actions">
+          <button class="ui-button ui-button--primary" type="submit">Change password</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="settings-group" aria-labelledby="settings-today-title">
+      <h2 class="settings-group-title" id="settings-today-title">Today's answers</h2>
+      <p class="settings-group-note">Use this section to correct an answer. Record new answers on <a class="link" href="/daily-check-in">Today</a>.</p>
+
+      <div class="surface-panel">
+        <div class="settings-row" data-settings-answer>
+          <span class="settings-row-label">
+            <span class="field-label">Strong</span>
+            <span class="field-hint" data-settings-answer-current>Loading…</span>
+          </span>
+          <span class="settings-row-control settings-answer-actions" role="group" aria-label="Change today's answer">
+            <button class="settings-answer-button settings-answer-yes" type="button" data-settings-answer-option="YES" aria-pressed="false">YES</button>
+            <button class="settings-answer-button settings-answer-no" type="button" data-settings-answer-option="NO" aria-pressed="false">NO</button>
+          </span>
         </div>
 
-        <form class="dashboard-card settings-card settings-form" action="/settings/password" method="post">
-          <header class="dashboard-card-head">
-            <h2>Password</h2>
-          </header>
+        <div class="settings-row settings-row--stacked" data-settings-reading>
+          <span class="settings-row-label">
+            <span class="field-label">Bible reading</span>
+            <span class="field-hint" data-settings-reading-current>Loading…</span>
+          </span>
+          <span class="settings-row-control settings-answer-actions" role="group" aria-label="Change today's Bible reading answer">
+            <button class="settings-answer-button settings-answer-yes" type="button" data-settings-reading-answer-option="YES" aria-pressed="false">YES</button>
+            <button class="settings-answer-button settings-answer-no" type="button" data-settings-reading-answer-option="NO" aria-pressed="false">NO</button>
+          </span>
 
-          <label class="settings-field">
-            <span>Current password</span>
-            <input type="password" name="currentPassword" autocomplete="current-password" required />
-          </label>
-
-          <label class="settings-field">
-            <span>New password</span>
-            <input type="password" name="password" autocomplete="new-password" required />
-          </label>
-
-          <label class="settings-field">
-            <span>Confirm new password</span>
-            <input type="password" name="passwordConfirmation" autocomplete="new-password" required />
-          </label>
-
-          <%- include("../../components/ui/button", {
-            tag: "button",
-            type: "submit",
-            variant: "primary",
-            className: "settings-submit",
-            label: "Change password"
-          }) %>
-        </form>
+          <div class="settings-reading-details" data-settings-reading-details hidden>
+            <p class="field-label">Today's passages</p>
+            <ul class="settings-reading-refs" data-settings-reading-refs></ul>
+            <button class="ui-button ui-button--quiet settings-reading-edit" type="button" data-settings-reading-edit>Edit passages and reflection</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+  </div>
+
+  <%- include("./reading-modal") %>
 
   <%- include("../../components/layout/footer") %>
 </main>

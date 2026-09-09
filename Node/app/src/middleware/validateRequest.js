@@ -1,7 +1,14 @@
 function parseBody(schema, body) {
   const result = schema.safeParse(body);
   if (!result.success) {
-    return { errors: result.error.issues.map((issue) => issue.message) };
+    const fieldErrors = {};
+    for (const issue of result.error.issues) {
+      const field = issue.path?.[0];
+      if (typeof field !== "string") continue;
+      (fieldErrors[field] ||= []).push(issue.message);
+    }
+
+    return { errors: result.error.issues.map((issue) => issue.message), fieldErrors };
   }
 
   return { data: result.data };
@@ -9,9 +16,10 @@ function parseBody(schema, body) {
 
 export function validateBody(schema) {
   return (req, res, next) => {
-    const { errors, data } = parseBody(schema, req.body);
+    const { errors, fieldErrors, data } = parseBody(schema, req.body);
     if (errors) {
       req.validationErrors = errors;
+      req.validationFieldErrors = fieldErrors;
       return next();
     }
 

@@ -3,14 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="theme-color" content="#111111" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="/brand/achimari-mark.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/achimari-mark-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/brand/achimari-touch-icon.png" />
+    <link rel="mask-icon" href="/brand/achimari-symbol.svg" color="#111111" />
+    <link rel="manifest" href="/brand/site.webmanifest" />
+    <link rel="preload" href="/fonts/achimari-hand/AchimariHand-Regular.otf" as="font" type="font/otf" crossorigin />
     <title><%= title || "" %></title>
     <%- include("./loading-head") %>
-    <% (assets.styles || []).forEach((href, index, styles) => { %>
-      <link rel="stylesheet" href="<%= href %>"<%= index === styles.length - 1 ? ' onload="window.NoOrStylesReady && window.NoOrStylesReady()"' : "" %> />
+
+    <% const pageAssets = getPageAssets(pageId); %>
+    <% const authStyles = [...(assets.styles || []), ...(pageAssets.styles || [])]; %>
+    <% authStyles.forEach((href) => { %>
+      <link rel="stylesheet" href="<%= href %>" onload="window.NoOrTrackStylesheet()" onerror="window.NoOrTrackStylesheet()" />
     <% }) %>
+    <script>window.NoOrSealStylesheets(<%= authStyles.length %>)</script>
   </head>
   <body data-page="<%= pageId %>">
+
+    <%- include("./ambient-sky") %>
+
+    <div class="noor-loader" data-noor-loader aria-hidden="true">
+      <div class="noor-loader-mark" aria-hidden="true"><%- include("../ui/brand-symbol", { className: "noor-loader-symbol" }) %></div>
+      <p class="sr-only" role="status" aria-live="polite" data-noor-loader-status></p>
+    </div>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <%- body %>
   </body>
 </html>

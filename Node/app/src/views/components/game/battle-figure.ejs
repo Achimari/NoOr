@@ -1,0 +1,36 @@
+
+<div
+  class="battle-figure battle-figure-<%= side %>"
+  data-character="<%= side %>"
+  data-pose="idle"
+  data-art="silhouette"
+  data-silhouette="<%= side === "you" ? "guardian" : "wraith" %>"
+  aria-hidden="true"
+>
+  <div class="battle-figure-motion" data-figure-motion>
+    <span class="battle-figure-shadow"></span>
+
+    <div class="battle-figure-facing">
+      <div class="battle-figure-idle">
+        <div class="battle-figure-pose">
+          <img class="battle-figure-image" data-character-image alt="" decoding="async" draggable="false" />
+          <span class="battle-figure-silhouettes">
+            <% if (side === "you") { %>
+              <%- include("./battle-silhouette", { kind: "guardian", uid: "you" }) %>
+            <% } else { %>
+              <%- include("./battle-silhouette", { kind: "wraith", uid: "them" }) %>
+              <%- include("./battle-silhouette", { kind: "guardian", uid: "them-guardian" }) %>
+            <% } %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <span class="battle-ward" data-ward></span>
+    <span class="battle-shield-ring" data-shield-ring></span>
+    <span class="battle-embers" data-embers><i></i><i></i><i></i></span>
+    <span class="battle-impact" data-impact></span>
+  </div>
+
+  <div class="battle-callouts" data-effect-layer="<%= side %>"></div>
+</div>

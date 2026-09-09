@@ -1,16 +1,53 @@
 <script>
   (function () {
     var root = document.documentElement;
-    var hideLoading = function () {
+    var settled = 0;
+    var expected = -1;
+    var revealed = false;
+    var watchdog = 0;
+    var revealTimer = 0;
+    var loadingStartedAt = window.performance && performance.now ? performance.now() : Date.now();
+    var minimumVisibleMs = 650;
+
+    function reveal() {
+      if (revealed) return;
+      var now = window.performance && performance.now ? performance.now() : Date.now();
+      var elapsed = now - loadingStartedAt;
+      var remaining = minimumVisibleMs - elapsed;
+      if (remaining > 0) {
+        window.clearTimeout(revealTimer);
+        revealTimer = window.setTimeout(reveal, remaining);
+        return;
+      }
+      revealed = true;
+      window.clearTimeout(watchdog);
+      window.clearTimeout(revealTimer);
       root.classList.remove("page-loading");
+      root.classList.add("page-entering");
+      window.setTimeout(function () {
+        root.classList.remove("page-entering");
+      }, 400);
+    }
+
+    function maybeReveal() {
+      if (expected >= 0 && settled >= expected) window.requestAnimationFrame(reveal);
+    }
+
+    window.NoOrTrackStylesheet = function () {
+      settled += 1;
+      maybeReveal();
+    };
+
+    window.NoOrSealStylesheets = function (total) {
+      expected = total;
+      maybeReveal();
     };
 
     root.classList.add("page-loading");
-    window.NoOrHideLoading = hideLoading;
-    window.NoOrStylesReady = function () {
-      window.requestAnimationFrame(hideLoading);
-    };
-    window.setTimeout(hideLoading, 900);
+    window.NoOrHideLoading = reveal;
+    window.NoOrStylesReady = reveal;
+
+    watchdog = window.setTimeout(reveal, 4000);
   })();
 </script>
 <noscript>
@@ -18,54 +55,92 @@
     html.page-loading {
       visibility: visible;
     }
+
+    html.page-loading body > *:not(.noor-loader) {
+      visibility: visible;
+    }
+
+    .noor-loader {
+      display: none;
+    }
   </style>
 </noscript>
 <style>
-  @keyframes noor-loader-spin {
-    from {
-      transform: translate(-50%, -50%) rotate(0deg);
-    }
-
-    to {
-      transform: translate(-50%, -50%) rotate(360deg);
-    }
-  }
 
   html.page-loading,
   html.page-loading body {
     min-height: 100%;
     margin: 0;
-    background: #000;
+    background: #f6f6f6;
   }
 
-  html.page-loading body > * {
+  html.page-loading body > *:not(.noor-loader) {
     visibility: hidden;
   }
 
-  html.page-loading body::before {
-    content: "";
+  .noor-loader {
     position: fixed;
     inset: 0;
-    z-index: 9998;
-    visibility: visible;
-    background: #000;
+
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f6f6f6;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      visibility 0s linear 160ms;
   }
 
-  html.page-loading body::after {
-    content: "";
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    z-index: 9999;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+  html.page-loading .noor-loader,
+  html.page-transitioning .noor-loader {
+    opacity: 1;
     visibility: visible;
-    transform: translate(-50%, -50%);
-    background:
-      radial-gradient(circle at center, #000 0 47%, transparent 48%),
-      conic-gradient(from 18deg, #fff 0 70%, rgba(255, 255, 255, 0.18) 70% 82%, transparent 82% 100%);
-    transform-origin: center;
-    animation: noor-loader-spin 0.52s linear infinite;
+    transition-delay: 0s;
+  }
+
+  .noor-loader-mark {
+    width: 44px;
+    height: 44px;
+    display: block;
+    color: #0d0d0d;
+    animation: noor-loader-spin 1.25s var(--loader-ease, cubic-bezier(0.45, 0, 0.55, 1)) infinite;
+  }
+
+  .noor-loader-symbol {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  @keyframes noor-loader-spin {
+    0%,
+    100% {
+      opacity: 0.28;
+      transform: scale(0.72);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .noor-loader-mark {
+      animation: none;
+      transform: none;
+      opacity: 0.5;
+    }
+
+    .noor-loader {
+      transition:
+        opacity 200ms ease,
+        visibility 0s linear 200ms;
+    }
   }
 </style>

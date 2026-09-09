@@ -1,4 +1,4 @@
-/* ================= GENERIC SECTIONS ================= */
+
 .section {
   padding: var(--section-padding) 0;
 }
@@ -36,4 +36,13 @@
 
 .page-subtitle {
   margin-bottom: 0;
+}
+
+.not-found-action {
+  display: flex;
+  justify-content: center;
+}
+
+.not-found-action:has(.ui-button:empty) {
+  display: none;
 }

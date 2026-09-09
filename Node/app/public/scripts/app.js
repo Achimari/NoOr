@@ -1,23 +1,20 @@
-const leaderboardRoot = document.querySelector("[data-leaderboard]");
-const overallBestValue = document.querySelector("[data-overall-best-value]");
-const overallBestName = document.querySelector("[data-overall-best-name]");
+const dailyCheckInRoot = document.querySelector("[data-daily-check-in]");
+const leaderboardRoot = document.querySelector("[data-recovery-leaderboard]");
+const overallBestValue = document.querySelector('[data-streak-best-value="recovery"]');
+const overallBestName = document.querySelector('[data-streak-best-name="recovery"]');
 const leaderboardBody = document.querySelector("[data-leaderboard-body]");
-const tableCount = document.querySelector("[data-table-count]");
+const tableCount = document.querySelector('[data-streak-count="recovery"]');
 const yesButton = document.querySelector(".dashboard-action-yes");
 const noButton = document.querySelector(".dashboard-action-no");
 const checkInMessage = document.querySelector("[data-check-in-message]");
 const checkInTimer = document.querySelector("[data-check-in-timer]");
 const checkInProgress = document.querySelector("[data-check-in-progress]");
-const dashboardWeek = document.querySelector(".dashboard-week");
-const weekDayButtons = document.querySelectorAll("[data-week-day]");
 const prayerForm = document.querySelector("[data-prayer-form]");
 const prayersBody = document.querySelector("[data-prayers-body]");
 const prayerCount = document.querySelector("[data-prayer-count]");
 const activePrayersBody = document.querySelector('[data-prayer-list="active"]');
 const activePrayerCount = document.querySelector("[data-active-prayer-count]");
 const prayerStatus = document.querySelector("[data-prayer-status]");
-const prayerFilterToggle = document.querySelector("[data-prayer-filter-toggle]");
-const prayerFilterPanel = document.querySelector("[data-prayer-filter-panel]");
 const prayerUserFilter = document.querySelector("[data-prayer-user-filter]");
 const prayerUserOptions = document.querySelector("[data-prayer-user-options]");
 const prayerTimeToggle = document.querySelector("[data-prayer-time-toggle]");
@@ -37,15 +34,15 @@ const timezoneEmpty = document.querySelector("[data-timezone-empty]");
 const settingsAnswer = document.querySelector("[data-settings-answer]");
 const settingsAnswerCurrent = document.querySelector("[data-settings-answer-current]");
 const settingsAnswerOptions = document.querySelectorAll("[data-settings-answer-option]");
+const settingsReading = document.querySelector("[data-settings-reading]");
 const prayerReactionEmoji = ["🙏", "❤️", "🙌", "🕊️", "💪", "🤍"];
-const currentUserId = Number(leaderboardRoot?.dataset.currentUserId || 0);
+const currentUserId = Number((dailyCheckInRoot || leaderboardRoot)?.dataset.currentUserId || 0);
 let resetTimerId;
 let allPrayers = [];
 let prayerTimeOrder = "newest";
 let toastTimerId;
 let reactionChooserPrayerId = null;
 let prayerActionsTrigger = null;
-let missedAnswerDateKey = null;
 let settingsCurrentAnswer = null;
 let pendingSettingsAnswer = null;
 
@@ -94,14 +91,14 @@ function restoreModalTrigger() {
     return;
   }
 
-  if (target.hasAttribute?.("data-missed-open")) {
-    document.querySelector("[data-missed-open]")?.focus();
+  if (target.hasAttribute?.("data-catch-up-open")) {
+    focusCatchUpAfterSave();
   }
 }
 
 function getOpenModal() {
   return document.querySelector(
-    "[data-prayer-reaction-chooser]:not([hidden]), [data-missed-answer-modal]:not([hidden]), [data-settings-answer-confirm-modal]:not([hidden])",
+    "[data-prayer-reaction-chooser]:not([hidden]), [data-catch-up-answer-modal]:not([hidden]), [data-catch-up-tasks-modal]:not([hidden]), [data-settings-answer-confirm-modal]:not([hidden]), [data-settings-reading-confirm-modal]:not([hidden]), [data-reading-modal]:not([hidden])",
   );
 }
 
@@ -201,7 +198,10 @@ timezoneOptions?.addEventListener("click", async (event) => {
   }
   setTimezoneMenuOpen(false);
   showToast("Timezone updated");
-  window.setTimeout(() => window.location.reload(), 400);
+  window.setTimeout(() => {
+    startPageTransition();
+    window.location.reload();
+  }, 400);
 });
 
 document.addEventListener("click", (event) => {
@@ -247,7 +247,6 @@ function setSettingsAnswerState(answer) {
 
   settingsAnswerOptions.forEach((button) => {
     const isSelected = button.dataset.settingsAnswerOption === answer;
-    button.classList.toggle("selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
   });
   setAmbientAnswerState(answer);
@@ -307,19 +306,16 @@ if (settingsAnswer) {
 function renderLeaderboard(leaderboard) {
   if (!leaderboardRoot || !leaderboard || !leaderboardBody) return;
 
+  const bestValue = leaderboard.overallBest?.value || 0;
   if (overallBestValue) {
-    overallBestValue.textContent = leaderboard.overallBest?.value || 0;
+    overallBestValue.textContent = `${bestValue} ${bestValue === 1 ? "day" : "days"}`;
   }
   if (overallBestName) {
     overallBestName.textContent = leaderboard.overallBest?.name || "No record yet";
   }
-  if (dashboardWeek && leaderboard.current.todayDateKey) {
-    dashboardWeek.dataset.currentDateKey = leaderboard.current.todayDateKey;
-  }
-  renderWeekDays(leaderboard.current.weekDays);
 
   if (tableCount) {
-    tableCount.textContent = `${leaderboard.leaders.length} users`;
+    tableCount.textContent = `${leaderboard.leaders.length} ${leaderboard.leaders.length === 1 ? "user" : "users"}`;
   }
 
   leaderboardBody.innerHTML = leaderboard.leaders.length
@@ -331,12 +327,11 @@ function renderLeaderboard(leaderboard) {
               <td>
                 <span class="leaderboard-user-cell">
                   <a class="leaderboard-user user-link" href="/customer/${entry.id}">${userIcon()}${escapeHtml(entry.name)}</a>
-                  ${renderInactiveTag(entry)}
                 </span>
               </td>
               <td>
                 <span class="leaderboard-streak">
-                  <span class="leaderboard-streak-value">${entry.value} days</span>
+                  <span class="leaderboard-streak-value">${entry.value} ${entry.value === 1 ? "day" : "days"}</span>
                   ${renderMissedDaysTag(entry)}
                 </span>
               </td>
@@ -344,14 +339,7 @@ function renderLeaderboard(leaderboard) {
           `,
         )
         .join("")
-    : '<tr><td colspan="3" class="leaderboard-empty"><span class="table-empty-title">No streaks yet</span><span class="table-empty-hint">Answer today\'s question above to start the first streak.</span></td></tr>';
-}
-
-function renderInactiveTag(entry) {
-  if (!entry?.isInactive || !entry.inactiveDays) return "";
-
-  const unit = entry.inactiveDays === 1 ? "day" : "days";
-  return `<span class="leaderboard-inactive-tag" data-mobile-label="${entry.inactiveDays}d inactive">Inactive for ${entry.inactiveDays} ${unit}</span>`;
+    : '<tr><td colspan="3" class="leaderboard-empty"><span class="table-empty-title">No recovery streaks yet.</span><span class="table-empty-hint">Answer today\'s question to start the first streak.</span></td></tr>';
 }
 
 function renderMissedDaysTag(entry) {
@@ -360,42 +348,8 @@ function renderMissedDaysTag(entry) {
 
   const separator = '<span class="leaderboard-streak-separator" aria-hidden="true">·</span>';
   const label = `${missedDays.count} missed`;
-  if (Number(entry.id) !== currentUserId) {
-    return `${separator}<span class="leaderboard-missed-tag is-static">${escapeHtml(label)}</span>`;
-  }
 
-  const ariaLabel = `Answer ${missedDays.count} missed ${missedDays.count === 1 ? "day" : "days"}`;
-  return `
-    ${separator}
-    <button class="leaderboard-missed-tag" type="button" data-missed-open data-missed-date="${escapeHtml(missedDays.nextDateKey || "")}" data-missed-count="${missedDays.count}" aria-label="${escapeHtml(ariaLabel)}">
-      ${escapeHtml(label)}
-    </button>
-  `;
-}
-
-function renderWeekDays(weekDays) {
-  if (!weekDayButtons.length || !Array.isArray(weekDays)) return;
-
-  weekDayButtons.forEach((dayButton, index) => {
-    const day = weekDays[index];
-    const answer = day?.answer || "";
-    if (day?.dateKey) dayButton.dataset.weekDay = day.dateKey;
-    if (day?.label) dayButton.textContent = day.label;
-    dayButton.classList.toggle("active", Boolean(day?.successful));
-    dayButton.classList.toggle("missed", Boolean(day?.missed));
-    dayButton.dataset.weekAnswer = answer;
-    dayButton.dataset.weekMissed = day?.missed ? "true" : "false";
-  });
-}
-
-function markTodayWeekDay(answer) {
-  const todayKey = dashboardWeek?.dataset.currentDateKey;
-  if (!todayKey) return;
-  const todayButton = [...weekDayButtons].find((dayButton) => dayButton.dataset.weekDay === todayKey);
-  if (!todayButton) return;
-
-  todayButton.classList.toggle("active", answer === "YES");
-  todayButton.dataset.weekAnswer = answer;
+  return `${separator}<span class="leaderboard-missed-tag is-static">${escapeHtml(label)}</span>`;
 }
 
 function userIcon() {
@@ -581,7 +535,6 @@ function openReactionChooser(prayerId) {
   chooser.querySelectorAll("[data-prayer-reaction]").forEach((button) => {
     button.disabled = false;
     const isSelected = prayer?.currentReaction === button.dataset.prayerReaction;
-    button.classList.toggle("selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
     button.setAttribute("aria-label", isSelected ? `Remove ${button.dataset.prayerReaction} reaction` : `React ${button.dataset.prayerReaction}`);
   });
@@ -604,69 +557,6 @@ function closeReactionChooser() {
   if (wasOpen) restoreModalTrigger();
 }
 
-function formatMissedDate(dateKey) {
-  if (!dateKey) return "this missed day";
-  const date = new Date(`${dateKey}T12:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) return dateKey;
-  return date.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function getMissedAnswerModal() {
-  let modal = document.querySelector("[data-missed-answer-modal]");
-  if (modal) return modal;
-
-  modal = document.createElement("div");
-  modal.className = "missed-answer-modal";
-  modal.setAttribute("data-missed-answer-modal", "");
-  modal.hidden = true;
-  modal.innerHTML = `
-    <div class="missed-answer-backdrop" data-missed-close></div>
-    <div class="missed-answer-dialog" role="dialog" aria-modal="true" aria-labelledby="missed-answer-title">
-      <header class="missed-answer-head">
-        <p class="dashboard-label">Missed day</p>
-        <h2 id="missed-answer-title" data-missed-title>Answer missed day</h2>
-      </header>
-      <div class="missed-answer-actions">
-        <button class="dashboard-action dashboard-action-yes" type="button" data-missed-answer="YES">Yes, I did</button>
-        <button class="dashboard-action dashboard-action-no" type="button" data-missed-answer="NO">No, I didn't</button>
-      </div>
-    </div>
-  `;
-  document.body.append(modal);
-  return modal;
-}
-
-function openMissedAnswerModal(dateKey) {
-  if (!dateKey) return;
-  rememberModalTrigger();
-  missedAnswerDateKey = dateKey;
-  const modal = getMissedAnswerModal();
-  const title = modal.querySelector("[data-missed-title]");
-  if (title) title.textContent = `Answer ${formatMissedDate(dateKey)}`;
-  modal.querySelectorAll("[data-missed-answer]").forEach((button) => {
-    button.disabled = false;
-  });
-  modal.hidden = false;
-  modal.querySelector("[data-missed-answer]")?.focus();
-}
-
-function closeMissedAnswerModal() {
-  const modal = document.querySelector("[data-missed-answer-modal]");
-  const wasOpen = Boolean(modal && !modal.hidden);
-  if (modal) {
-    modal.hidden = true;
-    modal.querySelectorAll("[data-missed-answer]").forEach((button) => {
-      button.disabled = false;
-    });
-  }
-  missedAnswerDateKey = null;
-  if (wasOpen) restoreModalTrigger();
-}
-
 function getSettingsAnswerConfirmModal() {
   let modal = document.querySelector("[data-settings-answer-confirm-modal]");
   if (modal) return modal;
@@ -684,8 +574,8 @@ function getSettingsAnswerConfirmModal() {
         <p data-settings-answer-confirm-copy>Change today's answer?</p>
       </header>
       <div class="settings-confirm-actions">
-        <button class="settings-confirm-button settings-confirm-cancel" type="button" data-settings-answer-cancel>Cancel</button>
-        <button class="settings-confirm-button settings-confirm-save" type="button" data-settings-answer-confirm>Change</button>
+        <button class="ui-button ui-button--secondary" type="button" data-settings-answer-cancel>Cancel</button>
+        <button class="ui-button ui-button--primary" type="button" data-settings-answer-confirm>Change</button>
       </div>
     </div>
   `;
@@ -763,20 +653,15 @@ function closePrayerMenus(except = null) {
   if (except !== "time") setTimeMenuOpen(false);
 }
 
-function setPrayerFilterPanelOpen(isOpen) {
-  if (!prayerFilterPanel || !prayerFilterToggle) return;
-  prayerFilterPanel.hidden = !isOpen;
-  prayerFilterToggle.setAttribute("aria-expanded", String(isOpen));
-  prayerFilterPanel.closest(".info-prayers")?.classList.toggle("filter-open", isOpen);
-}
-
 function updatePrayerTimeState() {
   if (prayerTimeLabel) {
     prayerTimeLabel.textContent = prayerTimeOrder === "oldest" ? "Oldest first" : "Newest first";
   }
 
   prayerTimeMenu?.querySelectorAll("[data-prayer-time-option]").forEach((button) => {
-    button.classList.toggle("selected", button.dataset.prayerTimeOption === prayerTimeOrder);
+    const isCurrent = button.dataset.prayerTimeOption === prayerTimeOrder;
+    if (isCurrent) button.setAttribute("aria-current", "true");
+    else button.removeAttribute("aria-current");
   });
 }
 
@@ -822,7 +707,7 @@ function resetPrayerFilters() {
 }
 
 function isPrayerFilterTarget(target) {
-  return Boolean(target.closest("[data-prayer-filter-panel]") || target.closest("[data-prayer-filter-toggle]"));
+  return Boolean(target.closest("[data-prayer-filter-panel]"));
 }
 
 function bindPrayerFilterControls() {
@@ -859,7 +744,6 @@ function bindPrayerFilterControls() {
   document.addEventListener("click", (event) => {
     if (!isPrayerFilterTarget(event.target)) {
       closePrayerMenus();
-      setPrayerFilterPanelOpen(false);
     }
   });
 }
@@ -913,24 +797,29 @@ function renderPrayers(prayers, targetBody = prayersBody) {
           const canAnswer = showActions && item.canMarkAnswered;
           const rowMenu =
             showReactions || canAnswer
-              ? `<button class="action-menu-trigger" type="button" data-prayer-actions-open data-prayer-id="${item.id}" data-prayer-can-react="${showReactions}" data-prayer-can-answer="${canAnswer}" aria-haspopup="menu" aria-expanded="false" aria-controls="prayer-actions-menu" aria-label="Open prayer actions">${actionMenuTriggerIcon()}</button>`
+              ? `<button class="action-menu-trigger prayer-item-menu" type="button" data-prayer-actions-open data-prayer-id="${item.id}" data-prayer-can-react="${showReactions}" data-prayer-can-answer="${canAnswer}" aria-haspopup="menu" aria-expanded="false" aria-controls="prayer-actions-menu" aria-label="Open prayer actions">${actionMenuTriggerIcon()}</button>`
               : "";
 
           return `
-            <tr>
-              <td><a class="leaderboard-user user-link" href="/customer/${item.userId}">${userIcon()}${escapeHtml(item.userName)}</a></td>
-              <td>
-                <div class="prayer-entry">
-                  <p class="prayer-message-text">${escapeHtml(item.prayer)}</p>
-                  ${reactions ? `<div class="prayer-entry-meta">${reactions}</div>` : ""}
-                </div>
-              </td>
-              ${showRowMenu ? `<td class="prayer-row-actions">${rowMenu}</td>` : ""}
-            </tr>
+            <li class="prayer-item"
+                data-prayer-row
+                data-prayer-id="${item.id}"
+                data-prayer-user-id="${item.userId}"
+                data-prayer-user-name="${escapeHtml(item.userName)}"
+                data-prayer-text="${escapeHtml(item.prayer)}"
+                data-prayer-can-mark-answered="${item.canMarkAnswered ? "true" : "false"}"
+                data-prayer-current-reaction="${escapeHtml(item.currentReaction || "")}">
+              <div class="prayer-item-head">
+                <a class="leaderboard-user user-link prayer-item-author" href="/customer/${item.userId}">${escapeHtml(item.userName)}</a>
+                ${showRowMenu ? rowMenu : ""}
+              </div>
+              <p class="prayer-message-text">${escapeHtml(item.prayer)}</p>
+              ${reactions ? `<div class="prayer-entry-meta">${reactions}</div>` : ""}
+            </li>
           `;
         })
         .join("")
-    : `<tr><td colspan="${2 + (showRowMenu ? 1 : 0)}" class="leaderboard-empty"><span class="table-empty-title">${emptyLabel}</span><span class="table-empty-hint">${emptyHint}</span></td></tr>`;
+    : `<li class="prayer-item prayer-item--empty"><div class="empty-state"><p class="empty-state-title">${emptyLabel}</p><p class="empty-state-note">${emptyHint}</p></div></li>`;
 }
 
 function applyPrayerFilters() {
@@ -967,13 +856,6 @@ async function markPrayerAnswered(prayerId, control) {
 
   await loadPrayers();
   showToast("Prayer marked as answered");
-}
-
-if (prayerFilterToggle && prayerFilterPanel) {
-  prayerFilterToggle.addEventListener("click", () => {
-    const isOpen = prayerFilterPanel.hidden;
-    setPrayerFilterPanelOpen(isOpen);
-  });
 }
 
 prayerUserFilter?.addEventListener("focus", openUserMenu);
@@ -1044,54 +926,6 @@ document.addEventListener("click", async (event) => {
     });
     closeSettingsAnswerConfirmModal();
     await saveSettingsAnswer(answer);
-    return;
-  }
-
-  const missedCloseButton = event.target.closest("[data-missed-close]");
-  if (missedCloseButton) {
-    closeMissedAnswerModal();
-    return;
-  }
-
-  const missedOpenButton = event.target.closest("[data-missed-open]");
-  if (missedOpenButton) {
-    openMissedAnswerModal(missedOpenButton.dataset.missedDate);
-    return;
-  }
-
-  const missedAnswerButton = event.target.closest("[data-missed-answer]");
-  if (missedAnswerButton && missedAnswerDateKey) {
-    const modal = missedAnswerButton.closest("[data-missed-answer-modal]");
-    const answer = missedAnswerButton.dataset.missedAnswer;
-    modal?.querySelectorAll("[data-missed-answer]").forEach((button) => {
-      button.disabled = true;
-    });
-
-    const result = await apiFetch("/api/check-in/missed", {
-      method: "POST",
-      body: {
-        dateKey: missedAnswerDateKey,
-        answer,
-      },
-    });
-    if (!result) return;
-
-    if (!result.ok || !result.data.leaderboard) {
-      modal?.querySelectorAll("[data-missed-answer]").forEach((button) => {
-        button.disabled = false;
-      });
-      showToast(result.data.error || "Could not save missed day", "error");
-      return;
-    }
-
-    renderLeaderboard(result.data.leaderboard);
-    if (result.data.status) {
-      setAnswerState(result.data.status);
-    } else {
-      await loadCheckInStatus();
-    }
-    closeMissedAnswerModal();
-    showToast(answer === "YES" ? "Missed day saved: yes" : "Missed day saved: no");
     return;
   }
 
@@ -1180,30 +1014,80 @@ document.addEventListener("keydown", (event) => {
     setHeaderMenuOpen(false);
     setTimezoneMenuOpen(false);
     closeReactionChooser();
-    closeMissedAnswerModal();
+    closeCatchUpAnswerModal();
+    closeCatchUpTasksModal();
     closeSettingsAnswerConfirmModal();
+    closeSettingsReadingConfirmModal();
+    closeReadingModal();
   }
 });
 
 window.addEventListener("resize", () => closePrayerActionsMenu());
 window.addEventListener("scroll", () => closePrayerActionsMenu(), true);
 
+const practiceLedgerNodes = {
+  strong: document.querySelector('[data-practice-status="strong"]'),
+  bible: document.querySelector('[data-practice-status="bible"]'),
+  tasks: document.querySelector('[data-practice-status="tasks"]'),
+};
+const horizonBand = document.querySelector("[data-horizon]");
+
+const REVEAL_BATCH_CAP = 5;
+
+window.NoOrRevealNewRows = revealNewRows;
+
+function revealNewRows(rows, previouslyVisible) {
+  rows.slice(previouslyVisible, previouslyVisible + REVEAL_BATCH_CAP).forEach((row, index) => {
+    row.style.setProperty("--reveal-index", String(index));
+    row.classList.remove("is-revealing");
+    void row.offsetWidth;
+    row.classList.add("is-revealing");
+    row.addEventListener("animationend", () => row.classList.remove("is-revealing"), { once: true });
+  });
+}
+
+function setPracticeStatus(practice, text, state) {
+  const node = practiceLedgerNodes[practice];
+  if (!node) return;
+  const changed = node.textContent !== text;
+  node.textContent = text;
+  if (state) node.dataset.state = state;
+  else delete node.dataset.state;
+
+  if (!changed) return;
+  node.classList.remove("is-settling");
+  void node.offsetWidth;
+  node.classList.add("is-settling");
+  node.addEventListener("animationend", () => node.classList.remove("is-settling"), { once: true });
+}
+
+function setHorizonState(answer) {
+  if (!horizonBand) return;
+  horizonBand.dataset.state = answer === "YES" ? "yes" : answer === "NO" ? "no" : "neutral";
+}
+
+function answerWords(answer) {
+  if (answer === "YES") return { text: "Yes", state: "yes" };
+  if (answer === "NO") return { text: "No", state: "no" };
+  return { text: "Not answered", state: null };
+}
+
 function setDailyActionSelection(answer) {
   if (yesButton) {
-    yesButton.classList.toggle("selected", answer === "YES");
     yesButton.setAttribute("aria-pressed", String(answer === "YES"));
   }
   if (noButton) {
-    noButton.classList.toggle("selected", answer === "NO");
     noButton.setAttribute("aria-pressed", String(answer === "NO"));
   }
+  const strong = answerWords(answer);
+  setPracticeStatus("strong", strong.text, strong.state);
+  setHorizonState(answer);
   setAmbientAnswerState(answer);
 }
 
 async function updateLeaderboard(action) {
   const endpoint = action === "reset" ? "/api/leaderboard/reset" : "/api/leaderboard/increment";
   setDailyActionSelection(action === "increment" ? "YES" : "NO");
-  markTodayWeekDay(action === "increment" ? "YES" : "NO");
 
   const result = await apiFetch(endpoint, { method: "POST" });
   if (!result) return;
@@ -1229,7 +1113,7 @@ async function updateLeaderboard(action) {
   showToast(action === "reset" ? "Answer saved: no" : "Answer saved: yes");
 }
 
-if (leaderboardRoot) {
+if (dailyCheckInRoot) {
   yesButton?.addEventListener("click", () => updateLeaderboard("increment"));
   noButton?.addEventListener("click", () => updateLeaderboard("reset"));
   loadCheckInStatus();
@@ -1265,6 +1149,11 @@ if (prayerForm) {
     prayerForm.reset();
     if (prayerStatus) prayerStatus.textContent = "";
     await loadPrayers();
+    const newest = prayersBody?.querySelector("[data-prayer-id]");
+    if (newest) {
+      newest.classList.add("is-revealing");
+      newest.addEventListener("animationend", () => newest.classList.remove("is-revealing"), { once: true });
+    }
     showToast("Prayer request added");
   });
 }
@@ -1299,10 +1188,6 @@ async function loadCheckInStatus() {
 function setAnswerState(status) {
   if (!yesButton || !noButton) return;
   window.clearInterval(resetTimerId);
-  if (dashboardWeek && status.dateKey) {
-    dashboardWeek.dataset.currentDateKey = status.dateKey;
-  }
-  renderWeekDays(status.weekDays);
 
   const isLocked = status.canAnswer === false;
   yesButton.disabled = isLocked;
@@ -1343,7 +1228,7 @@ function renderResetTimer(nextResetAt) {
 
   checkInMessage.textContent = `${formatTimerPart(hours)}:${formatTimerPart(minutes)}:${formatTimerPart(seconds)}`;
   if (checkInProgress) {
-    checkInProgress.style.width = `${progress}%`;
+    checkInProgress.style.setProperty("--timer-progress", String(progress / 100));
     checkInProgress.parentElement?.setAttribute("aria-valuenow", String(Math.round(progress)));
   }
 }
@@ -1352,87 +1237,1905 @@ function formatTimerPart(value) {
   return String(value).padStart(2, "0");
 }
 
-/* ------------------------------------------------------------
-   Ambient background — "Heavenly light through dark clouds"
-   One muted looping video behind dashboard content: real
-   footage of sunlight breaking through layered dark clouds
-   (Pixabay Content License, stored locally as a 30s
-   crossfaded seamless loop). No rendering loop; JS only builds
-   the layer once, mirrors check-in state, and manages
-   play/pause for visibility, reduced motion, and Save-Data.
-   ------------------------------------------------------------ */
+const readingCheck = document.querySelector("[data-reading-check]");
+const readingYesButton = document.querySelector('[data-reading-answer="YES"]');
+const readingNoButton = document.querySelector('[data-reading-answer="NO"]');
+const readingSummary = document.querySelector("[data-reading-summary]");
+const readingSummaryBadge = document.querySelector("[data-reading-summary-badge]");
+const readingSummaryNote = document.querySelector("[data-reading-summary-note]");
+const readingSummaryRefs = document.querySelector("[data-reading-summary-refs]");
+const readingTimer = document.querySelector("[data-reading-timer]");
+const readingTimerMessage = document.querySelector("[data-reading-timer-message]");
+const readingTimerProgress = document.querySelector("[data-reading-timer-progress]");
+const readingModal = document.querySelector("[data-reading-modal]");
+const readingForm = document.querySelector("[data-reading-form]");
+const readingPassageList = document.querySelector("[data-reading-passage-list]");
+const readingPassageTemplate = document.querySelector("[data-reading-passage-template]");
+const readingAddPassage = document.querySelector("[data-reading-add-passage]");
+const readingError = document.querySelector("[data-reading-error]");
+const readingReflection = document.querySelector("[data-reading-reflection]");
+const readingReflectionCount = document.querySelector("[data-reading-reflection-count]");
+const readingSaveButton = document.querySelector("[data-reading-save]");
 
-const AMBIENT_VIDEO_SOURCES = [
-  { src: "/videos/ambient-sky.webm", type: "video/webm" },
-  { src: "/videos/ambient-sky.mp4", type: "video/mp4" },
-];
-const AMBIENT_VIDEO_POSTER = "/videos/ambient-sky.jpg";
+const READING_MAX_PASSAGES = 20;
+
+let readingBooks = null;
+let readingBooksRequest = null;
+let readingResetTimerId;
+let readingPassageSeed = 0;
+let readingSubmitting = false;
+let readingModalSession = null;
+
+async function loadBibleBooks() {
+  if (readingBooks) return readingBooks;
+  if (!readingBooksRequest) {
+    readingBooksRequest = apiFetch("/api/reading-check-in/books").then((result) => {
+      readingBooksRequest = null;
+      if (result?.ok && Array.isArray(result.data.books)) {
+        readingBooks = result.data.books;
+      }
+      return readingBooks;
+    });
+  }
+
+  return readingBooksRequest;
+}
+
+function findReadingBook(code) {
+  return readingBooks?.find((book) => book.code === code) || null;
+}
+
+function formatPassageReference({ bookName, chapter, startVerse, endVerse }) {
+  const verses = startVerse === endVerse ? `${startVerse}` : `${startVerse}–${endVerse}`;
+  return `${bookName} ${chapter}:${verses}`;
+}
+
+function fillSelect(select, values, { placeholder, selected }) {
+  select.replaceChildren();
+
+  const placeholderOption = document.createElement("option");
+  placeholderOption.value = "";
+  placeholderOption.textContent = placeholder;
+  select.append(placeholderOption);
+
+  for (const value of values) {
+    const option = document.createElement("option");
+    option.value = String(value.value ?? value);
+    option.textContent = String(value.label ?? value);
+    select.append(option);
+  }
+
+  select.value = selected !== undefined && selected !== null ? String(selected) : "";
+  if (!select.value) select.selectedIndex = 0;
+}
+
+function getPassageControls(row) {
+  return {
+    book: row.querySelector('[data-reading-select="book"]'),
+    chapter: row.querySelector('[data-reading-select="chapter"]'),
+    startVerse: row.querySelector('[data-reading-select="startVerse"]'),
+    endVerse: row.querySelector('[data-reading-select="endVerse"]'),
+  };
+}
+
+function range(count) {
+  return Array.from({ length: Math.max(0, count) }, (unused, index) => index + 1);
+}
+
+function syncChapterSelect(row, { chapter, startVerse, endVerse } = {}) {
+  const controls = getPassageControls(row);
+  const book = findReadingBook(controls.book.value);
+  const chapters = book ? range(book.chapters.length) : [];
+
+  fillSelect(controls.chapter, chapters, { placeholder: "Chapter", selected: chapter });
+  controls.chapter.disabled = !book;
+  syncVerseSelects(row, { startVerse, endVerse });
+}
+
+function syncVerseSelects(row, { startVerse, endVerse } = {}) {
+  const controls = getPassageControls(row);
+  const book = findReadingBook(controls.book.value);
+  const chapter = Number(controls.chapter.value);
+  const verseCount = book && chapter ? book.chapters[chapter - 1] || 0 : 0;
+
+  fillSelect(controls.startVerse, range(verseCount), { placeholder: "From", selected: startVerse });
+  controls.startVerse.disabled = !verseCount;
+  syncEndVerseSelect(row, endVerse);
+}
+
+function syncEndVerseSelect(row, endVerse) {
+  const controls = getPassageControls(row);
+  const book = findReadingBook(controls.book.value);
+  const chapter = Number(controls.chapter.value);
+  const verseCount = book && chapter ? book.chapters[chapter - 1] || 0 : 0;
+  const start = Number(controls.startVerse.value);
+  const verses = start ? range(verseCount).filter((verse) => verse >= start) : [];
+  const keep = endVerse && Number(endVerse) >= start ? endVerse : (start || null);
+
+  fillSelect(controls.endVerse, verses, { placeholder: "To", selected: keep });
+  controls.endVerse.disabled = !verses.length;
+}
+
+function renumberPassages() {
+  const rows = [...readingPassageList.querySelectorAll("[data-reading-passage]")];
+
+  rows.forEach((row, index) => {
+    const title = row.querySelector("[data-reading-passage-title]");
+    if (title) title.textContent = `Passage ${index + 1}`;
+
+    const removeButton = row.querySelector("[data-reading-remove-passage]");
+    if (removeButton) {
+      removeButton.hidden = rows.length < 2;
+      removeButton.setAttribute("aria-label", `Remove passage ${index + 1}`);
+    }
+  });
+
+  if (readingAddPassage) {
+    readingAddPassage.disabled = rows.length >= READING_MAX_PASSAGES;
+  }
+}
+
+function addPassageRow(passage) {
+  if (!readingPassageList || !readingPassageTemplate) return null;
+  if (readingPassageList.querySelectorAll("[data-reading-passage]").length >= READING_MAX_PASSAGES) return null;
+
+  readingPassageSeed += 1;
+  const row = readingPassageTemplate.content.firstElementChild.cloneNode(true);
+  const controls = getPassageControls(row);
+
+  for (const [field, select] of Object.entries(controls)) {
+    const label = row.querySelector(`[data-reading-label="${field}"]`);
+    const id = `reading-${field.toLowerCase()}-${readingPassageSeed}`;
+    select.id = id;
+    select.name = id;
+    if (label) label.setAttribute("for", id);
+  }
+
+  fillSelect(controls.book, (readingBooks || []).map((book) => ({ value: book.code, label: book.name })), {
+    placeholder: "Book",
+    selected: passage?.book,
+  });
+
+  readingPassageList.append(row);
+  syncChapterSelect(row, passage);
+  renumberPassages();
+
+  return row;
+}
+
+function readPassageRows() {
+  return [...readingPassageList.querySelectorAll("[data-reading-passage]")].map((row) => {
+    const controls = getPassageControls(row);
+
+    return {
+      row,
+      controls,
+      value: {
+        book: controls.book.value,
+        chapter: Number(controls.chapter.value),
+        startVerse: Number(controls.startVerse.value),
+        endVerse: Number(controls.endVerse.value),
+      },
+    };
+  });
+}
+
+function showReadingError(message, field) {
+  if (readingError) {
+    readingError.textContent = message;
+    readingError.hidden = false;
+  }
+  field?.focus();
+}
+
+function clearReadingError() {
+  if (!readingError) return;
+  readingError.textContent = "";
+  readingError.hidden = true;
+}
+
+function collectReadingPassages() {
+  const rows = readPassageRows();
+
+  if (!rows.length) {
+    showReadingError("Add at least one passage you read.", readingAddPassage);
+    return null;
+  }
+
+  for (const [index, { controls, value }] of rows.entries()) {
+    const label = `Passage ${index + 1}`;
+
+    if (!value.book) {
+      showReadingError(`${label}: choose a book.`, controls.book);
+      return null;
+    }
+    if (!value.chapter) {
+      showReadingError(`${label}: choose a chapter.`, controls.chapter);
+      return null;
+    }
+    if (!value.startVerse) {
+      showReadingError(`${label}: choose the first verse.`, controls.startVerse);
+      return null;
+    }
+    if (!value.endVerse) {
+      showReadingError(`${label}: choose the last verse.`, controls.endVerse);
+      return null;
+    }
+    if (value.endVerse < value.startVerse) {
+      showReadingError(`${label}: the last verse cannot come before the first verse.`, controls.endVerse);
+      return null;
+    }
+  }
+
+  clearReadingError();
+  return rows.map(({ value }) => value);
+}
+
+function setReadingModalOpen(isOpen) {
+  if (!readingModal) return;
+  readingModal.hidden = !isOpen;
+  document.body.classList.toggle("reading-modal-open", isOpen);
+}
+
+function hasUnsavedReading() {
+  if (!readingModal || readingModal.hidden) return false;
+  return Boolean(readingReflection?.value.trim());
+}
+
+window.addEventListener("beforeunload", (event) => {
+  if (readingSubmitting || !hasUnsavedReading()) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
+
+async function openReadingModal({ save, passages = [], reflection = "" } = {}) {
+  if (!readingModal || !save) return;
+
+  rememberModalTrigger();
+  await loadBibleBooks();
+
+  if (!readingBooks) {
+    showToast("Could not load the Bible books", "error");
+    restoreModalTrigger();
+    return;
+  }
+
+  readingModalSession = { save };
+  clearReadingError();
+  readingPassageList.replaceChildren();
+  if (readingReflection) readingReflection.value = reflection || "";
+  updateReflectionCount();
+
+  if (passages.length) {
+    passages.forEach((passage) => addPassageRow(passage));
+  } else {
+    addPassageRow();
+  }
+
+  setReadingModalOpen(true);
+  readingPassageList.querySelector('[data-reading-select="book"]')?.focus();
+}
+
+function closeReadingModal() {
+  const wasOpen = Boolean(readingModal && !readingModal.hidden);
+  setReadingModalOpen(false);
+  setReadingSubmitting(false);
+  readingModalSession = null;
+  if (wasOpen) restoreReadingFocus();
+}
+
+function restoreReadingFocus() {
+  restoreModalTrigger();
+  const host = readingCheck || settingsReading;
+  if (!host || host.contains(document.activeElement)) return;
+
+  if (document.activeElement && document.activeElement !== document.body) return;
+
+  host.focus();
+}
+
+function setReadingSubmitting(isSubmitting) {
+  readingSubmitting = isSubmitting;
+  if (readingSaveButton) readingSaveButton.disabled = isSubmitting;
+}
+
+function updateReflectionCount() {
+  if (!readingReflectionCount || !readingReflection) return;
+  readingReflectionCount.textContent = String(readingReflection.value.length);
+}
+
+function renderReadingSummary(status) {
+  if (!readingSummary) return;
+
+  const hasReading = status.answeredToday && status.answer === "YES";
+  readingSummary.hidden = !hasReading;
+  if (!hasReading) return;
+
+  readingSummaryBadge.textContent = "Yes";
+  readingSummaryBadge.dataset.answer = "yes";
+  readingSummaryNote.textContent = "You read today";
+
+  readingSummaryRefs.replaceChildren();
+  for (const passage of status.passages || []) {
+    const item = document.createElement("li");
+    item.className = "reading-summary-ref";
+    item.setAttribute("data-reading-summary-ref", "");
+    item.textContent = passage.reference || formatPassageReference(passage);
+    readingSummaryRefs.append(item);
+  }
+}
+
+function setReadingAnswerState(status) {
+  if (!readingCheck) return;
+
+  window.clearInterval(readingResetTimerId);
+  const isLocked = status.canAnswer === false;
+
+  if (readingYesButton) {
+    readingYesButton.disabled = isLocked;
+    readingYesButton.setAttribute("aria-pressed", String(status.answer === "YES"));
+  }
+  if (readingNoButton) {
+    readingNoButton.disabled = isLocked;
+    readingNoButton.setAttribute("aria-pressed", String(status.answer === "NO"));
+  }
+
+  renderReadingSummary(status);
+
+  const reading = answerWords(status.answer);
+  setPracticeStatus("bible", reading.text, reading.state);
+
+  if (status.answeredToday && status.nextResetAt) {
+    readingTimer.hidden = false;
+    renderReadingResetTimer(status.nextResetAt);
+    readingResetTimerId = window.setInterval(() => renderReadingResetTimer(status.nextResetAt), 1000);
+  } else {
+    readingTimer.hidden = true;
+  }
+}
+
+function renderReadingResetTimer(nextResetAt) {
+  if (!readingTimerMessage || !readingTimer) return;
+
+  const remainingMs = Math.max(0, new Date(nextResetAt).getTime() - Date.now());
+
+  if (remainingMs === 0) {
+    window.clearInterval(readingResetTimerId);
+    setReadingAnswerState({
+      canAnswer: true,
+      answeredToday: false,
+      answer: null,
+      passages: [],
+    });
+    return;
+  }
+
+  const totalSeconds = Math.ceil(remainingMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const dayMs = 24 * 60 * 60 * 1000;
+  const progress = Math.min(100, Math.max(0, ((dayMs - remainingMs) / dayMs) * 100));
+
+  readingTimerMessage.textContent = `${formatTimerPart(hours)}:${formatTimerPart(minutes)}:${formatTimerPart(seconds)}`;
+  if (readingTimerProgress) {
+    readingTimerProgress.style.setProperty("--timer-progress", String(progress / 100));
+    readingTimerProgress.parentElement?.setAttribute("aria-valuenow", String(Math.round(progress)));
+  }
+}
+
+async function loadReadingCheckInStatus() {
+  const result = await apiFetch("/api/reading-check-in/status");
+  if (!result?.ok) return;
+
+  setReadingAnswerState(result.data);
+}
+
+async function requestReadingAnswer({ answer, passages = [], reflection = "", method = "POST" }) {
+  const result = await apiFetch("/api/reading-check-in/today", {
+    method,
+    body: { answer, passages, reflection },
+  });
+  if (!result) return null;
+
+  if (result.status === 409) {
+    return { status: null, error: "You already answered the reading check today", conflict: true };
+  }
+
+  if (!result.ok) {
+    return {
+      status: null,
+      error: result.data.errors?.[0] || result.data.error || "Could not save the reading answer",
+    };
+  }
+
+  return { status: result.data, error: null };
+}
+
+async function saveReadingAnswer({ answer, passages = [], reflection = "" }) {
+  const outcome = await requestReadingAnswer({ answer, passages, reflection, method: "POST" });
+  if (!outcome) return null;
+
+  if (outcome.conflict) {
+    await loadReadingCheckInStatus();
+    showToast(outcome.error);
+    return outcome;
+  }
+
+  if (outcome.error) {
+    showToast(outcome.error, "error");
+    return outcome;
+  }
+
+  setReadingAnswerState(outcome.status);
+  showToast(answer === "YES" ? "Reading saved: yes" : "Reading saved: no");
+  return outcome;
+}
+
+async function submitReadingModal(event) {
+  event.preventDefault();
+  if (readingSubmitting || !readingModalSession) return;
+
+  const passages = collectReadingPassages();
+  if (!passages) return;
+
+  setReadingSubmitting(true);
+  const { status, error } = await readingModalSession.save({
+    answer: "YES",
+    passages,
+    reflection: readingReflection?.value || "",
+  }) || {};
+  setReadingSubmitting(false);
+
+  if (status) {
+    closeReadingModal();
+    return;
+  }
+
+  if (error) showReadingError(error);
+}
+
+if (readingModal) {
+  document.body.append(readingModal);
+
+  readingAddPassage?.addEventListener("click", () => {
+    const row = addPassageRow();
+    row?.querySelector('[data-reading-select="book"]')?.focus();
+  });
+
+  readingPassageList?.addEventListener("change", (event) => {
+    const row = event.target.closest("[data-reading-passage]");
+    if (!row) return;
+
+    const field = event.target.dataset.readingSelect;
+    if (field === "book") syncChapterSelect(row);
+    if (field === "chapter") syncVerseSelects(row);
+    if (field === "startVerse") syncEndVerseSelect(row);
+    clearReadingError();
+  });
+
+  readingPassageList?.addEventListener("click", (event) => {
+    const removeButton = event.target.closest("[data-reading-remove-passage]");
+    if (!removeButton) return;
+
+    const row = removeButton.closest("[data-reading-passage]");
+    const rows = [...readingPassageList.querySelectorAll("[data-reading-passage]")];
+    if (rows.length < 2) return;
+
+    const nextFocus = row.nextElementSibling || row.previousElementSibling;
+    row.remove();
+    renumberPassages();
+    clearReadingError();
+    (nextFocus?.querySelector('[data-reading-select="book"]') || readingAddPassage)?.focus();
+  });
+
+  readingReflection?.addEventListener("input", updateReflectionCount);
+  readingForm?.addEventListener("submit", submitReadingModal);
+
+  readingModal.addEventListener("click", (event) => {
+    if (event.target.closest("[data-reading-close]")) closeReadingModal();
+  });
+
+  loadBibleBooks();
+}
+
+if (readingCheck) {
+  readingYesButton?.addEventListener("click", () => {
+    if (readingYesButton.disabled) return;
+    openReadingModal({ save: saveReadingAnswer });
+  });
+
+  readingNoButton?.addEventListener("click", async () => {
+    if (readingNoButton.disabled) return;
+    readingNoButton.disabled = true;
+    const saved = await saveReadingAnswer({ answer: "NO" });
+    if (!saved?.status) await loadReadingCheckInStatus();
+  });
+
+  loadReadingCheckInStatus();
+}
+
+const settingsReadingCurrent = document.querySelector("[data-settings-reading-current]");
+const settingsReadingOptions = document.querySelectorAll("[data-settings-reading-answer-option]");
+const settingsReadingDetails = document.querySelector("[data-settings-reading-details]");
+const settingsReadingRefs = document.querySelector("[data-settings-reading-refs]");
+const settingsReadingEdit = document.querySelector("[data-settings-reading-edit]");
+
+let settingsReadingStatus = null;
+let pendingSettingsReadingAnswer = null;
+
+function setSettingsReadingState(status) {
+  settingsReadingStatus = status || null;
+  const answer = status?.answeredToday ? status.answer : null;
+
+  if (settingsReadingCurrent) {
+    settingsReadingCurrent.textContent = answer || "Pending";
+  }
+
+  settingsReadingOptions.forEach((button) => {
+    const isSelected = button.dataset.settingsReadingAnswerOption === answer;
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+
+  const passages = answer === "YES" ? status?.passages || [] : [];
+  if (settingsReadingDetails) settingsReadingDetails.hidden = answer !== "YES";
+  if (settingsReadingRefs) {
+    settingsReadingRefs.replaceChildren(
+      ...passages.map((passage) => {
+        const item = document.createElement("li");
+        item.className = "settings-reading-ref";
+        item.setAttribute("data-settings-reading-ref", "");
+        item.textContent = passage.reference || "";
+        return item;
+      }),
+    );
+  }
+}
+
+async function loadSettingsReading() {
+  const result = await apiFetch("/api/reading-check-in/status");
+  if (!result) return;
+
+  if (!result.ok) {
+    setSettingsReadingState(null);
+    showToast("Could not load today's reading", "error");
+    return;
+  }
+
+  setSettingsReadingState(result.data);
+}
+
+function setSettingsReadingBusy(isBusy) {
+  settingsReadingOptions.forEach((button) => {
+    button.disabled = isBusy;
+  });
+  if (settingsReadingEdit) settingsReadingEdit.disabled = isBusy;
+}
+
+async function saveSettingsReading({ answer, passages = [], reflection = "" }) {
+  setSettingsReadingBusy(true);
+  const outcome = await requestReadingAnswer({ answer, passages, reflection, method: "PATCH" });
+  setSettingsReadingBusy(false);
+  if (!outcome) return null;
+
+  if (outcome.error) {
+    showToast(outcome.error, "error");
+    await loadSettingsReading();
+    return outcome;
+  }
+
+  setSettingsReadingState(outcome.status);
+  showToast(answer === "YES" ? "Today's reading answer changed to yes" : "Today's reading answer changed to no");
+  return outcome;
+}
+
+function getSettingsReadingConfirmModal() {
+  let modal = document.querySelector("[data-settings-reading-confirm-modal]");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.className = "settings-confirm-modal";
+  modal.setAttribute("data-settings-reading-confirm-modal", "");
+  modal.hidden = true;
+  modal.innerHTML = `
+    <div class="settings-confirm-backdrop" data-settings-reading-cancel></div>
+    <div class="settings-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-reading-confirm-title">
+      <header class="settings-confirm-head">
+        <p class="dashboard-label">Today's Bible reading</p>
+        <h2 id="settings-reading-confirm-title">Are you sure?</h2>
+        <p data-settings-reading-confirm-copy></p>
+      </header>
+      <div class="settings-confirm-actions">
+        <button class="ui-button ui-button--secondary" type="button" data-settings-reading-cancel>Cancel</button>
+        <button class="ui-button ui-button--primary" type="button" data-settings-reading-confirm>Change</button>
+      </div>
+    </div>
+  `;
+  document.body.append(modal);
+  return modal;
+}
+
+function openSettingsReadingConfirmModal(answer) {
+  rememberModalTrigger();
+  pendingSettingsReadingAnswer = answer;
+
+  const modal = getSettingsReadingConfirmModal();
+  const copy = modal.querySelector("[data-settings-reading-confirm-copy]");
+  if (copy) {
+    copy.textContent = settingsReadingStatus?.answer === "YES"
+      ? "Changing today's Bible reading answer to NO will remove today's saved passages and reflection."
+      : "Set today's Bible reading answer to NO?";
+  }
+
+  modal.querySelectorAll("[data-settings-reading-confirm], [data-settings-reading-cancel]").forEach((button) => {
+    button.disabled = false;
+  });
+  modal.hidden = false;
+  modal.querySelector("[data-settings-reading-confirm]")?.focus();
+}
+
+function closeSettingsReadingConfirmModal() {
+  const modal = document.querySelector("[data-settings-reading-confirm-modal]");
+  const wasOpen = Boolean(modal && !modal.hidden);
+  if (modal) modal.hidden = true;
+  pendingSettingsReadingAnswer = null;
+  if (wasOpen) restoreModalTrigger();
+}
+
+function openSettingsReadingEditor({ prefill }) {
+  const passages = prefill ? settingsReadingStatus?.passages || [] : [];
+  const reflection = prefill ? settingsReadingStatus?.reflection || "" : "";
+
+  openReadingModal({
+    save: saveSettingsReading,
+    passages,
+    reflection,
+  });
+}
+
+if (settingsReading) {
+  settingsReadingOptions.forEach((button) => {
+    button.addEventListener("click", () => {
+      const answer = button.dataset.settingsReadingAnswerOption;
+      const currentAnswer = settingsReadingStatus?.answeredToday ? settingsReadingStatus.answer : null;
+      if (!answer || answer === currentAnswer) return;
+
+      if (answer === "YES") {
+        openSettingsReadingEditor({ prefill: false });
+        return;
+      }
+
+      openSettingsReadingConfirmModal(answer);
+    });
+  });
+
+  settingsReadingEdit?.addEventListener("click", () => {
+    if (settingsReadingStatus?.answer !== "YES") return;
+    openSettingsReadingEditor({ prefill: true });
+  });
+
+  document.addEventListener("click", async (event) => {
+    if (event.target.closest("[data-settings-reading-cancel]")) {
+      closeSettingsReadingConfirmModal();
+      return;
+    }
+
+    const confirmButton = event.target.closest("[data-settings-reading-confirm]");
+    if (!confirmButton || !pendingSettingsReadingAnswer) return;
+
+    const answer = pendingSettingsReadingAnswer;
+    confirmButton.closest("[data-settings-reading-confirm-modal]")
+      ?.querySelectorAll("[data-settings-reading-confirm], [data-settings-reading-cancel]")
+      .forEach((button) => {
+        button.disabled = true;
+      });
+    closeSettingsReadingConfirmModal();
+    await saveSettingsReading({ answer });
+  });
+
+  loadSettingsReading();
+}
+
+const dailyGoalsRoot = document.querySelector("[data-daily-goals]");
+const dailyGoalList = document.querySelector("[data-daily-goal-list]");
+const dailyGoalTemplate = document.querySelector("[data-daily-goal-template]");
+const dailyGoalEmpty = document.querySelector("[data-daily-goal-empty]");
+const dailyGoalCount = document.querySelector("[data-daily-goal-count]");
+const dailyGoalProgress = document.querySelector("[data-daily-goal-progress]");
+const dailyGoalComposer = document.querySelector("[data-daily-goal-composer]");
+const dailyGoalInput = document.querySelector("[data-daily-goal-input]");
+const dailyGoalSaveButton = document.querySelector("[data-daily-goal-save]");
+const dailyGoalCancelButton = document.querySelector("[data-daily-goal-cancel]");
+const dailyGoalAddButton = document.querySelector("[data-daily-goal-add]");
+
+const DAILY_GOAL_TEXT_MAX = 200;
+
+let dailyGoalSummary = null;
+let dailyGoalResetTimerId;
+let dailyGoalComposerBusy = false;
+const savingDailyGoalIds = new Set();
+
+function hasFreeDailyGoalSlot() {
+  return !dailyGoalSummary || dailyGoalSummary.remainingSlots > 0;
+}
+
+function getDailyGoalById(id) {
+  return dailyGoalSummary?.goals.find((goal) => goal.id === id) || null;
+}
+
+function dailyGoalErrorMessage(result, fallback) {
+  return result.data.errors?.[0] || result.data.error || fallback;
+}
+
+function validateDailyGoalText(value) {
+  const text = String(value || "").trim();
+
+  if (!text) return { text: null, error: "Write what you want to complete" };
+  if (text.length > DAILY_GOAL_TEXT_MAX) {
+    return { text: null, error: `Keep the goal under ${DAILY_GOAL_TEXT_MAX} characters` };
+  }
+
+  return { text, error: null };
+}
+
+function captureDailyGoalFocus() {
+  const active = document.activeElement;
+  const row = active?.closest?.("[data-daily-goal]");
+  if (!row) return null;
+
+  const control = ["checkbox", "edit", "remove"].find((name) => active.matches?.(`[data-daily-goal-${name}]`));
+  return control ? { id: row.dataset.dailyGoalId, control } : null;
+}
+
+function restoreDailyGoalFocus(target) {
+  if (!target) return;
+
+  dailyGoalList
+    ?.querySelector(`[data-daily-goal][data-daily-goal-id="${target.id}"] [data-daily-goal-${target.control}]`)
+    ?.focus();
+}
+
+function buildDailyGoalRow(goal) {
+  const row = dailyGoalTemplate.content.firstElementChild.cloneNode(true);
+  const checkbox = row.querySelector("[data-daily-goal-checkbox]");
+  const label = row.querySelector("[data-daily-goal-label]");
+  const editLabel = row.querySelector("[data-daily-goal-edit-label]");
+  const editInput = row.querySelector("[data-daily-goal-edit-input]");
+  const actions = row.querySelector("[data-daily-goal-actions]");
+
+  row.dataset.dailyGoalId = String(goal.id);
+  row.classList.toggle("is-completed", goal.completed);
+
+  const checkboxId = `daily-goal-check-${goal.id}`;
+  checkbox.id = checkboxId;
+  checkbox.checked = goal.completed;
+  label.setAttribute("for", checkboxId);
+  label.textContent = goal.text;
+
+  const editInputId = `daily-goal-edit-${goal.id}`;
+  editInput.id = editInputId;
+  editInput.value = goal.text;
+  editLabel.setAttribute("for", editInputId);
+
+  actions.hidden = goal.completed;
+  row.querySelector("[data-daily-goal-edit]")?.setAttribute("aria-label", `Edit goal: ${goal.text}`);
+  row.querySelector("[data-daily-goal-remove]")?.setAttribute("aria-label", `Remove goal: ${goal.text}`);
+
+  return row;
+}
+
+function renderDailyGoals(summary) {
+  if (!dailyGoalList) return;
+
+  const focusTarget = captureDailyGoalFocus();
+  const goals = summary.goals || [];
+
+  dailyGoalList.replaceChildren(...goals.map(buildDailyGoalRow));
+
+  if (dailyGoalCount) dailyGoalCount.textContent = `${summary.total} of ${summary.limit}`;
+  if (dailyGoalEmpty) dailyGoalEmpty.hidden = goals.length > 0;
+  if (dailyGoalProgress) {
+    dailyGoalProgress.textContent = goals.length ? `${summary.completedCount} of ${summary.total} completed` : "";
+  }
+  setPracticeStatus(
+    "tasks",
+    goals.length ? `${summary.completedCount} of ${summary.total} done` : "None yet",
+    goals.length && summary.completedCount === summary.total ? "yes" : null,
+  );
+  if (dailyGoalAddButton) {
+    dailyGoalAddButton.hidden = summary.remainingSlots === 0 || !dailyGoalComposer?.hidden;
+  }
+
+  restoreDailyGoalFocus(focusTarget);
+}
+
+function applyDailyGoalSummary(summary) {
+  dailyGoalSummary = summary;
+  renderDailyGoals(summary);
+  scheduleDailyGoalReset(summary.nextResetAt);
+}
+
+async function loadDailyGoals() {
+  const result = await apiFetch("/api/daily-goals/today");
+  if (!result?.ok) return null;
+
+  applyDailyGoalSummary(result.data);
+  return result.data;
+}
+
+function setDailyGoalComposerBusy(isBusy) {
+  dailyGoalComposerBusy = isBusy;
+  if (dailyGoalSaveButton) dailyGoalSaveButton.disabled = isBusy;
+  if (dailyGoalCancelButton) dailyGoalCancelButton.disabled = isBusy;
+  if (dailyGoalInput) dailyGoalInput.readOnly = isBusy;
+}
+
+function openDailyGoalComposer() {
+  if (!dailyGoalComposer || !hasFreeDailyGoalSlot()) return;
+
+  dailyGoalComposer.hidden = false;
+  if (dailyGoalAddButton) dailyGoalAddButton.hidden = true;
+  dailyGoalInput?.focus();
+  dailyGoalInput?.select();
+}
+
+function closeDailyGoalComposer({ clear = false, restoreFocus = false } = {}) {
+  if (!dailyGoalComposer) return;
+
+  dailyGoalComposer.hidden = true;
+  if (clear && dailyGoalInput) dailyGoalInput.value = "";
+  if (dailyGoalAddButton) dailyGoalAddButton.hidden = !hasFreeDailyGoalSlot();
+
+  if (!restoreFocus) return;
+  if (dailyGoalAddButton && !dailyGoalAddButton.hidden) {
+    dailyGoalAddButton.focus();
+  } else {
+    dailyGoalsRoot?.focus();
+  }
+}
+
+async function submitDailyGoalComposer() {
+  if (dailyGoalComposerBusy) return;
+
+  const { text, error } = validateDailyGoalText(dailyGoalInput?.value);
+  if (error) {
+    showToast(error, "error");
+    dailyGoalInput?.focus();
+    return;
+  }
+
+  setDailyGoalComposerBusy(true);
+  const result = await apiFetch("/api/daily-goals/today", { method: "POST", body: { text } });
+  setDailyGoalComposerBusy(false);
+  if (!result) return;
+
+  if (!result.ok) {
+    showToast(dailyGoalErrorMessage(result, "Could not add the goal"), "error");
+    if (result.status === 409) await loadDailyGoals();
+    return;
+  }
+
+  applyDailyGoalSummary(result.data);
+  closeDailyGoalComposer({ clear: true, restoreFocus: true });
+  showToast("Goal added");
+}
+
+function setDailyGoalRowBusy(row, isBusy) {
+  row.classList.toggle("is-saving", isBusy);
+  row.querySelectorAll("button, input").forEach((control) => {
+    control.disabled = isBusy;
+  });
+}
+
+function closeDailyGoalRowPanels(row) {
+  const editForm = row.querySelector("[data-daily-goal-edit-form]");
+  const confirm = row.querySelector("[data-daily-goal-confirm]");
+  const actions = row.querySelector("[data-daily-goal-actions]");
+
+  if (editForm) editForm.hidden = true;
+  if (confirm) confirm.hidden = true;
+  if (actions) actions.hidden = false;
+}
+
+function openDailyGoalEditor(row) {
+  closeDailyGoalRowPanels(row);
+  const editForm = row.querySelector("[data-daily-goal-edit-form]");
+  const editInput = row.querySelector("[data-daily-goal-edit-input]");
+
+  editForm.hidden = false;
+  row.querySelector("[data-daily-goal-actions]").hidden = true;
+  editInput.focus();
+  editInput.select();
+}
+
+function closeDailyGoalEditor(row, { restoreFocus = false } = {}) {
+  const editInput = row.querySelector("[data-daily-goal-edit-input]");
+  const goal = getDailyGoalById(Number(row.dataset.dailyGoalId));
+
+  if (editInput && goal) editInput.value = goal.text;
+  closeDailyGoalRowPanels(row);
+  if (restoreFocus) row.querySelector("[data-daily-goal-edit]")?.focus();
+}
+
+function openDailyGoalRemoveConfirm(row) {
+  closeDailyGoalRowPanels(row);
+  const confirm = row.querySelector("[data-daily-goal-confirm]");
+
+  confirm.hidden = false;
+  row.querySelector("[data-daily-goal-actions]").hidden = true;
+  row.querySelector("[data-daily-goal-remove-confirm]")?.focus();
+}
+
+function closeDailyGoalRemoveConfirm(row, { restoreFocus = false } = {}) {
+  closeDailyGoalRowPanels(row);
+  if (restoreFocus) row.querySelector("[data-daily-goal-remove]")?.focus();
+}
+
+async function submitDailyGoalEdit(row) {
+  const id = Number(row.dataset.dailyGoalId);
+  const editInput = row.querySelector("[data-daily-goal-edit-input]");
+  if (!id || savingDailyGoalIds.has(id)) return;
+
+  const { text, error } = validateDailyGoalText(editInput?.value);
+  if (error) {
+    showToast(error, "error");
+    editInput?.focus();
+    return;
+  }
+
+  savingDailyGoalIds.add(id);
+  setDailyGoalRowBusy(row, true);
+  const result = await apiFetch(`/api/daily-goals/${id}`, { method: "PATCH", body: { text } });
+  savingDailyGoalIds.delete(id);
+  setDailyGoalRowBusy(row, false);
+  if (!result) return;
+
+  if (!result.ok) {
+    showToast(dailyGoalErrorMessage(result, "Could not update the goal"), "error");
+    if (result.status === 404 || result.status === 409) await loadDailyGoals();
+    else editInput?.focus();
+    return;
+  }
+
+  applyDailyGoalSummary(result.data);
+  restoreDailyGoalFocus({ id: String(id), control: "edit" });
+  showToast("Goal updated");
+}
+
+async function removeDailyGoal(row) {
+  const id = Number(row.dataset.dailyGoalId);
+  if (!id || savingDailyGoalIds.has(id)) return;
+
+  savingDailyGoalIds.add(id);
+  setDailyGoalRowBusy(row, true);
+  const result = await apiFetch(`/api/daily-goals/${id}`, { method: "DELETE" });
+  savingDailyGoalIds.delete(id);
+  setDailyGoalRowBusy(row, false);
+  if (!result) return;
+
+  if (!result.ok) {
+    showToast(dailyGoalErrorMessage(result, "Could not remove the goal"), "error");
+    if (result.status === 404 || result.status === 409) await loadDailyGoals();
+    return;
+  }
+
+  applyDailyGoalSummary(result.data);
+  showToast("Goal removed");
+  (dailyGoalAddButton?.hidden ? dailyGoalsRoot : dailyGoalAddButton)?.focus();
+}
+
+async function toggleDailyGoalCompletion(checkbox) {
+  const row = checkbox.closest("[data-daily-goal]");
+  const id = Number(row?.dataset.dailyGoalId);
+
+  if (!id || savingDailyGoalIds.has(id)) {
+    checkbox.checked = !checkbox.checked;
+    return;
+  }
+
+  const completed = checkbox.checked;
+  const focusTarget = { id: row.dataset.dailyGoalId, control: "checkbox" };
+  savingDailyGoalIds.add(id);
+  row.classList.add("is-saving");
+  row.classList.toggle("is-completed", completed);
+
+  const result = await apiFetch(`/api/daily-goals/${id}/completion`, {
+    method: "PATCH",
+    body: { completed },
+  });
+
+  savingDailyGoalIds.delete(id);
+  row.classList.remove("is-saving");
+  if (!result) return;
+
+  if (!result.ok) {
+    checkbox.checked = !completed;
+    row.classList.toggle("is-completed", !completed);
+    showToast(dailyGoalErrorMessage(result, "Could not update the goal"), "error");
+    if (result.status === 404 || result.status === 409) await loadDailyGoals();
+    return;
+  }
+
+  applyDailyGoalSummary(result.data);
+  restoreDailyGoalFocus(focusTarget);
+  showToast(completed ? "Goal completed" : "Goal reopened");
+}
+
+function setDailyGoalControlsDisabled(isDisabled) {
+  dailyGoalsRoot?.querySelectorAll("button, input").forEach((control) => {
+    control.disabled = isDisabled;
+  });
+}
+
+async function handleDailyGoalReset() {
+  setDailyGoalControlsDisabled(true);
+  closeDailyGoalComposer({ clear: true });
+
+  try {
+    await loadDailyGoals();
+  } finally {
+    setDailyGoalControlsDisabled(false);
+  }
+}
+
+function scheduleDailyGoalReset(nextResetAt) {
+  window.clearTimeout(dailyGoalResetTimerId);
+  if (!nextResetAt) return;
+
+  const remainingMs = new Date(nextResetAt).getTime() - Date.now();
+  if (Number.isNaN(remainingMs)) return;
+
+  if (remainingMs <= 0) {
+    handleDailyGoalReset();
+    return;
+  }
+
+  dailyGoalResetTimerId = window.setTimeout(handleDailyGoalReset, remainingMs + 500);
+}
+
+if (dailyGoalsRoot && dailyGoalList && dailyGoalTemplate) {
+  dailyGoalAddButton?.addEventListener("click", openDailyGoalComposer);
+  dailyGoalCancelButton?.addEventListener("click", () => {
+    closeDailyGoalComposer({ clear: true, restoreFocus: true });
+  });
+
+  dailyGoalsRoot.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (event.target.matches("[data-daily-goal-composer]")) {
+      submitDailyGoalComposer();
+      return;
+    }
+
+    const row = event.target.closest("[data-daily-goal]");
+    if (row && event.target.matches("[data-daily-goal-edit-form]")) {
+      submitDailyGoalEdit(row);
+    }
+  });
+
+  dailyGoalsRoot.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+
+    if (event.target.closest("[data-daily-goal-composer]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeDailyGoalComposer({ clear: true, restoreFocus: true });
+      return;
+    }
+
+    const row = event.target.closest("[data-daily-goal]");
+    if (!row) return;
+
+    if (event.target.closest("[data-daily-goal-edit-form]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeDailyGoalEditor(row, { restoreFocus: true });
+      return;
+    }
+
+    if (event.target.closest("[data-daily-goal-confirm]")) {
+      event.preventDefault();
+      event.stopPropagation();
+      closeDailyGoalRemoveConfirm(row, { restoreFocus: true });
+    }
+  });
+
+  dailyGoalList.addEventListener("change", (event) => {
+    const checkbox = event.target.closest("[data-daily-goal-checkbox]");
+    if (checkbox) toggleDailyGoalCompletion(checkbox);
+  });
+
+  dailyGoalList.addEventListener("click", (event) => {
+    const row = event.target.closest("[data-daily-goal]");
+    if (!row) return;
+
+    if (event.target.closest("[data-daily-goal-edit]")) {
+      openDailyGoalEditor(row);
+      return;
+    }
+    if (event.target.closest("[data-daily-goal-edit-cancel]")) {
+      closeDailyGoalEditor(row, { restoreFocus: true });
+      return;
+    }
+    if (event.target.closest("[data-daily-goal-remove]")) {
+      openDailyGoalRemoveConfirm(row);
+      return;
+    }
+    if (event.target.closest("[data-daily-goal-remove-cancel]")) {
+      closeDailyGoalRemoveConfirm(row, { restoreFocus: true });
+      return;
+    }
+    if (event.target.closest("[data-daily-goal-remove-confirm]")) {
+      removeDailyGoal(row);
+    }
+  });
+
+  loadDailyGoals();
+}
+
+const catchUpCard = document.querySelector("[data-catch-up]");
+const catchUpList = document.querySelector("[data-catch-up-list]");
+const catchUpTemplate = document.querySelector("[data-catch-up-template]");
+const catchUpCount = document.querySelector("[data-catch-up-count]");
+const catchUpStatus = document.querySelector("[data-catch-up-status]");
+const catchUpMore = document.querySelector("[data-catch-up-more]");
+const catchUpPageStatus = document.querySelector("[data-catch-up-page-status]");
+const catchUpAnswerModal = document.querySelector("[data-catch-up-answer-modal]");
+const catchUpAnswerTitle = document.querySelector("[data-catch-up-answer-title]");
+const catchUpAnswerDate = document.querySelector("[data-catch-up-answer-date]");
+const catchUpAnswerNote = document.querySelector("[data-catch-up-answer-note]");
+const catchUpAnswerYes = document.querySelector("[data-catch-up-answer-yes]");
+const catchUpAnswerNo = document.querySelector("[data-catch-up-answer-no]");
+const catchUpTasksModal = document.querySelector("[data-catch-up-tasks-modal]");
+const catchUpTasksForm = document.querySelector("[data-catch-up-tasks-form]");
+const catchUpTasksList = document.querySelector("[data-catch-up-tasks-list]");
+const catchUpTaskTemplate = document.querySelector("[data-catch-up-task-template]");
+const catchUpTasksDate = document.querySelector("[data-catch-up-tasks-date]");
+const catchUpTasksError = document.querySelector("[data-catch-up-tasks-error]");
+const catchUpTasksAdd = document.querySelector("[data-catch-up-tasks-add]");
+const catchUpTasksNone = document.querySelector("[data-catch-up-tasks-none]");
+const catchUpTasksSave = document.querySelector("[data-catch-up-tasks-save]");
+
+const CATCH_UP_ACTIVITIES = {
+  STRONG: {
+    name: "Strong check-in",
+    note: "Say whether you stayed strong that day.",
+    action: "Answer",
+    question: "Did you stay strong?",
+    yes: "Yes, I stayed strong",
+    no: "No, I struggled",
+    savedYes: "Strong check-in saved: yes",
+    savedNo: "Strong check-in saved: no",
+  },
+  READING: {
+    name: "Bible reading",
+    note: "Record what you read, or say you did not read.",
+    action: "Answer",
+    question: "Did you read the Bible?",
+    yes: "Yes, I read",
+    no: "No, I did not read",
+    savedYes: "Reading saved: yes",
+    savedNo: "Reading saved: no",
+  },
+  GOALS: {
+    name: "Daily tasks",
+    note: "Add the tasks you completed, or say you completed none.",
+    action: "Answer",
+    question: "What did you complete?",
+    yes: "",
+    no: "",
+    savedYes: "Tasks saved",
+    savedNo: "Tasks saved: none completed",
+  },
+};
+const CATCH_UP_TASK_LIMIT = 5;
+const CATCH_UP_PAGE_SIZE = 5;
+
+let catchUpItems = [];
+let catchUpTotal = 0;
+let catchUpVisibleCount = CATCH_UP_PAGE_SIZE;
+let catchUpLoadingMore = false;
+let catchUpAnswerTarget = null;
+let catchUpTasksDateKey = null;
+let catchUpTasksSubmitting = false;
+
+function catchUpActivityCopy(activity) {
+  return CATCH_UP_ACTIVITIES[activity] || null;
+}
+
+function sortCatchUpItems(items) {
+  const order = Object.keys(CATCH_UP_ACTIVITIES);
+
+  return [...items].sort((first, second) => (
+    first.dateKey === second.dateKey
+      ? order.indexOf(first.activity) - order.indexOf(second.activity)
+      : first.dateKey.localeCompare(second.dateKey)
+  ));
+}
+
+function normalizeCatchUpPayload(payload) {
+  const items = sortCatchUpItems(
+    (payload?.items || []).filter((item) => item?.dateKey && CATCH_UP_ACTIVITIES[item.activity]),
+  );
+
+  return { total: items.length, items };
+}
+
+function formatCatchUpDate(dateKey) {
+  const date = new Date(`${dateKey}T12:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return String(dateKey || "");
+
+  return date.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function catchUpStatusMessage(total) {
+  if (!total) return "You are all caught up.";
+
+  return `${total} ${total === 1 ? "activity" : "activities"} left to complete.`;
+}
+
+function getCatchUpPageState(totalCount, requestedVisibleCount) {
+  const total = Math.max(0, Number(totalCount) || 0);
+  const requested = Math.max(CATCH_UP_PAGE_SIZE, Number(requestedVisibleCount) || CATCH_UP_PAGE_SIZE);
+  const visibleCount = Math.min(total, requested);
+  const remainingCount = Math.max(0, total - visibleCount);
+
+  return {
+    visibleCount,
+    remainingCount,
+    nextBatchCount: Math.min(CATCH_UP_PAGE_SIZE, remainingCount),
+  };
+}
+
+function syncCatchUpPagination({ announce = false } = {}) {
+  if (!catchUpList || !catchUpMore) return;
+
+  const rows = [...catchUpList.querySelectorAll("[data-catch-up-item]")];
+  const page = getCatchUpPageState(catchUpTotal, catchUpVisibleCount);
+  catchUpVisibleCount = page.visibleCount || CATCH_UP_PAGE_SIZE;
+
+  const previouslyVisible = rows.filter((row) => !row.hidden).length;
+  rows.forEach((row, index) => {
+    row.hidden = index >= page.visibleCount;
+  });
+  if (page.visibleCount > previouslyVisible) revealNewRows(rows, previouslyVisible);
+
+  catchUpMore.hidden = page.remainingCount === 0;
+  catchUpMore.disabled = catchUpLoadingMore;
+  catchUpMore.setAttribute("aria-busy", catchUpLoadingMore ? "true" : "false");
+  catchUpMore.textContent = "View more";
+  catchUpMore.setAttribute("aria-expanded", page.visibleCount > CATCH_UP_PAGE_SIZE ? "true" : "false");
+  catchUpMore.setAttribute(
+    "aria-label",
+    page.remainingCount > 0
+      ? `View ${page.nextBatchCount} more missed activities; ${page.remainingCount} activities remaining`
+      : "All missed activities are shown",
+  );
+
+  if (announce && catchUpPageStatus) {
+    catchUpPageStatus.textContent = page.remainingCount > 0
+      ? `Showing ${page.visibleCount} of ${catchUpTotal} missed activities.`
+      : `Showing all ${catchUpTotal} missed activities.`;
+  }
+}
+
+function mergeCatchUpItems(firstPage, nextPage) {
+  const byItem = new Map();
+
+  [...firstPage, ...nextPage].forEach((item) => {
+    byItem.set(`${item.dateKey}:${item.activity}`, item);
+  });
+
+  return sortCatchUpItems([...byItem.values()]);
+}
+
+function reconcileCatchUpItemsAfterSave(currentItems, payload, resolvedItem) {
+  const normalized = normalizeCatchUpPayload(payload);
+  const total = Math.max(normalized.items.length, Number(payload?.total) || 0);
+  const desiredLoadedCount = Math.min(total, currentItems.length);
+  const unresolvedItems = currentItems.filter(
+    (item) => item.dateKey !== resolvedItem.dateKey || item.activity !== resolvedItem.activity,
+  );
+  const items = mergeCatchUpItems(unresolvedItems, normalized.items).slice(0, desiredLoadedCount);
+
+  return { total, desiredLoadedCount, items };
+}
+
+async function showMoreCatchUp() {
+  if (catchUpLoadingMore || catchUpVisibleCount >= catchUpTotal) return;
+
+  const previousVisibleCount = catchUpVisibleCount;
+  const nextVisibleCount = Math.min(catchUpTotal, catchUpVisibleCount + CATCH_UP_PAGE_SIZE);
+  const missingCount = Math.max(0, nextVisibleCount - catchUpItems.length);
+  const triggerHadFocus = document.activeElement === catchUpMore;
+
+  if (missingCount > 0) {
+    catchUpLoadingMore = true;
+    syncCatchUpPagination();
+
+    const result = await apiFetch(
+      `/api/missed-activities?offset=${catchUpItems.length}&limit=${missingCount}`,
+    );
+
+    catchUpLoadingMore = false;
+    if (!result?.ok) {
+      syncCatchUpPagination();
+      showToast(catchUpErrorMessage(result, "Could not load more missed activities"), "error");
+      return;
+    }
+
+    catchUpItems = mergeCatchUpItems(catchUpItems, normalizeCatchUpPayload(result.data).items);
+    catchUpTotal = Math.max(catchUpItems.length, Number(result.data?.total) || 0);
+  }
+
+  catchUpVisibleCount = nextVisibleCount;
+  renderCatchUp({ total: catchUpTotal, items: catchUpItems }, { announcePage: true });
+
+  if (catchUpMore?.hidden) {
+    catchUpList
+      ?.querySelectorAll("[data-catch-up-open]")
+      .item(previousVisibleCount)
+      ?.focus();
+  } else if (triggerHadFocus) {
+    catchUpMore?.focus();
+  }
+}
+
+function buildCatchUpRow(item) {
+  const row = catchUpTemplate.content.firstElementChild.cloneNode(true);
+  const copy = catchUpActivityCopy(item.activity);
+  const date = formatCatchUpDate(item.dateKey);
+  const action = row.querySelector("[data-catch-up-open]");
+
+  row.dataset.catchUpDate = item.dateKey;
+  row.dataset.catchUpActivity = item.activity;
+  row.querySelector("[data-catch-up-date]").textContent = date;
+  row.querySelector("[data-catch-up-activity]").textContent = copy.name;
+  row.querySelector("[data-catch-up-note]").textContent = copy.note;
+
+  action.textContent = copy.action;
+  action.dataset.catchUpDate = item.dateKey;
+  action.dataset.catchUpActivity = item.activity;
+  action.setAttribute("aria-haspopup", "dialog");
+  action.setAttribute("aria-label", `${copy.action} ${copy.name} for ${date}`);
+
+  return row;
+}
+
+function renderCatchUp(payload, { announcePage = false } = {}) {
+  if (!catchUpCard || !catchUpList || !catchUpTemplate) return;
+
+  const { total, items } = normalizeCatchUpPayload(payload);
+  const remaining = Math.max(total, Number(payload?.total) || 0);
+
+  catchUpItems = items;
+  catchUpTotal = remaining;
+  if (!items.length) catchUpVisibleCount = CATCH_UP_PAGE_SIZE;
+  catchUpCard.hidden = remaining === 0;
+  catchUpList.replaceChildren(...items.map(buildCatchUpRow));
+  syncCatchUpPagination({ announce: announcePage });
+
+  if (catchUpCount) catchUpCount.textContent = remaining ? `${remaining} left` : "";
+  if (catchUpStatus) catchUpStatus.textContent = catchUpStatusMessage(remaining);
+}
+
+async function applyCatchUpPayload(payload, resolvedItem) {
+  if (!payload) return;
+
+  if (resolvedItem && catchUpItems.length) {
+    const reconciled = reconcileCatchUpItemsAfterSave(catchUpItems, payload, resolvedItem);
+    const missingCount = reconciled.desiredLoadedCount - reconciled.items.length;
+
+    if (missingCount > 0) {
+      const result = await apiFetch(
+        `/api/missed-activities?offset=${reconciled.items.length}&limit=${missingCount}`,
+      );
+      if (result?.ok) {
+        reconciled.items = mergeCatchUpItems(
+          reconciled.items,
+          normalizeCatchUpPayload(result.data).items,
+        ).slice(0, reconciled.desiredLoadedCount);
+      }
+    }
+
+    renderCatchUp({ total: reconciled.total, items: reconciled.items });
+    return;
+  }
+
+  renderCatchUp(payload);
+}
+
+async function loadCatchUp() {
+  const result = await apiFetch(`/api/missed-activities?offset=0&limit=${CATCH_UP_PAGE_SIZE}`);
+  if (!result?.ok) return null;
+
+  renderCatchUp(result.data);
+  return result.data;
+}
+
+function catchUpErrorMessage(result, fallback = "Could not save that day") {
+  return result?.data?.errors?.[0] || result?.data?.error || fallback;
+}
+
+function focusCatchUpAfterSave() {
+  const next = catchUpList?.querySelector("[data-catch-up-open]");
+  if (next) {
+    next.focus();
+    return;
+  }
+
+  document.getElementById("main-content")?.focus();
+}
+
+function setCatchUpModalOpen(modal, isOpen) {
+  if (!modal) return;
+  modal.hidden = !isOpen;
+  document.body.classList.toggle(
+    "catch-up-modal-open",
+    Boolean(document.querySelector("[data-catch-up-answer-modal]:not([hidden]), [data-catch-up-tasks-modal]:not([hidden])")),
+  );
+}
+
+function setCatchUpAnswerBusy(isBusy) {
+  [catchUpAnswerYes, catchUpAnswerNo].forEach((button) => {
+    if (button) button.disabled = isBusy;
+  });
+}
+
+function openCatchUpAnswerModal({ dateKey, activity }) {
+  const copy = catchUpActivityCopy(activity);
+  if (!catchUpAnswerModal || !copy) return;
+
+  rememberModalTrigger();
+  catchUpAnswerTarget = { dateKey, activity };
+
+  if (catchUpAnswerDate) catchUpAnswerDate.textContent = formatCatchUpDate(dateKey);
+  if (catchUpAnswerTitle) catchUpAnswerTitle.textContent = copy.question;
+  if (catchUpAnswerNote) catchUpAnswerNote.textContent = copy.note;
+  if (catchUpAnswerYes) catchUpAnswerYes.textContent = copy.yes;
+  if (catchUpAnswerNo) catchUpAnswerNo.textContent = copy.no;
+
+  setCatchUpAnswerBusy(false);
+  setCatchUpModalOpen(catchUpAnswerModal, true);
+  catchUpAnswerYes?.focus();
+}
+
+function closeCatchUpAnswerModal() {
+  const wasOpen = Boolean(catchUpAnswerModal && !catchUpAnswerModal.hidden);
+  setCatchUpModalOpen(catchUpAnswerModal, false);
+  setCatchUpAnswerBusy(false);
+  catchUpAnswerTarget = null;
+  if (wasOpen) restoreModalTrigger();
+}
+
+async function saveMissedStrong({ dateKey, answer }) {
+  const result = await apiFetch("/api/check-in/missed", {
+    method: "POST",
+    body: { dateKey, answer },
+  });
+  if (!result) return null;
+
+  if (!result.ok) {
+    return { ok: false, error: catchUpErrorMessage(result) };
+  }
+
+  if (result.data.leaderboard) renderLeaderboard(result.data.leaderboard);
+  if (result.data.status) setAnswerState(result.data.status);
+  await applyCatchUpPayload(result.data.missedActivities, { dateKey, activity: "STRONG" });
+
+  const copy = catchUpActivityCopy("STRONG");
+  return { ok: true, message: answer === "YES" ? copy.savedYes : copy.savedNo };
+}
+
+async function saveMissedReading({ dateKey, answer, passages = [], reflection = "" }) {
+  const result = await apiFetch("/api/reading-check-in/missed", {
+    method: "POST",
+    body: { dateKey, answer, passages, reflection },
+  });
+  if (!result) return null;
+
+  if (!result.ok) {
+    return { ok: false, error: catchUpErrorMessage(result, "Could not save that reading") };
+  }
+
+  await applyCatchUpPayload(result.data.missedActivities, { dateKey, activity: "READING" });
+
+  const copy = catchUpActivityCopy("READING");
+  return {
+    ok: true,
+    reading: result.data.reading || true,
+    message: answer === "YES" ? copy.savedYes : copy.savedNo,
+  };
+}
+
+function buildMissedReadingEditorSave(dateKey) {
+  return async ({ answer, passages, reflection }) => {
+    const outcome = await saveMissedReading({ dateKey, answer, passages, reflection });
+    if (!outcome) return null;
+    if (!outcome.ok) return { status: null, error: outcome.error };
+
+    showToast(outcome.message);
+    return { status: outcome.reading, error: null };
+  };
+}
+
+async function submitCatchUpAnswer(answer) {
+  if (!catchUpAnswerTarget || !["YES", "NO"].includes(answer)) return;
+
+  const { dateKey, activity } = catchUpAnswerTarget;
+
+  if (activity === "READING" && answer === "YES") {
+    closeCatchUpAnswerModal();
+    await openReadingModal({ save: buildMissedReadingEditorSave(dateKey) });
+    return;
+  }
+
+  setCatchUpAnswerBusy(true);
+  const outcome = activity === "STRONG"
+    ? await saveMissedStrong({ dateKey, answer })
+    : await saveMissedReading({ dateKey, answer });
+  setCatchUpAnswerBusy(false);
+
+  if (!outcome) return;
+  if (!outcome.ok) {
+    showToast(outcome.error, "error");
+    return;
+  }
+
+  closeCatchUpAnswerModal();
+  showToast(outcome.message);
+}
+
+function showCatchUpTasksError(message, field) {
+  if (catchUpTasksError) {
+    catchUpTasksError.textContent = message;
+    catchUpTasksError.hidden = false;
+  }
+  field?.focus();
+}
+
+function clearCatchUpTasksError() {
+  if (!catchUpTasksError) return;
+  catchUpTasksError.textContent = "";
+  catchUpTasksError.hidden = true;
+}
+
+function catchUpTaskRows() {
+  return [...(catchUpTasksList?.querySelectorAll("[data-catch-up-task]") || [])];
+}
+
+function renumberCatchUpTasks() {
+  const rows = catchUpTaskRows();
+
+  rows.forEach((row, index) => {
+    const position = index + 1;
+    const label = row.querySelector("[data-catch-up-task-label]");
+    const input = row.querySelector("[data-catch-up-task-input]");
+    const remove = row.querySelector("[data-catch-up-task-remove]");
+    const inputId = `catch-up-task-${position}`;
+
+    if (input) input.id = inputId;
+    if (label) {
+      label.setAttribute("for", inputId);
+      label.textContent = `Task ${position}`;
+    }
+    if (remove) {
+      remove.hidden = rows.length < 2;
+      remove.setAttribute("aria-label", `Remove task ${position}`);
+    }
+  });
+
+  if (catchUpTasksAdd) catchUpTasksAdd.hidden = rows.length >= CATCH_UP_TASK_LIMIT;
+}
+
+function addCatchUpTaskRow({ focus = false } = {}) {
+  if (!catchUpTasksList || !catchUpTaskTemplate) return null;
+  if (catchUpTaskRows().length >= CATCH_UP_TASK_LIMIT) return null;
+
+  const row = catchUpTaskTemplate.content.firstElementChild.cloneNode(true);
+  catchUpTasksList.append(row);
+  renumberCatchUpTasks();
+  if (focus) row.querySelector("[data-catch-up-task-input]")?.focus();
+
+  return row;
+}
+
+function removeCatchUpTaskRow(row) {
+  if (!row || catchUpTaskRows().length < 2) return;
+
+  const nextFocus = row.nextElementSibling || row.previousElementSibling;
+  row.remove();
+  renumberCatchUpTasks();
+  clearCatchUpTasksError();
+  (nextFocus?.querySelector("[data-catch-up-task-input]") || catchUpTasksAdd)?.focus();
+}
+
+function collectCatchUpTasks() {
+  const rows = catchUpTaskRows();
+  const tasks = [];
+
+  for (const [index, row] of rows.entries()) {
+    const input = row.querySelector("[data-catch-up-task-input]");
+    const text = String(input?.value || "").trim();
+
+    if (!text) {
+      showCatchUpTasksError(`Task ${index + 1}: write what you completed, or remove it.`, input);
+      return null;
+    }
+
+    tasks.push(text);
+  }
+
+  if (!tasks.length) {
+    showCatchUpTasksError("Add at least one task you completed.", catchUpTasksAdd);
+    return null;
+  }
+
+  clearCatchUpTasksError();
+  return tasks;
+}
+
+function setCatchUpTasksSubmitting(isSubmitting) {
+  catchUpTasksSubmitting = isSubmitting;
+  if (catchUpTasksSave) catchUpTasksSave.disabled = isSubmitting;
+  if (catchUpTasksNone) catchUpTasksNone.disabled = isSubmitting;
+}
+
+function openCatchUpTasksModal(dateKey) {
+  if (!catchUpTasksModal || !catchUpTasksList) return;
+
+  rememberModalTrigger();
+  catchUpTasksDateKey = dateKey;
+  if (catchUpTasksDate) catchUpTasksDate.textContent = formatCatchUpDate(dateKey);
+
+  clearCatchUpTasksError();
+  catchUpTasksList.replaceChildren();
+  addCatchUpTaskRow();
+  setCatchUpTasksSubmitting(false);
+  setCatchUpModalOpen(catchUpTasksModal, true);
+  catchUpTasksList.querySelector("[data-catch-up-task-input]")?.focus();
+}
+
+function closeCatchUpTasksModal() {
+  const wasOpen = Boolean(catchUpTasksModal && !catchUpTasksModal.hidden);
+  setCatchUpModalOpen(catchUpTasksModal, false);
+  setCatchUpTasksSubmitting(false);
+  catchUpTasksDateKey = null;
+  if (wasOpen) restoreModalTrigger();
+}
+
+async function submitCatchUpTasksAnswer({ answer, tasks }) {
+  if (catchUpTasksSubmitting || !catchUpTasksDateKey) return;
+
+  const dateKey = catchUpTasksDateKey;
+  setCatchUpTasksSubmitting(true);
+  const result = await apiFetch("/api/daily-goals/missed", {
+    method: "POST",
+    body: { dateKey, answer, tasks },
+  });
+  setCatchUpTasksSubmitting(false);
+  if (!result) return;
+
+  if (!result.ok) {
+    showCatchUpTasksError(catchUpErrorMessage(result, "Could not save those tasks"));
+    return;
+  }
+
+  await applyCatchUpPayload(result.data.missedActivities, { dateKey, activity: "GOALS" });
+  closeCatchUpTasksModal();
+  const copy = catchUpActivityCopy("GOALS");
+  showToast(answer === "YES" ? copy.savedYes : copy.savedNo);
+}
+
+async function submitCatchUpTasks(event) {
+  event.preventDefault();
+
+  const tasks = collectCatchUpTasks();
+  if (!tasks) return;
+
+  await submitCatchUpTasksAnswer({ answer: "YES", tasks });
+}
+
+function openCatchUpItem(dateKey, activity) {
+  if (!dateKey || !catchUpActivityCopy(activity)) return;
+
+  if (activity === "GOALS") {
+    openCatchUpTasksModal(dateKey);
+    return;
+  }
+
+  openCatchUpAnswerModal({ dateKey, activity });
+}
+
+if (catchUpCard && catchUpList && catchUpTemplate) {
+  if (catchUpAnswerModal) document.body.append(catchUpAnswerModal);
+  if (catchUpTasksModal) document.body.append(catchUpTasksModal);
+
+  catchUpList.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-catch-up-open]");
+    if (!trigger) return;
+
+    openCatchUpItem(trigger.dataset.catchUpDate, trigger.dataset.catchUpActivity);
+  });
+
+  catchUpMore?.addEventListener("click", showMoreCatchUp);
+
+  catchUpAnswerModal?.addEventListener("click", (event) => {
+    if (event.target.closest("[data-catch-up-answer-close]")) {
+      closeCatchUpAnswerModal();
+      return;
+    }
+
+    const answerButton = event.target.closest("[data-catch-up-answer]");
+    if (answerButton && !answerButton.disabled) {
+      submitCatchUpAnswer(answerButton.dataset.catchUpAnswer);
+    }
+  });
+
+  catchUpTasksModal?.addEventListener("click", (event) => {
+    if (event.target.closest("[data-catch-up-tasks-close]")) {
+      closeCatchUpTasksModal();
+      return;
+    }
+    if (event.target.closest("[data-catch-up-tasks-add]")) {
+      addCatchUpTaskRow({ focus: true });
+      return;
+    }
+    if (event.target.closest("[data-catch-up-tasks-none]")) {
+      submitCatchUpTasksAnswer({ answer: "NO", tasks: [] });
+      return;
+    }
+
+    const removeButton = event.target.closest("[data-catch-up-task-remove]");
+    if (removeButton) removeCatchUpTaskRow(removeButton.closest("[data-catch-up-task]"));
+  });
+
+  catchUpTasksList?.addEventListener("input", clearCatchUpTasksError);
+  catchUpTasksForm?.addEventListener("submit", submitCatchUpTasks);
+
+  loadCatchUp();
+}
+
+const FOCUS_MOVING_KEYS = new Set([
+  "Tab", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+  "Home", "End", "PageUp", "PageDown", "Escape",
+]);
+
+function setInputModality(modality) {
+  document.documentElement.dataset.inputModality = modality;
+}
+
+document.addEventListener("pointerdown", () => setInputModality("pointer"), true);
+document.addEventListener("keydown", (event) => {
+  if (FOCUS_MOVING_KEYS.has(event.key)) setInputModality("keyboard");
+}, true);
+
+const PAGE_TRANSITION_DELAY = 160;
+
+let pageTransitionTimer = 0;
+
+function pageTransitionRoot() {
+  return document.documentElement;
+}
+
+function startPageTransition() {
+  if (pageTransitionTimer) return;
+
+  pageTransitionTimer = window.setTimeout(() => {
+    pageTransitionTimer = 0;
+    pageTransitionRoot().classList.add("page-transitioning");
+
+    const loader = document.querySelector("[data-noor-loader]");
+    if (!loader) return;
+    loader.removeAttribute("aria-hidden");
+    loader.setAttribute("aria-busy", "true");
+    const status = loader.querySelector("[data-noor-loader-status]");
+    if (status) status.textContent = "Loading page…";
+  }, PAGE_TRANSITION_DELAY);
+}
+
+function resetPageTransition() {
+  window.clearTimeout(pageTransitionTimer);
+  pageTransitionTimer = 0;
+  pageTransitionRoot().classList.remove("page-transitioning");
+
+  const loader = document.querySelector("[data-noor-loader]");
+  if (!loader) return;
+  loader.setAttribute("aria-hidden", "true");
+  loader.removeAttribute("aria-busy");
+  const status = loader.querySelector("[data-noor-loader-status]");
+  if (status) status.textContent = "";
+}
+
+window.NoOrStartPageTransition = startPageTransition;
+window.NoOrResetPageTransition = resetPageTransition;
+
+function isSameOriginDocumentLink(anchor) {
+  const href = anchor.getAttribute("href");
+  if (!href) return false;
+  if (anchor.hasAttribute("download")) return false;
+  if (anchor.target && anchor.target !== "_self") return false;
+  if (/^(mailto:|tel:|sms:|tg:)/i.test(href)) return false;
+
+  let url;
+  try {
+    url = new URL(anchor.href, window.location.href);
+  } catch {
+    return false;
+  }
+  if (url.origin !== window.location.origin) return false;
+  if (/(^|\.)t\.me$/i.test(url.hostname)) return false;
+  if (url.pathname === window.location.pathname
+    && url.search === window.location.search
+    && url.hash) return false;
+  return true;
+}
+
+function isPlainActivation(event) {
+  return !event.defaultPrevented
+    && event.button === 0
+    && !event.metaKey
+    && !event.ctrlKey
+    && !event.shiftKey
+    && !event.altKey;
+}
+
+function optedOut(element) {
+  return Boolean(element.closest("[data-no-page-transition]"));
+}
+
+document.addEventListener("click", (event) => {
+  const anchor = event.target.closest?.("a[href]");
+  if (!anchor || !isPlainActivation(event) || optedOut(anchor)) return;
+  if (!isSameOriginDocumentLink(anchor)) return;
+  if (hasUnsavedReading()) return;
+  startPageTransition();
+});
+
+document.addEventListener("submit", (event) => {
+  const form = event.target;
+  if (!(form instanceof HTMLFormElement) || event.defaultPrevented) return;
+  if (optedOut(form)) return;
+  if (!form.getAttribute("action") && !form.action) return;
+  try {
+    if (new URL(form.action, window.location.href).origin !== window.location.origin) return;
+  } catch {
+    return;
+  }
+  if (form.target && form.target !== "_self") return;
+  if (typeof form.checkValidity === "function" && !form.checkValidity()) return;
+  if (hasUnsavedReading()) return;
+  startPageTransition();
+});
+
+window.addEventListener("pageshow", (event) => {
+  resetPageTransition();
+  if (event.persisted) pageTransitionRoot().classList.remove("page-loading", "page-entering");
+});
+
+window.addEventListener("pagehide", resetPageTransition);
 
 let ambientRoot = null;
-let ambientVideoElement = null;
-const ambientReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function setAmbientAnswerState(answer) {
   if (!ambientRoot) return;
   ambientRoot.dataset.state = answer === "YES" ? "yes" : answer === "NO" ? "no" : "neutral";
 }
 
-function ambientPlaybackAllowed() {
-  return !ambientReducedMotion.matches && !navigator.connection?.saveData && !document.hidden;
-}
-
-function syncAmbientPlayback() {
-  if (!ambientVideoElement) return;
-  if (ambientPlaybackAllowed()) {
-    ambientVideoElement.play()?.catch(() => {});
-  } else {
-    ambientVideoElement.pause();
-  }
-}
-
 function initAmbientArt() {
-  if (ambientRoot || document.querySelector("[data-ambient-video]")) return;
-  if (!document.querySelector(".dashboard-page, .dashboard-section")) return;
+  if (ambientRoot) return;
 
-  try {
-    const root = document.createElement("div");
-    root.className = "ambient-video";
-    root.setAttribute("data-ambient-video", "");
-    root.setAttribute("aria-hidden", "true");
-    root.dataset.state = "neutral";
-    root.innerHTML = `
-      <video class="ambient-video__media" muted loop playsinline preload="metadata" poster="${AMBIENT_VIDEO_POSTER}" tabindex="-1">
-        ${AMBIENT_VIDEO_SOURCES.map((source) => `<source src="${source.src}" type="${source.type}">`).join("\n        ")}
-      </video>
-      <div class="ambient-video__tint"></div>
-      <div class="ambient-video__overlay"></div>
-      <div class="ambient-video__vignette"></div>
-    `;
+  const sharedSky = document.querySelector("[data-app-sky]");
+  if (!sharedSky) return;
 
-    const video = root.querySelector("video");
-    video.muted = true;
-    const showFallback = () => {
-      root.classList.add("is-fallback");
-      root.style.backgroundImage = `url(${AMBIENT_VIDEO_POSTER})`;
-    };
-    video.addEventListener("error", showFallback);
-    const sourceElements = video.querySelectorAll("source");
-    sourceElements[sourceElements.length - 1]?.addEventListener("error", showFallback);
-
-    document.body.prepend(root);
-    document.body.classList.add("has-ambient-video");
-    ambientRoot = root;
-    ambientVideoElement = video;
-
-    document.addEventListener("visibilitychange", syncAmbientPlayback);
-    ambientReducedMotion.addEventListener?.("change", syncAmbientPlayback);
-    syncAmbientPlayback();
-  } catch {
-    document.querySelector("[data-ambient-video]")?.remove();
-    document.body.classList.remove("has-ambient-video");
-    ambientRoot = null;
-    ambientVideoElement = null;
-  }
+  ambientRoot = sharedSky;
+  document.body.classList.add("has-ambient-video");
+  document.body.dataset.ambient = document.body.dataset.page === "battle" ? "scene" : "shared";
 }
 
 initAmbientArt();

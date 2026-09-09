@@ -2,8 +2,7 @@
   <div class="header-container">
     <div class="header-left">
       <a href="/daily-check-in" class="logo-block logo-link">
-        <img src="/Logo.png" alt="NoOr" class="header-logo" draggable="false" />
-
+        <%- include("../ui/brand-mark", { tone: "chrome" }) %>
       </a>
     </div>
 
@@ -14,38 +13,101 @@
             <%= link.label %>
           </a>
           <% }) %>
-      </nav>
-      <% } %>
 
-    <div class="header-actions">
-      <nav class="header-auth-actions" aria-label="Account">
         <% if (auth) { %>
-          <a class="header-settings-link<%= currentPath === "/settings" ? " active" : "" %>" href="/settings" aria-label="Open settings">
-            <%- include("../ui/icon", { name: "gear", className: "header-settings-icon" }) %>
-          </a>
-          <div class="header-timezone" data-timezone-menu>
-            <button class="header-timezone-button" type="button" data-timezone-toggle aria-expanded="false" aria-label="Change timezone">
-              <span data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
+
+          <div class="header-nav-account" data-mobile-account>
+            <span class="header-nav-account-heading">Account</span>
+            <a href="/profile" class="header-link header-nav-account-link<%= currentPath === "/profile" ? " active" : "" %>">My Profile</a>
+            <a href="/achievements" class="header-link header-nav-account-link<%= currentPath === "/achievements" ? " active" : "" %>">Achievements</a>
+
+            <button class="header-nav-account-link header-nav-timezone" type="button" data-mobile-timezone-toggle aria-expanded="false" aria-controls="mobile-timezone-panel">
+              Region / Time zone
+              <span class="header-nav-timezone-current" data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
             </button>
-            <div class="header-timezone-menu" data-timezone-options hidden>
-              <input class="header-timezone-search" type="search" placeholder="Search timezone" data-timezone-search autocomplete="off" />
-              <div class="header-timezone-list" data-timezone-list>
+            <div class="header-nav-timezone-panel" id="mobile-timezone-panel" data-mobile-timezone-panel hidden>
+              <input class="header-timezone-search" type="search" placeholder="Search time zones…" data-mobile-timezone-search autocomplete="off" spellcheck="false" aria-label="Search time zones" />
+              <div class="header-timezone-list" data-mobile-timezone-list>
                 <% timezoneOptions.forEach((timezone) => { %>
-                  <button class="header-timezone-option<%= timezone.value === auth.timezone ? " selected" : "" %>" type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
+                  <button class="header-timezone-option"<%- timezone.value === auth.timezone ? ' aria-current="true"' : "" %> type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
                     <%= timezone.label %>
                   </button>
                 <% }) %>
               </div>
-              <span class="header-timezone-empty" data-timezone-empty hidden>No timezones found</span>
+              <span class="header-timezone-empty" data-mobile-timezone-empty hidden>No timezones found</span>
             </div>
+            <a href="/settings" class="header-link header-nav-account-link<%= currentPath === "/settings" ? " active" : "" %>">Settings</a>
+            <a href="/help" class="header-link header-nav-account-link<%= currentPath === "/help" ? " active" : "" %>">Help</a>
+            <form class="header-nav-logout" action="/logout" method="post">
+              <button class="header-link header-nav-account-link" type="submit">Logout</button>
+            </form>
           </div>
-          <form class="header-logout-form" action="/logout" method="post">
-            <button class="header-auth-link header-auth-button" type="submit">Logout</button>
-          </form>
-        <% } else { %>
-          <a class="header-auth-link" href="/login">Login</a>
         <% } %>
       </nav>
+      <% } %>
+
+    <div class="header-actions">
+      <% if (!auth) { %>
+        <nav class="header-auth-actions" aria-label="Account">
+          <a class="header-auth-link" href="/login">Login</a>
+        </nav>
+      <% } %>
+      <% if (auth) { %>
+        <div class="header-account" data-account-menu>
+          <button
+            class="header-account-button"
+            type="button"
+            data-account-toggle
+            aria-expanded="false"
+            aria-controls="account-panel"
+            aria-label="<%= auth.name %> account menu"
+          >
+            <span
+              class="header-account-identity"
+              data-emblem="<%= auth.emblemKey %>"
+              data-accent="<%= auth.accentKey %>"
+              aria-hidden="true"
+            ></span>
+          </button>
+
+          <div class="header-account-panel" id="account-panel" data-account-panel hidden>
+            <nav class="header-account-nav" aria-label="Account">
+              <a class="header-account-link<%= currentPath === "/profile" ? " active" : "" %>" href="/profile" data-account-item>My Profile</a>
+              <a class="header-account-link<%= currentPath === "/achievements" ? " active" : "" %>" href="/achievements" data-account-item>Achievements</a>
+            </nav>
+
+            <section class="header-account-section" aria-labelledby="account-region-label">
+
+              <p class="header-account-heading" id="account-region-label">Region / Time zone</p>
+              <div class="header-timezone" data-timezone-menu>
+                <button class="header-timezone-button" type="button" data-timezone-toggle aria-expanded="false" aria-label="Change timezone">
+                  <span data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
+                </button>
+                <div class="header-timezone-menu" data-timezone-options hidden>
+                  <input class="header-timezone-search" type="search" placeholder="Search time zones…" data-timezone-search autocomplete="off" spellcheck="false" aria-label="Search time zones" />
+                  <div class="header-timezone-list" data-timezone-list>
+                    <% timezoneOptions.forEach((timezone) => { %>
+                      <button class="header-timezone-option"<%- timezone.value === auth.timezone ? ' aria-current="true"' : "" %> type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
+                        <%= timezone.label %>
+                      </button>
+                    <% }) %>
+                  </div>
+                  <span class="header-timezone-empty" data-timezone-empty hidden>No timezones found</span>
+                </div>
+              </div>
+            </section>
+
+            <nav class="header-account-nav" aria-label="Account settings">
+              <a class="header-account-link<%= currentPath === "/settings" ? " active" : "" %>" href="/settings" data-account-item>Settings</a>
+              <a class="header-account-link<%= currentPath === "/help" ? " active" : "" %>" href="/help" data-account-item>Help</a>
+            </nav>
+
+            <form class="header-account-logout" action="/logout" method="post">
+              <button class="header-account-link header-account-logout-button" type="submit" data-account-item>Logout</button>
+            </form>
+          </div>
+        </div>
+      <% } %>
       <% if (t("header.nav", []).length) { %>
         <button class="header-menu-button" type="button" data-header-menu-toggle aria-label="Open navigation menu" aria-expanded="false">
           <span></span>

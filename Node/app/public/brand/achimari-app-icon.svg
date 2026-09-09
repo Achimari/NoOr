@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Achimari">
+  <title>Achimari</title>
+  <rect width="64" height="64" fill="#111111" />
+  <path d="M14 18 23 11 32 20 42 12 51 18" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M7 48 23 24 34 37 44 27 57 48" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M14 53 23 44 31 52 M35 53 44 44 52 52" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
