@@ -27,4 +27,22 @@ describe("Community editorial layout", () => {
       /@media\s*\(max-width:\s*800px\)[\s\S]*?\.community-editorial-grid\s*{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s,
     );
   });
+
+  it("keeps prayer interaction feedback on the three-dot action only", () => {
+    assert.match(
+      styles,
+      /\.community-page \.prayer-item:focus-within\s*{[^}]*background:\s*transparent/s,
+      "focusing a control must not tint the whole prayer",
+    );
+    assert.match(
+      styles,
+      /\.community-page \.prayer-item-author:focus-visible\s*{[^}]*text-decoration:\s*none/s,
+      "the author keeps the global focus ring without adding an underline",
+    );
+    assert.match(
+      styles,
+      /@media\s*\(hover:\s*hover\)\s*and\s*\(pointer:\s*fine\)[\s\S]*?\.community-page \.prayer-item-author:hover\s*{[^}]*text-decoration:\s*none/s,
+      "hovering the author must not add a second row effect",
+    );
+  });
 });

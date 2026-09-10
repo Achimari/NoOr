@@ -28,6 +28,18 @@ svg {
   user-select: none;
 }
 
+/* Form controls do not inherit the document's font: left alone, a button or a
+   select falls back to the UA's own family and size, which put Arial at 13.3px
+   inside an otherwise handwritten interface. Zero specificity, so any component
+   rule still wins — this only catches what nothing else styles. */
+:where(button, input, select, textarea, optgroup) {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
 .sr-only,
 .visually-hidden {
   position: absolute;
@@ -51,17 +63,28 @@ body {
   color: var(--text);
   font-family: var(--font-ui);
 
+  /* The product ships one real 400 face. A synthesised bold or italic would be
+     a smeared outline of it, so the browser is told never to invent either. */
   font-synthesis: none;
   font-size: var(--text-body);
+  font-weight: var(--weight-body);
   line-height: var(--leading-body);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0;
+
+  /* No font-smoothing override. `-webkit-font-smoothing: antialiased` drops
+     macOS from subpixel to grayscale rendering, which thins every stroke — the
+     last thing a monoline handwritten face can afford. `optimizeLegibility` is
+     also gone: it buys nothing here (the ligature/kerning work already comes
+     from the font's own GPOS) and has a history of rendering bugs. Each
+     platform now rasterises the text its own normal way.
+     Stroke weight is solved in the font outline, not by CSS. */
   color-scheme: light;
 }
 
-:where(h1, h2, h3) {
-  text-transform: uppercase;
+:where(h1, h2, h3, h4, h5, h6) {
+  font-weight: var(--weight-body);
+  line-height: var(--leading-title);
+  text-wrap: balance;
 }
 
 body:has(.dashboard-page),
@@ -105,7 +128,7 @@ main {
   background: var(--white);
   color: var(--ink);
   box-shadow: var(--shadow-pop);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   text-decoration: none;
   transform: translateY(calc(-100% - var(--space-4)));
   transition: transform var(--duration-ui) var(--ease-out);
@@ -121,14 +144,8 @@ main:focus {
 
 .battle-active {
 
-  --font-ui: "Achimari Hand", var(--font-system);
-  --font-display: "Achimari Hand", var(--font-system);
-  --font-body: "Achimari Hand", var(--font-system);
-  --font-reading: "Achimari Hand", var(--font-system);
-  --font-synthesis-branded: none;
   font-family: var(--font-ui);
-  font-synthesis: none;
-  font-size: 1rem;
+  font-size: var(--text-control);
   line-height: 1.6;
 }
 

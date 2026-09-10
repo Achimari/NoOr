@@ -116,17 +116,18 @@
 .achievements-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: clamp(1.6rem, 3.4vw, 2.1rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, var(--text-page-title));
+  font-weight: var(--weight-body);
+  letter-spacing: 0;
+  line-height: 1.15;
 }
 
 .achievements-lede {
   margin: var(--space-2) 0 0;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  font-weight: 500;
+  color: var(--ink-on-sky);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.5;
   max-width: var(--measure-reading);
 }
@@ -140,14 +141,14 @@
 .achievements-count {
   margin: 0 0 var(--space-2);
   color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
 .achievements-count strong {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: var(--text-subtitle);
+  font-weight: var(--weight-body);
 }
 
 .achievements-meter,
@@ -210,11 +211,10 @@
 
 .achievements-panel-title {
   margin: 0 0 var(--space-4);
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  color: var(--ink-on-sky);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .achievements-latest-body {
@@ -231,32 +231,32 @@
 .achievements-latest-name {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.25;
 }
 
 .achievements-latest-requirement {
   margin: var(--space-1) 0 0;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  font-weight: 500;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   line-height: 1.5;
 }
 
 .achievements-latest-date {
   margin: var(--space-2) 0 0;
   color: var(--text-primary);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
 .achievements-empty {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.55;
 }
 
@@ -294,8 +294,8 @@
 .achievements-next-name {
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.3;
 }
 
@@ -309,8 +309,8 @@
 
 .achievements-figure {
   color: var(--text-primary);
-  font-size: 0.8125rem;
-  font-weight: 700;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -320,8 +320,8 @@
   display: inline-flex;
   align-items: center;
   color: var(--link);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -351,8 +351,8 @@
   background: var(--surface-1);
   color: var(--text-primary);
   font-family: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     background-color var(--duration-ui) var(--ease-out),
@@ -361,9 +361,9 @@
 }
 
 .achievements-filter-count {
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  font-weight: 700;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
@@ -390,9 +390,9 @@
 
 .achievements-result {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 .achievements-card[hidden],
@@ -420,17 +420,16 @@
 .achievements-category-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .achievements-category-count {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
@@ -473,26 +472,25 @@
 .achievements-card-name {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
 
 .achievements-card-tier {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .achievements-card-requirement {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  font-weight: 500;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
@@ -504,8 +502,8 @@
   gap: var(--space-1) var(--space-2);
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.8125rem;
-  font-weight: 700;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 .achievements-state-mark {
@@ -528,7 +526,7 @@
 
 .achievements-card-date {
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 

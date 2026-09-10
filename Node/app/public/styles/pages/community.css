@@ -26,15 +26,15 @@
 .community-quote blockquote {
   margin: 0;
   color: var(--ink);
-  font-size: 1.125rem;
+  font-size: var(--text-body);
   line-height: 1.6;
   text-wrap: pretty;
 }
 
 .community-quote-source {
   margin-block-start: var(--space-2);
-  color: var(--ink-muted);
-  font-size: 0.875rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
 }
 
 .community-resource {
@@ -53,14 +53,14 @@
 
 .community-resource-meta {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: 0.875rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
 }
 
 .community-resource-summary {
   margin: 0;
   color: var(--ink);
-  font-size: 1rem;
+  font-size: var(--text-control);
   line-height: 1.55;
   text-wrap: pretty;
 }
@@ -72,7 +72,7 @@
   background: var(--surface-subtle);
   border-radius: var(--radius-row);
   color: var(--ink);
-  font-size: 0.9375rem;
+  font-size: var(--text-label);
   line-height: 1.5;
   text-wrap: pretty;
 }
@@ -80,9 +80,9 @@
 .community-resource-action-label {
   display: block;
   margin-block-end: 2px;
-  color: var(--ink-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
 
@@ -101,17 +101,17 @@
 .prayer-panel-copy h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
 .prayer-panel-copy p {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.5;
 }
 
@@ -144,9 +144,9 @@
   position: relative;
   display: grid;
   gap: var(--space-1);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .prayer-filter-combo,
@@ -164,8 +164,8 @@
   background: var(--surface-1);
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   transition:
     background-color var(--duration-ui) var(--ease-out),
     border-color var(--duration-ui) var(--ease-out);
@@ -250,10 +250,10 @@
   border: 0;
   border-radius: var(--radius-tag);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   text-align: left;
   cursor: pointer;
   transition:
@@ -283,15 +283,15 @@
 .prayer-filter-menu button[aria-current] {
   background: var(--ink-10);
   color: var(--text-primary);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .prayer-filter-empty {
   display: block;
   padding: var(--space-2);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .prayer-filter-clear {
@@ -300,10 +300,10 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-control);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     transform var(--duration-fast) var(--ease-out),
@@ -328,6 +328,22 @@
   background: var(--ink-06);
   border-color: var(--border-strong);
   color: var(--text-primary);
+}
+
+.community-page .prayer-item:focus-within {
+  background: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .community-page .prayer-item-author:hover {
+    color: var(--brand);
+    text-decoration: none;
+  }
+}
+
+.community-page .prayer-item-author:focus-visible {
+  color: var(--brand);
+  text-decoration: none;
 }
 
 .community-telegram {

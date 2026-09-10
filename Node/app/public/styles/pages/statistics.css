@@ -26,11 +26,15 @@
 }
 
 .progress-missed {
-  display: inline-block;
-  margin-inline-start: var(--space-2);
-  color: var(--ink-muted);
+  /* Its own line, so the streak values themselves share one right edge instead
+     of being pushed around by whether a row carries a missed-day count. */
+  display: block;
+  margin-block-start: 2px;
+  color: var(--ink-secondary-strong);
+  font-family: var(--font-data);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -78,7 +82,7 @@
   display: inline-flex;
   align-items: baseline;
   gap: var(--space-2);
-  font-size: 0.9375rem;
+  font-size: var(--text-label);
 }
 
 .split-legend-item::before {
@@ -109,17 +113,21 @@
 
 .split-legend-value {
   color: var(--ink);
-  font-weight: 400;
+  font-family: var(--font-data);
+  font-weight: var(--weight-body);
+  font-variant-numeric: tabular-nums;
 }
 
 .split-legend-share {
-  color: var(--ink-muted);
+  color: var(--ink-secondary-strong);
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 
 .split-caption {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
 }
 
 .split[data-empty="true"] .split-bar-segment {
@@ -148,8 +156,8 @@
   margin: var(--space-3) 0 0;
   padding: 0;
   list-style: none;
-  font-size: 0.875rem;
-  color: var(--ink-muted);
+  font-size: var(--text-micro);
+  color: var(--ink-secondary-strong);
 }
 
 .weekday-legend-item {
@@ -192,8 +200,9 @@
 }
 
 .weekday-label {
-  color: var(--ink-muted);
-  font-size: 0.875rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 @media (max-width: 700px) {
@@ -240,7 +249,11 @@
   display: flex;
   gap: var(--space-3);
   white-space: nowrap;
+  font-family: var(--font-data);
   font-size: var(--text-micro);
+  font-variant-numeric: tabular-nums;
+
+  font-weight: var(--weight-body);
 }
 
 .weekday-figure-yes {
@@ -288,22 +301,24 @@
 }
 
 .prayer-world-region-name {
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
   overflow-wrap: anywhere;
   hyphens: auto;
 }
 
 .prayer-world-region-count {
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
+  color: var(--ink-secondary-strong);
+  font-family: var(--font-data);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
 .prayer-world-region.is-active .prayer-world-region-name,
 .prayer-world-region.is-active .prayer-world-region-count {
   color: var(--ink);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .prayer-world-region--empty {

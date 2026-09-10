@@ -49,6 +49,30 @@ describe("shared page shell contract", () => {
     assert.match(shell, /\.page-shell\s*{[^}]*padding-inline:\s*var\(--padding\)/s);
   });
 
+  it("uses the Community header-to-title gap on every primary route", () => {
+    const shell = style("shell.css");
+    const battle = style("game/battle.css");
+    const today = style("pages/daily-check-in.css");
+    const todayHorizon = today.match(/\.today-page \.horizon\s*{([^}]*)}/s)?.[1] || "";
+
+    assert.match(
+      shell,
+      /\.page-shell\s*{[^}]*padding-block:\s*var\(--section-gap\)/s,
+      "the shared page shell owns the Community top gap",
+    );
+    assert.doesNotMatch(
+      battle,
+      /(?:\.battle-container|\.battle-page \.page-head)\s*{[^}]*padding-block-start/s,
+      "Battle must not replace the shared top gap",
+    );
+    assert.match(
+      todayHorizon,
+      /padding-block-start:\s*var\(--section-gap\)/,
+      "Today must use the same top gap as Community",
+    );
+    assert.match(todayHorizon, /justify-content:\s*flex-start/, "Today must align its title from the top gap");
+  });
+
   it("keeps the legacy container wrapper on exactly the shared measure", () => {
     const globals = style("globals.css");
     const containerRule = globals.match(/\.container\s*{[^}]*}/s)?.[0] || "";

@@ -8,15 +8,15 @@
 
 .field-label {
   color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
 .field-hint {
-  color: var(--ink-muted);
-  font-size: 0.875rem;
-  line-height: 1.4;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  line-height: 1.45;
   text-wrap: pretty;
 }
 
@@ -31,7 +31,7 @@
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 1rem;
+  font-size: var(--text-control);
   line-height: 1.4;
   transition:
     border-color var(--duration-ui) var(--ease-out),
@@ -47,7 +47,7 @@
 
 .field-input::placeholder,
 .field-textarea::placeholder {
-  color: var(--ink-quiet);
+  color: var(--ink-muted);
 }
 
 .field-input:disabled,
@@ -69,8 +69,9 @@
   align-items: flex-start;
   gap: var(--space-2);
   color: var(--danger);
-  font-size: 0.875rem;
-  line-height: 1.4;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
+  line-height: 1.45;
   text-wrap: pretty;
 }
 
@@ -89,8 +90,8 @@
   max-width: var(--measure-reading);
   min-height: calc(var(--tap-min) * 4);
   font-family: var(--font-reading);
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
 @media (prefers-contrast: more) {

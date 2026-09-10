@@ -59,16 +59,19 @@
 
 .auth-title {
   color: var(--text-primary);
-  letter-spacing: -0.02em;
-  font-size: clamp(2rem, 4vw, 2.6rem);
-  line-height: 1.08;
-  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: 0;
+  font-size: clamp(var(--text-page-title), 4vw, var(--text-display));
+  line-height: 1.15;
+  font-weight: var(--weight-body);
   margin: 0;
 }
 
 .auth-subtitle {
   margin: var(--space-2) 0 0;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
 .auth-errors {
@@ -85,8 +88,8 @@
 
 .auth-errors p {
   margin: 0;
-  font-size: 0.94rem;
-  font-weight: 700;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.35;
 }
 
@@ -95,8 +98,8 @@
   gap: var(--space-1);
   margin-bottom: var(--space-4);
   color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .auth-field input {
@@ -108,8 +111,11 @@
   border-radius: var(--radius-control);
   background: var(--white);
   color: var(--text-primary);
+
+  /* `font: inherit` resets font-size, so the control size must follow it. */
   font: inherit;
-  font-weight: 500;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   transition:
     border-color var(--duration-ui) var(--ease-out),
     background-color var(--duration-ui) var(--ease-out);
@@ -125,9 +131,9 @@
 
 .auth-hint {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 .auth-actions {

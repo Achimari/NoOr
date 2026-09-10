@@ -31,8 +31,7 @@
 .t-reading,
 .t-eyebrow {
   font-family: var(--font-ui);
-  font-synthesis: var(--font-synthesis-branded);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .t-display {
@@ -43,7 +42,9 @@
 }
 
 .t-page-title {
-  font-size: var(--text-display);
+  font-family: var(--font-display);
+  font-size: var(--text-page-title);
+  font-weight: var(--weight-body);
   line-height: var(--leading-display);
   letter-spacing: 0;
   text-wrap: balance;
@@ -88,7 +89,7 @@
 }
 
 .t-eyebrow {
-  color: var(--ink-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
   line-height: 1.4;
   letter-spacing: 0.01em;
@@ -102,7 +103,8 @@
 }
 
 .page-head-eyebrow {
-  color: var(--ink-muted);
+  color: var(--ink-on-sky);
+  font-weight: var(--weight-body);
   font-size: var(--text-meta);
   line-height: var(--leading-meta);
   letter-spacing: 0.01em;
@@ -112,18 +114,17 @@
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-synthesis: var(--font-synthesis-branded);
-  font-size: var(--text-display);
-  font-weight: 400;
+  font-size: var(--text-page-title);
+  font-weight: var(--weight-body);
   line-height: var(--leading-display);
   letter-spacing: 0;
   text-wrap: balance;
 }
 
 .page-head-lede {
-  max-width: var(--measure-reading);
+  max-width: var(--measure-prose);
   margin: 0;
-  color: var(--ink-muted);
+  color: var(--ink-on-sky);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   text-wrap: pretty;
@@ -185,9 +186,8 @@
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-synthesis: var(--font-synthesis-branded);
   font-size: var(--text-title);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: var(--leading-title);
   letter-spacing: 0;
   text-wrap: balance;

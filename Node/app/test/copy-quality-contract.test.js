@@ -8,10 +8,35 @@ const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 
 describe("copy quality contract", () => {
-  it("renders semantic page and section titles in uppercase", () => {
+  it("writes page and section titles in sentence case", () => {
+    // Achimari Hand is a handwritten face: all-caps strips the ascender and
+    // descender shapes a reader uses to recognise a word. Uppercase survives
+    // only where the markup writes it, on the short Yes/No decision labels.
     const globals = read("public/styles/globals.css");
+    const shell = read("public/styles/shell.css");
+    const today = read("public/styles/pages/daily-check-in.css");
 
-    assert.match(globals, /:where\(h1,\s*h2,\s*h3\)\s*{[^}]*text-transform:\s*uppercase/s);
+    assert.doesNotMatch(
+      globals,
+      /:where\([^)]*h2[^)]*\)\s*\{[^}]*text-transform:\s*uppercase/s,
+      "the global sheet must not case every heading",
+    );
+
+    for (const sheet of [shell, today]) {
+      assert.doesNotMatch(sheet, /text-transform:\s*uppercase/, "titles read in sentence case");
+    }
+
+    assert.match(today, /\.today-title\s*\{[^}]*text-transform:\s*none/s);
+  });
+
+  it("keeps the Today heading reading as Today", () => {
+    const home = read("src/views/pages/partials/home-content.ejs");
+
+    assert.match(home, /class="page-head-title today-title">Today</);
+    assert.doesNotMatch(home, />TODAY</);
+    // The approved uppercase: short, large, expressive decision labels.
+    assert.match(home, /class="dashboard-action-label">YES</);
+    assert.match(home, /class="dashboard-action-label">NO</);
   });
 
   it("uses concrete language for Progress data", () => {

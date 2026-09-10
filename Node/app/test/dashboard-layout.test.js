@@ -69,18 +69,24 @@ describe("daily check-in layout", () => {
 
     assert.doesNotMatch(materialStyles, /\.horizon::before\s*{/);
     assert.ok(todayHorizon, "Today defines its horizon spacing");
-    assert.match(todayHorizon[1], /padding-block-start:\s*var\(--space-5\)/);
+    assert.match(todayHorizon[1], /justify-content:\s*flex-start/);
+    assert.match(todayHorizon[1], /padding-block-start:\s*var\(--section-gap\)/);
     assert.match(todayHorizon[1], /padding-block-end:\s*var\(--space-5\)/);
     assert.doesNotMatch(todayHorizon[1], /border-block-end|background-image/);
   });
 
-  it("frames the practice summary with matching contained rules", () => {
+  it("does not render or style a duplicate practice summary", async () => {
+    const html = await renderDashboard();
     const todayStyles = readFileSync(dashboardStylesPath, "utf8");
-    const ledgerRule = todayStyles.match(/\.practice-ledger\s*{([^}]*)}/s);
 
-    assert.ok(ledgerRule, "the practice summary has a shared rule");
-    assert.match(ledgerRule[1], /border-block-start:\s*1px solid/);
-    assert.match(ledgerRule[1], /border-block-end:\s*1px solid/);
+    assert.doesNotMatch(html, /practice-ledger|data-practice-status|Today's progress/);
+    assert.doesNotMatch(todayStyles, /\.practice-ledger/);
+  });
+
+  it("removes the summary's client-side update path", () => {
+    const appScript = readFileSync(appScriptPath, "utf8");
+
+    assert.doesNotMatch(appScript, /practiceLedgerNodes|setPracticeStatus|answerWords|data-practice-status/);
   });
 
   it("removes the weekly answer strip", async () => {

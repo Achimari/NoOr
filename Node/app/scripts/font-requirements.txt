@@ -1,1 +1,5 @@
+# Pinned build dependencies for scripts/build-achimari-font.py.
+# afdko supplies otfautohint, invoked as `python -m afdko.otfautohint`, so the
+# build never depends on a globally installed binary.
 fonttools==4.64.0
+afdko==4.0.1

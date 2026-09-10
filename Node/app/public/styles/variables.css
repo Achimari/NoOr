@@ -19,6 +19,17 @@
   --ink: #111111;
   --ink-raised: #242424;
   --ink-muted: #5c5c58;
+
+  /* 8.2:1 on paper. For small, muted or image-adjacent copy that has to clear
+     roughly 7:1 where --ink-muted's 6.7:1 is only just enough. */
+  --ink-secondary-strong: #4f4f4a;
+
+  /* Text that floats on the horizon image. The darkest composited cloud pixel
+     there measures rgb(158,158,158): full ink holds 7.05:1, every muted ink
+     falls under 3.1:1, so anything over the sky takes this. */
+  --ink-on-sky: var(--ink);
+
+  /* 3.5:1 on white — a rule and divider colour, never a text colour. */
   --ink-quiet: #8a8a84;
 
   --rule: #d2d2cc;
@@ -37,26 +48,55 @@
   --danger: #b3261e;
   --danger-soft: #fbebea;
 
-  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
-    Helvetica, Arial, sans-serif;
-  --font-ui: "Achimari Hand", var(--font-system);
-  --font-display: "Achimari Hand", var(--font-system);
-  --font-body: "Achimari Hand", var(--font-system);
-  --font-reading: "Achimari Hand", var(--font-system);
+  /* One visible family. Achimari Hand carries the whole product — display,
+     interface, prose, forms, tables, figures and HUD alike. `cursive` is the
+     generic fallback for a failed load or a glyph the face does not draw; it is
+     not a companion font and no token or component may select a stack instead. */
+  --font-brand: "Achimari Hand", cursive;
 
-  --font-synthesis-branded: none;
+  --font-display: var(--font-brand);
+  --font-ui: var(--font-brand);
+  --font-body: var(--font-brand);
+  --font-reading: var(--font-brand);
+  --font-data: var(--font-brand);
+
+  /* Achimari Hand ships Regular only. Hierarchy is drawn with size, space,
+     colour, casing and grouping — never with a weight the face cannot serve,
+     and never with a synthesised one (see font-synthesis: none in globals). */
+  --weight-body: 400;
 
   --text-display: 2.5rem;
-  --text-title: 1.625rem;
-  --text-subtitle: 1.1875rem;
-  --text-body: 1.0625rem;
-  --text-meta: 0.9375rem;
-  --text-micro: 0.875rem;
+  --text-page-title: 2rem;
+  --text-title: 1.75rem;
+  --text-subtitle: 1.5rem;
 
-  --leading-display: 1.4;
-  --leading-title: 1.4;
-  --leading-body: 1.55;
-  --leading-meta: 1.45;
+  /* Card and panel headings. Named because the sheets carried a dozen one-off
+     sizes that all meant the same thing. */
+  --text-component: 1.375rem;
+
+  /* A statistic read at a glance: a streak count, a stat total, a timer. */
+  --text-figure: 1.625rem;
+
+  /* Long-form reading. A handwritten face carries less information per pixel
+     than a grotesque, so the body step sits where a sans would put a lede. */
+  --text-body: 1.25rem;
+
+  /* Ordinary interface copy, inputs and primary controls. */
+  --text-control: 1.125rem;
+
+  /* Labels, and the critical HUD and statistics values. */
+  --text-label: 1.0625rem;
+
+  --text-meta: var(--text-label);
+
+  /* The floor. Nothing that carries meaning is set below this. */
+  --text-micro: 1rem;
+
+  --leading-display: 1.15;
+  --leading-title: 1.3;
+  --leading-body: 1.65;
+  --leading-meta: 1.5;
+  --leading-control: 1.4;
 
   --radius-row: 8px;
   --radius-control: 10px;
@@ -87,6 +127,13 @@
   --measure-wide: 1160px;
   --measure-focus: 820px;
   --measure-reading: 680px;
+
+  /* Long-form prose. Deliberately not expressed in `ch`: the CSS `ch` unit is
+     the advance of "0", and Achimari Hand's zero (618 units) is far wider than
+     its lowercase, so `68ch` lets a paragraph run to ~91 real characters. This
+     value is calibrated against measured prose — ~64 characters per line at
+     --text-body. */
+  --measure-prose: 33rem;
   --measure-dialog: 520px;
 
   --tap-min: 44px;

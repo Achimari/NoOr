@@ -1025,11 +1025,6 @@ document.addEventListener("keydown", (event) => {
 window.addEventListener("resize", () => closePrayerActionsMenu());
 window.addEventListener("scroll", () => closePrayerActionsMenu(), true);
 
-const practiceLedgerNodes = {
-  strong: document.querySelector('[data-practice-status="strong"]'),
-  bible: document.querySelector('[data-practice-status="bible"]'),
-  tasks: document.querySelector('[data-practice-status="tasks"]'),
-};
 const horizonBand = document.querySelector("[data-horizon]");
 
 const REVEAL_BATCH_CAP = 5;
@@ -1055,30 +1050,9 @@ function revealNewRows(rows, previouslyVisible) {
   });
 }
 
-function setPracticeStatus(practice, text, state) {
-  const node = practiceLedgerNodes[practice];
-  if (!node) return;
-  const changed = node.textContent !== text;
-  node.textContent = text;
-  if (state) node.dataset.state = state;
-  else delete node.dataset.state;
-
-  if (!changed) return;
-  node.classList.remove("is-settling");
-  void node.offsetWidth;
-  node.classList.add("is-settling");
-  node.addEventListener("animationend", () => node.classList.remove("is-settling"), { once: true });
-}
-
 function setHorizonState(answer) {
   if (!horizonBand) return;
   horizonBand.dataset.state = answer === "YES" ? "yes" : answer === "NO" ? "no" : "neutral";
-}
-
-function answerWords(answer) {
-  if (answer === "YES") return { text: "Yes", state: "yes" };
-  if (answer === "NO") return { text: "No", state: "no" };
-  return { text: "Not answered", state: null };
 }
 
 function setDailyActionSelection(answer) {
@@ -1088,8 +1062,6 @@ function setDailyActionSelection(answer) {
   if (noButton) {
     noButton.setAttribute("aria-pressed", String(answer === "NO"));
   }
-  const strong = answerWords(answer);
-  setPracticeStatus("strong", strong.text, strong.state);
   setHorizonState(answer);
   setAmbientAnswerState(answer);
 }
@@ -1591,9 +1563,6 @@ function setReadingAnswerState(status) {
 
   renderReadingSummary(status);
 
-  const reading = answerWords(status.answer);
-  setPracticeStatus("bible", reading.text, reading.state);
-
   if (status.answeredToday && status.nextResetAt) {
     readingTimer.hidden = false;
     renderReadingResetTimer(status.nextResetAt);
@@ -2046,11 +2015,6 @@ function renderDailyGoals(summary) {
   if (dailyGoalProgress) {
     dailyGoalProgress.textContent = goals.length ? `${summary.completedCount} of ${summary.total} completed` : "";
   }
-  setPracticeStatus(
-    "tasks",
-    goals.length ? `${summary.completedCount} of ${summary.total} done` : "None yet",
-    goals.length && summary.completedCount === summary.total ? "yes" : null,
-  );
   if (dailyGoalAddButton) {
     dailyGoalAddButton.hidden = summary.remainingSlots === 0 || !dailyGoalComposer?.hidden;
   }

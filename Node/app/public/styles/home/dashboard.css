@@ -1,8 +1,8 @@
 
 
 .dashboard-page {
-  --table-body-size: 0.95rem;
-  --table-head-size: 0.75rem;
+  --table-body-size: var(--text-control);
+  --table-head-size: var(--text-label);
   --table-row-padding-y: 10px;
   --table-row-padding-x: var(--space-4);
   --table-row-min-height: 58px;
@@ -29,9 +29,9 @@
 .dashboard-answer-status {
   min-height: 0;
   margin: 0 0 var(--space-4);
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   text-align: center;
 }
 
@@ -51,8 +51,8 @@
   background: var(--surface-2);
   color: var(--text-primary);
   box-shadow: var(--shadow-panel);
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   opacity: 0;
   pointer-events: none;
@@ -93,29 +93,29 @@
 
 .dashboard-label {
   margin: 0 0 var(--space-1);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
 .dashboard-value {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.45rem;
-  font-weight: 400;
+  font-size: var(--text-figure);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
 .dashboard-value-unit {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .home-page .dashboard-current .dashboard-value {
-  font-size: 1.7rem;
+  font-size: var(--text-figure);
 }
 
 .dashboard-holder-name {
@@ -139,16 +139,16 @@
 .dashboard-card-head h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
 .dashboard-card-head span {
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   white-space: nowrap;
 }
 
@@ -181,14 +181,14 @@
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-muted);
   font-size: var(--table-head-size);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
 .leaderboard-table td {
   height: var(--table-row-min-height);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   border-top: 1px solid var(--border-subtle);
   transition: background var(--duration-fast) var(--ease-out);
 }
@@ -273,21 +273,21 @@ a.leaderboard-user {
   background: var(--danger-tint);
   color: var(--danger);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
   white-space: nowrap;
 }
 
 .leaderboard-rank {
   color: var(--text-muted);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .leaderboard-streak {
   width: 100%;
   gap: var(--space-3);
   font-size: var(--table-body-size);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .leaderboard-streak-value {
@@ -297,7 +297,7 @@ a.leaderboard-user {
 .leaderboard-streak-separator {
   display: none;
   color: var(--text-muted);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .leaderboard-missed-tag {
@@ -311,10 +311,10 @@ a.leaderboard-user {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
   background: var(--ink-06);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font: inherit;
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
   white-space: nowrap;
   cursor: pointer;
@@ -390,17 +390,17 @@ p.leaderboard-empty {
 .table-empty-title {
   display: block;
   color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
 .table-empty-hint {
   display: block;
   margin-top: 4px;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.45;
 }
 
@@ -448,8 +448,8 @@ p.leaderboard-empty {
   margin: 0;
   color: var(--text-primary);
   max-width: 24ch;
-  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
-  font-weight: 400;
+  font-size: clamp(var(--text-component), 1.7vw, var(--text-figure));
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
   overflow-wrap: anywhere;
@@ -457,9 +457,9 @@ p.leaderboard-empty {
 
 .info-quote-source {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -482,15 +482,14 @@ p.leaderboard-empty {
 
 .info-resource .dashboard-label {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .info-resource-head h2 {
-  font-size: 1.08rem;
+  font-size: var(--text-component);
   line-height: 1.4;
   text-wrap: balance;
 }
@@ -502,7 +501,7 @@ p.leaderboard-empty {
   border-radius: var(--radius-tag);
   background: var(--ink-06);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -514,17 +513,17 @@ p.leaderboard-empty {
 
 .info-resource-source {
   margin-top: 2px;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
 .info-resource-summary {
   max-width: 56ch;
   color: var(--text-primary);
-  font-size: 0.92rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.55;
 }
 
@@ -540,8 +539,8 @@ p.leaderboard-empty {
 .info-resource-action > p:last-child {
   max-width: 56ch;
   color: var(--text-primary);
-  font-size: 0.88rem;
-  font-weight: 400;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   line-height: 1.5;
 }
 
@@ -553,9 +552,9 @@ p.leaderboard-empty {
   min-height: var(--tap-min);
   margin-top: auto;
   border-radius: var(--radius-tag);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-out);
@@ -575,8 +574,8 @@ p.leaderboard-empty {
 .telegram-card-copy {
   margin: 0;
   max-width: 34ch;
-  font-size: 0.95rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.55;
 }
 
@@ -585,8 +584,8 @@ p.leaderboard-empty {
   min-height: 52px;
   margin-top: auto;
   border-radius: 12px;
-  font-size: 0.96rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
 }
 
 .info-telegram-card {
@@ -682,10 +681,10 @@ p.leaderboard-empty {
   border: 0;
   border-radius: var(--radius-tag);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font: inherit;
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   text-align: left;
   cursor: pointer;
   transition:
@@ -846,16 +845,16 @@ p.leaderboard-empty {
 .settings-confirm-head h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.12rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
 .settings-confirm-head p:last-child {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.92rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.45;
 }
 
@@ -872,8 +871,8 @@ p.leaderboard-empty {
   padding: 0 var(--space-3);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-control);
-  font-size: 1rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   text-align: center;
 }
 
@@ -908,7 +907,7 @@ p.leaderboard-empty {
   border-radius: var(--radius-control);
   background: transparent;
   color: var(--text-primary);
-  font-size: 1.22rem;
+  font-size: var(--text-component);
   cursor: pointer;
   transition:
     border-color var(--duration-fast) var(--ease-out),
@@ -1004,8 +1003,8 @@ p.leaderboard-empty {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
   font-size: var(--text-micro);
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .customer-answer-yes {
@@ -1048,16 +1047,16 @@ p.leaderboard-empty {
 }
 
 .customer-details-list dt {
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .customer-details-list dd {
   margin: 0;
   color: var(--text-primary);
   font-size: var(--table-body-size);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -1085,9 +1084,9 @@ p.leaderboard-empty {
 }
 
 .customer-prayer-item span {
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.55;
 }
 
@@ -1096,7 +1095,7 @@ p.leaderboard-empty {
   max-width: 72ch;
   color: var(--text-muted);
   font-size: var(--table-body-size);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
@@ -1183,8 +1182,6 @@ p.leaderboard-empty {
 
 @media (max-width: 680px) {
   .dashboard-page {
-    --table-body-size: 0.9rem;
-    --table-head-size: 0.72rem;
     --table-row-padding-y: 10px;
     --table-row-padding-x: var(--space-2);
     --table-row-min-height: 54px;
@@ -1219,7 +1216,7 @@ p.leaderboard-empty {
 
   .dashboard-timer-value {
     flex: 0 0 auto;
-    font-size: 1.3rem;
+    font-size: var(--text-figure);
   }
 
   .leaderboard-table th:first-child,
@@ -1256,7 +1253,7 @@ p.leaderboard-empty {
     border: 0;
     background: transparent;
     font-size: var(--text-micro);
-    font-weight: 400;
+    font-weight: var(--weight-body);
   }
 
   .leaderboard-inactive-tag {
@@ -1266,7 +1263,7 @@ p.leaderboard-empty {
     background: transparent;
     color: var(--text-muted);
     font-size: 0;
-    font-weight: 400;
+    font-weight: var(--weight-body);
   }
 
   .leaderboard-inactive-tag::after {
@@ -1446,8 +1443,6 @@ p.leaderboard-empty {
 
 @media (max-width: 420px) {
   .dashboard-page {
-    --table-body-size: 0.875rem;
-    --table-head-size: 0.72rem;
     --table-row-min-height: 52px;
   }
 

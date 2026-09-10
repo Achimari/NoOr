@@ -12,18 +12,24 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  font-family: var(--font-data);
+
+  /* Achimari Hand draws proportional digits and ships no `tnum` feature, so
+     columns are held by alignment and a reserved width, not by the font.
+     This line is harmless progressive enhancement if a fallback face renders. */
+  font-variant-numeric: tabular-nums;
 }
 
 .data-table caption {
   padding: var(--space-3) var(--space-4);
-  color: var(--ink-muted);
-  font-size: 0.875rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
   text-align: start;
 }
 
 .data-table th,
 .data-table td {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-4);
   text-align: start;
   vertical-align: middle;
 }
@@ -34,10 +40,10 @@
   z-index: 1;
   border-block-end: 1px solid var(--separator);
   background: var(--surface);
-  color: var(--ink-muted);
-  font-size: var(--text-micro);
-  font-weight: 400;
-  letter-spacing: 0.02em;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
@@ -48,7 +54,7 @@
 
 .data-table tbody td {
   color: var(--ink);
-  font-size: 0.9375rem;
+  font-size: var(--text-control);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -65,7 +71,7 @@
 
 .data-table a {
   color: var(--brand);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   text-decoration: none;
   overflow-wrap: anywhere;
 }
@@ -91,11 +97,10 @@
 
 .data-table-you {
   margin-inline-start: var(--space-2);
-  color: var(--ink-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .data-table-name {
@@ -107,15 +112,26 @@
   white-space: nowrap;
 }
 
-.data-table-rank {
-  width: 3rem;
-  color: var(--ink-muted);
+.data-table .data-table-rank {
+  width: 3.5rem;
+  color: var(--ink-secondary-strong);
+  font-variant-numeric: tabular-nums;
+
+  /* Outranks the `.data-table th, .data-table td { text-align: start }` base,
+     which previously beat these column classes on specificity and left every
+     figure ragged. Header and body cells share the class, so both move. */
+  text-align: end;
+  padding-inline-end: var(--space-3);
 }
 
-.data-table-figure {
+.data-table .data-table-figure {
   text-align: end;
-  font-weight: 400;
+  font-weight: var(--weight-body);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
+
+  /* A reserved column keeps "1 day" and "128 days" on the same right edge. */
+  min-width: 7rem;
 }
 
 @media (max-width: 560px) {
@@ -135,8 +151,8 @@
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: var(--space-1) var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-4);
   }
 
   .data-table--stack tbody tr + tr {
@@ -151,6 +167,18 @@
 
   .data-table--stack .data-table-name {
     max-width: none;
+  }
+
+  /* Stacked rows are their own grid; the reserved desktop column widths would
+     only squeeze the name. Alignment still comes from the grid tracks. */
+  .data-table--stack .data-table-rank {
+    width: auto;
+    padding-inline-end: 0;
+    text-align: start;
+  }
+
+  .data-table--stack .data-table-figure {
+    min-width: 0;
   }
 }
 

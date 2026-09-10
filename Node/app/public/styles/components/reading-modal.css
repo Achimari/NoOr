@@ -59,8 +59,8 @@ body.reading-modal-open {
 .reading-modal-head h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.12rem;
-  font-weight: 400;
+  font-size: var(--text-subtitle);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -126,11 +126,10 @@ body.reading-modal-open {
 
 .reading-passage-title {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .reading-passage-remove {
@@ -138,10 +137,10 @@ body.reading-modal-open {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: 0.8rem;
-  font-weight: 400;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     transform var(--duration-fast) var(--ease-out),
@@ -176,9 +175,9 @@ body.reading-modal-open {
 }
 
 .reading-field label {
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .reading-field select {
@@ -191,7 +190,7 @@ body.reading-modal-open {
   background: var(--surface-2);
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.92rem;
+  font-size: var(--text-control);
   cursor: pointer;
 }
 
@@ -211,9 +210,9 @@ body.reading-modal-open {
   border-radius: var(--radius-control);
   background: var(--danger-tint);
   color: var(--danger);
-  font-size: 0.86rem;
-  font-weight: 400;
-  line-height: 1.4;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
+  line-height: 1.45;
 }
 
 .reading-modal-error[hidden] {
@@ -230,19 +229,18 @@ body.reading-modal-open {
   align-items: center;
   gap: var(--space-2);
   color: var(--text-primary);
-  font-size: 0.88rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .reading-optional {
   padding: 2px 8px;
   border-radius: var(--radius-tag);
   background: var(--ink-06);
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .reading-reflection textarea {
@@ -255,8 +253,8 @@ body.reading-modal-open {
   background: var(--surface-1);
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.92rem;
-  line-height: 1.5;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   resize: vertical;
 }
 
@@ -266,10 +264,11 @@ body.reading-modal-open {
 
 .reading-reflection-count {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .reading-modal-actions {

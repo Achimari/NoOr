@@ -17,8 +17,7 @@
 
 .brand-wordmark {
   font-family: var(--font-display);
-  font-synthesis: var(--font-synthesis-branded);
-  font-size: 1.3125rem;
+  font-size: var(--text-subtitle);
   line-height: 1.4;
 
   letter-spacing: 0;
@@ -39,7 +38,7 @@
 
 @media (max-width: 480px) {
   .brand-wordmark {
-    font-size: 1.125rem;
+    font-size: var(--text-subtitle);
   }
 
   .brand-lockup--lead .brand-wordmark {

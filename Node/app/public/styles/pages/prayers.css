@@ -39,18 +39,18 @@
 .prayer-card-intro h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
 .prayer-card-intro p {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   max-width: 40ch;
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.5;
 }
 
@@ -71,9 +71,9 @@
 }
 
 .prayer-field>span {
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -98,24 +98,24 @@
   background: transparent;
   color: var(--text-primary);
   font: inherit;
-  font-size: 1rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   line-height: 1.55;
   caret-color: var(--white);
 }
 
 .prayer-field textarea::placeholder {
   color: var(--text-muted);
-  font-size: 1rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
 }
 
 .prayer-form .auth-submit {
   width: 100%;
   min-height: 52px;
   border-radius: 12px;
-  font-size: 0.96rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .prayer-form-status {

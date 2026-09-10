@@ -66,19 +66,18 @@
 .profile-name {
   margin: 0;
   font-family: var(--font-display);
-  font-synthesis: var(--font-synthesis-branded);
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.75rem, 3vw, var(--text-page-title));
+  font-weight: var(--weight-body);
+  line-height: 1.15;
+  letter-spacing: 0;
   color: var(--text-primary);
   overflow-wrap: anywhere;
 }
 
 .profile-subtitle {
   margin: var(--space-1) 0 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--ink-on-sky);
+  font-size: var(--text-label);
 }
 
 .profile-head-links {
@@ -98,7 +97,8 @@
   border-radius: var(--radius-control);
   color: var(--text-primary);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   transition: background-color var(--duration-ui) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
@@ -116,12 +116,11 @@
   background: none;
   box-shadow: none;
   color: var(--ink);
-  font-family: var(--font-display);
-  font-synthesis: var(--font-synthesis-branded);
-  font-size: clamp(1.35rem, 2.3vw, 1.75rem);
-  font-weight: 650;
-  line-height: 1.15;
-  letter-spacing: -0.014em;
+  font-family: var(--font-ui);
+  font-size: var(--text-subtitle);
+  font-weight: var(--weight-body);
+  line-height: 1.25;
+  letter-spacing: 0;
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -145,28 +144,28 @@
 .profile-note,
 .profile-setup-text {
   margin: var(--space-2) 0 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
   line-height: 1.55;
-  max-width: 62ch;
+  max-width: var(--measure-prose);
 }
 
 .profile-empty,
 .profile-private {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
 }
 
 .profile-error {
   margin: var(--space-3) 0 0;
   color: var(--danger);
-  font-size: 0.875rem;
+  font-size: var(--text-micro);
 }
 
 .profile-points-remaining {
-  color: var(--text-muted);
-  font-size: 0.875rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
   font-variant-numeric: tabular-nums;
 }
 
@@ -192,8 +191,8 @@
 
 .profile-allocation-label {
   color: var(--text-primary);
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: var(--weight-body);
+  font-size: var(--text-label);
 }
 
 .profile-allocation-control {
@@ -213,7 +212,7 @@
   border: 1px solid var(--border-strong);
   background: var(--surface-2);
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: var(--text-control);
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-ui) var(--ease-out);
 }
@@ -239,8 +238,8 @@
 
 .profile-allocation-earned {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.8125rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -271,16 +270,18 @@
 }
 
 .profile-stat:first-child { border-top: 0; }
-.profile-stat-label { grid-area: label; color: var(--text-primary); font-weight: 600; }
-.profile-stat-note { grid-area: note; color: var(--text-muted); font-size: 0.8125rem; }
+.profile-stat-label { grid-area: label; color: var(--text-primary); font-weight: var(--weight-body); }
+.profile-stat-note { grid-area: note; color: var(--ink-secondary-strong); font-size: var(--text-micro); }
 
 .profile-stat-value {
   grid-area: value;
-  font-size: 1.5rem;
+  font-family: var(--font-data);
+  font-size: var(--text-figure);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .profile-derived {
@@ -293,16 +294,17 @@
 }
 
 .profile-derived-item dt {
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  letter-spacing: 0.02em;
 }
 
 .profile-derived-item dd {
   margin: var(--space-1) 0 0;
   color: var(--text-primary);
-  font-size: 1.125rem;
+  font-family: var(--font-data);
+  font-size: var(--text-body);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
@@ -310,10 +312,9 @@
 
 .profile-legend {
   padding: 0;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  letter-spacing: 0.02em;
 }
 
 .profile-preset-grid {
@@ -361,7 +362,7 @@
 [data-accent-swatch="blue"]::after { background: rgba(47, 91, 115, 0.55); border-color: #2f5b73; }
 [data-accent-swatch="rose"]::after { background: rgba(163, 74, 92, 0.55); border-color: #a34a5c; }
 
-.profile-preset-label { color: var(--text-primary); font-size: 0.8125rem; }
+.profile-preset-label { color: var(--text-primary); font-size: var(--text-micro); }
 
 .profile-toggle-list { display: grid; gap: var(--space-3); margin-top: var(--space-4); }
 
@@ -383,8 +384,8 @@
 .profile-toggle:active { transform: scale(0.99); }
 
 .profile-toggle input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--text-primary); }
-.profile-toggle-title { display: block; color: var(--text-primary); font-weight: 600; font-size: 0.9rem; }
-.profile-toggle-note { display: block; color: var(--text-muted); font-size: 0.8125rem; margin-top: 2px; }
+.profile-toggle-title { display: block; color: var(--text-primary); font-weight: var(--weight-body); font-size: var(--text-label); }
+.profile-toggle-note { display: block; color: var(--ink-secondary-strong); font-size: var(--text-micro); margin-top: 2px; }
 
 .profile-today,
 .profile-streaks { display: grid; gap: var(--space-3); }
@@ -428,19 +429,19 @@
 .profile-disclosure-summary::after,
 .profile-streak-summary::after {
   content: "Show";
-  color: var(--text-muted);
-  font-size: 0.8125rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
 }
 
 [open] > .profile-disclosure-summary::after,
 [open] > .profile-streak-summary::after { content: "Hide"; }
 
 .profile-disclosure-label,
-.profile-streak-label { font-weight: 600; font-size: 0.95rem; }
+.profile-streak-label { font-weight: var(--weight-body); font-size: var(--text-label); }
 
 .profile-disclosure-state,
 .profile-streak-current,
-.profile-streak-best { color: var(--text-muted); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.profile-streak-best { color: var(--ink-secondary-strong); font-size: var(--text-micro); font-variant-numeric: tabular-nums; }
 
 .profile-streak-inactive {
   padding: 3px 9px;
@@ -448,8 +449,8 @@
   border-radius: var(--radius-tag);
   background: var(--danger-tint);
   color: var(--danger);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
@@ -477,26 +478,25 @@
 .profile-task:first-child { border-top: 0; }
 
 .profile-task-state {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
+  font-size: var(--text-micro);
+  letter-spacing: 0.02em;
+  color: var(--ink-secondary-strong);
 }
 
 .profile-task[data-completed="true"] .profile-task-state { color: var(--success); }
-.profile-task-text { color: var(--text-primary); font-size: 0.9rem; }
-.profile-passage { color: var(--text-primary); font-size: 0.9rem; }
+.profile-task-text { color: var(--text-primary); font-size: var(--text-label); }
+.profile-passage { color: var(--text-primary); font-size: var(--text-label); }
 
 .profile-reflection {
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: var(--text-label);
   line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.profile-streak-description { margin: 0; color: var(--text-muted); font-size: 0.875rem; }
+.profile-streak-description { margin: 0; color: var(--ink-secondary-strong); font-size: var(--text-micro); }
 
 .profile-streak-figures {
   display: grid;
@@ -506,27 +506,28 @@
 }
 
 .profile-streak-figures dt {
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  letter-spacing: 0.02em;
 }
 
 .profile-streak-figures dd {
   margin: var(--space-1) 0 0;
   color: var(--text-primary);
-  font-size: 1.125rem;
+  font-family: var(--font-data);
+  font-size: var(--text-body);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
-.profile-day-result { font-size: 0.8125rem; color: var(--text-muted); }
+.profile-day-result { font-size: var(--text-micro); color: var(--ink-secondary-strong); }
 .profile-day-result[data-result="yes"] { color: var(--success); }
 .profile-day-result[data-result="no-data"] { color: var(--text-muted); font-style: italic; opacity: 0.7; }
 
 .profile-streak-table th[scope="row"] {
   width: auto;
   white-space: nowrap;
-  font-weight: 500;
+  font-weight: var(--weight-body);
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
@@ -540,7 +541,7 @@
 .profile-spells-head h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.05rem;
+  font-size: var(--text-body);
 }
 
 .profile-spells-setup {

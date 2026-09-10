@@ -57,23 +57,59 @@ describe("Quiet Light design tokens", () => {
     assert.match(variables, /--danger:\s*#b3261e/i);
   });
 
-  it("writes the whole interface in one hand, with a system Unicode fallback", () => {
+  it("sets the whole interface in one visible family", () => {
     const variables = read("public/styles/variables.css");
 
-    for (const role of ["--font-ui", "--font-display", "--font-body", "--font-reading"]) {
+    // Achimari Hand is named once and every role follows it. `cursive` sits
+    // behind it for a failed load or a glyph the face does not draw; it is a
+    // generic fallback, not a companion typeface a reader would ever see.
+    assert.match(variables, /--font-brand:\s*"Achimari Hand",\s*cursive/);
+
+    for (const role of ["--font-display", "--font-ui", "--font-body", "--font-reading", "--font-data"]) {
       assert.match(
         variables,
-        new RegExp(`${role}:\\s*"Achimari Hand", var\\(--font-system\\)`),
-        `${role} must resolve to Achimari Hand, then the system fallback`,
+        new RegExp(`${role}:\\s*var\\(--font-brand\\)`),
+        `${role} must resolve to Achimari Hand, not to a second family`,
       );
     }
-    assert.match(variables, /--font-system:\s*-apple-system/);
 
+    assert.doesNotMatch(variables, /--font-system:/, "the system stack is no longer a typography role");
     assert.doesNotMatch(variables, /font-family:\s*"(?:Kitaro Road|Sagfield)"/);
-
     assert.doesNotMatch(variables, /url\([^)]*SF[- ]?Pro/i);
     assert.match(variables, /url\("\/fonts\/achimari-hand\/AchimariHand-Regular\.otf"\)/);
     assert.doesNotMatch(variables, /url\(["']?(?:https?:)?\/\//i);
+  });
+
+  it("keeps the accessible secondary ink and holds the quiet ink off text", () => {
+    const variables = read("public/styles/variables.css");
+
+    // #8a8a84 is 3.5:1 on white — a rule colour, not a text colour. The darker
+    // secondary is 8.2:1, so small and image-adjacent copy clears roughly 7:1.
+    assert.match(variables, /--ink-quiet:\s*#8a8a84/i);
+    assert.match(variables, /--ink-secondary-strong:\s*#4f4f4a/i);
+    assert.match(variables, /--ink-muted:\s*#5c5c58/i);
+    assert.match(variables, /--ink-on-sky:\s*var\(--ink\)/);
+  });
+
+  it("publishes a type scale whose every step stays readable in a handwritten face", () => {
+    const variables = read("public/styles/variables.css");
+    const step = (name) => Number(variables.match(new RegExp(`${name}:\\s*([\\d.]+)rem`))[1]) * 16;
+
+    assert.equal(step("--text-body"), 20, "long-form copy sits at 20px");
+    assert.equal(step("--text-control"), 18, "ordinary copy, inputs and controls sit at 18px");
+    assert.equal(step("--text-label"), 17, "labels and critical data sit at 17px");
+    assert.equal(step("--text-micro"), 16, "nothing meaningful is set below this");
+    assert.equal(step("--text-page-title"), 32, "a page title sits at 32px");
+    assert.ok(step("--text-component") >= 20 && step("--text-component") <= 24);
+  });
+
+  it("publishes one weight, because the face ships one", () => {
+    const variables = read("public/styles/variables.css");
+
+    assert.match(variables, /--weight-body:\s*400/);
+    for (const retired of ["--weight-medium", "--weight-semibold", "--weight-strong"]) {
+      assert.doesNotMatch(variables, new RegExp(`${retired}:`), `${retired} promises a weight that does not exist`);
+    }
   });
 });
 

@@ -47,7 +47,7 @@
   margin: var(--space-2) 0;
   padding-inline-start: var(--space-4);
   color: var(--ink);
-  font-size: 0.9375rem;
+  font-size: var(--text-label);
   line-height: 1.5;
 }
 
@@ -68,8 +68,8 @@
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     background-color var(--duration-ui) var(--ease-out),
@@ -169,9 +169,9 @@
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
   background: var(--ink-06);
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 600;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   line-height: 1;
 }
 
@@ -182,9 +182,9 @@
 .settings-field {
   display: grid;
   gap: var(--space-2);
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 600;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 .settings-field input {
@@ -196,8 +196,8 @@
   background: var(--surface-2);
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.96rem;
-  font-weight: 500;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   transition:
     border-color var(--duration-ui) var(--ease-out),
     background var(--duration-ui) var(--ease-out);
@@ -245,8 +245,8 @@
   border-radius: var(--radius-tag);
   background: var(--surface-2);
   color: var(--text-primary);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
 
@@ -259,8 +259,8 @@
   background: transparent;
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     transform var(--duration-fast) var(--ease-out),

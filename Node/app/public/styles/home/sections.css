@@ -8,11 +8,11 @@
 }
 
 .section-title {
-  font-size: clamp(1.95rem, 3.8vw, 2.4rem);
-  font-weight: 700;
+  font-size: clamp(var(--text-page-title), 3.8vw, 2.4rem);
+  font-weight: var(--weight-body);
   text-align: center;
   line-height: 1.18;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   margin-bottom: var(--space-3);
 }
 
@@ -21,7 +21,7 @@
   max-width: 66ch;
   margin: 0 auto;
   color: var(--text-secondary);
-  font-size: 1.06rem;
+  font-size: var(--text-component);
   line-height: 1.7;
 }
 

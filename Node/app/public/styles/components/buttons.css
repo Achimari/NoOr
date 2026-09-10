@@ -15,8 +15,8 @@
   font: inherit;
 
   font-family: var(--font-ui);
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   text-align: center;
   text-decoration: none;
@@ -85,8 +85,8 @@
 
 .ui-button--quiet {
   padding-inline: var(--space-3);
-  color: var(--ink-muted);
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-weight: var(--weight-body);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -133,7 +133,7 @@
 .ui-button--large {
   min-height: 48px;
   padding-inline: var(--space-5);
-  font-size: 1rem;
+  font-size: var(--text-subtitle);
 }
 
 .ui-button[data-loading="true"] {

@@ -10,7 +10,8 @@
 
 .today-page .horizon {
   margin-block-start: 0;
-  padding-block-start: var(--space-5);
+  justify-content: flex-start;
+  padding-block-start: var(--section-gap);
   padding-block-end: var(--space-5);
 }
 
@@ -18,84 +19,29 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--space-2) var(--space-3);
+  column-gap: 16px;
+  row-gap: 4px;
 }
 
 .today-title {
   margin: 0;
   color: var(--ink);
-  font-size: 2.125rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 2.3vw, 1.75rem);
+  font-weight: var(--weight-body);
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+  text-wrap: balance;
 }
 
 .today-date {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: var(--text-meta);
-  line-height: var(--leading-meta);
-}
-
-.practice-ledger {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  margin: var(--space-4) 0 0;
-  padding: 0;
-  list-style: none;
-  border-block-start: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
-  border-block-end: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
-}
-
-.practice-ledger-item {
-  flex: 1 1 7rem;
-  min-width: 0;
-  display: grid;
-  gap: 1px;
-  padding: var(--space-2) var(--space-4) var(--space-2) 0;
-}
-
-.practice-ledger-item + .practice-ledger-item {
-  padding-inline-start: var(--space-4);
-  border-inline-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
-}
-
-.practice-ledger-name {
-  color: var(--ink-muted);
-  font-size: var(--text-micro);
-  font-weight: 400;
-  letter-spacing: 0.02em;
-}
-
-.practice-ledger-status {
-  color: var(--ink);
-  font-size: 1rem;
-  font-weight: 400;
+  color: var(--ink-on-sky);
+  font-family: var(--font-ui);
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-.practice-ledger-status[data-state="yes"] {
-  color: color-mix(in srgb, var(--success) 72%, var(--ink) 28%);
-}
-
-.practice-ledger-status[data-state="no"] {
-  color: color-mix(in srgb, var(--danger) 72%, var(--ink) 28%);
-}
-
-.practice-ledger-item[hidden] {
-  display: none;
-}
-
-@media (max-width: 420px) {
-  .practice-ledger-item {
-    flex-basis: 100%;
-    padding-inline: 0;
-  }
-
-  .practice-ledger-item + .practice-ledger-item {
-    padding-inline-start: 0;
-    border-inline-start: 0;
-    border-block-start: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
-  }
 }
 
 .practice {
@@ -120,8 +66,9 @@
 .practice-title {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(1.35rem, 2.3vw, 1.75rem);
-  font-weight: 400;
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-subtitle), 2.3vw, 1.75rem);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
@@ -149,15 +96,16 @@
 }
 
 .today-page .dashboard-action-label {
+  font-family: var(--font-display);
   font-size: clamp(1.75rem, 3vw, 2.25rem);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
 .today-page .dashboard-action-subtitle {
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .today-page .dashboard-action-copy {
@@ -193,15 +141,15 @@
 
 .today-page .dashboard-timer-label {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: 0.875rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 .today-page .dashboard-timer-value {
   color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .today-page .dashboard-timer-track {
@@ -232,9 +180,9 @@
   border: 0;
   border-radius: 0;
   background: none;
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .daily-goals-add {
@@ -249,8 +197,8 @@
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     background-color var(--duration-ui) var(--ease-out),
@@ -288,8 +236,8 @@
 
 .today-page .daily-goals-empty,
 .today-page .daily-goals-progress {
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
 }
 
 .today-page .daily-goals-progress:empty {
@@ -361,7 +309,7 @@
 .dashboard-action-label {
   color: var(--text-primary);
   font-size: clamp(3.2rem, 5.6vw, 4.8rem);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 
   letter-spacing: 0;
@@ -369,8 +317,8 @@
 
 .dashboard-action-subtitle {
   color: var(--text-muted);
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
-  font-weight: 400;
+  font-size: clamp(var(--text-label), 1.5vw, var(--text-component));
+  font-weight: var(--weight-body);
   line-height: 1.4;
   transition: color var(--duration-ui) var(--ease-out);
 }
@@ -435,15 +383,15 @@
 
 .dashboard-timer-label {
   margin: 0 0 var(--space-1);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .dashboard-timer-value {
   color: var(--text-primary);
-  font-size: 1.6rem;
-  font-weight: 400;
+  font-size: var(--text-figure);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
@@ -538,9 +486,8 @@
   background: var(--ink-10);
   color: var(--text-primary);
   font-size: var(--text-micro);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .reading-summary-badge[data-answer="yes"] {
@@ -549,9 +496,9 @@
 }
 
 .reading-summary-note {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .reading-summary-refs {
@@ -574,7 +521,7 @@
   background: var(--surface-2);
   color: var(--text-primary);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .reading-check-timer {
@@ -598,8 +545,8 @@
 .daily-goals-heading h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.05rem;
-  font-weight: 400;
+  font-size: var(--text-body);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
@@ -609,17 +556,17 @@
   padding: 4px 10px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   white-space: nowrap;
 }
 
 .daily-goals-hint {
   margin: calc(var(--space-2) * -1) 0 0;
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   line-height: 1.45;
 }
 
@@ -692,8 +639,8 @@
   min-height: 44px;
   min-width: 0;
   color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   overflow-wrap: anywhere;
   cursor: pointer;
@@ -725,10 +672,10 @@
   border: 1px solid transparent;
   border-radius: var(--radius-tag);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font: inherit;
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     transform var(--duration-fast) var(--ease-out),
@@ -764,9 +711,9 @@
 .daily-goals-empty {
   margin: 0;
   padding: var(--space-3) 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .daily-goals-empty[hidden] {
@@ -775,9 +722,9 @@
 
 .daily-goals-progress {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .daily-goals-progress:empty {
@@ -808,9 +755,9 @@
 }
 
 .daily-goal-field label {
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .daily-goal-input {
@@ -823,7 +770,7 @@
   background: var(--surface-1);
   color: var(--text-primary);
   font: inherit;
-  font-size: 0.92rem;
+  font-size: var(--text-label);
 }
 
 .daily-goal-input::placeholder {
@@ -843,8 +790,8 @@
 .daily-goal-confirm-copy {
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.88rem;
-  font-weight: 400;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
 }
 
 .catch-up-card[hidden] {
@@ -868,25 +815,25 @@
 .catch-up-heading h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.2rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
 .catch-up-count {
   flex: 0 0 auto;
-  color: var(--text-muted);
-  font-size: 0.88rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   white-space: nowrap;
 }
 
 .catch-up-hint {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.92rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.45;
 }
 
@@ -908,7 +855,7 @@
   color: var(--text-primary);
   font: inherit;
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   cursor: pointer;
   transition:
     transform var(--duration-fast) var(--ease-out),
@@ -962,8 +909,8 @@
 .catch-up-item-date {
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.98rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
 }
@@ -971,16 +918,16 @@
 .catch-up-item-activity {
   margin: 0;
   color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
 .catch-up-item-note {
   margin: 0;
-  color: var(--text-muted);
+  color: var(--ink-secondary-strong);
   font-size: var(--text-micro);
-  font-weight: 400;
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -993,8 +940,8 @@
   background: var(--action);
   color: var(--on-action);
   font: inherit;
-  font-size: 0.88rem;
-  font-weight: 400;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   white-space: nowrap;
   cursor: pointer;
   transition:
@@ -1039,8 +986,8 @@
   background: var(--surface);
   color: var(--catch-up-answer-ink);
   font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   text-align: center;
   text-wrap: balance;
@@ -1082,9 +1029,9 @@
 
 .catch-up-answer-note {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.45;
 }
 
@@ -1174,8 +1121,8 @@ body.catch-up-modal-open {
 .catch-up-tasks-head h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.12rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -1188,9 +1135,9 @@ body.catch-up-modal-open {
 
 .catch-up-tasks-hint {
   margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 400;
+  color: var(--ink-secondary-strong);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.45;
 }
 
@@ -1220,8 +1167,8 @@ body.catch-up-modal-open {
 .catch-up-tasks-error {
   margin: 0;
   color: var(--danger);
-  font-size: 0.88rem;
-  font-weight: 400;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
@@ -1235,8 +1182,8 @@ body.catch-up-modal-open {
 }
 
 .catch-up-tasks-add-mark {
-  font-size: 1.05rem;
-  font-weight: 400;
+  font-size: var(--text-body);
+  font-weight: var(--weight-body);
   line-height: 1.4;
 }
 

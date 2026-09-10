@@ -58,8 +58,8 @@
 .ui-dialog-title {
   margin: 0;
   color: var(--ink);
-  font-size: 1.25rem;
-  font-weight: 400;
+  font-size: var(--text-component);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   letter-spacing: 0;
   text-wrap: balance;

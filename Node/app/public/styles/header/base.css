@@ -87,8 +87,8 @@ body.header-menu-open {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap-min);
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   color: var(--text-secondary);
   text-decoration: none;
   position: relative;
@@ -116,7 +116,7 @@ body.header-menu-open {
 .header-nav .header-link.active:link,
 .header-nav .header-link.active:visited {
   color: var(--header-active);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .header-actions {
@@ -207,8 +207,8 @@ body.header-menu-open {
   background: var(--white-06);
   color: var(--white-72);
   font: inherit;
-  font-size: var(--text-micro);
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   cursor: pointer;
   transition:
@@ -284,8 +284,8 @@ body.header-menu-open {
   background: var(--white-06);
   color: var(--white);
   font: inherit;
-  font-size: var(--text-micro);
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
 }
 
 .header-timezone-search:focus-visible {
@@ -319,8 +319,8 @@ body.header-menu-open {
   background: transparent;
   color: var(--white-72);
   font: inherit;
-  font-size: var(--text-micro);
-  font-weight: 400;
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
   text-align: left;
   cursor: pointer;
   transition:
@@ -335,9 +335,9 @@ body.header-menu-open {
 
 .header-timezone-empty {
   padding: 8px 10px;
-  color: var(--white-54);
-  font-size: var(--text-micro);
-  font-weight: 400;
+  color: var(--white-72);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body);
 }
 
 .header-timezone-empty[hidden] {
@@ -347,7 +347,7 @@ body.header-menu-open {
 .header-timezone-option[aria-current="true"] {
   background: var(--white-10);
   color: var(--white);
-  font-weight: 400;
+  font-weight: var(--weight-body);
 }
 
 .header-timezone-option[aria-current="true"]::after {
@@ -422,8 +422,8 @@ body.header-menu-open {
   background: transparent;
   color: var(--text-secondary);
   font: inherit;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   line-height: 1.4;
   text-decoration: none;
   cursor: pointer;
@@ -672,7 +672,8 @@ body.header-menu-open {
   background: transparent;
   color: var(--white-72);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
   text-align: left;
   text-decoration: none;
   cursor: pointer;
@@ -701,11 +702,10 @@ body.header-menu-open {
 
 .header-account-heading {
   margin: 0 0 var(--space-2);
-  color: var(--white-54);
+  color: var(--white-72);
   font-size: var(--text-micro);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .header-account-logout { margin: 0; }
@@ -718,11 +718,10 @@ body.header-menu-open {
   margin-top: var(--space-4);
   padding-top: var(--space-3);
   border-top: 1px solid var(--white-18);
-  color: var(--white-54);
+  color: var(--white-72);
   font-size: var(--text-micro);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: var(--weight-body);
+  letter-spacing: 0.02em;
 }
 
 .header-nav-timezone {
@@ -745,7 +744,7 @@ body.header-menu-open {
   transform: scale(0.98);
 }
 
-.header-nav-timezone-current { color: var(--white-54); font-size: var(--text-micro); }
+.header-nav-timezone-current { color: var(--white-72); font-size: var(--text-micro); }
 
 .header-nav-timezone-panel {
   margin: var(--space-2) 0;
