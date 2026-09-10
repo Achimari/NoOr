@@ -27,6 +27,7 @@ import {
   PRESET_ACCENTS,
   PRESET_EMBLEMS,
 } from "../domain/constants.js";
+import { ANSWER_YES, isUserAnswer, normalizeAnswer, withoutNoData } from "../domain/activityAnswers.js";
 import { AppError } from "../utils/appError.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
@@ -50,7 +51,7 @@ function buildDays(rows, todayDateKey, isSuccess) {
     .sort((first, second) => second.dateKey.localeCompare(first.dateKey))
     .map((row) => ({
       dateKey: row.dateKey,
-      answer: row.answer === "YES" ? "YES" : "NO",
+      answer: normalizeAnswer(row.answer),
       success: isSuccess(row),
       isToday: row.dateKey === todayDateKey,
     }));
@@ -66,8 +67,12 @@ function buildGoalHistoryRows(goalRows, checkInRows) {
   }
 
   for (const row of checkInRows) {
-    if (!row?.dateKey || !["YES", "NO"].includes(row.answer)) continue;
-    answerByDateKey.set(row.dateKey, row.answer);
+    if (!row?.dateKey) continue;
+    if (isUserAnswer(row.answer)) {
+      answerByDateKey.set(row.dateKey, row.answer);
+      continue;
+    }
+    if (!answerByDateKey.has(row.dateKey)) answerByDateKey.set(row.dateKey, normalizeAnswer(row.answer));
   }
 
   return [...answerByDateKey.entries()].map(([dateKey, answer]) => ({ dateKey, answer }));
@@ -82,6 +87,8 @@ export function buildStreaks(source, todayDateKey, createdDateKey) {
   const readingNormalized = [...normalizeReadingRows(readingRows)].reverse();
   const successfulGoalDays = getSuccessfulGoalDateKeys(goalRows);
   const goalHistoryRows = buildGoalHistoryRows(goalRows, goalCheckInRows);
+  const readingAnswered = withoutNoData(readingNormalized);
+  const goalAnswered = withoutNoData(goalHistoryRows);
 
   return addInactiveState({
     recovery: {
@@ -90,10 +97,10 @@ export function buildStreaks(source, todayDateKey, createdDateKey) {
       description: "Days you answered that you stayed strong.",
       current: calculateCurrentStreak(recoveryRows, todayDateKey),
       best: calculateMaxStreak(recoveryRows),
-      qualifyingDays: recoveryRows.filter((row) => row.answer === "YES").length,
+      qualifyingDays: recoveryRows.filter((row) => row.answer === ANSWER_YES).length,
       recordedDays: recoveryRows.length,
       inactiveDays: calculateInactiveDays(recoveryRows, todayDateKey, createdDateKey),
-      days: buildDays(recoveryRows, todayDateKey, (row) => row.answer === "YES"),
+      days: buildDays(recoveryRows, todayDateKey, (row) => row.answer === ANSWER_YES),
     },
     reading: {
       id: "reading",
@@ -101,10 +108,10 @@ export function buildStreaks(source, todayDateKey, createdDateKey) {
       description: "Days you answered yes to the Bible reading check.",
       current: calculateReadingCurrentStreak(readingRows, todayDateKey),
       best: calculateReadingMaxStreak(readingRows),
-      qualifyingDays: readingNormalized.filter((row) => row.answer === "YES").length,
-      recordedDays: readingNormalized.length,
-      inactiveDays: calculateInactiveDays(readingNormalized, todayDateKey, createdDateKey),
-      days: buildDays(readingNormalized, todayDateKey, (row) => row.answer === "YES"),
+      qualifyingDays: readingAnswered.filter((row) => row.answer === ANSWER_YES).length,
+      recordedDays: readingAnswered.length,
+      inactiveDays: calculateInactiveDays(readingAnswered, todayDateKey, createdDateKey),
+      days: buildDays(readingNormalized, todayDateKey, (row) => row.answer === ANSWER_YES),
     },
     goals: {
       id: "goals",
@@ -113,8 +120,8 @@ export function buildStreaks(source, todayDateKey, createdDateKey) {
       current: calculateGoalCurrentStreak(goalRows, todayDateKey),
       best: calculateGoalMaxStreak(goalRows),
       qualifyingDays: successfulGoalDays.size,
-      recordedDays: goalHistoryRows.length,
-      inactiveDays: calculateInactiveDays(goalHistoryRows, todayDateKey, createdDateKey),
+      recordedDays: goalAnswered.length,
+      inactiveDays: calculateInactiveDays(goalAnswered, todayDateKey, createdDateKey),
       days: buildDays(goalHistoryRows, todayDateKey, (row) => successfulGoalDays.has(row.dateKey)),
     },
   });

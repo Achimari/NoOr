@@ -18,6 +18,7 @@ import {
   calculateGoalMaxStreak,
   calculateReadingMaxStreak,
 } from "./streakLeaderboardService.js";
+import { ANSWER_YES, withoutNoData } from "../domain/activityAnswers.js";
 import { DEXTERITY_REQUIRED_GOALS, DEFAULT_ACCENT_KEY, PRESET_ACCENTS } from "../domain/constants.js";
 import { AppError } from "../utils/appError.js";
 
@@ -40,7 +41,7 @@ function countDistinct(values) {
 }
 
 function countFullyRecordedDays({ strongRows, readingRows, goalRows, goalCheckInDateKeys }) {
-  const readingDates = new Set(readingRows.map((row) => row.dateKey));
+  const readingDates = new Set(withoutNoData(readingRows).map((row) => row.dateKey));
   const taskDates = new Set([
     ...goalCheckInDateKeys,
     ...goalRows.map((row) => row.dateKey),
@@ -74,7 +75,7 @@ export function buildAchievementFacts(sources) {
   const readingRows = sources.readingRows || [];
   const goalRows = sources.goalRows || [];
   const goalCheckInDateKeys = sources.goalCheckInDateKeys || [];
-  const readingYesRows = readingRows.filter((row) => row.answer === "YES");
+  const readingYesRows = readingRows.filter((row) => row.answer === ANSWER_YES);
 
   return normalizeFacts({
     allocationConfirmed: Boolean(sources.gameProfile?.allocationConfirmedAt),

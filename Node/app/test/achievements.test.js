@@ -698,7 +698,7 @@ describe("achievement repository queries", () => {
 
     assert.deepEqual(client.seen.checkInHistory.select, { dateKey: true, answer: true });
     assert.deepEqual(client.seen.dailyGoal.select, { dateKey: true, completedAt: true });
-    assert.deepEqual(client.seen.dailyGoalCheckIn.select, { dateKey: true });
+    assert.deepEqual(client.seen.dailyGoalCheckIn.select, { dateKey: true, answer: true });
     assert.equal(client.seen.dailyGoal.select.text, undefined);
     assert.equal(client.seen.gameProfile.select.emblemKey, undefined);
     assert.deepEqual(Object.keys(client.seen.gameProfile.select).sort(), ["accentKey", "allocationConfirmedAt"]);

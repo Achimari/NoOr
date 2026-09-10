@@ -1037,10 +1037,19 @@ const REVEAL_BATCH_CAP = 5;
 window.NoOrRevealNewRows = revealNewRows;
 
 function revealNewRows(rows, previouslyVisible) {
-  rows.slice(previouslyVisible, previouslyVisible + REVEAL_BATCH_CAP).forEach((row, index) => {
+  const batch = rows.slice(previouslyVisible, previouslyVisible + REVEAL_BATCH_CAP);
+
+  // Write every row first, force layout once, then start them together.
+  // Reading `offsetWidth` per row interleaved the writes with reads and made
+  // the browser lay the document out once per row.
+  batch.forEach((row, index) => {
     row.style.setProperty("--reveal-index", String(index));
     row.classList.remove("is-revealing");
-    void row.offsetWidth;
+  });
+
+  if (batch.length) void batch[0].offsetWidth;
+
+  batch.forEach((row) => {
     row.classList.add("is-revealing");
     row.addEventListener("animationend", () => row.classList.remove("is-revealing"), { once: true });
   });

@@ -6,23 +6,41 @@
     var revealed = false;
     var watchdog = 0;
     var revealTimer = 0;
-    var loadingStartedAt = window.performance && performance.now ? performance.now() : Date.now();
+    var appearTimer = 0;
+    var loaderShownAt = 0;
     var minimumVisibleMs = 650;
+    var appearAfterMs = 160;
+
+    function now() {
+      return window.performance && performance.now ? performance.now() : Date.now();
+    }
+
+    // The loader is only worth showing for a load the reader actually waits on.
+    // It stays off screen until `appearAfterMs`, so a fast load reveals with no
+    // overlay at all; only once it has appeared does it owe a readable lifetime.
+    function showLoader() {
+      appearTimer = 0;
+      if (revealed || loaderShownAt) return;
+      loaderShownAt = now();
+      root.classList.add("page-loading-visible");
+    }
 
     function reveal() {
       if (revealed) return;
-      var now = window.performance && performance.now ? performance.now() : Date.now();
-      var elapsed = now - loadingStartedAt;
-      var remaining = minimumVisibleMs - elapsed;
-      if (remaining > 0) {
-        window.clearTimeout(revealTimer);
-        revealTimer = window.setTimeout(reveal, remaining);
-        return;
+      if (loaderShownAt) {
+        var elapsed = now() - loaderShownAt;
+        var remaining = minimumVisibleMs - elapsed;
+        if (remaining > 0) {
+          window.clearTimeout(revealTimer);
+          revealTimer = window.setTimeout(reveal, remaining);
+          return;
+        }
       }
       revealed = true;
       window.clearTimeout(watchdog);
       window.clearTimeout(revealTimer);
-      root.classList.remove("page-loading");
+      window.clearTimeout(appearTimer);
+      root.classList.remove("page-loading", "page-loading-visible");
       root.classList.add("page-entering");
       window.setTimeout(function () {
         root.classList.remove("page-entering");
@@ -47,6 +65,7 @@
     window.NoOrHideLoading = reveal;
     window.NoOrStylesReady = reveal;
 
+    appearTimer = window.setTimeout(showLoader, appearAfterMs);
     watchdog = window.setTimeout(reveal, 4000);
   })();
 </script>
@@ -95,7 +114,7 @@
       visibility 0s linear 160ms;
   }
 
-  html.page-loading .noor-loader,
+  html.page-loading-visible .noor-loader,
   html.page-transitioning .noor-loader {
     opacity: 1;
     visibility: visible;
@@ -107,6 +126,13 @@
     height: 44px;
     display: block;
     color: #0d0d0d;
+  }
+
+  /* The mark only animates while the overlay is on screen. A `visibility:
+     hidden` layer still runs its animation, which kept an infinite loop
+     compositing on every route for the whole life of the page. */
+  html.page-loading-visible .noor-loader-mark,
+  html.page-transitioning .noor-loader-mark {
     animation: noor-loader-spin 1.25s var(--loader-ease, cubic-bezier(0.45, 0, 0.55, 1)) infinite;
   }
 
@@ -131,6 +157,8 @@
 
   @media (prefers-reduced-motion: reduce) {
 
+    html.page-loading-visible .noor-loader-mark,
+    html.page-transitioning .noor-loader-mark,
     .noor-loader-mark {
       animation: none;
       transform: none;

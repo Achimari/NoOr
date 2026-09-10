@@ -262,8 +262,8 @@
                             <time class="profile-streak-date" datetime="<%= day.dateKey %>"><%= day.dateKey %><%= day.isToday ? " (today)" : "" %></time>
                           </th>
                           <td>
-                            <span class="profile-day-result" data-result="<%= day.answer.toLowerCase() %>">
-                              <%= day.answer === "YES" ? "Yes" : "No" %>
+                            <span class="profile-day-result" data-result="<%= day.answer.toLowerCase().replace("_", "-") %>">
+                              <%= day.answer === "YES" ? "Yes" : day.answer === "NO_DATA" ? "No data" : "No" %>
                             </span>
                           </td>
                         </tr>

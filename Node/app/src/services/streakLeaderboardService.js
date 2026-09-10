@@ -3,6 +3,7 @@ import {
   calculateInactiveDays,
   calculateMaxStreak,
 } from "../repositories/checkInRepository.js";
+import { withoutNoData } from "../domain/activityAnswers.js";
 import { findGoalStreakRows, findReadingStreakRows } from "../repositories/streakLeaderboardRepository.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
@@ -151,7 +152,7 @@ export function buildStreakBoard(users, { getRows, getCurrentStreak, getMaxStrea
       const todayDateKey = getTodayDateKey(now, user.timezone);
       const createdDateKey = getTodayDateKey(user.createdAt, user.timezone);
       const userRows = getRows(user);
-      const inactiveDays = calculateInactiveDays(userRows, todayDateKey, createdDateKey);
+      const inactiveDays = calculateInactiveDays(withoutNoData(userRows), todayDateKey, createdDateKey);
 
       return {
         id: user.id,

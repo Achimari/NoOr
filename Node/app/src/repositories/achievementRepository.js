@@ -1,3 +1,4 @@
+import { withoutNoData } from "../domain/activityAnswers.js";
 import { prisma } from "../prisma/client.js";
 
 const readingSelect = {
@@ -45,7 +46,7 @@ export async function findAchievementSources(userId, client = prisma) {
     }),
     client.dailyGoalCheckIn.findMany({
       where: { userId },
-      select: { dateKey: true },
+      select: { dateKey: true, answer: true },
     }),
     client.spellUnlock.findMany({
       where: { userId },
@@ -72,7 +73,7 @@ export async function findAchievementSources(userId, client = prisma) {
     strongRows,
     readingRows: readingRows.map(toReadingFact),
     goalRows,
-    goalCheckInDateKeys: goalCheckInRows.map((row) => row.dateKey),
+    goalCheckInDateKeys: withoutNoData(goalCheckInRows).map((row) => row.dateKey),
     spellKeys: spellRows.map((row) => row.spellKey),
     completedEncounterKeys: pveRows.map((row) => row.encounterKey),
     qualifyingPvpMatches,

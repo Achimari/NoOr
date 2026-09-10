@@ -158,7 +158,7 @@ describe("profile streak history", () => {
     );
 
     assert.match(template, /<th scope="col">Answer<\/th>/);
-    assert.match(template, /day\.answer === "YES" \? "Yes" : "No"/);
+    assert.match(template, /day\.answer === "YES" \? "Yes" : day\.answer === "NO_DATA" \? "No data" : "No"/);
     assert.doesNotMatch(template, /Not counted|Counted/);
     assert.match(styles, /\.profile-streak-table th\[scope="row"\][^{]*\{[^}]*white-space:\s*nowrap/s);
   });
