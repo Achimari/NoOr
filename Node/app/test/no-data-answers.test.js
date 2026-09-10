@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { describe, it } from "node:test";
 import {
   ACTIVITY_ANSWERS,
@@ -323,6 +323,51 @@ describe("the backfill console script", () => {
     assert.throws(() => parseArgs(["--user=abc"]), /account ids/);
     assert.throws(() => parseArgs(["--user=0"]), /account ids/);
     assert.throws(() => parseArgs(["--wipe"]), /Unknown option/);
+  });
+});
+
+describe("the stored answer check constraint", () => {
+  const migrationsUrl = new URL("../prisma/migrations/", import.meta.url);
+
+  function readEffectiveGoalAnswerCheck() {
+    const names = readdirSync(migrationsUrl).filter((name) => !name.endsWith(".toml")).sort();
+    let effective = null;
+
+    for (const name of names) {
+      const path = new URL(`${name}/migration.sql`, migrationsUrl);
+      if (!existsSync(path)) continue;
+      const sql = readFileSync(path, "utf8");
+      for (const match of sql.matchAll(/daily_goal_check_ins_answer_check"?\s+CHECK\s*\(\s*"answer"\s+IN\s*\(([^)]*)\)/g)) {
+        effective = match[1].split(",").map((value) => value.trim().replace(/'/g, ""));
+      }
+    }
+
+    return effective;
+  }
+
+  it("admits every answer state the application can store", () => {
+    const admitted = readEffectiveGoalAnswerCheck();
+
+    assert.ok(admitted, "no daily_goal_check_ins answer check found in the migrations");
+    for (const answer of ACTIVITY_ANSWERS) {
+      assert.ok(admitted.includes(answer), `the database check rejects ${answer}`);
+    }
+  });
+
+  it("admits nothing the application cannot store", () => {
+    for (const answer of readEffectiveGoalAnswerCheck()) {
+      assert.ok(ACTIVITY_ANSWERS.includes(answer), `the database check admits unknown answer ${answer}`);
+    }
+  });
+
+  it("widens the constraint in its own migration instead of editing the original", () => {
+    const original = readFileSync(
+      new URL("20260905000000_create_daily_goal_check_ins/migration.sql", migrationsUrl),
+      "utf8",
+    );
+
+    assert.match(original, /CHECK \("answer" IN \('YES', 'NO'\)\)/);
+    assert.doesNotMatch(original, /NO_DATA/);
   });
 });
 
