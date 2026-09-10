@@ -140,6 +140,13 @@ describe("Progress page", () => {
     assert.doesNotMatch(html, /href="\/statistics\?streak=bible"/);
   });
 
+  it("labels the answer statistics with the selected table", async () => {
+    const html = await render({ streak: "bible" });
+
+    assert.match(html, /data-statistics-source="reading"/);
+    assert.match(html, /id="answers-title">Answer patterns<\/h2>[\s\S]*?class="section-head-note">Bible<\/span>/);
+  });
+
   it("summarises all three streaks even though one board is shown", async () => {
     const html = await render();
 

@@ -1,5 +1,6 @@
-import { findAllCheckInHistory, findCheckInHistoryByUserId } from "../repositories/checkInRepository.js";
 import { findAuthUserTimezones } from "../repositories/authRepository.js";
+import * as statisticsRepository from "../repositories/statisticsRepository.js";
+import { buildGoalHistoryRows } from "./streakLeaderboardService.js";
 
 const WEEK_DAYS = [
   { label: "Mon", longLabel: "Monday" },
@@ -130,10 +131,40 @@ function buildPrayerWorld(rows) {
   };
 }
 
-export async function getStatisticsSummary(userId) {
-  const [historyRows, currentUserHistoryRows, timezoneRows] = await Promise.all([
-    findAllCheckInHistory(),
-    findCheckInHistoryByUserId(userId),
+function toGoalAnswerRows(source) {
+  return buildGoalHistoryRows(source?.dailyGoals, source?.dailyGoalCheckIns);
+}
+
+export async function loadStatisticsAnswerRows(source, userId, repository = statisticsRepository) {
+  if (source === "reading") {
+    const [historyRows, currentUserHistoryRows] = await Promise.all([
+      repository.findAllReadingAnswerRows(),
+      repository.findReadingAnswerRowsByUserId(userId),
+    ]);
+    return { historyRows, currentUserHistoryRows };
+  }
+
+  if (source === "goals") {
+    const [allSources, currentUserSource] = await Promise.all([
+      repository.findAllGoalAnswerSources(),
+      repository.findGoalAnswerSourceByUserId(userId),
+    ]);
+    return {
+      historyRows: allSources.flatMap(toGoalAnswerRows),
+      currentUserHistoryRows: toGoalAnswerRows(currentUserSource),
+    };
+  }
+
+  const [historyRows, currentUserHistoryRows] = await Promise.all([
+    repository.findAllRecoveryAnswerRows(),
+    repository.findRecoveryAnswerRowsByUserId(userId),
+  ]);
+  return { historyRows, currentUserHistoryRows };
+}
+
+export async function getStatisticsSummary(userId, source = "recovery") {
+  const [{ historyRows, currentUserHistoryRows }, timezoneRows] = await Promise.all([
+    loadStatisticsAnswerRows(source, userId),
     findAuthUserTimezones(),
   ]);
   const days = WEEK_DAYS.map((day) => ({

@@ -60,14 +60,15 @@ export function renderPage({ view, pageId, titleKey }) {
     }
 
     if (pageId === "statistics") {
+      const activeStreak = resolveStreakView(req.query.streak);
       const [statistics, recovery, streaks] = await Promise.all([
-        getStatisticsSummary(req.user.id),
+        getStatisticsSummary(req.user.id, activeStreak.key),
         getLeaderboardSummary(req.user.id, req.user.timezone),
         getStreakLeaderboards(req.user.id),
       ]);
 
       viewData.statistics = statistics;
-      viewData.activeStreak = resolveStreakView(req.query.streak);
+      viewData.activeStreak = activeStreak;
       viewData.leaderboards = {
         recovery: {
           currentUserId: recovery.current.id,

@@ -9,6 +9,7 @@ import {
   calculateGoalMaxStreak,
   calculateReadingCurrentStreak,
   calculateReadingMaxStreak,
+  buildGoalHistoryRows,
   getSuccessfulGoalDateKeys,
   normalizeReadingRows,
 } from "./streakLeaderboardService.js";
@@ -27,7 +28,7 @@ import {
   PRESET_ACCENTS,
   PRESET_EMBLEMS,
 } from "../domain/constants.js";
-import { ANSWER_YES, isUserAnswer, normalizeAnswer, withoutNoData } from "../domain/activityAnswers.js";
+import { ANSWER_YES, normalizeAnswer, withoutNoData } from "../domain/activityAnswers.js";
 import { AppError } from "../utils/appError.js";
 import { getTodayDateKey } from "../utils/dateKey.js";
 
@@ -55,27 +56,6 @@ function buildDays(rows, todayDateKey, isSuccess) {
       success: isSuccess(row),
       isToday: row.dateKey === todayDateKey,
     }));
-}
-
-function buildGoalHistoryRows(goalRows, checkInRows) {
-  const successfulDateKeys = getSuccessfulGoalDateKeys(goalRows);
-  const answerByDateKey = new Map();
-
-  for (const row of goalRows) {
-    if (!row?.dateKey) continue;
-    answerByDateKey.set(row.dateKey, successfulDateKeys.has(row.dateKey) ? "YES" : "NO");
-  }
-
-  for (const row of checkInRows) {
-    if (!row?.dateKey) continue;
-    if (isUserAnswer(row.answer)) {
-      answerByDateKey.set(row.dateKey, row.answer);
-      continue;
-    }
-    if (!answerByDateKey.has(row.dateKey)) answerByDateKey.set(row.dateKey, normalizeAnswer(row.answer));
-  }
-
-  return [...answerByDateKey.entries()].map(([dateKey, answer]) => ({ dateKey, answer }));
 }
 
 export function buildStreaks(source, todayDateKey, createdDateKey) {

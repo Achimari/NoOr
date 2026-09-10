@@ -152,9 +152,12 @@
       </article>
     </section>
 
-    <section class="page-section section-frame section-frame--ruled progress-answers" aria-labelledby="answers-title">
-      <h2 class="section-head-title" id="answers-title">Answer patterns</h2>
-      <p class="section-lede">Compare your Yes and No answers with the community as a whole.</p>
+    <section class="page-section section-frame section-frame--ruled progress-answers" aria-labelledby="answers-title" data-statistics-source="<%= active.key %>">
+      <div class="section-head">
+        <h2 class="section-head-title" id="answers-title">Answer patterns</h2>
+        <span class="section-head-note"><%= active.label %></span>
+      </div>
+      <p class="section-lede">Compare your Yes and No answers for <%= active.label %> with the community as a whole.</p>
 
     <div class="pattern-group" data-personal-patterns aria-labelledby="personal-patterns-title">
       <div class="section-head">
