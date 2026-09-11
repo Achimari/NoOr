@@ -127,6 +127,49 @@ describe("motion contract", () => {
     assert.match(statistics, /min\(calc\(var\(--reveal-index/, "the stagger is capped so a long list never queues");
   });
 
+  it("caps the statistics stagger at 30ms a row and 180ms in total", () => {
+    const statistics = stripComments(style("pages/statistics.css"));
+    const delays = [...statistics.matchAll(/animation-delay:\s*min\(calc\(var\(--reveal-index[^)]*\)\s*\*\s*(\d+)ms\),\s*(\d+)ms\)/g)];
+
+    assert.ok(delays.length >= 2, "every staggered mark declares its cap");
+    for (const [, step, cap] of delays) {
+      assert.ok(Number(step) <= 30, `a ${step}ms step per row queues a long list`);
+      assert.ok(Number(cap) <= 180, `a ${cap}ms total stagger makes the last row feel late`);
+    }
+  });
+
+  it("reveals statistics marks with transform and opacity only", () => {
+    const statistics = stripComments(style("pages/statistics.css"));
+
+    for (const [, name, body] of statistics.matchAll(/@keyframes\s+([\w-]+)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g)) {
+      for (const [, property] of body.matchAll(/(?:^|[{;\s])([a-z-]+)\s*:/g)) {
+        assert.ok(
+          ["transform", "opacity"].includes(property),
+          `@keyframes ${name} animates ${property}; only transform and opacity are compositable`,
+        );
+      }
+    }
+  });
+
+  it("never loops a statistics mark, so the globe cannot pulse or spin", () => {
+    const statistics = stripComments(style("pages/statistics.css"));
+
+    assert.doesNotMatch(statistics, /animation[^;}]*infinite/, "nothing on this page may run forever");
+    assert.doesNotMatch(statistics, /animation[^;}]*(?:alternate|rotate\b)/, "no back-and-forth decoration");
+  });
+
+  it("hands the server-rendered value straight to the reduced-motion reader", () => {
+    const statistics = stripComments(style("pages/statistics.css"));
+    const reduced = statistics.match(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/);
+
+    assert.ok(reduced, "the page declares a reduced-motion path");
+    for (const mark of ["ledger-track-segment", "ledger-track-edge", "prayer-world-region-fill", "prayer-globe-point"]) {
+      assert.match(reduced[1], new RegExp(`\\.${mark}\\b`), `${mark} still animates under reduced motion`);
+    }
+    assert.match(reduced[1], /animation:\s*none/, "the marks render at their final size immediately");
+    assert.doesNotMatch(reduced[1], /animation-delay:\s*(?!0)/, "a delay under reduced motion still withholds the value");
+  });
+
   it("keeps a reduced-motion alternative for every new animation", () => {
     for (const file of ["shell.css", "pages/statistics.css", "components/material.css"]) {
       const css = stripComments(style(file));

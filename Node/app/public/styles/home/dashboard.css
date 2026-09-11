@@ -1169,15 +1169,6 @@ p.leaderboard-empty {
     gap: var(--space-4);
     min-height: 0;
   }
-
-  .prayer-world-visual {
-    min-height: 232px;
-    order: -1;
-  }
-
-  .prayer-globe {
-    width: min(232px, 74vw);
-  }
 }
 
 @media (max-width: 680px) {
@@ -1310,11 +1301,6 @@ p.leaderboard-empty {
 
   .statistics-donut-legend {
     width: 100%;
-  }
-
-  .prayer-world-region {
-    grid-template-columns: minmax(82px, 1fr) 30px minmax(82px, 0.82fr);
-    gap: var(--space-2);
   }
 
   .prayer-filter-head {

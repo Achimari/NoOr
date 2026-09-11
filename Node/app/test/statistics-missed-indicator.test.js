@@ -34,17 +34,25 @@ function board(overrides = {}) {
 }
 
 function statisticsSummary() {
-  const day = { label: "Monday", caption: "Most no answers" };
-  const chart = [{ label: "Mon", value: 1, percentage: 50, id: "yes", tone: "yes", sharePercentage: 50 }];
+  const split = (yes, no) => {
+    const total = yes + no;
+    const yesSharePercentage = total > 0 ? Math.round((yes / total) * 100) : 0;
+    return { yes, no, total, yesSharePercentage, noSharePercentage: total > 0 ? 100 - yesSharePercentage : 0 };
+  };
+  const weekdayChart = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((label, index) => ({
+    label,
+    longLabel: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][index],
+    ...split(index === 0 ? 1 : 0, index === 0 ? 1 : 0),
+  }));
 
   return {
-    hardestDay: day,
-    easiestDay: day,
-    totals: { no: 1, yes: 1, answers: 2 },
-    noChart: chart,
-    yesChart: chart,
-    answerDistributionChart: chart,
-    currentUserAnswerDistributionChart: chart,
+    yourAnswers: split(1, 1),
+    communityAnswers: split(1, 1),
+    weekdayChart,
+    weekdaySummary: {
+      highest: { hasData: true, label: "Monday", shortLabel: "Mon", percentage: 50, total: 2 },
+      lowest: { hasData: true, label: "Monday", shortLabel: "Mon", percentage: 50, total: 2 },
+    },
     prayerWorld: {
       totalUsers: 1,
       activeRegion: "Riga",

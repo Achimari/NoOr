@@ -21,40 +21,91 @@ const TIMEZONE_AREAS = [
   { prefix: "Pacific", x: 82, y: 64, spreadX: 12, spreadY: 11 },
 ];
 
+const NO_WEEKDAY_DATA = "Not enough data yet";
+
 function getWeekdayIndex(dateKey) {
   const date = new Date(`${dateKey}T12:00:00.000Z`);
   if (Number.isNaN(date.getTime())) return null;
   return (date.getUTCDay() + 6) % 7;
 }
 
-function getTopDay(days, field) {
-  return days.reduce((topDay, day) => {
-    if (!topDay || day[field] > topDay[field]) return day;
-    return topDay;
-  }, null);
+/**
+ * The one composition measure the page paints and prints. Rounding the No share
+ * separately can draw 99% or 101% of a track, so the second share is always the
+ * remainder of the first.
+ */
+export function toAnswerSplit(yes, no) {
+  const total = yes + no;
+  const yesSharePercentage = total > 0 ? Math.round((yes / total) * 100) : 0;
+
+  return {
+    yes,
+    no,
+    total,
+    yesSharePercentage,
+    noSharePercentage: total > 0 ? 100 - yesSharePercentage : 0,
+  };
 }
 
-function toBarPercentage(value, maxValue) {
-  if (value <= 0 || maxValue <= 0) return 0;
-  return Math.max(6, Math.round((value / maxValue) * 100));
-}
+export function buildWeekdayChart(historyRows) {
+  const counts = WEEK_DAYS.map(() => ({ yes: 0, no: 0 }));
 
-function buildChartRows(days, field, maxValue) {
-  return days.map((day) => ({
-    ...day,
-    value: day[field],
-    percentage: toBarPercentage(day[field], maxValue),
+  for (const row of historyRows) {
+    const weekdayIndex = getWeekdayIndex(row.dateKey);
+    if (weekdayIndex === null) continue;
+
+    if (row.answer === "YES") counts[weekdayIndex].yes += 1;
+    if (row.answer === "NO") counts[weekdayIndex].no += 1;
+  }
+
+  return WEEK_DAYS.map((day, index) => ({
+    label: day.label,
+    longLabel: day.longLabel,
+    ...toAnswerSplit(counts[index].yes, counts[index].no),
   }));
 }
 
-function buildDistributionRows(rows, maxValue) {
-  const totalValue = rows.reduce((total, row) => total + row.value, 0);
+function toWeekdaySummaryEntry(day) {
+  return {
+    hasData: true,
+    label: day.longLabel,
+    shortLabel: day.label,
+    percentage: day.yesSharePercentage,
+    total: day.total,
+  };
+}
 
-  return rows.map((row) => ({
-    ...row,
-    percentage: toBarPercentage(row.value, maxValue),
-    sharePercentage: totalValue > 0 ? Math.round((row.value / totalValue) * 100) : 0,
-  }));
+export function buildWeekdaySummary(weekdayChart) {
+  const recorded = weekdayChart.filter((day) => day.total > 0);
+
+  if (!recorded.length) {
+    const empty = { hasData: false, label: NO_WEEKDAY_DATA, shortLabel: NO_WEEKDAY_DATA, percentage: 0, total: 0 };
+    return { highest: empty, lowest: empty };
+  }
+
+  // `reduce` without a seed starts on the first recorded weekday, and only a
+  // strictly better share displaces the day already held — so a tie always
+  // keeps the earlier weekday whatever order the rows arrived in.
+  const highest = recorded.reduce((best, day) => (
+    day.yesSharePercentage > best.yesSharePercentage ? day : best
+  ));
+  const lowest = recorded.reduce((least, day) => (
+    day.yesSharePercentage < least.yesSharePercentage ? day : least
+  ));
+
+  return { highest: toWeekdaySummaryEntry(highest), lowest: toWeekdaySummaryEntry(lowest) };
+}
+
+function countAnswers(rows) {
+  let yes = 0;
+  let no = 0;
+
+  for (const row of rows) {
+    if (row.answer === "YES") yes += 1;
+    if (row.answer === "NO") no += 1;
+  }
+
+  return { yes, no };
 }
 
 function clamp(value, min, max) {
@@ -167,78 +218,16 @@ export async function getStatisticsSummary(userId, source = "recovery") {
     loadStatisticsAnswerRows(source, userId),
     findAuthUserTimezones(),
   ]);
-  const days = WEEK_DAYS.map((day) => ({
-    ...day,
-    yes: 0,
-    no: 0,
-  }));
 
-  for (const row of historyRows) {
-    const weekdayIndex = getWeekdayIndex(row.dateKey);
-    if (weekdayIndex === null) continue;
-
-    if (row.answer === "YES") {
-      days[weekdayIndex].yes += 1;
-    }
-
-    if (row.answer === "NO") {
-      days[weekdayIndex].no += 1;
-    }
-  }
-
-  const maxNo = Math.max(0, ...days.map((day) => day.no));
-  const maxYes = Math.max(0, ...days.map((day) => day.yes));
-  const hardestDay = getTopDay(days, "no");
-  const easiestDay = getTopDay(days, "yes");
-  const totalYes = days.reduce((total, day) => total + day.yes, 0);
-  const totalNo = days.reduce((total, day) => total + day.no, 0);
-  const answerDistribution = [
-    { id: "yes", label: "Yes", tone: "yes", value: totalYes },
-    { id: "no", label: "No", tone: "no", value: totalNo },
-  ];
-  const maxAnswerDistribution = Math.max(0, ...answerDistribution.map((row) => row.value));
-  const currentUserAnswerDistribution = [
-    {
-      id: "yes",
-      label: "Yes",
-      tone: "yes",
-      value: currentUserHistoryRows.filter((row) => row.answer === "YES").length,
-    },
-    {
-      id: "no",
-      label: "No",
-      tone: "no",
-      value: currentUserHistoryRows.filter((row) => row.answer === "NO").length,
-    },
-  ];
-  const maxCurrentUserAnswerDistribution = Math.max(
-    0,
-    ...currentUserAnswerDistribution.map((row) => row.value),
-  );
+  const communityCounts = countAnswers(historyRows);
+  const yourCounts = countAnswers(currentUserHistoryRows);
+  const weekdayChart = buildWeekdayChart(historyRows);
 
   return {
-    hardestDay: {
-      label: maxNo > 0 ? hardestDay.longLabel : "Not enough data",
-      value: maxNo,
-      caption: maxNo > 0 ? `${maxNo} No answer${maxNo === 1 ? "" : "s"}` : "Answer more days to reveal it",
-    },
-    easiestDay: {
-      label: maxYes > 0 ? easiestDay.longLabel : "Not enough data",
-      value: maxYes,
-      caption: maxYes > 0 ? `${maxYes} Yes answer${maxYes === 1 ? "" : "s"}` : "Answer more days to reveal it",
-    },
-    noChart: buildChartRows(days, "no", maxNo),
-    yesChart: buildChartRows(days, "yes", maxYes),
-    currentUserAnswerDistributionChart: buildDistributionRows(
-      currentUserAnswerDistribution,
-      maxCurrentUserAnswerDistribution,
-    ),
-    answerDistributionChart: buildDistributionRows(answerDistribution, maxAnswerDistribution),
-    totals: {
-      yes: totalYes,
-      no: totalNo,
-      answers: totalYes + totalNo,
-    },
+    yourAnswers: toAnswerSplit(yourCounts.yes, yourCounts.no),
+    communityAnswers: toAnswerSplit(communityCounts.yes, communityCounts.no),
+    weekdayChart,
+    weekdaySummary: buildWeekdaySummary(weekdayChart),
     prayerWorld: buildPrayerWorld(timezoneRows),
   };
 }

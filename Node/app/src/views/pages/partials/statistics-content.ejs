@@ -10,46 +10,56 @@
 
   const dayWord = (value) => (value === 1 ? "day" : "days");
   const plural = (value, one, many) => `${value} ${value === 1 ? one : many}`;
-  const totalAnswers = statistics.totals.answers;
-  const yesShare = statistics.answerDistributionChart.find((a) => a.id === "yes")?.sharePercentage || 0;
-  const mineYesShare = statistics.currentUserAnswerDistributionChart.find((a) => a.id === "yes")?.sharePercentage || 0;
-  const mineTotal = statistics.currentUserAnswerDistributionChart.reduce((sum, a) => sum + a.value, 0);
+
+  // Every number on this page counts every answer ever stored for the selected
+  // practice. There is no period-filtered DTO, so the scope is said out loud.
+  const dataScope = `${active.label} · all recorded answers`;
+  const yours = statistics.yourAnswers;
+  const community = statistics.communityAnswers;
+  const weekdays = statistics.weekdayChart;
+  const weekdaySummary = statistics.weekdaySummary;
 
   const escape = (value) => String(value)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
-  const split = ({ rows, total, id, caption }) => {
-    const yes = rows.find((row) => row.id === "yes") || { value: 0, sharePercentage: 0 };
-    const no = rows.find((row) => row.id === "no") || { value: 0, sharePercentage: 0 };
-    const ratio = (row) => (total > 0 ? row.value / total : 0);
+  const counts = (split) => `${split.yes} Yes · ${split.no} No · ${split.total} total`;
 
-    return `
-      <div class="split" data-split="${escape(id)}" data-empty="${total === 0}">
-        <div class="split-bar" aria-hidden="true">
-          <span class="split-bar-segment split-bar-segment--yes" style="--bar-scale: ${ratio(yes)}"></span>
-          <span class="split-bar-segment split-bar-segment--no" style="--bar-scale: ${ratio(no)}"></span>
-        </div>
-        <ul class="split-legend">
-          <li class="split-legend-item split-legend-item--yes">
-            <span class="split-legend-label">Yes</span>
-            <span class="split-legend-value">${escape(yes.value)}</span>
-            <span class="split-legend-share">${escape(yes.sharePercentage)}%</span>
-          </li>
-          <li class="split-legend-item split-legend-item--no">
-            <span class="split-legend-label">No</span>
-            <span class="split-legend-value">${escape(no.value)}</span>
-            <span class="split-legend-share">${escape(no.sharePercentage)}%</span>
-          </li>
-          <li class="split-legend-item split-legend-item--total">
-            <span class="split-legend-label">Total</span>
-            <span class="split-legend-value">${escape(total)}</span>
-          </li>
-        </ul>
-        <p class="split-caption">${escape(caption)}</p>
-      </div>
-    `;
-  };
+  // One 100% composition track, used identically by both distribution panels and
+  // by every weekday row, so the shares are directly comparable everywhere.
+  const track = (split) => `
+        <span class="ledger-track" data-empty="${split.total === 0}" aria-hidden="true">
+          <span class="ledger-track-segment ledger-track-segment--yes" style="--bar-scale: ${split.yesSharePercentage / 100}"></span>
+          <span class="ledger-track-segment ledger-track-segment--no" style="--bar-scale: ${split.noSharePercentage / 100}"><span class="ledger-track-hatch"></span></span>
+          ${split.yes > 0 && split.no > 0
+            ? `<span class="ledger-track-edge" style="--edge-at: ${split.yesSharePercentage}%"></span>`
+            : ""}
+        </span>`;
+
+  const legend = () => `
+      <ul class="ledger-legend">
+        <li class="ledger-legend-item ledger-legend-item--yes">Yes</li>
+        <li class="ledger-legend-item ledger-legend-item--no">No</li>
+      </ul>`;
+
+  const answerPanel = ({ hook, title, split, emptyCopy }) => `
+        <div class="answer-panel" ${hook}>
+          <h4 class="answer-panel-title">${escape(title)}</h4>
+          ${split.total > 0
+            ? `<p class="answer-panel-headline">
+            <span class="answer-panel-percent">${escape(split.yesSharePercentage)}%</span>
+            <span class="answer-panel-measure">Yes</span>
+          </p>`
+            : ""}
+          ${track(split)}
+          ${split.total > 0
+            ? `<p class="answer-panel-values">${escape(counts(split))}</p>`
+            : `<p class="answer-panel-empty">${escape(emptyCopy)}</p>`}
+        </div>`;
+
+  const shareSentence = (prefix, entry) => (entry.hasData
+    ? `${prefix}: ${entry.label}, ${entry.percentage}% of ${plural(entry.total, "answer", "answers")}.`
+    : "");
 %>
 <main id="main-content" tabindex="-1" class="dashboard-page statistics-page progress-page" data-recovery-leaderboard data-current-user-id="<%= leaderboards.recovery.currentUserId %>">
   <div class="page-shell">
@@ -155,76 +165,72 @@
     <section class="page-section section-frame section-frame--ruled progress-answers" aria-labelledby="answers-title" data-statistics-source="<%= active.key %>">
       <div class="section-head">
         <h2 class="section-head-title" id="answers-title">Answer patterns</h2>
-        <span class="section-head-note"><%= active.label %></span>
+        <span class="section-head-note"><%= dataScope %></span>
       </div>
-      <p class="section-lede">Compare your Yes and No answers for <%= active.label %> with the community as a whole.</p>
+      <p class="section-lede">Compare what you recorded with the community. A Yes and a No are both recorded answers, kept exactly as they were given.</p>
 
-    <div class="pattern-group" data-personal-patterns aria-labelledby="personal-patterns-title">
-      <div class="section-head">
-        <h3 class="t-component-title" id="personal-patterns-title">Your patterns</h3>
-        <span class="section-head-note"><%= plural(mineTotal, "answer", "answers") %></span>
-      </div>
+      <figure class="ledger-figure" data-answer-comparison aria-labelledby="answer-comparison-title">
+        <figcaption class="ledger-figure-head">
+          <h3 class="ledger-figure-title t-component-title" id="answer-comparison-title">Your answers and the community</h3>
+          <p class="ledger-figure-note"><%= dataScope %></p>
+        </figcaption>
 
-      <%- split({
-        rows: statistics.currentUserAnswerDistributionChart,
-        total: mineTotal,
-        id: "mine",
-        caption: mineTotal === 0
-          ? "Nothing recorded yet. Your first answer starts the picture."
-          : `${mineYesShare}% of your answers are Yes.`,
-      }) %>
-    </div>
+        <%- legend() %>
 
-    <div class="pattern-group" data-community-patterns aria-labelledby="community-patterns-title">
-      <div class="section-head">
-        <h3 class="t-component-title" id="community-patterns-title">The community</h3>
-        <span class="section-head-note"><%= plural(statistics.prayerWorld.totalUsers, "user", "users") %></span>
-      </div>
-
-      <%- split({
-        rows: statistics.answerDistributionChart,
-        total: totalAnswers,
-        id: "community",
-        caption: totalAnswers === 0
-          ? "No answers recorded yet."
-          : `${yesShare}% of all answers are Yes.`,
-      }) %>
-
-      <div class="pattern-block">
-        <div class="section-head">
-          <h3 class="t-component-title">Answers by weekday</h3>
-          <span class="section-head-note"><%= yesShare %>% Yes of <%= totalAnswers %></span>
+        <div class="answer-compare">
+          <%- answerPanel({
+            hook: "data-personal-patterns",
+            title: "Your answers",
+            split: yours,
+            emptyCopy: `No answers recorded yet. Your first ${active.label} answer fills this in.`,
+          }) %>
+          <%- answerPanel({
+            hook: "data-community-patterns",
+            title: "Community",
+            split: community,
+            emptyCopy: `No ${active.label} answers recorded yet across the community.`,
+          }) %>
         </div>
-        <p class="section-lede">Highest Yes rate: <%= statistics.easiestDay.label %> (<%= statistics.easiestDay.caption %>). Lowest: <%= statistics.hardestDay.label %> (<%= statistics.hardestDay.caption %>).</p>
+      </figure>
 
-        <ul class="weekday-legend">
-          <li class="weekday-legend-item weekday-legend-item--yes">Yes</li>
-          <li class="weekday-legend-item weekday-legend-item--no">No</li>
-        </ul>
+      <figure class="ledger-figure" data-weekday-chart aria-labelledby="weekday-chart-title">
+        <figcaption class="ledger-figure-head">
+          <h3 class="ledger-figure-title t-component-title" id="weekday-chart-title">Community rhythm by weekday</h3>
+          <p class="ledger-figure-note"><%= dataScope %></p>
+        </figcaption>
+
+        <% if (weekdaySummary.highest.hasData) { %>
+          <p class="ledger-figure-insight"><%= shareSentence("Highest recorded Yes share", weekdaySummary.highest) %> <%= shareSentence("Lowest recorded Yes share", weekdaySummary.lowest) %></p>
+        <% } else { %>
+          <p class="ledger-figure-insight">No answers recorded yet. Each weekday fills in once members record <%= active.label %> answers on that day.</p>
+        <% } %>
+
+        <%- legend() %>
 
         <ul class="weekday-chart">
-          <% statistics.yesChart.forEach((day, index) => { %>
-            <% const no = statistics.noChart[index] || { value: 0, percentage: 0 }; %>
+          <% weekdays.forEach((day, index) => { %>
             <li class="weekday-row" style="--reveal-index: <%= index %>">
-              <span class="weekday-label"><%= day.longLabel || day.label %></span>
-              <span class="weekday-bars" aria-hidden="true">
-                <span class="weekday-track">
-                  <span class="weekday-bar weekday-bar-yes" style="--bar-scale: <%= Math.max(0, Math.min(100, day.percentage)) / 100 %>"></span>
-                </span>
-                <span class="weekday-track">
-                  <span class="weekday-bar weekday-bar-no" style="--bar-scale: <%= Math.max(0, Math.min(100, no.percentage)) / 100 %>"></span>
-                </span>
+              <span class="weekday-label">
+                <span class="weekday-label-long"><%= day.longLabel %></span>
+                <span class="weekday-label-short" aria-hidden="true"><%= day.label %></span>
               </span>
-              <span class="weekday-figures">
-                <span class="weekday-figure weekday-figure-yes"><%= day.value %> Yes</span>
-                <span class="weekday-figure weekday-figure-no"><%= no.value %> No</span>
-              </span>
+              <% if (day.total > 0) { %>
+                <span class="weekday-share"><%= day.yesSharePercentage %>%<span class="sr-only"> Yes</span></span>
+              <% } else { %>
+                <span class="weekday-share weekday-share--empty"></span>
+              <% } %>
+              <%- track(day) %>
+              <% if (day.total > 0) { %>
+                <span class="weekday-values"><%= counts(day) %></span>
+              <% } else { %>
+                <span class="weekday-values weekday-values--empty">No answers</span>
+              <% } %>
             </li>
           <% }) %>
         </ul>
-      </div>
+      </figure>
 
-      <div class="pattern-block prayer-world" data-prayer-world>
+      <div class="prayer-world" data-prayer-world>
         <div class="section-head">
           <h3 class="t-component-title">Community time zones</h3>
           <span class="section-head-note">Most active · <%= statistics.prayerWorld.activeRegion %></span>
@@ -240,6 +246,7 @@
                   <span class="prayer-world-region-fill" style="--bar-scale: <%= Math.max(0, Math.min(100, region.percentage)) / 100 %>"></span>
                 </span>
                 <span class="prayer-world-region-count"><%= region.count %></span>
+                <span class="prayer-world-region-share"><%= region.percentage %>%</span>
               </li>
             <% }) %>
             <% if (!statistics.prayerWorld.regions.length) { %>
@@ -267,7 +274,6 @@
           </div>
         </div>
       </div>
-    </div>
     </section>
 
   </div>

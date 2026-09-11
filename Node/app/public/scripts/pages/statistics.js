@@ -21,6 +21,7 @@
     const nextBatchCount = Math.min(PREVIEW_ROW_COUNT, remainingCount);
 
     const previouslyVisible = rows.filter((row) => !row.hidden).length;
+    const toggleHadFocus = typeof document !== "undefined" && document.activeElement === toggle;
     rows.forEach((row, index) => {
       row.hidden = index >= visibleCount;
     });
@@ -49,6 +50,15 @@
           ? `Showing ${visibleCount} of ${rows.length} users in ${boardLabel}.`
           : `Showing all ${rows.length} users in ${boardLabel}.`;
       }
+    }
+
+    if (toggleHadFocus && toggle.hidden) {
+      // The last activation hides the control the reader is standing on, which
+      // would drop focus to the document and send a keyboard walk back to the
+      // top of the page. Land on the first row they just revealed instead.
+      const firstRevealed = rows[previouslyVisible];
+      const target = firstRevealed?.querySelector?.("a, button, [tabindex]") || firstRevealed;
+      target?.focus?.();
     }
   }
 
