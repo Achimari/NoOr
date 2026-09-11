@@ -1,14 +1,5 @@
 
 
-body[data-page="battle"]:has([data-battle-page][data-battle-focus="false"]) > main {
-  background: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--horizon-height) - var(--horizon-fade)),
-    var(--paper) var(--horizon-height)
-  );
-}
-
 .battle-head {
   max-width: var(--measure-reading);
 }

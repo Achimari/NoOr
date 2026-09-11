@@ -32,19 +32,17 @@
 /* Sky becomes paper.
  *
  * One fixed sky sits behind everything (.app-sky above). The working field
- * washes it into warm paper over --horizon-fade, and then stays opaque paper
+ * washes it into white paper over --horizon-fade, and then stays opaque paper
  * for the rest of the page: a linear-gradient holds its final stop forever, so
  * nothing below the horizon can ever show moving sky behind a form or a table.
  *
  * The ramp is deliberately non-linear. A single transparent-to-paper stop puts
  * the steepest change in the middle of the band, which reads as a horizontal
  * edge. Weighting the alpha so it starts slowly and commits late lets the lower
- * clouds dissolve instead.
+ * clouds dissolve into the page instead of stopping at a line.
  */
-body:has(.app-sky) > main {
-  position: relative;
-  z-index: var(--z-content);
-  background: linear-gradient(
+body:has(.app-sky) {
+  --paper-field: linear-gradient(
     to bottom,
     transparent 0,
     transparent calc(var(--horizon-height) - var(--horizon-fade)),
@@ -53,6 +51,12 @@ body:has(.app-sky) > main {
     color-mix(in srgb, var(--paper) 72%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.25),
     var(--paper) var(--horizon-height)
   );
+}
+
+body:has(.app-sky) > main {
+  position: relative;
+  z-index: var(--z-content);
+  background: var(--paper-field);
 }
 
 /* The paper fibre. One layer, owned here and nowhere else.
@@ -85,6 +89,45 @@ body:has(.app-sky) > main::before {
   );
 }
 
+/* The ruling. A second layer, not a second background on the fibre, because it
+ * needs its own mask: the lines have to arrive *after* the paper has settled.
+ * That order is the whole idea — the lowest clouds go soft, then fibrous, and
+ * only then do they resolve into lines.
+ *
+ * Same negative z-index as the fibre, declared later, so the lines paint over
+ * the grain and still under every child of the working field.
+ *
+ * The interval is the body rhythm: 20px copy at 1.65 leading is a 33px line.
+ *
+ * It runs unbroken across the whole field. Nothing masks it out: a big opaque
+ * block over a ruled page does not read as "no lines here", it reads as a
+ * separate sheet laid on top. Continuity is what proves the white is paper.
+ */
+body:has(.app-sky) > main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-page-texture);
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--paper-line-step) - var(--paper-line-width)),
+    var(--paper-rule) calc(var(--paper-line-step) - var(--paper-line-width)),
+    var(--paper-rule) var(--paper-line-step)
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon-height) - var(--horizon-fade) * 0.55),
+    #000 calc(var(--horizon-height) + var(--horizon-fade) * 0.25)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon-height) - var(--horizon-fade) * 0.55),
+    #000 calc(var(--horizon-height) + var(--horizon-fade) * 0.25)
+  );
+}
+
 /* Narrow screens get a shorter wash: the horizon is a smaller share of a phone
  * viewport, and a 112px ramp there eats the whole opening region. */
 @media (max-width: 760px) {
@@ -100,18 +143,39 @@ body[data-ambient="scene"]:has(.app-sky) > main {
   background: transparent;
 }
 
-body[data-ambient="scene"]:has(.app-sky) > main::before {
+body[data-ambient="scene"]:has(.app-sky) > main::before,
+body[data-ambient="scene"]:has(.app-sky) > main::after {
   content: none;
+}
+
+/* ...but the battle *entry* screen shares that page, so the switch above strips
+ * its paper too. Give the book surface back here, beside the rule it excepts,
+ * rather than mixing a second ramp in the battle sheet: the entry screen is an
+ * ordinary page and reads on exactly the same paper as every other one. */
+body[data-ambient="scene"]:has(.app-sky):has([data-battle-focus="false"]) > main {
+  background: var(--paper-field);
+}
+
+body[data-ambient="scene"]:has(.app-sky):has([data-battle-focus="false"]) > main::before,
+body[data-ambient="scene"]:has(.app-sky):has([data-battle-focus="false"]) > main::after {
+  content: "";
 }
 
 body[data-ambient="scene"] .app-sky::after {
   background: var(--ambient-scrim);
 }
 
-/* Decorative grain is the first thing to go when the reader has asked for a
- * plainer surface. The paper colour stays; only the texture leaves. */
+/* A reader who has asked for less transparency gets the page itself, not a wash
+ * over a moving sky: the field goes solid from its first pixel, and the two
+ * decorative layers — which only exist to make that transition believable —
+ * leave with it. */
 @media (prefers-reduced-transparency: reduce) {
-  body:has(.app-sky) > main::before {
+  body:has(.app-sky) > main {
+    background: var(--paper);
+  }
+
+  body:has(.app-sky) > main::before,
+  body:has(.app-sky) > main::after {
     content: none;
   }
 }
@@ -121,7 +185,8 @@ body[data-ambient="scene"] .app-sky::after {
     background: var(--paper-raised);
   }
 
-  body:has(.app-sky) > main::before {
+  body:has(.app-sky) > main::before,
+  body:has(.app-sky) > main::after {
     content: none;
   }
 }
@@ -140,12 +205,13 @@ body[data-ambient="scene"] .app-sky::after {
     background: var(--canvas);
   }
 
-  /* No decorative grain, and no wash: a flat, solid field. */
+  /* No decorative grain, no ruling, no wash: a flat, solid field. */
   body:has(.app-sky) > main {
     background: var(--canvas);
   }
 
-  body:has(.app-sky) > main::before {
+  body:has(.app-sky) > main::before,
+  body:has(.app-sky) > main::after {
     content: none;
   }
 }

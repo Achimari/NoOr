@@ -38,10 +38,10 @@ describe("Quiet Light design tokens", () => {
   it("defines the approved semantic surface and ink roles", () => {
     const variables = read("public/styles/variables.css");
 
-    assert.match(variables, /--canvas:\s*#f4efe4/i);
-    assert.match(variables, /--paper:\s*#f8f4e8/i);
-    assert.match(variables, /--paper-raised:\s*#fcfaf4/i);
-    assert.match(variables, /--paper-muted:\s*#efe9dc/i);
+    assert.match(variables, /--canvas:\s*#fcfcfa/i);
+    assert.match(variables, /--paper:\s*#ffffff/i);
+    assert.match(variables, /--paper-raised:\s*#ffffff/i);
+    assert.match(variables, /--paper-muted:\s*#f3f3f0/i);
     assert.match(variables, /--surface:\s*var\(--paper\)/i);
     assert.match(variables, /--surface-subtle:\s*var\(--paper-muted\)/i);
     assert.match(variables, /--ink:\s*#111111/i);
@@ -84,9 +84,9 @@ describe("Quiet Light design tokens", () => {
   it("keeps the accessible secondary ink and holds the quiet ink off text", () => {
     const variables = read("public/styles/variables.css");
 
-    // #8a8a84 is 3.5:1 on white — a rule colour, not a text colour. The darker
+    // #8a8a8a is 3.5:1 on white — a rule colour, not a text colour. The darker
     // secondary is 8.2:1, so small and image-adjacent copy clears roughly 7:1.
-    assert.match(variables, /--ink-quiet:\s*#8a8a84/i);
+    assert.match(variables, /--ink-quiet:\s*#8a8a8a/i);
     assert.match(variables, /--ink-secondary-strong:\s*#4f4f4a/i);
     assert.match(variables, /--ink-muted:\s*#5c5c58/i);
     assert.match(variables, /--ink-on-sky:\s*var\(--ink\)/);

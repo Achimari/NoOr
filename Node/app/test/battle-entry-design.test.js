@@ -207,7 +207,17 @@ describe("Battle entry follows the Achimari Course Ledger", () => {
 
   it("keeps readable entry content off glass and full-scene imagery", () => {
     assert.doesNotMatch(styles, /--glass|backdrop-filter|box-shadow/);
-    assert.match(styles, /data-battle-focus="false"[^}]*background:[^}]*var\(--paper\)/s);
+
+    // The whole battle page carries data-ambient="scene", which strips the paper
+    // for the immersive scene. The entry screen gets the shared book surface
+    // back from the material layer that owns it — this sheet no longer mixes a
+    // second sky-to-paper ramp of its own.
+    assert.doesNotMatch(styles, /var\(--horizon-fade\)/, "the battle sheet owns no paper ramp");
+    assert.match(
+      read("public/styles/components/material.css"),
+      /data-battle-focus="false"[^}]*background:\s*var\(--paper-field\)/s,
+      "the entry screen still reads on paper, not on the scene",
+    );
   });
 
   it("gives Trials the wider column, then stacks the choices at mobile", () => {

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.11
 """Generate the seamless paper-fibre texture used by the shared material layer.
 
-The texture is decorative: it gives the warm paper a faint fibre so Achimari Hand
+The texture is decorative: it gives the white paper a faint fibre so Achimari Hand
 reads as ink on a surface rather than ink on a flat fill. It must be felt, not
 seen — visible when you deliberately stare at a blank margin, invisible while
 reading, and never strong enough to break the edge of a thin handwritten stroke.
@@ -15,7 +15,7 @@ seam; this cannot.
 
 Output
 ------
-RGBA WebP. The fibre lives in the *alpha* channel over a constant warm-dark ink,
+RGBA WebP. The fibre lives in the *alpha* channel over a constant neutral grey,
 so the layer only ever darkens the paper very slightly — which is what paper
 fibre does. Peak alpha is deliberately tiny (see PEAK_ALPHA).
 
@@ -39,15 +39,16 @@ OUTPUT_PATH = APP_ROOT / "public" / "textures" / "paper-fiber.webp"
 SIZE = 320
 SEED = 20260911
 
-# Warm dark ink for the fibre. Never pure black: on warm paper a neutral-black
-# grain reads as dirt, a warm-grey one reads as fibre.
-FIBRE_RGB = (104, 96, 82)
+# Neutral grey for the fibre. On white paper any warmth at all reads as age, and
+# pure black reads as dirt; an even mid-grey just makes the white feel physical.
+FIBRE_RGB = (112, 112, 112)
 
-# Peak alpha out of 255. Calibrated against the *rendered* page rather than a
-# formula: at alpha 6 a blank margin measured only 1.66% luminance range on
-# screen, under the 2-4% target. 11 lands near 3%. Keeping the range this narrow
-# also keeps the lossless WebP small — the alpha plane holds a dozen values.
-PEAK_ALPHA = 11
+# Peak alpha out of 255. Recalibrated for white paper: white is the brightest
+# base there is, so the same alpha that swung ~3% on ivory swings 5.4% on white
+# and starts to read as grey rather than as fibre. 6 brings the swing back to
+# ~3%. Keeping the range this narrow also keeps the lossless WebP small — the
+# alpha plane holds only a handful of values.
+PEAK_ALPHA = 6
 
 # How much of the field is broad mottling versus fine grain. Mostly grain: broad
 # blotches at any real strength start to look like staining.
@@ -106,7 +107,7 @@ def build_report(alpha_peak: int) -> str:
     overstates what a reader sees, because a blank region rarely contains both
     extremes inside one glance.
     """
-    paper = np.array([248, 244, 232], dtype=float)  # --paper #f8f4e8
+    paper = np.array([255, 255, 255], dtype=float)  # --paper #ffffff
     ink = np.array(FIBRE_RGB, dtype=float)
 
     def luminance(rgb: np.ndarray) -> float:
