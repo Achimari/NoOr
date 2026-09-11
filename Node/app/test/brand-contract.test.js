@@ -16,7 +16,7 @@ const LEGACY_ALLOWLIST = [
   },
   {
     pattern:
-      /(?:window\.)?NoOr(?:TrackStylesheet|SealStylesheets|HideLoading|StylesReady|RevealNewRows|StartPageTransition|ResetPageTransition)/g,
+      /(?:window\.)?NoOr(?:TrackStylesheet|SealStylesheets|HideLoading|StylesReady|RevealNewRows|StartPageTransition|ResetPageTransition|PageReady|LockInteraction|UnlockInteraction)/g,
     reason: "window.NoOr* global read across script boundaries",
   },
   {

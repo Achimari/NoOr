@@ -155,14 +155,24 @@ describe("Achimari favicon and loader", () => {
     });
   });
 
-  it("draws the loader with the shared monogram rather than a generic spinner", () => {
+  it("draws the loader as the original black field and white ring", () => {
+    // Reversed deliberately by the owner: the monogram loader introduced with
+    // the Achimari rebrand is replaced by the earlier black-field spinner
+    // (commit 2ba01079). The loader is now a loading *gate*, and a plain
+    // rotating ring reads as progress where a pulsing brand mark read as
+    // decoration. The monogram remains the product's identity everywhere else —
+    // favicon, touch icon, mask icon and manifest are all asserted above.
     const head = read("src/views/components/layout/loading-head.ejs");
     const documents = `${read("src/views/components/layout/document.ejs")}\n${read("src/views/components/layout/auth-document.ejs")}`;
 
-    assert.doesNotMatch(head, /conic-gradient/, "the broken-ring loader must be gone");
+    assert.match(head, /conic-gradient/, "the ring is drawn in CSS, with no asset to fetch");
+    assert.match(head, /background:\s*#000/, "the field is black, as it was");
     assert.match(head, /noor-loader-mark/, "the legacy hook name stays; only the drawing changes");
-    assert.match(head, /noor-loader-symbol/);
-    assert.equal((documents.match(/include\("\.\.\/ui\/brand-symbol"/g) || []).length, 2);
+
+    // The loader no longer pulls in the monogram, so neither document should
+    // still be including it for that purpose.
+    assert.equal((documents.match(/include\("\.\.\/ui\/brand-symbol"/g) || []).length, 0);
+    assert.doesNotMatch(head, /noor-loader-symbol/, "the SVG wrapper class is gone with the SVG");
   });
 
   it("keeps the loader honest under reduced motion", () => {

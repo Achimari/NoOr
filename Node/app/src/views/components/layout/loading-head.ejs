@@ -1,45 +1,85 @@
 <script>
   (function () {
     var root = document.documentElement;
+
+    // ---- Readiness -------------------------------------------------------
+    // The overlay is a gate on real readiness, not a timed splash. It lifts
+    // when every condition below is genuinely satisfied:
+    //
+    //   1. every stylesheet this document declared has settled (load or error);
+    //   2. the DOM is parsed and deferred scripts have run — DOMContentLoaded
+    //      fires after deferred scripts execute, so synchronous page-specific
+    //      initialisation is already complete by then;
+    //   3. the one webfont the whole product is set in has resolved, so text
+    //      never appears in the fallback face and then swap;
+    //   4. no page has an outstanding readiness hold (see window.NoOrPageReady).
+    //
+    // Deliberately NOT waited on: the ambient sky video, lazy images, analytics
+    // or any other background work. None of it is needed for a usable screen.
     var settled = 0;
     var expected = -1;
+    var domReady = false;
+    var fontsReady = false;
+    var holds = 0;
+
     var revealed = false;
     var watchdog = 0;
-    var revealTimer = 0;
     var appearTimer = 0;
-    var loaderShownAt = 0;
-    var minimumVisibleMs = 650;
+
+    // The overlay stays off screen this long. A load that finishes inside it
+    // reveals with no overlay at all, which is why no minimum display time is
+    // needed afterwards: nothing ever flashes.
     var appearAfterMs = 160;
 
-    function now() {
-      return window.performance && performance.now ? performance.now() : Date.now();
+    // The font is the only readiness input on an unbounded network fetch, and
+    // on a slow link it was making the global watchdog the normal completion
+    // path — measured firing on a 180kbps throttle. Preferring the real face is
+    // worth a short wait, not an indefinite one: past this the page reveals and
+    // font-display: swap does its job.
+    var fontGraceMs = 2500;
+
+    // Safety net only. If this fires something is wrong, and it is recorded on
+    // the document so it can be told apart from a normal reveal.
+    var watchdogMs = 15000;
+
+    function ready() {
+      return expected >= 0 && settled >= expected && domReady && fontsReady && holds === 0;
     }
 
-    // The loader is only worth showing for a load the reader actually waits on.
-    // It stays off screen until `appearAfterMs`, so a fast load reveals with no
-    // overlay at all; only once it has appeared does it owe a readable lifetime.
     function showLoader() {
       appearTimer = 0;
-      if (revealed || loaderShownAt) return;
-      loaderShownAt = now();
+      if (revealed) return;
       root.classList.add("page-loading-visible");
+    }
+
+    function lockBody() {
+      var body = document.body;
+      if (!body || !("inert" in HTMLElement.prototype)) return;
+      for (var i = 0; i < body.children.length; i += 1) {
+        var child = body.children[i];
+        if (child.hasAttribute("data-noor-loader")) continue;
+        if (child.inert) continue; // already inert for another reason; leave it
+        child.inert = true;
+        child.setAttribute("data-noor-inerted", "");
+      }
+    }
+
+    function unlockBody() {
+      var body = document.body;
+      if (!body) return;
+      var held = body.querySelectorAll("[data-noor-inerted]");
+      for (var i = 0; i < held.length; i += 1) {
+        held[i].inert = false;
+        held[i].removeAttribute("data-noor-inerted");
+      }
     }
 
     function reveal() {
       if (revealed) return;
-      if (loaderShownAt) {
-        var elapsed = now() - loaderShownAt;
-        var remaining = minimumVisibleMs - elapsed;
-        if (remaining > 0) {
-          window.clearTimeout(revealTimer);
-          revealTimer = window.setTimeout(reveal, remaining);
-          return;
-        }
-      }
       revealed = true;
       window.clearTimeout(watchdog);
-      window.clearTimeout(revealTimer);
       window.clearTimeout(appearTimer);
+      unlockBody();
       root.classList.remove("page-loading", "page-loading-visible");
       root.classList.add("page-entering");
       window.setTimeout(function () {
@@ -48,9 +88,10 @@
     }
 
     function maybeReveal() {
-      if (expected >= 0 && settled >= expected) window.requestAnimationFrame(reveal);
+      if (ready()) window.requestAnimationFrame(reveal);
     }
 
+    // ---- Public contract -------------------------------------------------
     window.NoOrTrackStylesheet = function () {
       settled += 1;
       maybeReveal();
@@ -61,18 +102,113 @@
       maybeReveal();
     };
 
-    root.classList.add("page-loading");
+    // A page with critical asynchronous initialisation takes a hold and
+    // releases it when the first usable screen is genuinely ready. This is the
+    // explicit contract that replaces guessing with a timeout.
+    //
+    //   var done = window.NoOrPageReady.hold("battle:spells");
+    //   loadSpellMeta().then(done, done);
+    window.NoOrPageReady = {
+      hold: function () {
+        if (revealed) return function () {};
+        holds += 1;
+        var released = false;
+        return function release() {
+          if (released) return;
+          released = true;
+          holds -= 1;
+          maybeReveal();
+        };
+      },
+      isReady: function () {
+        return revealed;
+      },
+    };
+
+    // Interaction locking is shared with the navigation controller so a click
+    // can lock the page instantly, before the overlay is visible.
+    window.NoOrLockInteraction = lockBody;
+    window.NoOrUnlockInteraction = unlockBody;
+
+    // Kept for compatibility with older callers.
     window.NoOrHideLoading = reveal;
     window.NoOrStylesReady = reveal;
 
+    root.classList.add("page-loading");
+
+    function settleFonts() {
+      fontsReady = true;
+      maybeReveal();
+    }
+
+    // Only ask about fonts once the DOM is parsed. Queried from <head>,
+    // document.fonts.ready can resolve before the stylesheets that request the
+    // face have even been seen — which would let the page reveal in the
+    // fallback and swap a moment later.
+    function watchFonts() {
+      if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === "function") {
+        document.fonts.ready.then(settleFonts, settleFonts);
+        window.setTimeout(settleFonts, fontGraceMs);
+      } else {
+        settleFonts();
+      }
+    }
+
+    function onDomReady() {
+      domReady = true;
+      lockBody();
+      watchFonts();
+      maybeReveal();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", onDomReady);
+    } else {
+      onDomReady();
+    }
+
     appearTimer = window.setTimeout(showLoader, appearAfterMs);
-    watchdog = window.setTimeout(reveal, 4000);
+    watchdog = window.setTimeout(function () {
+      root.dataset.loaderWatchdog = "fired";
+      reveal();
+    }, watchdogMs);
+
+    // A bfcache restore hands back a fully initialised page: never re-gate it,
+    // and never leave it locked.
+    window.addEventListener("pageshow", function (event) {
+      if (!event.persisted) return;
+      revealed = true;
+      window.clearTimeout(watchdog);
+      window.clearTimeout(appearTimer);
+      unlockBody();
+      root.classList.remove("page-loading", "page-loading-visible", "page-entering");
+    });
+
+    // The auth documents (login, onboarding) ship no JS bundle, so the
+    // navigation controller in app.js does not exist there and nothing would
+    // stop a double submit. Guard only that case: when the controller is
+    // present it owns eligibility, and this defers to it entirely.
+    document.addEventListener("submit", function (event) {
+      if (typeof window.NoOrStartPageTransition === "function") return;
+      var form = event.target;
+      if (!form || event.defaultPrevented) return;
+      if (form.target && form.target !== "_self") return;
+      // A validation failure keeps the reader on the page; never lock them out.
+      if (typeof form.checkValidity === "function" && !form.checkValidity()) return;
+      lockBody();
+    });
+
+    // An error must never leave the document gated or locked.
+    window.addEventListener("error", function () {
+      if (!revealed) window.setTimeout(reveal, 0);
+    }, true);
   })();
 </script>
 <noscript>
   <style>
     html.page-loading {
       visibility: visible;
+      overflow: auto;
     }
 
     html.page-loading body > *:not(.noor-loader) {
@@ -90,7 +226,13 @@
   html.page-loading body {
     min-height: 100%;
     margin: 0;
-    background: #f6f6f6;
+    background: #000;
+  }
+
+  /* Scroll is locked for as long as the gate is up, and released with it. */
+  html.page-loading,
+  html.page-transitioning {
+    overflow: hidden;
   }
 
   html.page-loading body > *:not(.noor-loader) {
@@ -105,9 +247,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f6f6f6;
+    background: #000;
     opacity: 0;
     visibility: hidden;
+
+    /* The overlay itself swallows every pointer event while it is up. */
     pointer-events: none;
     transition:
       opacity 160ms cubic-bezier(0.23, 1, 0.32, 1),
@@ -118,40 +262,36 @@
   html.page-transitioning .noor-loader {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
     transition-delay: 0s;
-  }
-
-  .noor-loader-mark {
-    width: 44px;
-    height: 44px;
-    display: block;
-    color: #0d0d0d;
   }
 
   /* The mark only animates while the overlay is on screen. A `visibility:
      hidden` layer still runs its animation, which kept an infinite loop
      compositing on every route for the whole life of the page. */
-  html.page-loading-visible .noor-loader-mark,
-  html.page-transitioning .noor-loader-mark {
-    animation: noor-loader-spin 1.25s var(--loader-ease, cubic-bezier(0.45, 0, 0.55, 1)) infinite;
+  .noor-loader-mark {
+    width: 42px;
+    height: 42px;
+    display: block;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, #000 0 47%, transparent 48%),
+      conic-gradient(from 18deg, #fff 0 70%, rgba(255, 255, 255, 0.18) 70% 82%, transparent 82% 100%);
+    transform-origin: center;
   }
 
-  .noor-loader-symbol {
-    display: block;
-    width: 100%;
-    height: 100%;
+  html.page-loading-visible .noor-loader-mark,
+  html.page-transitioning .noor-loader-mark {
+    animation: noor-loader-spin 0.52s linear infinite;
   }
 
   @keyframes noor-loader-spin {
-    0%,
-    100% {
-      opacity: 0.28;
-      transform: scale(0.72);
+    from {
+      transform: rotate(0deg);
     }
 
-    50% {
-      opacity: 1;
-      transform: scale(1);
+    to {
+      transform: rotate(360deg);
     }
   }
 
@@ -162,7 +302,7 @@
     .noor-loader-mark {
       animation: none;
       transform: none;
-      opacity: 0.5;
+      opacity: 0.55;
     }
 
     .noor-loader {

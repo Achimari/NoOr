@@ -29,6 +29,18 @@
   z-index: 2;
 }
 
+/* Sky becomes paper.
+ *
+ * One fixed sky sits behind everything (.app-sky above). The working field
+ * washes it into warm paper over --horizon-fade, and then stays opaque paper
+ * for the rest of the page: a linear-gradient holds its final stop forever, so
+ * nothing below the horizon can ever show moving sky behind a form or a table.
+ *
+ * The ramp is deliberately non-linear. A single transparent-to-paper stop puts
+ * the steepest change in the middle of the band, which reads as a horizontal
+ * edge. Weighting the alpha so it starts slowly and commits late lets the lower
+ * clouds dissolve instead.
+ */
 body:has(.app-sky) > main {
   position: relative;
   z-index: var(--z-content);
@@ -36,16 +48,82 @@ body:has(.app-sky) > main {
     to bottom,
     transparent 0,
     transparent calc(var(--horizon-height) - var(--horizon-fade)),
+    color-mix(in srgb, var(--paper) 10%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.75),
+    color-mix(in srgb, var(--paper) 34%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.5),
+    color-mix(in srgb, var(--paper) 72%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.25),
     var(--paper) var(--horizon-height)
   );
 }
 
+/* The paper fibre. One layer, owned here and nowhere else.
+ *
+ * z-index is negative so it paints above main's own paper fill but below every
+ * child — a positive value would land above the text. main already establishes
+ * a stacking context, so the negative value cannot escape behind the sky.
+ *
+ * The mask fades the grain in on the same band as the paper, so the texture
+ * arrives with the surface rather than switching on at the horizon.
+ */
+body:has(.app-sky) > main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-page-texture);
+  pointer-events: none;
+  background-image: var(--paper-texture);
+  background-repeat: repeat;
+  background-size: var(--paper-texture-size) var(--paper-texture-size);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon-height) - var(--horizon-fade)),
+    #000 var(--horizon-height)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon-height) - var(--horizon-fade)),
+    #000 var(--horizon-height)
+  );
+}
+
+/* Narrow screens get a shorter wash: the horizon is a smaller share of a phone
+ * viewport, and a 112px ramp there eats the whole opening region. */
+@media (max-width: 760px) {
+  body:has(.app-sky) > main {
+    --horizon-fade: 84px;
+  }
+}
+
+/* The active battle is a full immersive scene: no paper, no fibre, nothing
+ * between the reader and the artwork. The battle *entry* screen is an ordinary
+ * page and keeps both. */
 body[data-ambient="scene"]:has(.app-sky) > main {
   background: transparent;
 }
 
+body[data-ambient="scene"]:has(.app-sky) > main::before {
+  content: none;
+}
+
 body[data-ambient="scene"] .app-sky::after {
   background: var(--ambient-scrim);
+}
+
+/* Decorative grain is the first thing to go when the reader has asked for a
+ * plainer surface. The paper colour stays; only the texture leaves. */
+@media (prefers-reduced-transparency: reduce) {
+  body:has(.app-sky) > main::before {
+    content: none;
+  }
+}
+
+@media print {
+  body:has(.app-sky) > main {
+    background: var(--paper-raised);
+  }
+
+  body:has(.app-sky) > main::before {
+    content: none;
+  }
 }
 
 @media (prefers-contrast: more) {
@@ -60,6 +138,15 @@ body[data-ambient="scene"] .app-sky::after {
 
   .app-sky::after {
     background: var(--canvas);
+  }
+
+  /* No decorative grain, and no wash: a flat, solid field. */
+  body:has(.app-sky) > main {
+    background: var(--canvas);
+  }
+
+  body:has(.app-sky) > main::before {
+    content: none;
   }
 }
 

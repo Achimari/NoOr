@@ -1706,8 +1706,13 @@
 
   if (!battleId) setFocusMode(false);
 
+  // The first usable battle screen needs the spell metadata: without it the
+  // action tray renders empty. Hold the loader until it resolves rather than
+  // revealing a half-built arena — and release on failure too, so a dead
+  // request can never trap the reader behind the overlay.
+  const ready = window.NoOrPageReady?.hold() ?? (() => {});
   loadSpellMeta().then(() => {
     if (battleId) refresh();
     else pollQueue();
-  });
+  }).catch(() => {}).finally(ready);
 })();

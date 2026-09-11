@@ -2990,14 +2990,31 @@ document.addEventListener("keydown", (event) => {
 
 const PAGE_TRANSITION_DELAY = 160;
 
+// Safety net only. A navigation the user backs out of — a beforeunload prompt
+// they cancel, a link that turns out to be a download — fires no event at all,
+// so nothing would otherwise release the lock. This is never the normal path:
+// a real navigation replaces the document long before it runs.
+const PAGE_TRANSITION_ABANDON_MS = 10000;
+
 let pageTransitionTimer = 0;
+let pageTransitionAbandonTimer = 0;
 
 function pageTransitionRoot() {
   return document.documentElement;
 }
 
 function startPageTransition() {
-  if (pageTransitionTimer) return;
+  // Idempotent: the abandon timer stays armed for the whole transition, so a
+  // second click cannot start a second one or leak a timer.
+  if (pageTransitionTimer || pageTransitionAbandonTimer) return;
+
+  // Lock first, show second. The browser has already committed to leaving, so
+  // a second click, a drag or a stray keystroke must not reach the old page —
+  // but the spinner still waits out PAGE_TRANSITION_DELAY so a fast navigation
+  // never flashes an overlay.
+  window.NoOrLockInteraction?.();
+
+  pageTransitionAbandonTimer = window.setTimeout(resetPageTransition, PAGE_TRANSITION_ABANDON_MS);
 
   pageTransitionTimer = window.setTimeout(() => {
     pageTransitionTimer = 0;
@@ -3014,8 +3031,11 @@ function startPageTransition() {
 
 function resetPageTransition() {
   window.clearTimeout(pageTransitionTimer);
+  window.clearTimeout(pageTransitionAbandonTimer);
   pageTransitionTimer = 0;
+  pageTransitionAbandonTimer = 0;
   pageTransitionRoot().classList.remove("page-transitioning");
+  window.NoOrUnlockInteraction?.();
 
   const loader = document.querySelector("[data-noor-loader]");
   if (!loader) return;
@@ -3090,6 +3110,7 @@ window.addEventListener("pageshow", (event) => {
   resetPageTransition();
   if (event.persisted) pageTransitionRoot().classList.remove("page-loading", "page-entering");
 });
+
 
 window.addEventListener("pagehide", resetPageTransition);
 
