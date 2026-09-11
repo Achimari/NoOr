@@ -216,6 +216,169 @@ body[data-ambient="scene"] .app-sky::after {
   }
 }
 
+/* Stickers — records applied to the page.
+ *
+ * The page is one continuous ruled sheet. A sticker is a label laid on top of
+ * it: it masks the rules directly beneath it, and it earns that mask by having
+ * a reason to exist, a defined edge and deliberate proportions. Anything that
+ * masks the paper without those three is the Wave 1 defect again.
+ *
+ * Opt-in only. There is no selector here that turns a section, a list or a card
+ * into a sticker on its own — the class is added to audited components.
+ */
+.sticker-surface {
+  position: relative;
+  border: 1px solid var(--sticker-edge);
+  border-radius: var(--sticker-radius);
+  background: var(--sticker-bg);
+  box-shadow: var(--sticker-shadow);
+}
+
+/* The most important object in view. One per viewport, at most. */
+.sticker-surface--feature {
+  border-color: var(--sticker-edge-strong);
+}
+
+/* Placed by hand, not scattered. Two fixed angles, no runtime randomness, and
+ * never on anything the reader has to aim at or read in quantity. */
+.sticker-surface--tilt-a { transform: rotate(var(--sticker-tilt-a)); }
+.sticker-surface--tilt-b { transform: rotate(var(--sticker-tilt-b)); }
+
+/* A tilt on a phone reads as a rendering fault, not as a hand: the column is
+ * narrow enough that a rotated edge visibly diverges from the screen edge. */
+@media (max-width: 760px) {
+  .sticker-surface--tilt-a,
+  .sticker-surface--tilt-b {
+    transform: none;
+  }
+}
+
+/* Only a sticker that actually does something is allowed to move. A resting
+ * sticker never lifts, so "can I press this?" is answered before the pointer
+ * arrives. Named properties only — never `all`. */
+.sticker-surface--interactive {
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sticker-surface--interactive:hover {
+    transform: translateY(-2px);
+    border-color: var(--sticker-edge-strong);
+    box-shadow: var(--sticker-shadow-hover);
+  }
+}
+
+.sticker-surface--interactive:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: var(--sticker-shadow);
+}
+
+/* No focus rule here on purpose. globals.css owns the ring's geometry for every
+ * control, and it is drawn *inside* the element (outline-offset: -1px), so a
+ * sticker's transform, edge and shadow can never clip or cover it. A second
+ * owner here would be a second answer to the same question. */
+
+/* A status is a small applied label, not a coloured region. Colour is always
+ * carried alongside text, never instead of it. */
+.sticker-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border: 1px solid var(--sticker-edge);
+  border-radius: var(--radius-row);
+  background: var(--sticker-bg);
+  color: var(--ink-muted);
+  font-size: var(--text-micro);
+}
+
+.sticker-status--done {
+  border-color: var(--success-line);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.sticker-status--current {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+  color: var(--brand-hover);
+}
+
+.sticker-status--blocked {
+  color: var(--ink-secondary-strong);
+}
+
+/* Preference modes. A sticker still has to read as an object when the reader
+ * has asked for less: the edge survives, the decoration does not. */
+@media (prefers-reduced-motion: reduce) {
+  .sticker-surface--interactive {
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .sticker-surface--interactive:hover,
+  .sticker-surface--interactive:active {
+    transform: none;
+  }
+
+  .sticker-surface--tilt-a,
+  .sticker-surface--tilt-b {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .sticker-surface {
+    background: var(--sticker-bg);
+    border-color: var(--sticker-edge-strong);
+  }
+}
+
+@media (prefers-contrast: more) {
+  .sticker-surface,
+  .sticker-status {
+    border-color: var(--ink);
+    box-shadow: none;
+  }
+
+  .sticker-surface--tilt-a,
+  .sticker-surface--tilt-b {
+    transform: none;
+  }
+
+  .sticker-surface--interactive:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .sticker-surface,
+  .sticker-status {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .sticker-surface--tilt-a,
+  .sticker-surface--tilt-b,
+  .sticker-surface--interactive:hover {
+    transform: none;
+  }
+}
+
+@media print {
+  .sticker-surface {
+    box-shadow: none;
+  }
+
+  .sticker-surface--tilt-a,
+  .sticker-surface--tilt-b {
+    transform: none;
+  }
+}
+
 .is-floating {
   border: 1px solid var(--separator);
   border-radius: var(--radius-panel);

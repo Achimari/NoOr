@@ -100,7 +100,21 @@ describe("daily check-in layout", () => {
   it("uses the Strong-question action surface for Bible reading", async () => {
     const html = await renderDashboard();
 
-    assert.match(html, /class="dashboard-actions reading-check-actions"/);
+    // Both questions share one action surface. Asserted as "the reading group
+    // carries the same surface classes as the Strong group" rather than as a
+    // literal string, so the shared surface can gain a sticker without this
+    // test claiming the two have diverged.
+    const surfaceOf = (label) => {
+      const group = html.match(new RegExp(`class="([^"]*dashboard-actions[^"]*)"[^>]*aria-label="${label}"`));
+      assert.ok(group, `no action group for ${label}`);
+      return group[1].split(/\s+/).filter((c) => c !== "reading-check-actions").sort();
+    };
+    assert.deepEqual(
+      surfaceOf("Did you read the Bible today\\?"),
+      surfaceOf("Daily action"),
+      "the Bible question must reuse the Strong question's action surface",
+    );
+    assert.match(html, /class="[^"]*\breading-check-actions\b[^"]*"/);
     assert.match(html, /aria-label="Did you read the Bible today\?"/);
     assert.match(html, /class="dashboard-action dashboard-action-yes reading-action reading-action-yes"/);
     assert.match(html, /class="dashboard-action dashboard-action-no reading-action reading-action-no"/);

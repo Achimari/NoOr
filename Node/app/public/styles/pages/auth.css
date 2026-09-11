@@ -33,10 +33,9 @@
 .auth-card {
   width: 100%;
   padding: clamp(var(--space-5), 4vw, var(--space-7));
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-panel);
-  background: var(--glass-1);
-  box-shadow: var(--shadow-panel);
+
+  /* Surface delegated to .sticker-surface. The form is the record you arrive
+     on: a solid white label on the page, not a pane of glass over the sky. */
 }
 
 @supports not (backdrop-filter: blur(4px)) {

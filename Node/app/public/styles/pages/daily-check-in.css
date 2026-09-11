@@ -83,10 +83,8 @@
 
 .today-page .dashboard-actions {
   margin-bottom: 0;
-  border-radius: var(--radius-panel);
 
-  background: var(--surface);
-  box-shadow: none;
+  /* Surface delegated to .sticker-surface — this rule now only positions. */
 }
 
 .today-page .dashboard-action {
@@ -267,10 +265,12 @@
   gap: 0;
   width: 100%;
   margin-bottom: var(--space-4);
+
+  /* Surface delegated to .sticker-surface: the answer panel is a record applied
+     to the page, so its edge, radius, fill and contact shadow are the sticker's
+     to own. Restating them here would silently override the primitive.
+     `overflow` stays clipped so the two answer halves meet the rounded edge. */
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-panel);
-  background: var(--surface-1);
 }
 
 .dashboard-action {

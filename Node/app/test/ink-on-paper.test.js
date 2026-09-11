@@ -287,10 +287,17 @@ describe("the sheet is continuous", () => {
     }
   });
 
-  it("keeps the ruling faint enough to run under everything without shouting", () => {
+  it("keeps the ruling strong enough to be seen and faint enough to read under", () => {
     const alpha = Number(token("--paper-rule").match(/([\d.]+)%\s*\)/)[1]);
-    assert.ok(alpha <= 7, `the ruling must not exceed 7%, got ${alpha}%`);
-    assert.ok(alpha >= 4, `below 4% the page stops reading as paper at all, got ${alpha}%`);
+    assert.ok(alpha <= 8, `the ruling must not exceed 8%, got ${alpha}%`);
+    assert.ok(alpha >= 6, `under 6% the page stopped reading as paper at all, got ${alpha}%`);
+  });
+
+  it("gives the fibre enough presence to be felt on white", () => {
+    const script = read("scripts/build-paper-texture.py");
+    const peak = Number(script.match(/PEAK_ALPHA\s*=\s*(\d+)/)[1]);
+    assert.ok(peak >= 8, `the fibre was invisible on white at 6, got ${peak}`);
+    assert.ok(peak <= 10, `above 10 the white starts reading as grey, got ${peak}`);
   });
 });
 

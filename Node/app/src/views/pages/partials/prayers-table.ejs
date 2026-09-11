@@ -21,7 +21,7 @@
     <% if (prayers.length) { %>
       <% prayers.forEach((item) => { %>
         <li
-          class="prayer-item"
+          class="prayer-item sticker-surface"
           data-prayer-row
           data-prayer-id="<%= item.id %>"
           data-prayer-user-id="<%= item.userId %>"
@@ -67,7 +67,7 @@
       <% }) %>
     <% } else { %>
       <li class="prayer-item prayer-item--empty">
-        <div class="empty-state">
+        <div class="empty-state sticker-surface sticker-surface--tilt-b">
           <p class="empty-state-title"><%= emptyLabel %></p>
           <p class="empty-state-note"><%= emptyHint %></p>
         </div>

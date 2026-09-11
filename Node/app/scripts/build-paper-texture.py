@@ -43,12 +43,12 @@ SEED = 20260911
 # pure black reads as dirt; an even mid-grey just makes the white feel physical.
 FIBRE_RGB = (112, 112, 112)
 
-# Peak alpha out of 255. Recalibrated for white paper: white is the brightest
-# base there is, so the same alpha that swung ~3% on ivory swings 5.4% on white
-# and starts to read as grey rather than as fibre. 6 brings the swing back to
-# ~3%. Keeping the range this narrow also keeps the lossless WebP small — the
-# alpha plane holds only a handful of values.
-PEAK_ALPHA = 6
+# Peak alpha out of 255. 6 was calibrated to keep the swing near 3%, but on
+# screen that made the fibre disappear entirely: the page read as flat #fff. 9
+# is the point where the surface is felt on inspection without the white ever
+# reading as grey or dirty. Keeping the range this narrow also keeps the
+# lossless WebP small — the alpha plane holds only a handful of values.
+PEAK_ALPHA = 9
 
 # How much of the field is broad mottling versus fine grain. Mostly grain: broad
 # blotches at any real strength start to look like staining.

@@ -75,17 +75,31 @@ describe("Settings groups a heading with the rows it names", () => {
     const markup = read("src/views/pages/partials/settings-content.ejs");
 
     assert.doesNotMatch(markup, /class="surface-panel settings-form"/, "no panel nested inside the group panel");
+
+    // The group is a record applied to the page, so its one boundary is now the
+    // shared sticker edge rather than a border restated in the page sheet. The
+    // rule that matters is unchanged: exactly one boundary, owned in one place.
+    assert.match(markup, /<section class="settings-group sticker-surface"/,
+      "the group itself carries the one boundary");
     assert.match(
+      read("public/styles/components/material.css"),
+      /\.sticker-surface\s*\{[^}]*border:\s*1px solid var\(--sticker-edge\)/,
+      "and that boundary has a single owner",
+    );
+    assert.doesNotMatch(
       read("public/styles/pages/settings.css"),
-      /\.settings-group\s*\{[^}]*border:\s*1px solid var\(--rule\)/,
-      "the group itself carries the one boundary",
+      /\.settings-group\s*\{[^}]*border:/,
+      "the page sheet must not restate a second boundary",
     );
   });
 
   it("keeps every group heading inside its own boundary", () => {
     const markup = read("src/views/pages/partials/settings-content.ejs");
 
-    for (const [, group] of markup.matchAll(/<section class="settings-group"[^>]*>([\s\S]*?)<\/section>/g)) {
+    const groups = [...markup.matchAll(/<section class="settings-group[^"]*"[^>]*>([\s\S]*?)<\/section>/g)];
+    assert.ok(groups.length >= 3, `expected every settings group to be checked, found ${groups.length}`);
+
+    for (const [, group] of groups) {
       const title = group.indexOf("settings-group-title");
       const form = group.indexOf("<form");
       assert.ok(title !== -1, "each group states its title");
