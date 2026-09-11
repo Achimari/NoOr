@@ -15,6 +15,11 @@ const pageStyles = readFileSync(
   "utf8",
 ).replace(/\/\*[\s\S]*?\*\//g, "");
 
+const tableStyles = readFileSync(
+  new URL("../public/styles/components/tables.css", import.meta.url),
+  "utf8",
+).replace(/\/\*[\s\S]*?\*\//g, "");
+
 function rule(selector) {
   const match = pageStyles.match(
     new RegExp(`(?:^|[,{}])\\s*${selector.replace(/[.[\]()+*]/g, "\\$&")}\\s*(?:,[^{]*)?\\{([^}]*)\\}`, "m"),
@@ -24,6 +29,13 @@ function rule(selector) {
 
 function mediaBlock(query) {
   const match = pageStyles.match(
+    new RegExp(`@media\\s*\\(${query}\\)\\s*\\{((?:[^{}]|\\{[^{}]*\\})*)\\}`),
+  );
+  return match?.[1] || "";
+}
+
+function tableMediaBlock(query) {
+  const match = tableStyles.match(
     new RegExp(`@media\\s*\\(${query}\\)\\s*\\{((?:[^{}]|\\{[^{}]*\\})*)\\}`),
   );
   return match?.[1] || "";
@@ -552,6 +564,21 @@ describe("Progress page", () => {
 });
 
 describe("Progress page visual system", () => {
+  it("paints each stacked leaderboard row as one continuous mobile surface", () => {
+    const narrow = tableMediaBlock("max-width: 560px");
+
+    assert.match(
+      narrow,
+      /\.data-table--stack tbody tr \+ tr th,\s*\.data-table--stack tbody tr \+ tr td\s*\{[^}]*border:\s*0/,
+      "cell separators must not break the row rule into three short lines",
+    );
+    assert.match(
+      narrow,
+      /\.data-table--stack tbody tr\[data-current-user\]\s*\{[^}]*background:\s*var\(--surface-subtle\)/,
+      "the current-user tint must cover the row padding and grid gaps",
+    );
+  });
+
   it("encodes Yes as solid ink and No as the same colour under a hatch", () => {
     assert.match(rule(".ledger-track-segment--yes"), /background:\s*var\(--success\)/);
     assert.match(rule(".ledger-track-segment--no"), /background:\s*var\(--danger\)/);

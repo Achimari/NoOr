@@ -159,10 +159,23 @@
     border-block-start: 1px solid var(--separator);
   }
 
+  /* The desktop separator selector includes `tr + tr`, so the mobile reset
+     needs the same structural specificity. Otherwise every grid cell keeps a
+     short top rule and the intended row separator is drawn in fragments. */
+  .data-table--stack tbody tr + tr th,
+  .data-table--stack tbody tr + tr td {
+    border: 0;
+  }
+
   .data-table--stack tbody th,
   .data-table--stack tbody td {
     padding: 0;
-    border: 0;
+  }
+
+  /* Cell backgrounds stop at the grid gaps and padding. Carrying the selected
+     state on the row turns the current member into one continuous surface. */
+  .data-table--stack tbody tr[data-current-user] {
+    background: var(--surface-subtle);
   }
 
   .data-table--stack .data-table-name {
