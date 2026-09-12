@@ -151,7 +151,6 @@
   min-width: 96px;
   min-height: 56px;
   padding-inline: var(--space-5);
-  padding-inline-end: calc(var(--space-5) + var(--space-4));
   border: 1px solid var(--border-control);
   border-radius: var(--radius-control);
   background: var(--surface);
@@ -178,37 +177,12 @@
   transform: scale(0.97);
 }
 
-/* The same rule as Today: the recorded answer is the ink field, the answer
-   itself is the word, and the selection carries a printed check. */
+/* The recorded answer is the ink field; the label states which answer it is. */
 .settings-answer-yes[aria-pressed="true"],
 .settings-answer-no[aria-pressed="true"] {
-  position: relative;
   border: 0;
   background: var(--ink);
   color: var(--white);
-}
-
-/* The recorded mark. A selected control in a monochrome system cannot be
-   recognised by its fill alone — a hover, a focus and a disabled state can all
-   darken a surface — so every selected control also carries this printed check
-   in its corner. It is drawn in CSS rather than placed in the markup, because
-   the state already exists in `aria-pressed` and the mark must never be a
-   second source of truth.
-
-   Two strokes, rotated: a real check, not a tick-shaped glyph that disappears
-   in forced colours. */
-.settings-answer-yes[aria-pressed="true"]::after,
-.settings-answer-no[aria-pressed="true"]::after {
-  content: "";
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-end: var(--space-5);
-  inline-size: 9px;
-  block-size: 16px;
-  border-inline-end: 2.5px solid currentColor;
-  border-block-end: 2.5px solid currentColor;
-  transform: translateY(-50%) rotate(42deg);
-  pointer-events: none;
 }
 
 .settings-answer-button:disabled {

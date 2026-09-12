@@ -182,14 +182,28 @@ describe("interaction state ownership", () => {
     assert.match(css, /\.settings-answer-no\[aria-pressed="true"\]/);
   });
 
-  it("marks a recorded Yes or No with the ink field and a printed check, not a hue", () => {
+  it("keeps a recorded settings answer icon-free while the ink field carries selection", () => {
+    const css = stripComments(style("pages/settings.css"));
+    const selected = /\.settings-answer-(yes|no)\[aria-pressed="true"\]/;
+    const block = css.match(new RegExp(`${selected.source}[^{]*{([^}]*)}`))?.[2] || "";
+
+    assert.match(block, /background:\s*var\(--ink\)/, "a recorded settings answer remains the ink field");
+    assert.match(block, /border:\s*0|border-color:\s*transparent/, "a recorded settings answer has no border");
+    assert.doesNotMatch(
+      css,
+      /\.settings-answer-(?:yes|no)\[aria-pressed="true"\]::after/,
+      "selected settings answers must not render a checkmark",
+    );
+  });
+
+  it("marks a recorded Today answer with the ink field and a printed check, not a hue", () => {
     // Superseded 2026-09-12: "full green and red, borderless and icon-free".
     // The press has one ink, so a fill cannot say which answer was given and a
     // fill alone cannot even say that an answer *was* given — hover, focus and
     // disabled all darken a surface too. So the answer is carried by the word,
     // which is the largest thing on the module, and the selection is carried by
     // the ink field plus a check mark that no other state can produce.
-    for (const file of ["pages/settings.css", "pages/daily-check-in.css"]) {
+    for (const file of ["pages/daily-check-in.css"]) {
       const css = stripComments(style(file));
       const selected = /\.(settings-answer|dashboard-action)-(yes|no)\[aria-pressed="true"\]/;
 
