@@ -8,13 +8,17 @@ const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 
 describe("copy quality contract", () => {
-  it("writes page and section titles in sentence case", () => {
-    // Achimari Hand is a handwritten face: all-caps strips the ascender and
-    // descender shapes a reader uses to recognise a word. Uppercase survives
-    // only where the markup writes it, on the short Yes/No decision labels.
+  it("writes every title in sentence case in the markup that ships", () => {
+    // Sacred Press sets display titles in capitals as a *typographic
+    // treatment*. The copy itself stays sentence case, which is what a screen
+    // reader announces, what a translator receives, and what survives if the
+    // stylesheet never loads. `text-transform` is presentation; the DOM text is
+    // the content, and only the content is asserted here.
+    //
+    // This supersedes the handwritten-face rule that banned the treatment
+    // outright (CONSTRAINTS.md, 2026-09-11): Unbounded is a geometric display
+    // face whose capitals are drawn to be set as capitals.
     const globals = read("public/styles/globals.css");
-    const shell = read("public/styles/shell.css");
-    const today = read("public/styles/pages/daily-check-in.css");
 
     assert.doesNotMatch(
       globals,
@@ -22,11 +26,52 @@ describe("copy quality contract", () => {
       "the global sheet must not case every heading",
     );
 
-    for (const sheet of [shell, today]) {
-      assert.doesNotMatch(sheet, /text-transform:\s*uppercase/, "titles read in sentence case");
-    }
+    const titles = [
+      ["src/views/pages/partials/home-content.ejs", /class="page-head-title today-title">([^<]+)</],
+      ["src/views/pages/partials/my-prayers-content.ejs", /class="page-head-title">([^<]+)</],
+      ["src/views/pages/partials/statistics-content.ejs", /class="page-head-title">([^<]+)</],
+    ];
 
-    assert.match(today, /\.today-title\s*\{[^}]*text-transform:\s*none/s);
+    for (const [view, pattern] of titles) {
+      const [, text] = read(view).match(pattern) || [];
+      assert.ok(text, `${view} must still render a page title`);
+      assert.notEqual(text, text.toUpperCase(), `${view} writes "${text}" in capitals in the markup`);
+      assert.match(text.trim(), /^[A-Z][a-z]/, `${view} must open its title with one capital`);
+    }
+  });
+
+  it("tracks every uppercase treatment, and confines it to display and data", () => {
+    // A capital run set at default spacing collides. Every rule that cases text
+    // must also track it, and the treatment belongs to page openings, mono
+    // marks and short controls — never to prose.
+    const sheets = ["public/styles/shell.css", "public/styles/pages/daily-check-in.css"];
+
+    for (const sheet of sheets) {
+      const css = read(sheet).replace(/\/\*[\s\S]*?\*\//g, "");
+      for (const [block] of css.matchAll(/[^{}]*\{[^}]*\}/g)) {
+        if (!/text-transform:\s*uppercase/.test(block)) continue;
+        const selector = block.slice(0, block.indexOf("{")).trim().replace(/\s+/g, " ");
+        assert.match(
+          block,
+          /letter-spacing:/,
+          `${sheet} — ${selector} sets capitals without tracking them`,
+        );
+        // Prose is set in the body role; a count or a date is set in the data
+        // role. The treatment belongs to the second and never to the first, so
+        // the rule is drawn on the face rather than on a selector name —
+        // `.section-head-note` is a count, `.settings-group-note` is a sentence.
+        assert.doesNotMatch(
+          selector,
+          /lede|prose|subtitle|message|copy|paragraph|description|hint/i,
+          `${sheet} — ${selector} cases running text`,
+        );
+        assert.doesNotMatch(
+          block,
+          /font-family:\s*var\(--font-(?:body|reading)\)/,
+          `${sheet} — ${selector} cases text set in the body face`,
+        );
+      }
+    }
   });
 
   it("keeps the Today heading reading as Today", () => {

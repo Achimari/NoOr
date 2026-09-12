@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 const templatePath = path.join(appRoot, "src/views/pages/partials/battle-content.ejs");
@@ -51,6 +53,7 @@ const COMPLETED_COURSE = MIXED_COURSE.map((encounter) => ({
 
 async function renderEntry({ encounters = MIXED_COURSE, confirmed = true } = {}) {
   const html = await ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
     pve: { activeBattleId: null, encounters },
     character: {
       stats: { strength: 4, dexterity: 3, intelligence: 3, wisdom: 1 },
@@ -208,16 +211,16 @@ describe("Battle entry follows the Achimari Course Ledger", () => {
   it("keeps readable entry content off glass and full-scene imagery", () => {
     assert.doesNotMatch(styles, /--glass|backdrop-filter|box-shadow/);
 
-    // The whole battle page carries data-ambient="scene", which strips the paper
-    // for the immersive scene. The entry screen gets the shared book surface
-    // back from the material layer that owns it — this sheet no longer mixes a
-    // second sky-to-paper ramp of its own.
-    assert.doesNotMatch(styles, /var\(--horizon-fade\)/, "the battle sheet owns no paper ramp");
+    // The sky that the battle page used to switch off is retired, so there is
+    // no ramp to opt out of and none to opt back into: the entry screen reads
+    // on the document's own flat paper, like every other route.
+    assert.doesNotMatch(styles, /var\(--horizon-fade\)|--paper-field/, "the battle sheet owns no paper ramp");
     assert.match(
       read("public/styles/components/material.css"),
-      /data-battle-focus="false"[^}]*background:\s*var\(--paper-field\)/s,
+      /main\s*\{[^}]*background:\s*var\(--paper\)/s,
       "the entry screen still reads on paper, not on the scene",
     );
+    assert.doesNotMatch(styles, /data-ambient/, "the battle sheet no longer branches on an ambient backdrop");
   });
 
   it("gives Trials the wider column, then stacks the choices at mobile", () => {

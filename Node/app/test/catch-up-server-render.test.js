@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 function renderedRows(html) {
   const list = html.slice(html.indexOf("data-catch-up-list"), html.indexOf("</ul>"));
   return list.match(/<li class="catch-up-item"[^>]*data-catch-up-item/g) || [];
@@ -22,7 +24,8 @@ function items(count, activity = "STRONG") {
 }
 
 async function render(missedActivities) {
-  return ejs.renderFile(catchUpPath, { missedActivities, dateLocale: "en" });
+  return ejs.renderFile(catchUpPath, {
+    ...sharedViewLocals, missedActivities, dateLocale: "en" });
 }
 
 describe("catch-up is complete on first paint", () => {

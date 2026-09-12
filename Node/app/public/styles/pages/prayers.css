@@ -62,7 +62,7 @@
   margin-bottom: 0;
   padding: var(--space-4);
   border: 1px solid var(--border-control);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--surface-2);
   color: var(--text-primary);
   min-height: 0;
@@ -72,7 +72,7 @@
 
 .prayer-field>span {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -113,7 +113,7 @@
 .prayer-form .auth-submit {
   width: 100%;
   min-height: 52px;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   font-size: var(--text-label);
   font-weight: var(--weight-body);
 }

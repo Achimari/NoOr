@@ -3,6 +3,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 import { validateBody } from "../src/middleware/validateRequest.js";
 import { registerSchema } from "../src/validators/authValidators.js";
 
@@ -18,6 +20,7 @@ function runValidation(schema, body) {
 
 async function renderLogin(locals = {}) {
   return ejs.renderFile(loginPath, {
+    ...sharedViewLocals,
     t: (key) => ({
       "auth.login.title": "Sign in",
       "auth.login.subtitle": "",

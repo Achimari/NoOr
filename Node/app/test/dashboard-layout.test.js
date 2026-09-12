@@ -5,6 +5,8 @@ import { describe, it } from "node:test";
 import vm from "node:vm";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 const templatePath = fileURLToPath(
   new URL("../src/views/pages/partials/home-content.ejs", import.meta.url),
 );
@@ -38,6 +40,7 @@ function renderReadingSummaryForStatus(status) {
 
 async function renderDashboard() {
   return ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
     checkIn: {
       id: 7,
       todayDateKey: "2026-09-04",
@@ -49,30 +52,33 @@ async function renderDashboard() {
 }
 
 describe("daily check-in layout", () => {
-  it("keeps the Today horizon transparent over the shared sky", () => {
+  it("opens Today on the page itself, with no backdrop behind the heading", () => {
+    // The shared sky is retired (CONSTRAINTS.md, 2026-09-11), so the opening
+    // band has nothing to be transparent over: it is paper, like the rest of
+    // the sheet, and nothing may paint a second ground beneath the heading.
     const materialStyles = readFileSync(materialStylesPath, "utf8");
-    const horizonRule = materialStyles.match(/\.horizon\s*{([^}]*)}/s);
+    const pageStyles = readFileSync(dashboardStylesPath, "utf8");
 
-    assert.ok(horizonRule, "the shared horizon rule exists");
-    assert.match(horizonRule[1], /background-color:\s*transparent/);
-    assert.doesNotMatch(
-      materialStyles,
-      /\.horizon::after\s*{/,
-      "Today must not paint a second white gradient over the shared sky",
-    );
+    assert.doesNotMatch(materialStyles, /\.horizon\b/, "the sky-era horizon component is gone");
+    assert.doesNotMatch(pageStyles, /--horizon-fade|app-sky|ambient-video/, "Today mounts no backdrop");
+
+    const opening = pageStyles.match(/\.today-opening\s*{([^}]*)}/s);
+    if (opening) {
+      assert.doesNotMatch(opening[1], /background-image|gradient/, "the opening is paper, not a wash");
+    }
   });
 
   it("ends the Today header with space instead of a decorative line", () => {
     const materialStyles = readFileSync(materialStylesPath, "utf8");
     const todayStyles = readFileSync(dashboardStylesPath, "utf8");
-    const todayHorizon = todayStyles.match(/\.today-page \.horizon\s*{([^}]*)}/s);
+    const todayOpening = todayStyles.match(/\.today-page \.today-opening\s*{([^}]*)}/s);
 
-    assert.doesNotMatch(materialStyles, /\.horizon::before\s*{/);
-    assert.ok(todayHorizon, "Today defines its horizon spacing");
-    assert.match(todayHorizon[1], /justify-content:\s*flex-start/);
-    assert.match(todayHorizon[1], /padding-block-start:\s*var\(--section-gap\)/);
-    assert.match(todayHorizon[1], /padding-block-end:\s*var\(--space-5\)/);
-    assert.doesNotMatch(todayHorizon[1], /border-block-end|background-image/);
+    assert.doesNotMatch(materialStyles, /\.page-opening::before\s*{/);
+    assert.ok(todayOpening, "Today defines its opening spacing");
+    assert.match(todayOpening[1], /justify-content:\s*flex-start/);
+    assert.match(todayOpening[1], /padding-block-start:\s*var\(--section-gap\)/);
+    assert.match(todayOpening[1], /padding-block-end:\s*var\(--space-5\)/);
+    assert.doesNotMatch(todayOpening[1], /border-block-end|background-image/);
   });
 
   it("does not render or style a duplicate practice summary", async () => {

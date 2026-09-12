@@ -65,8 +65,11 @@
   <div class="page-shell">
 
     <header class="page-head">
-      <h1 class="page-head-title">Progress</h1>
-      <p class="page-head-lede">Track your streaks and compare answer patterns across the community.</p>
+      <div class="page-head-copy">
+        <h1 class="page-head-title">Progress</h1>
+        <p class="page-head-lede">Track your streaks and compare answer patterns across the community.</p>
+      </div>
+
     </header>
 
     <section class="page-section progress-standing" aria-labelledby="streak-summary-title">
@@ -74,7 +77,7 @@
       <ul class="stat-line progress-summary">
         <% views.forEach((view) => { %>
           <li class="stat-line-item" data-streak-summary="<%= view.slug %>">
-            <span class="stat-line-label"><%= view.label %></span>
+            <span class="stat-line-label"><%- include("../../components/ui/icon", { name: "flame", className: "ui-icon--sm" }) %><%= view.label %></span>
             <span class="stat-line-value"><%= view.board.overallBest?.value || 0 %> <%= dayWord(view.board.overallBest?.value || 0) %></span>
             <span class="stat-line-note">Best · <%= view.board.overallBest?.name || "No record yet" %></span>
           </li>
@@ -84,7 +87,7 @@
 
     <section class="page-section section-frame section-frame--ruled" aria-labelledby="leaderboard-title">
       <div class="section-head">
-        <h2 class="section-head-title" id="leaderboard-title">Streak leaderboard</h2>
+        <h2 class="section-head-title" id="leaderboard-title"><%- include("../../components/ui/icon", { name: "trophy", className: "practice-mark" }) %>Streak leaderboard</h2>
         <span class="section-head-note"><%= plural(activeBoard.leaders.length, "user", "users") %></span>
       </div>
       <p class="section-lede">Compare current streaks across the community. Each one follows that member's time zone.</p>
@@ -139,7 +142,7 @@
               <% } else { %>
                 <tr>
                   <td colspan="3">
-                    <div class="empty-state sticker-surface">
+                    <div class="empty-state press-region">
                       <p class="empty-state-title"><%= activeStreak.empty %></p>
                       <p class="empty-state-note"><%= activeStreak.emptyHint %></p>
                     </div>

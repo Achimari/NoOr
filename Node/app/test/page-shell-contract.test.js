@@ -53,7 +53,7 @@ describe("shared page shell contract", () => {
     const shell = style("shell.css");
     const battle = style("game/battle.css");
     const today = style("pages/daily-check-in.css");
-    const todayHorizon = today.match(/\.today-page \.horizon\s*{([^}]*)}/s)?.[1] || "";
+    const todayOpening = today.match(/\.today-page \.today-opening\s*{([^}]*)}/s)?.[1] || "";
 
     assert.match(
       shell,
@@ -66,11 +66,11 @@ describe("shared page shell contract", () => {
       "Battle must not replace the shared top gap",
     );
     assert.match(
-      todayHorizon,
+      todayOpening,
       /padding-block-start:\s*var\(--section-gap\)/,
       "Today must use the same top gap as Community",
     );
-    assert.match(todayHorizon, /justify-content:\s*flex-start/, "Today must align its title from the top gap");
+    assert.match(todayOpening, /justify-content:\s*flex-start/, "Today must align its title from the top gap");
   });
 
   it("keeps the legacy container wrapper on exactly the shared measure", () => {
@@ -134,5 +134,25 @@ describe("shared page shell contract", () => {
       /padding:\s*var\(--space-5\)/,
       "the achievements page header must not inset itself from the shared grid",
     );
+  });
+
+  it("uses the canonical page title on Help and Achievements without local typography overrides", () => {
+    const pages = [
+      ["help-content.ejs", "Help", "game/help.css", "help-title"],
+      ["achievements-content.ejs", "Achievements", "game/achievements.css", "achievements-title"],
+    ];
+
+    for (const [view, title, sheet, retiredClass] of pages) {
+      assert.match(
+        partial(view),
+        new RegExp(`<h1 class="page-head-title">${title}</h1>`),
+        `${title} must use the same title component as the other main pages`,
+      );
+      assert.doesNotMatch(
+        style(sheet).replace(/\/\*[\s\S]*?\*\//g, ""),
+        new RegExp(`\\.${retiredClass}\\s*\\{`),
+        `${sheet} must not override the shared title typography`,
+      );
+    }
   });
 });

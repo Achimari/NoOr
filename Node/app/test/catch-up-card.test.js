@@ -5,6 +5,8 @@ import { describe, it } from "node:test";
 import vm from "node:vm";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 const templatePath = fileURLToPath(
   new URL("../src/views/pages/partials/home-content.ejs", import.meta.url),
 );
@@ -101,6 +103,7 @@ function renderCatchUpWithPayload(payload) {
 
 async function renderDashboard() {
   return ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
     checkIn: {
       id: 7,
       todayDateKey: "2026-09-04",

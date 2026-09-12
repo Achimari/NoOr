@@ -6,11 +6,11 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
+const appRoot = root;
 const read = (relativePath) => readFileSync(path.join(root, relativePath), "utf8");
 
 const footerView = read("src/views/components/layout/footer.ejs");
 const footerCss = read("public/styles/home/footer.css");
-const ambientSky = read("src/views/components/layout/ambient-sky.ejs");
 
 describe("retired footer-water feature", () => {
   it("renders the compact footer directly without a decorative media band", () => {
@@ -35,10 +35,18 @@ describe("retired footer-water feature", () => {
     assert.doesNotMatch(footerView, /<section[^>]*footer-info[^>]*aria-hidden/);
   });
 
-  it("returns the ambient controller to sky-only playback", () => {
-    assert.match(ambientSky, /data-app-sky/);
-    assert.match(ambientSky, /function syncPlayback\(\)/);
-    assert.doesNotMatch(ambientSky, /data-app-water|waterVideo|waterSourcesLoaded|observeWater|initWater/);
+  it("leaves no ambient video controller of any kind behind", () => {
+    // The water band was retired first; the shared sky followed it when Sacred
+    // Press replaced the ambient backdrop with printed plates (CONSTRAINTS.md,
+    // 2026-09-11). Neither controller may come back by either name.
+    const app = read("public/scripts/app.js");
+
+    assert.doesNotMatch(app, /data-app-water|waterVideo|waterSourcesLoaded|observeWater|initWater/);
+    assert.doesNotMatch(app, /data-app-sky|initAmbientArt|has-ambient-video/);
+    assert.ok(
+      !existsSync(path.join(appRoot, "src/views/components/layout/ambient-sky.ejs")),
+      "the shared sky component has no remaining consumer",
+    );
   });
 
   it("removes the unused water media and its local documentation", () => {

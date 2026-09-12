@@ -1,552 +1,153 @@
+/* Sacred Press material.
+ *
+ * The page is one printed sheet: a flat mineral ground, one fibre layer, and
+ * ink. There is no full-page ruling, no sticker, no rotation, no contact shadow
+ * and no floating card — all five are recorded as superseded in CONSTRAINTS.md
+ * (2026-09-11).
+ *
+ * A group is made with exactly one boundary: spacing, one thin rule, a tonal
+ * fill, or a black field. Never two at once, and never one region inside
+ * another.
+ */
 
+/* ---------------------------------------------------------------- the sheet */
 
-.app-sky {
+/* The working field is the paper itself. Flat: a gradient here is what used to
+   wash a photograph up behind the content. */
+main {
+  background: var(--paper);
+}
+
+/* The fibre. One layer, owned here and nowhere else.
+ *
+ * Fixed rather than absolute, so scrolling never repaints it: the element stays
+ * put in the viewport and the browser can keep it on its own layer. It is
+ * pointer-events: none and aria-invisible, sits under every child of the
+ * document, and paints a single flat tile: no filter, no blend mode, no moving
+ * layer. Nothing here can make a scrolling container recomposite.
+ */
+body::before {
+  content: "";
   position: fixed;
-  inset: 0;
-  z-index: var(--z-sky);
-  pointer-events: none;
-
-  background-color: var(--ambient-base);
-}
-
-.app-sky::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    url("/videos/ambient-sky.jpg") center 40% / cover no-repeat,
-    var(--ambient-base);
-  filter: var(--ambient-filter);
-  z-index: -2;
-}
-
-.app-sky::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background: var(--sky-scrim);
-  z-index: 2;
-}
-
-/* Sky becomes paper.
- *
- * One fixed sky sits behind everything (.app-sky above). The working field
- * washes it into white paper over --horizon-fade, and then stays opaque paper
- * for the rest of the page: a linear-gradient holds its final stop forever, so
- * nothing below the horizon can ever show moving sky behind a form or a table.
- *
- * The ramp is deliberately non-linear. A single transparent-to-paper stop puts
- * the steepest change in the middle of the band, which reads as a horizontal
- * edge. Weighting the alpha so it starts slowly and commits late lets the lower
- * clouds dissolve into the page instead of stopping at a line.
- */
-body:has(.app-sky) {
-  --paper-field: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--horizon-height) - var(--horizon-fade)),
-    color-mix(in srgb, var(--paper) 10%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.75),
-    color-mix(in srgb, var(--paper) 34%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.5),
-    color-mix(in srgb, var(--paper) 72%, transparent) calc(var(--horizon-height) - var(--horizon-fade) * 0.25),
-    var(--paper) var(--horizon-height)
-  );
-}
-
-body:has(.app-sky) > main {
-  position: relative;
-  z-index: var(--z-content);
-  background: var(--paper-field);
-}
-
-/* The paper fibre. One layer, owned here and nowhere else.
- *
- * z-index is negative so it paints above main's own paper fill but below every
- * child — a positive value would land above the text. main already establishes
- * a stacking context, so the negative value cannot escape behind the sky.
- *
- * The mask fades the grain in on the same band as the paper, so the texture
- * arrives with the surface rather than switching on at the horizon.
- */
-body:has(.app-sky) > main::before {
-  content: "";
-  position: absolute;
   inset: 0;
   z-index: var(--z-page-texture);
   pointer-events: none;
+  opacity: var(--paper-texture-opacity);
   background-image: var(--paper-texture);
   background-repeat: repeat;
   background-size: var(--paper-texture-size) var(--paper-texture-size);
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent calc(var(--horizon-height) - var(--horizon-fade)),
-    #000 var(--horizon-height)
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent calc(var(--horizon-height) - var(--horizon-fade)),
-    #000 var(--horizon-height)
-  );
 }
 
-/* The ruling. A second layer, not a second background on the fibre, because it
- * needs its own mask: the lines have to arrive *after* the paper has settled.
- * That order is the whole idea — the lowest clouds go soft, then fibrous, and
- * only then do they resolve into lines.
- *
- * Same negative z-index as the fibre, declared later, so the lines paint over
- * the grain and still under every child of the working field.
- *
- * The interval is the body rhythm: 20px copy at 1.65 leading is a 33px line.
- *
- * It runs unbroken across the whole field. Nothing masks it out: a big opaque
- * block over a ruled page does not read as "no lines here", it reads as a
- * separate sheet laid on top. Continuity is what proves the white is paper.
- */
-body:has(.app-sky) > main::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: var(--z-page-texture);
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--paper-line-step) - var(--paper-line-width)),
-    var(--paper-rule) calc(var(--paper-line-step) - var(--paper-line-width)),
-    var(--paper-rule) var(--paper-line-step)
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent calc(var(--horizon-height) - var(--horizon-fade) * 0.55),
-    #000 calc(var(--horizon-height) + var(--horizon-fade) * 0.25)
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent calc(var(--horizon-height) - var(--horizon-fade) * 0.55),
-    #000 calc(var(--horizon-height) + var(--horizon-fade) * 0.25)
-  );
-}
+/* ------------------------------------------------------------------ regions */
 
-/* Narrow screens get a shorter wash: the horizon is a smaller share of a phone
- * viewport, and a 112px ramp there eats the whole opening region. */
-@media (max-width: 760px) {
-  body:has(.app-sky) > main {
-    --horizon-fade: 84px;
-  }
-}
-
-/* The active battle is a full immersive scene: no paper, no fibre, nothing
- * between the reader and the artwork. The battle *entry* screen is an ordinary
- * page and keeps both. */
-body[data-ambient="scene"]:has(.app-sky) > main {
-  background: transparent;
-}
-
-body[data-ambient="scene"]:has(.app-sky) > main::before,
-body[data-ambient="scene"]:has(.app-sky) > main::after {
-  content: none;
-}
-
-/* ...but the battle *entry* screen shares that page, so the switch above strips
- * its paper too. Give the book surface back here, beside the rule it excepts,
- * rather than mixing a second ramp in the battle sheet: the entry screen is an
- * ordinary page and reads on exactly the same paper as every other one. */
-body[data-ambient="scene"]:has(.app-sky):has([data-battle-focus="false"]) > main {
-  background: var(--paper-field);
-}
-
-body[data-ambient="scene"]:has(.app-sky):has([data-battle-focus="false"]) > main::before,
-body[data-ambient="scene"]:has(.app-sky):has([data-battle-focus="false"]) > main::after {
-  content: "";
-}
-
-body[data-ambient="scene"] .app-sky::after {
-  background: var(--ambient-scrim);
-}
-
-/* A reader who has asked for less transparency gets the page itself, not a wash
- * over a moving sky: the field goes solid from its first pixel, and the two
- * decorative layers — which only exist to make that transition believable —
- * leave with it. */
-@media (prefers-reduced-transparency: reduce) {
-  body:has(.app-sky) > main {
-    background: var(--paper);
-  }
-
-  body:has(.app-sky) > main::before,
-  body:has(.app-sky) > main::after {
-    content: none;
-  }
-}
-
-@media print {
-  body:has(.app-sky) > main {
-    background: var(--paper-raised);
-  }
-
-  body:has(.app-sky) > main::before,
-  body:has(.app-sky) > main::after {
-    content: none;
-  }
-}
-
-@media (prefers-contrast: more) {
-
-  .app-sky::before {
-    display: none;
-  }
-
-  .app-sky {
-    background-color: var(--canvas);
-  }
-
-  .app-sky::after {
-    background: var(--canvas);
-  }
-
-  /* No decorative grain, no ruling, no wash: a flat, solid field. */
-  body:has(.app-sky) > main {
-    background: var(--canvas);
-  }
-
-  body:has(.app-sky) > main::before,
-  body:has(.app-sky) > main::after {
-    content: none;
-  }
-}
-
-/* Stickers — records applied to the page.
- *
- * The page is one continuous ruled sheet. A sticker is a label laid on top of
- * it: it masks the rules directly beneath it, and it earns that mask by having
- * a reason to exist, a defined edge and deliberate proportions. Anything that
- * masks the paper without those three is the Wave 1 defect again.
- *
- * Opt-in only. There is no selector here that turns a section, a list or a card
- * into a sticker on its own — the class is added to audited components.
- */
-.sticker-surface {
+/* One boundary per group. The default is a hairline rule drawn from the ink, so
+   it reads as printing rather than as a UI border, and the sheet shows straight
+   through — a region is an area of the page, not an object laid on it. */
+.press-region {
   position: relative;
-  border: 1px solid var(--sticker-edge);
-  border-radius: var(--sticker-radius);
-  background: var(--sticker-bg);
-  box-shadow: var(--sticker-shadow);
-}
-
-/* The most important object in view. One per viewport, at most. */
-.sticker-surface--feature {
-  border-color: var(--sticker-edge-strong);
-}
-
-/* Placed by hand, not scattered. Two fixed angles, no runtime randomness, and
- * never on anything the reader has to aim at or read in quantity. */
-.sticker-surface--tilt-a { transform: rotate(var(--sticker-tilt-a)); }
-.sticker-surface--tilt-b { transform: rotate(var(--sticker-tilt-b)); }
-
-/* A tilt on a phone reads as a rendering fault, not as a hand: the column is
- * narrow enough that a rotated edge visibly diverges from the screen edge. */
-@media (max-width: 760px) {
-  .sticker-surface--tilt-a,
-  .sticker-surface--tilt-b {
-    transform: none;
-  }
-}
-
-/* Only a sticker that actually does something is allowed to move. A resting
- * sticker never lifts, so "can I press this?" is answered before the pointer
- * arrives. Named properties only — never `all`. */
-.sticker-surface--interactive {
-  transition:
-    transform var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sticker-surface--interactive:hover {
-    transform: translateY(-2px);
-    border-color: var(--sticker-edge-strong);
-    box-shadow: var(--sticker-shadow-hover);
-  }
-}
-
-.sticker-surface--interactive:active {
-  transform: translateY(0) scale(0.99);
-  box-shadow: var(--sticker-shadow);
-}
-
-/* No focus rule here on purpose. globals.css owns the ring's geometry for every
- * control, and it is drawn *inside* the element (outline-offset: -1px), so a
- * sticker's transform, edge and shadow can never clip or cover it. A second
- * owner here would be a second answer to the same question. */
-
-/* A status is a small applied label, not a coloured region. Colour is always
- * carried alongside text, never instead of it. */
-.sticker-status {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 2px var(--space-2);
-  border: 1px solid var(--sticker-edge);
-  border-radius: var(--radius-row);
-  background: var(--sticker-bg);
-  color: var(--ink-muted);
-  font-size: var(--text-micro);
-}
-
-.sticker-status--done {
-  border-color: var(--success-line);
-  background: var(--success-soft);
-  color: var(--success);
-}
-
-.sticker-status--current {
-  border-color: var(--brand);
-  background: color-mix(in srgb, var(--brand) 8%, #fff);
-  color: var(--brand-hover);
-}
-
-.sticker-status--blocked {
-  color: var(--ink-secondary-strong);
-}
-
-/* Preference modes. A sticker still has to read as an object when the reader
- * has asked for less: the edge survives, the decoration does not. */
-@media (prefers-reduced-motion: reduce) {
-  .sticker-surface--interactive {
-    transition: border-color var(--duration-fast) var(--ease-out);
-  }
-
-  .sticker-surface--interactive:hover,
-  .sticker-surface--interactive:active {
-    transform: none;
-  }
-
-  .sticker-surface--tilt-a,
-  .sticker-surface--tilt-b {
-    transform: none;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .sticker-surface {
-    background: var(--sticker-bg);
-    border-color: var(--sticker-edge-strong);
-  }
-}
-
-@media (prefers-contrast: more) {
-  .sticker-surface,
-  .sticker-status {
-    border-color: var(--ink);
-    box-shadow: none;
-  }
-
-  .sticker-surface--tilt-a,
-  .sticker-surface--tilt-b {
-    transform: none;
-  }
-
-  .sticker-surface--interactive:hover {
-    transform: none;
-    box-shadow: none;
-  }
-}
-
-@media (forced-colors: active) {
-  .sticker-surface,
-  .sticker-status {
-    border: 1px solid CanvasText;
-    box-shadow: none;
-  }
-
-  .sticker-surface--tilt-a,
-  .sticker-surface--tilt-b,
-  .sticker-surface--interactive:hover {
-    transform: none;
-  }
-}
-
-@media print {
-  .sticker-surface {
-    box-shadow: none;
-  }
-
-  .sticker-surface--tilt-a,
-  .sticker-surface--tilt-b {
-    transform: none;
-  }
-}
-
-.is-floating {
-  border: 1px solid var(--separator);
+  border: 1px solid var(--rule);
   border-radius: var(--radius-panel);
-  background: color-mix(in srgb, var(--surface) 82%, transparent);
-  box-shadow: var(--shadow-float);
-}
-
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .is-floating {
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-  }
-}
-
-.is-floating .is-floating {
-  background: var(--surface);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: none;
-}
-
-.horizon {
-  position: relative;
-
-  margin-inline: calc(50% - 50vw);
-  padding-inline: calc(50vw - 50%);
-  margin-block-start: calc(var(--section-gap) * -1);
-  padding-block: var(--section-gap);
-  min-height: var(--horizon-height);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  isolation: isolate;
-
-  background-color: transparent;
-
-  padding-inline-start: max(calc(50vw - 50%), env(safe-area-inset-left));
-  padding-inline-end: max(calc(50vw - 50%), env(safe-area-inset-right));
-}
-
-.horizon-media,
-.horizon-media video,
-.horizon-media img {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-}
-
-.horizon-media video,
-.horizon-media img {
-  filter: var(--ambient-filter);
-}
-
-.horizon[data-state="yes"] .horizon-media video,
-.horizon[data-state="yes"] .horizon-media img {
-  filter: var(--ambient-filter) brightness(1.08);
-}
-
-.horizon[data-state="no"] .horizon-media video,
-.horizon[data-state="no"] .horizon-media img {
-  filter: var(--ambient-filter) brightness(0.92);
-}
-
-.horizon-media video,
-.horizon-media img {
-  transition: filter var(--duration-panel) var(--ease-out);
-}
-
-.horizon-content {
-  position: relative;
-  width: 100%;
-  max-width: var(--measure-wide);
-  margin-inline: auto;
-  padding-inline: var(--padding);
-}
-
-.ambient-video {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-background);
-  overflow: hidden;
-  pointer-events: none;
-  background: var(--ambient-base);
-  background-size: cover;
-  background-position: center 40%;
-}
-
-.ambient-video__media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
-  object-position: center 40%;
-  opacity: 1;
-
-  filter: var(--ambient-filter);
-  z-index: -1;
-}
-
-.ambient-video.is-fallback .ambient-video__media {
-  display: none;
-}
-
-.ambient-video__tint,
-.ambient-video__overlay,
-.ambient-video__vignette {
-  position: absolute;
-  inset: 0;
-}
-
-.ambient-video__tint,
-.ambient-video__vignette {
-  z-index: 1;
-}
-
-.ambient-video__overlay {
-  background: var(--ambient-scrim);
-}
-
-.ambient-video__vignette {
-  background: radial-gradient(
-    ellipse at center,
-    transparent 38%,
-    rgba(29, 29, 31, 0.04) 76%,
-    var(--ambient-vignette) 100%
-  );
-}
-
-.ambient-video__tint {
-  opacity: 0;
-  transition: opacity var(--duration-panel) var(--ease-out);
-}
-
-.ambient-video[data-state="yes"] .ambient-video__tint {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.ambient-video[data-state="no"] .ambient-video__tint {
-  opacity: 1;
-  background: rgba(29, 29, 31, 0.07);
-}
-
-body.has-ambient-video .dashboard-page {
-  position: relative;
-  z-index: var(--z-content);
-  isolation: isolate;
-}
-
-body[data-ambient="scene"] .dashboard-page,
-body[data-ambient="scene"] .dashboard-section {
   background: transparent;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ambient-video__tint {
-    transition: none;
-  }
+/* Never nest. An inner boundary inside an outer one loses its own edge and
+   keeps only its spacing, so a nesting mistake degrades to the right answer
+   instead of drawing a box inside a box.
+   `.surface-panel` and `.data-table-wrap` are the other two primitives that
+   draw a boundary, so they are absorbed the same way. */
+.press-region .press-region,
+.press-region .surface-panel,
+.press-region .data-table-wrap,
+.surface-panel .surface-panel,
+.surface-panel .press-region {
+  border-color: transparent;
+  background: transparent;
 }
 
-.dashboard-section>.container {
+/* ------------------------------------------------------------------- plates */
+
+/* A printed plate: an image with a cut edge, sitting on the page like a pasted
+   photograph. The ratio is declared by the consumer so the box is reserved
+   before the file arrives and nothing shifts when it does.
+   The ground is the muted paper, so a plate whose image fails to load is still
+   a deliberate tonal block rather than a hole. */
+.press-plate {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--paper-muted);
+  aspect-ratio: var(--plate-ratio, 3 / 2);
+}
+
+.press-plate > img,
+.press-plate > picture,
+.press-plate > picture > img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: var(--plate-position, center);
+}
+
+/* A reserved plate: the slot exists, the box is held, and no file has arrived
+   yet. It reads as a deliberate tint block with a printed edge — the sheet's
+   own fibre showing through a ruled rectangle — rather than as a grey void or
+   a stock placeholder. The moment an image is placed inside it, `:empty` stops
+   matching and it becomes an ordinary plate. */
+.press-plate:empty {
+  border: 1px solid var(--rule);
+  background: transparent;
+}
+
+/* A plate whose file did not arrive. The box was reserved before the request
+   was made, so nothing moves; the recessed ground is already painted, so the
+   region is still a deliberate tonal block on the sheet. All that is removed
+   here is the browser's own broken-image glyph, which the page did not draw.
+   The attribute is set by app.js; with no script the plate keeps the glyph and
+   everything else about the page is unchanged. */
+.press-plate[data-plate-failed="true"] > picture,
+.press-plate[data-plate-failed="true"] > img {
+  visibility: hidden;
+}
+
+/* -------------------------------------------------------------------- icons */
+
+/* One family, one geometry. Every icon is a 24-unit square drawn in Phosphor's
+   regular weight — a 1.5px stroke on a 24px grid — so nothing has to be sized
+   or re-weighted per component. The box scales with the text it sits beside and
+   takes its colour from `currentColor`, which is what keeps an icon legible on
+   paper, on a tonal region and on the black field without a single override. */
+.ui-icon {
+  display: inline-block;
+  flex: none;
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  vertical-align: -0.22em;
+  fill: currentColor;
+}
+
+/* Beside a line of running text, where a full 1.25em reads as a bullet. */
+.ui-icon--sm {
+  inline-size: 1em;
+  block-size: 1em;
+  vertical-align: -0.14em;
+}
+
+/* The mark that opens a titled module. It sits on the title's own baseline and
+   takes the muted ink, so it reads as a printer's mark beside the heading
+   rather than as a second, competing heading. */
+.practice-mark {
+  inline-size: 1em;
+  block-size: 1em;
+  margin-inline-end: 0.45em;
+  color: var(--ink-muted);
+  vertical-align: -0.1em;
+}
+
+/* --------------------------------------------------------- dashboard shell */
+
+.dashboard-section > .container {
   margin: 0 auto;
 }
 
@@ -554,66 +155,89 @@ body[data-ambient="scene"] .dashboard-section {
   width: min(100%, var(--measure-wide));
 }
 
-.home-page .dashboard-head,
-.home-page .dashboard-answer-status {
-  width: min(100%, 760px);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.home-page .dashboard-current {
-  width: 100%;
-}
-
 .dashboard-head {
-  text-align: center;
   margin-bottom: var(--space-5);
 }
 
 .dashboard-kicker {
   margin: 0 0 var(--space-1);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-family: var(--font-data);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
 }
 
 .dashboard-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: clamp(1.75rem, 3vw, var(--text-page-title));
-  font-weight: var(--weight-body);
-  line-height: 1.12;
+  font-size: var(--text-page-title);
+  font-weight: var(--weight-strong);
+  line-height: var(--leading-title);
   letter-spacing: 0;
 }
 
+/* ------------------------------------------------------- reader preferences */
+
+/* The fibre is the one decorative layer on the page, so it is also the first
+   thing to go when a reader asks for a plainer surface. The paper underneath is
+   a solid colour and loses nothing. */
 @media (prefers-reduced-transparency: reduce) {
-  .is-floating {
-    background: var(--surface);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+  body::before {
+    display: none;
   }
 }
 
 @media (prefers-contrast: more) {
-  .is-floating {
-    border-color: var(--ink);
-    background: var(--surface);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-
-  .surface-panel {
-    border-color: var(--ink-muted);
-  }
-
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .horizon-media video {
+  body::before {
     display: none;
   }
 
-  .horizon-media img {
-    display: block;
+  .press-region {
+    border-color: var(--ink);
   }
+
+  .press-plate {
+    border: 1px solid var(--ink);
+  }
+}
+
+@media (forced-colors: active) {
+  body::before {
+    display: none;
+  }
+
+  .ui-icon {
+    forced-color-adjust: auto;
+    fill: CanvasText;
+  }
+
+  .press-region {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .press-plate {
+    forced-color-adjust: none;
+  }
+}
+
+/* Save-Data readers get the flat ground with no decorative fibre request. */
+@media (prefers-reduced-data: reduce) {
+  body::before {
+    display: none;
+  }
+}
+
+@media print {
+  body::before {
+    display: none;
+  }
+
+  main {
+    background: #fff;
+  }
+
 }

@@ -15,12 +15,15 @@
   transform: translateY(-0.03em);
 }
 
+/* The wordmark is the one place the display face carries the product's name.
+   It is drawn in Unbounded at the heavy display step — the project's own
+   choice, not lettering traced from any reference. */
 .brand-wordmark {
   font-family: var(--font-display);
-  font-size: var(--text-subtitle);
-  line-height: 1.4;
-
-  letter-spacing: 0;
+  font-size: var(--text-component);
+  font-weight: var(--weight-display);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-display);
   white-space: nowrap;
 }
 
@@ -32,17 +35,42 @@
   color: var(--ink);
 }
 
+/* An opening lockup, one step up from the header's. */
 .brand-lockup--lead .brand-wordmark {
-  font-size: 1.75rem;
+  font-size: var(--text-title);
+}
+
+/* The auth lockup sits above the form, with a readable symbol and wordmark. */
+.brand-lockup--masthead {
+  display: flex;
+  align-items: center;
+  gap: clamp(var(--space-2), 1.4vw, var(--space-4));
+  color: var(--ink);
+}
+
+.brand-lockup--masthead .brand-wordmark {
+  font-family: var(--font-display);
+
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: var(--weight-display-heavy);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+}
+
+.brand-lockup--masthead .brand-symbol {
+  width: 2rem;
+  height: 2rem;
+  transform: none;
 }
 
 @media (max-width: 480px) {
   .brand-wordmark {
-    font-size: var(--text-subtitle);
+    font-size: var(--text-control);
   }
 
   .brand-lockup--lead .brand-wordmark {
-    font-size: 1.5rem;
+    font-size: var(--text-component);
   }
 }
 

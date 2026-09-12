@@ -90,6 +90,42 @@ function baseRules(owners, selector) {
   });
 }
 
+/**
+ * Target size. WCAG 2.2's 44x44 bar applies to controls the reader has to aim
+ * at. It explicitly exempts a link inside a sentence, whose size is set by the
+ * surrounding line-height — enlarging those would break the prose they live in.
+ * Every control that is *not* inline text is held to the floor in both axes.
+ */
+describe("every aimed control clears the target floor in both axes", () => {
+  const AIMED = [
+    ["public/styles/components/status.css", ".segmented-option"],
+    ["public/styles/home/dashboard.css", ".leaderboard-user"],
+    ["public/styles/components/feed.css", ".prayer-item-author"],
+    ["public/styles/components/buttons.css", ".ui-button"],
+  ];
+
+  it("sets a floor on height and width, not only on height", () => {
+    for (const [file, selector] of AIMED) {
+      const css = readFileSync(path.join(appRoot, file), "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "");
+      const block = (css.match(new RegExp(`(?:^|\\n|,)\\s*${selector.replace(".", "\\.")}\\s*,?[^{]*\\{([^}]*)\\}`)) || [])[1] || "";
+
+      assert.ok(block, `${file} must still style ${selector}`);
+      assert.match(block, /min-height:\s*var\(--tap-min\)/, `${selector} has no height floor`);
+      assert.match(block, /min-width:\s*var\(--tap-min\)/, `${selector} has no width floor`);
+    }
+  });
+
+  it("leaves an inline link in a sentence alone, as the guideline requires", () => {
+    // `.link` is the inline prose link. Giving it a 44px box would push the
+    // words around it apart; WCAG 2.2 SC 2.5.8 exempts exactly this case.
+    const shell = readFileSync(path.join(publicDir, "styles", "shell.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    const block = (shell.match(/(?:^|\n|,)\s*\.link\s*,?[^{]*\{([^}]*)\}/) || [])[1] || "";
+
+    assert.doesNotMatch(block, /min-height:\s*var\(--tap-min\)/, "an inline link must not be boxed to 44px");
+  });
+});
+
 describe("interaction state ownership", () => {
   const components = [
     ["settings", ".settings-answer-button"],
@@ -146,32 +182,54 @@ describe("interaction state ownership", () => {
     assert.match(css, /\.settings-answer-no\[aria-pressed="true"\]/);
   });
 
-  it("keeps selected Yes and No full green and red, borderless and icon-free", () => {
+  it("marks a recorded Yes or No with the ink field and a printed check, not a hue", () => {
+    // Superseded 2026-09-12: "full green and red, borderless and icon-free".
+    // The press has one ink, so a fill cannot say which answer was given and a
+    // fill alone cannot even say that an answer *was* given — hover, focus and
+    // disabled all darken a surface too. So the answer is carried by the word,
+    // which is the largest thing on the module, and the selection is carried by
+    // the ink field plus a check mark that no other state can produce.
     for (const file of ["pages/settings.css", "pages/daily-check-in.css"]) {
       const css = stripComments(style(file));
-      const yes = css.match(/\.(settings-answer-yes|dashboard-action-yes)\[aria-pressed="true"\][^{]*{([^}]*)}/)?.[2] || "";
-      const no = css.match(/\.(settings-answer-no|dashboard-action-no)\[aria-pressed="true"\][^{]*{([^}]*)}/)?.[2] || "";
+      const selected = /\.(settings-answer|dashboard-action)-(yes|no)\[aria-pressed="true"\]/;
 
-      const fill = (declaration, token) =>
-        new RegExp(`background:\\s*var\\(--(${token}|state-fill)\\)`).test(declaration)
-        && new RegExp(`--state-fill:\\s*var\\(--${token}\\)`).test(css) === /state-fill/.test(declaration);
+      const block = css.match(new RegExp(`${selected.source}[^{]*{([^}]*)}`))?.[3] || "";
+      assert.match(
+        block,
+        /background:\s*var\(--(ink|state-fill)\)/,
+        `${file}: a recorded answer must be the ink field, got: ${block.trim()}`,
+      );
+      assert.match(block, /border:\s*0|border-color:\s*transparent/, `${file}: a recorded answer has no border`);
+      assert.match(block, /position:\s*relative/, `${file}: the field must anchor its own mark`);
 
-      assert.ok(fill(yes, "success"), `${file}: selected Yes must be full green, got: ${yes.trim()}`);
-      assert.ok(fill(no, "danger"), `${file}: selected No must be full red, got: ${no.trim()}`);
-      assert.match(yes, /border:\s*0|border-color:\s*transparent/, `${file}: selected Yes must have no border`);
-      assert.match(no, /border:\s*0|border-color:\s*transparent/, `${file}: selected No must have no border`);
-      assert.doesNotMatch(yes, /content:\s*"/, `${file}: selected Yes must have no icon`);
-      assert.doesNotMatch(no, /content:\s*"/, `${file}: selected No must have no icon`);
+      // The mark itself, and on *both* halves of the pair — a check on only the
+      // Yes is how this silently regresses.
+      for (const half of ["yes", "no"]) {
+        const mark = css.match(
+          new RegExp(`\\.(?:settings-answer|dashboard-action)-${half}\\[aria-pressed="true"\\]::after[^{]*{([^}]*)}`),
+        )?.[1];
+        assert.ok(mark, `${file}: selected ${half} carries no recorded mark`);
+        assert.match(mark, /border-inline-end:[^;]*currentColor/, `${file}: the ${half} mark must be drawn in two strokes`);
+        assert.match(mark, /border-block-end:[^;]*currentColor/, `${file}: the ${half} mark must be drawn in two strokes`);
+        assert.match(mark, /position:\s*absolute/, `${file}: the ${half} mark must not affect layout`);
+      }
     }
   });
 
-  it("never lets hover repaint a selected answer", () => {
-    const css = stripComments(style("pages/settings.css"));
-    assert.doesNotMatch(
-      css,
-      /\[aria-pressed="true"\]:hover\s*{[^}]*background:\s*(?!var\(--success\)|var\(--danger\))/,
-      "hovering a chosen answer must keep its semantic fill",
-    );
+  it("never lets hover repaint or impersonate a selected answer", () => {
+    for (const file of ["pages/settings.css", "pages/daily-check-in.css"]) {
+      const css = stripComments(style(file));
+      assert.doesNotMatch(
+        css,
+        /\[aria-pressed="true"\]:hover\s*{[^}]*background:\s*(?!var\(--ink\)|var\(--state-fill\))/,
+        `${file}: hovering a chosen answer must keep its ink field`,
+      );
+      // Every hover rule on these controls is scoped away from the selected
+      // state, so a hover can never paint the field a selection uses.
+      for (const [, body] of css.matchAll(/:hover(\([^)]*\))?[^{]*{([^}]*)}/g)) {
+        assert.doesNotMatch(body || "", /background:\s*var\(--ink\)\s*;/, `${file}: hover must not paint the ink field`);
+      }
+    }
   });
 
   it("gates every hover-only rule behind a fine pointer", () => {
@@ -360,9 +418,15 @@ describe("interaction state ownership", () => {
   });
 
   it("gives every filled control a ring it can actually be seen against", () => {
+    // The destructive control left this list on 2026-09-12: it is no longer a
+    // filled button. A red fill cannot mark danger in a monochrome system and a
+    // black one would make it look like the primary action, so it is now a
+    // paper-ground control closed with a heavy ink rule — and a white ring on
+    // paper is no ring at all, which is why it takes the ordinary ink ring and
+    // is asserted separately below.
     const filled = [
       ["components/buttons.css", ".ui-button--primary:focus-visible"],
-      ["components/buttons.css", ".ui-button--danger:focus-visible"],
+      ["components/buttons.css", ".ui-button--accent:focus-visible"],
       ["pages/daily-check-in.css", '.dashboard-action[aria-pressed="true"]:focus-visible'],
       ["pages/settings.css", '.settings-answer-yes[aria-pressed="true"]:focus-visible'],
     ];
@@ -374,6 +438,20 @@ describe("interaction state ownership", () => {
       const body = css.slice(index).match(/{([^}]*)}/)?.[1] || "";
       assert.match(body, /outline-color:\s*var\(--focus-ring-on-deep\)/, `${selector} needs the light ring`);
     }
+
+    // And the paper-ground destructive control keeps the ink ring: it must not
+    // have been given the light one by inheriting the filled group's rule.
+    const buttons = stripComments(style("components/buttons.css"));
+    assert.doesNotMatch(
+      buttons,
+      /\.ui-button--danger:focus-visible[^{]*{[^}]*outline-color:\s*var\(--focus-ring-on-deep\)/,
+      "a white ring on a paper control is not a ring",
+    );
+    assert.doesNotMatch(
+      buttons.match(/\.ui-button--primary:focus-visible,\s*\.ui-button--accent:focus-visible[^{]*{[^}]*}/)?.[0] || "",
+      /--danger/,
+      "the destructive control must not be grouped with the filled controls' ring",
+    );
   });
 
   it("keeps a visible 2px focus ring distinct from hover", () => {

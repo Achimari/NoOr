@@ -1,71 +1,113 @@
 # Achimari webfonts — provenance and licence status
 
 This directory is the only place the product loads fonts from. Every declared
-face is self-hosted and same-origin; the application makes no third-party font
-request.
+face is self-hosted, same-origin and WOFF2; the application makes no font
+request to Google Fonts or any other third-party origin. `variables.css` is the
+only file that declares an `@font-face`, and `test/typography-contract.test.js`
+parses the shipped binaries to prove that what the stylesheet promises is what
+the files actually deliver.
 
-## Active face
+## Active faces — Sacred Press
 
-| Family | Role | File status | Licence |
+Four semantic roles, drawn from three families. The role a piece of text has
+decides its family; nothing picks a font by taste.
+
+| Role | Family | Files | Licence |
 | --- | --- | --- | --- |
-| Achimari Hand | All website typography | **Generated** as `achimari-hand/AchimariHand-Regular.otf` | SIL Open Font License 1.1 |
+| display | Unbounded Variable | `unbounded/Unbounded-Variable.woff2` | SIL Open Font License 1.1 |
+| UI | IBM Plex Sans Condensed | `ibm-plex-sans-condensed/IBMPlexSansCondensed-{Regular,SemiBold}.woff2` | SIL Open Font License 1.1 |
+| body / reading | IBM Plex Sans | `ibm-plex-sans/IBMPlexSans-{Regular,SemiBold}.woff2` | SIL Open Font License 1.1 |
+| data | IBM Plex Mono | `ibm-plex-mono/IBMPlexMono-{Regular,SemiBold}.woff2` | SIL Open Font License 1.1 |
 
-Achimari Hand follows the project owner's supplied specimen: a thin, upright
-handwritten face. Because the specimen is a flat image rather than editable
-outlines, the generated font uses the OFL-licensed Handlee Regular as its
-construction source, with renamed metadata, specimen-matched proportions,
-additional specimen glyphs, and true CFF/OpenType outlines.
+**display** carries the wordmark, `h1`, a selected `h2` and a small number of
+major editorial numerals — never a label, a button, a form or a table. The
+contract keeps that list closed. **UI** is condensed because the interface is
+dense and the page is not. **body** is the wider face, used where prose has to
+be read in quantity. **data** is monospaced, so a column of figures lines up and
+a counting number stops jumping.
 
-The active file is **version 2.000**, a screen-optimised revision. Version 1.000
-was built at 96% width, which thinned every stroke to roughly one CSS pixel at
-interface sizes and left OS/2 x-height, cap-height and all CFF hinting data
-empty. Version 2.000 is built at natural width with a small deterministic
-outline dilation, and carries measured vertical metrics plus CFF alignment zones
-and stem widths. Counters are wider than 1.000's, not narrower. Per-glyph
-autohinting is available behind `--autohint` but is not in the shipped file;
-`achimari-hand/SOURCE.md` records why.
-Full technical provenance, the candidate comparison and the reproducible build
-command are in `achimari-hand/SOURCE.md`; the complete licence is in
-`achimari-hand/OFL.txt`.
+Every face covers Latin and Cyrillic, so English and Russian are both set in the
+real family rather than falling through to a system fallback. The contract
+asserts full A–Z, А–Я, digits and interface punctuation against each binary's
+own `cmap`.
 
-The resulting Regular face contains Latin Extended characters and the specimen's
-math and punctuation additions. Unsupported scripts, including Cyrillic, fall
-through to the generic `cursive` fallback instead of displaying missing-glyph
-boxes; that fallback exists only for load failure and missing glyphs, and is
-never selected as an interface font. No bold or italic face is invented by the
-browser: `font-synthesis: none` is set globally, because the family ships one
-real 400 weight.
+### Weights
 
-## Inactive owner-supplied files
+IBM Plex ships static 400 and 600 faces here, and those are the only two weights
+any Plex role may request. Unbounded ships as one variable file whose weight
+axis runs 400–900, so both display steps (700 and 800) are real interpolated
+instances. `font-synthesis: none` is set globally, so the browser never invents
+a weight or a slant, and no role can quietly resolve to a smeared outline.
 
-The earlier `Kitaro Road` and `Sagfield` files remain untouched in their
-directories so owner-supplied assets are not destroyed. They are no longer
-declared by CSS or used by any typography role. Their external web-licence status
-was not verified in this repository, so they should remain inactive unless the
-owner confirms the appropriate licences.
+## Licences
+
+The complete SIL Open Font License 1.1 text is kept beside each family:
+
+- `unbounded/OFL.txt` — from `google/fonts`, `ofl/unbounded/OFL.txt`
+- `ibm-plex-sans/LICENSE.txt`, `ibm-plex-sans-condensed/LICENSE.txt`,
+  `ibm-plex-mono/LICENSE.txt` — from `IBM/plex`, `LICENSE.txt`
+
+Both projects are OFL 1.1, which permits self-hosting, subsetting and format
+conversion provided the licence travels with the files. It does, above.
+
+## Provenance and SHA-256 manifest
+
+IBM publishes built WOFF2 upstream, so those six files are vendored byte for
+byte. Google publishes Unbounded as a variable TTF only, so it is converted
+locally with fontTools, subset to Latin and Cyrillic plus the punctuation both
+need, and clamped to the 400–900 band the display role uses. It remains a
+variable font.
+
+| SHA-256 | Bytes | File |
+| --- | ---: | --- |
+| `a71a56e516751883cb7877112d39f9c13b92c2dc15caaf00277b7f9d941d673a` | 63,228 | `ibm-plex-sans-condensed/IBMPlexSansCondensed-Regular.woff2` |
+| `385a082a1eac88343eab01fb6746be04b7175dacaf4550b17dee76ea0f78126d` | 66,040 | `ibm-plex-sans-condensed/IBMPlexSansCondensed-SemiBold.woff2` |
+| `ba711a3085ff9f27440b6b9c4550cfc47c97bf36591d5da958b975bb3add8c1a` | 63,020 | `ibm-plex-sans/IBMPlexSans-Regular.woff2` |
+| `f78048030eab62e860efa39a0df79e2e5581bf122eb95b9bc42c0b8a4988d205` | 67,060 | `ibm-plex-sans/IBMPlexSans-SemiBold.woff2` |
+| `ba204497f16b6d334cee9d1e963a831b73e3a56e1d6300a8489d18df7214b350` | 49,248 | `ibm-plex-mono/IBMPlexMono-Regular.woff2` |
+| `6a825b4824c01cbb401e829e5a066a1818411bcb3538b5a5792c5ca9b82343c3` | 50,600 | `ibm-plex-mono/IBMPlexMono-SemiBold.woff2` |
+| `5f2208b6f4c722f7439428f473c6989f1bf405801f130ba5ffd73b3ee383cac6` | 51,440 | `unbounded/Unbounded-Variable.woff2` |
+
+The Unbounded source that conversion starts from is
+`google/fonts` `ofl/unbounded/Unbounded[wght].ttf`, version 1.701, SHA-256
+`323b511be380c8d474ef030686b71aedde501f8d9cd46da558b7c40454372c3f`.
+
+Total shipped type payload: **410 KB** across seven files, of which 51 KB is the
+display face. Two are preloaded — the condensed UI Regular, which the first
+painted text is set in, and the display variable file, which draws the largest
+text on screen. Nothing else is preloaded.
 
 ## Rebuilding
 
-From `Node/app`, run:
+From `Node/app`:
 
 ```sh
 python3.11 -m pip install -r scripts/font-requirements.txt
-python3.11 scripts/build-achimari-font.py
+python3.11 scripts/vendor-sacred-press-fonts.py
 ```
 
-The build takes under a second and is byte-deterministic. Then run `npm test`
-and `npm run build:assets`. The typography contract parses the shipped binary
-and verifies that it has the CFF/OpenType `OTTO` signature, carries version
-2.000, real OS/2 x-height and cap-height, CFF alignment zones matching those
-measured heights, stem widths, is loaded locally with `font-display: swap`, and
-owns every website typography role.
+The build is byte-deterministic: `head.created` and `head.modified` are pinned
+to a constant and timestamp recalculation is switched off, so two runs of the
+same source produce identical bytes and the manifest above stays checkable. The
+script prints the manifest it just wrote; if a digest here disagrees with it,
+one of the two is wrong and neither should be trusted until that is resolved.
 
-For a browser-level check that the face actually rasterises rather than silently
-falling back, run the app and then:
+Then run `npm test` and `npm run build:assets`.
 
-```sh
-ACHIMARI_BASE_URL=http://127.0.0.1:3002 python3.11 scripts/verify-achimari-font-browser.py
-```
+## Retired faces
 
-It drives Chromium at 320/390/768/1024/1440px and at device-pixel ratios 1 and 2,
-and writes screenshots for inspection.
+**Achimari Hand** was the single handwritten family that carried every visible
+role before the Sacred Press overhaul recorded in `CONSTRAINTS.md` on
+2026-09-11. It is no longer declared by any stylesheet, requested by any view or
+preloaded by either document shell, and its generated binary has been removed
+from this served path — an unused 51 KB font in a production asset directory is
+a cost with no consumer.
+
+The work is not destroyed: `scripts/build-achimari-font.py` and
+`achimari-hand/SOURCE.md` remain, and the face can be regenerated in under a
+second from pinned dependencies if the owner ever wants it back. Its OFL licence
+text stays in `achimari-hand/OFL.txt`.
+
+**Kitaro Road** and **Sagfield** were owner-supplied commercial faces whose web
+licence status was never verified in this repository. No file for either was
+ever installed here, and none may be downloaded, converted or imitated.

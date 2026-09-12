@@ -6,13 +6,16 @@
   const generalErrors = formErrors.filter((message) => !attributed.has(message));
 %>
 <main id="main-content" tabindex="-1" class="auth-page">
-  <section class="section auth-section">
-    <div class="container auth-container">
-      <div class="auth-brand">
-        <%- include("../../components/ui/brand-mark", { tone: "chrome", size: "lead" }) %>
-      </div>
+  <section class="auth-gateway">
 
-      <form class="auth-card sticker-surface" action="/auth/register" method="post" novalidate>
+    <header class="auth-masthead">
+      <%- include("../../components/ui/brand-mark", { tone: "paper", size: "masthead" }) %>
+    </header>
+
+    <div class="auth-body">
+
+      <div class="auth-form-column">
+        <form class="auth-card press-region" action="/auth/register" method="post" novalidate>
         <header class="auth-head">
           <h1 class="auth-title"><%= t("auth.onboarding.title") %></h1>
           <% if (t("auth.onboarding.subtitle")) { %>
@@ -22,6 +25,7 @@
 
         <% if (generalErrors.length) { %>
           <div class="auth-errors" role="alert">
+            <%- include("../../components/ui/icon", { name: "warning", className: "ui-icon--sm" }) %>
             <% generalErrors.forEach((error) => { %>
               <p><%= error %></p>
             <% }) %>
@@ -42,7 +46,7 @@
             required
           />
           <% if ((byField.name || []).length) { %>
-            <p class="field-error" id="onboarding-name-error"><%= byField.name.join(" ") %></p>
+            <p class="field-error" id="onboarding-name-error"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= byField.name.join(" ") %></p>
           <% } %>
         </div>
 
@@ -61,7 +65,7 @@
           />
           <p class="field-hint" id="password-hint"><%= t("auth.onboarding.passwordHint") %></p>
           <% if ((byField.password || []).length) { %>
-            <p class="field-error" id="onboarding-password-error"><%= byField.password.join(" ") %></p>
+            <p class="field-error" id="onboarding-password-error"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= byField.password.join(" ") %></p>
           <% } %>
         </div>
 
@@ -77,15 +81,17 @@
             required
           />
           <% if ((byField.passwordConfirmation || []).length) { %>
-            <p class="field-error" id="onboarding-confirm-error"><%= byField.passwordConfirmation.join(" ") %></p>
+            <p class="field-error" id="onboarding-confirm-error"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= byField.passwordConfirmation.join(" ") %></p>
           <% } %>
         </div>
 
         <div class="auth-actions">
-          <button class="ui-button ui-button--primary auth-submit" type="submit"><%= t("auth.onboarding.submit") %></button>
-          <a class="ui-button ui-button--secondary auth-secondary" href="/login"><%= t("auth.onboarding.loginLink") %></a>
+          <button class="ui-button ui-button--accent auth-submit" type="submit"><%= t("auth.onboarding.submit") %><%- include("../../components/ui/icon", { name: "arrow-right", className: "ui-icon--sm" }) %></button>
+          <a class="ui-button ui-button--quiet auth-secondary" href="/login"><%= t("auth.onboarding.loginLink") %></a>
         </div>
-      </form>
+        </form>
+      </div>
+
     </div>
   </section>
 </main>

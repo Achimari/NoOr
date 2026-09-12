@@ -4,8 +4,8 @@
   "id": "/",
   "start_url": "/daily-check-in",
   "display": "standalone",
-  "background_color": "#f6f6f6",
-  "theme_color": "#111111",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "/brand/achimari-mark-192.png",

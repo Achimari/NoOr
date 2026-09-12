@@ -1,5 +1,3 @@
-
-
 .progress-page {
   background: transparent;
 }
@@ -41,7 +39,7 @@
   margin-block-start: 2px;
   color: var(--ink-secondary-strong);
   font-family: var(--font-data);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -117,7 +115,7 @@
   padding: 0;
   list-style: none;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
 }
 
 .ledger-legend-item {
@@ -270,7 +268,7 @@
   /* Each row is its own grid, so the value column is reserved rather than
      sized to its content: otherwise a "No answers" row would widen its track
      and the seven bars would stop sharing one right edge. */
-  grid-template-columns: 6.5rem 3.75rem minmax(0, 1fr) 11rem;
+  grid-template-columns: 6.5rem 3.75rem minmax(0, 1fr) 14rem;
   align-items: center;
   gap: var(--space-2) var(--space-4);
   min-width: 0;
@@ -289,7 +287,7 @@
 .weekday-share {
   color: var(--ink);
   font-family: var(--font-data);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-variant-numeric: tabular-nums;
   text-align: end;
 }
@@ -297,9 +295,11 @@
 .weekday-values {
   color: var(--ink-secondary-strong);
   font-family: var(--font-data);
-  font-size: var(--text-micro);
+  font-size: var(--text-control);
   font-variant-numeric: tabular-nums;
+  line-height: var(--leading-control);
   text-align: end;
+  white-space: nowrap;
 }
 
 .prayer-world {
@@ -400,14 +400,13 @@
   border: 1px solid var(--border-subtle);
   border-radius: 50%;
 
-  /* Quieter ink than the old near-black sphere: the decoration must not outweigh
-     the reader's own comparison at the top of the section. */
-  background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.18), transparent 26%),
-    linear-gradient(135deg, #5a5a56 0%, #43433f 48%, #2a2a27 100%);
-  box-shadow:
-    inset -28px -36px 60px rgba(0, 0, 0, 0.34),
-    inset 16px 14px 32px rgba(255, 255, 255, 0.05);
+  /* An engraved globe, not a rendered sphere. The lit graphite ball this
+     replaced was the last shaded object on the sheet: two gradients and two
+     inset glows pretending at a light source the rest of the page does not
+     have. A press draws a globe with a rule, a graticule and a stippled
+     landmass, and that is what this is now — white paper inside a printed
+     circle, with every land shape reading as ink. */
+  background: var(--paper);
 }
 
 .prayer-globe::before,
@@ -415,7 +414,7 @@
   content: "";
   position: absolute;
   inset: 15%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--rule);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -431,17 +430,22 @@
 .prayer-globe-shine {
   position: absolute;
   inset: 0;
+  /* The graticule: meridians and parallels, printed as hairlines. */
   background:
-    repeating-linear-gradient(90deg, transparent 0 31px, rgba(255, 255, 255, 0.032) 32px, transparent 33px),
-    repeating-linear-gradient(0deg, transparent 0 31px, rgba(255, 255, 255, 0.028) 32px, transparent 33px);
-  opacity: 0.6;
+    repeating-linear-gradient(90deg, transparent 0 31px, var(--rule) 32px, transparent 33px),
+    repeating-linear-gradient(0deg, transparent 0 31px, var(--rule) 32px, transparent 33px);
+  border-radius: 50%;
+  opacity: 0.9;
 }
 
 .prayer-globe-land {
   position: absolute;
   display: block;
-  background: rgba(255, 255, 255, 0.16);
-  opacity: 0.76;
+  /* Land is stippled ink, the way a printed map fills a landmass. */
+  background-color: transparent;
+  background-image: radial-gradient(var(--ink) 0.9px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.85;
 }
 
 .prayer-globe-land-americas {
@@ -495,14 +499,17 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--ink-quiet) 55%, var(--white));
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink-quiet) 22%, transparent);
+  /* A region with prayers is an open ring; the active one is struck solid and
+     given a wider halo, so the two read apart on a monochrome sheet and at a
+     glance. The same regions are named in the list beside the globe. */
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
   transform: translate(-50%, -50%) scale(var(--point-scale, 1));
 }
 
 .prayer-globe-point.is-active {
-  background: var(--white);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--ink-quiet) 30%, transparent);
+  background: var(--ink);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 4.5px var(--ink);
 }
 
 /* --- responsive ----------------------------------------------------------- */

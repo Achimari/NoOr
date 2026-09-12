@@ -8,24 +8,6 @@
 
 .help-head { padding-bottom: var(--space-4); }
 
-.help-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3vw, var(--text-page-title));
-  font-weight: var(--weight-body);
-  line-height: 1.15;
-  letter-spacing: 0;
-  color: var(--text-primary);
-}
-
-.help-intro {
-  margin: var(--space-3) 0 0;
-  max-width: var(--measure-prose);
-  color: var(--ink-on-sky);
-  font-size: var(--text-body);
-  line-height: var(--leading-body);
-}
-
 .help-toc {
   padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border-subtle);
@@ -36,7 +18,7 @@
 .help-toc-title {
   margin: 0 0 var(--space-3);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -85,7 +67,7 @@
 
 @supports not (backdrop-filter: blur(4px)) {
   .help-section {
-    background: rgba(255, 255, 255, 0.985);
+    background: var(--paper);
   }
 }
 
@@ -163,7 +145,7 @@
 
 .help-table thead th {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -191,7 +173,7 @@
 .help-figure figcaption {
   margin-top: var(--space-3);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   line-height: 1.5;
 }
 
@@ -228,4 +210,3 @@
 @media (max-width: 560px) {
   .help-toc { padding: var(--space-3) var(--space-4); }
 }
-

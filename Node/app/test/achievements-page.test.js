@@ -5,6 +5,8 @@ import { describe, it } from "node:test";
 import vm from "node:vm";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 import pageRoutes from "../src/routes/pageRoutes.js";
 import { renderAchievementsPage } from "../src/controllers/achievementController.js";
 import { getPageAssets } from "../src/middleware/viewLocals.js";
@@ -66,6 +68,7 @@ async function buildView(options) {
 
 async function renderContent(achievements) {
   return ejs.renderFile(contentPath, {
+    ...sharedViewLocals,
     achievements,
     t: () => "",
     siteData: { socialLinks: [] },
@@ -282,6 +285,7 @@ describe("achievements page markup", () => {
 describe("achievement seal component", () => {
   async function renderSeal(locals) {
     return ejs.renderFile(sealPath, {
+    ...sharedViewLocals,
       iconKey: "first-step",
       status: ACHIEVEMENT_STATUS.EARNED,
       percent: 100,
@@ -330,6 +334,7 @@ describe("achievement seal component", () => {
 describe("achievements navigation", () => {
   async function renderHeader(currentPath) {
     return ejs.renderFile(headerPath, {
+    ...sharedViewLocals,
       currentPath,
       pageId: "achievements",
       auth: { id: 3, timezone: "Europe/Riga", isTelegramLinked: false },

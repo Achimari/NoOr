@@ -14,12 +14,16 @@
   display: none;
 }
 
+/* A tab in a segmented control is a real target in both axes, not just in
+   height: "Bible" is a short word and would otherwise sit at 35px wide. */
 .segmented-option {
   flex: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: var(--tap-min);
-  padding: 0;
+  min-width: var(--tap-min);
+  padding-inline: var(--space-2);
   border-block-end: 2px solid transparent;
   color: var(--ink-muted);
   font-size: var(--text-body);
@@ -69,7 +73,7 @@
 .inline-meter-value {
   flex: none;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
 }
 
 .status-text {
@@ -80,17 +84,38 @@
   font-weight: var(--weight-body);
 }
 
+/* ------------------------------------------------------- monochrome states */
+
+/* Success and failure are the same ink now, so neither may be recognised by
+   its colour. Each carries its own mark instead — a check for a confirmation,
+   a struck bar for a failure — and the text beside it always says which, so a
+   state survives greyscale, a monochrome display and any colour vision
+   deficiency identically. `test/monochrome-states.test.js` holds this. */
 .status-text--success {
   color: var(--success);
+  font-weight: var(--weight-strong);
 }
 
 .status-text--danger {
   color: var(--danger);
+  font-weight: var(--weight-strong);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 3px solid var(--danger-line);
 }
 
 .status-text--quiet {
   color: var(--ink-muted);
   font-weight: var(--weight-body);
+}
+
+/* The mark that opens a state message. It is drawn, not coloured: the check is
+   two strokes and the failure is a bar with a gap, so the two are different
+   shapes at any size and in forced colours. */
+.status-mark {
+  flex: none;
+  align-self: center;
+  inline-size: 1em;
+  block-size: 1em;
 }
 
 .status-dot {
@@ -100,6 +125,12 @@
   align-self: center;
   border-radius: 50%;
   background: currentColor;
+}
+
+/* An open ring is "not yet"; a filled disc is "now". Two shapes, one ink. */
+.status-dot--pending {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px currentColor;
 }
 
 .availability-row {
@@ -159,9 +190,19 @@
   background: var(--surface-subtle);
 }
 
+/* A failure notice is closed with the ink itself on its leading edge, where an
+   attention notice is closed with a hairline. The weight of that rule is the
+   difference, and it is measured rather than decorative. */
 .notice--danger {
-  border-color: color-mix(in srgb, var(--danger) 34%, transparent);
+  border-color: var(--rule);
+  border-inline-start: 3px solid var(--danger-line);
   background: var(--danger-soft);
+}
+
+.notice--success {
+  border-color: var(--rule);
+  border-inline-start: 1px solid var(--success-line);
+  background: var(--success-soft);
 }
 
 .notice-title {

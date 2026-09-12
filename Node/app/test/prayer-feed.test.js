@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 const partialPath = fileURLToPath(
   new URL("../src/views/pages/partials/prayers-table.ejs", import.meta.url),
 );
@@ -23,7 +25,8 @@ function prayer(overrides = {}) {
 }
 
 async function render(locals) {
-  return ejs.renderFile(partialPath, { prayers: [prayer()], ...locals });
+  return ejs.renderFile(partialPath, {
+    ...sharedViewLocals, prayers: [prayer()], ...locals });
 }
 
 describe("prayer feed", () => {
@@ -63,7 +66,8 @@ describe("prayer feed", () => {
   });
 
   it("states what is empty and what happens next", async () => {
-    const html = await ejs.renderFile(partialPath, { prayers: [], listType: "active", showActions: true });
+    const html = await ejs.renderFile(partialPath, {
+    ...sharedViewLocals, prayers: [], listType: "active", showActions: true });
 
     assert.match(html, /No active prayer requests/);
     assert.match(html, /Requests you share appear here until they are answered\./);

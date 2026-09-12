@@ -5,14 +5,28 @@
 }
 
 .settings-group {
-
+  display: grid;
+  gap: var(--space-4) var(--space-6);
+  align-items: start;
   padding: clamp(var(--space-4), 2.4vw, var(--space-5));
+  margin-block-end: var(--space-4);
 
-  /* Surface delegated to .sticker-surface — see daily-check-in.css. */
+  /* Surface delegated to .press-region — see daily-check-in.css. */
+}
+
+.settings-group-heading .settings-group-title {
+  margin-block-end: var(--space-2);
+}
+
+.settings-group-heading .settings-group-note {
+  margin: 0;
 }
 
 .settings-form {
-  display: block;
+  display: grid;
+  gap: var(--space-4);
+  align-items: end;
+  min-width: 0;
 }
 
 .settings-group .settings-row {
@@ -23,8 +37,81 @@
   padding-inline: var(--space-4);
 }
 
+.settings-form .settings-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  padding-block: 0;
+  border-block-start: 0;
+}
+
+.settings-form .settings-row-label {
+  flex: none;
+}
+
+.settings-form .settings-row-control {
+  width: 100%;
+}
+
+.settings-form .settings-row--actions {
+  align-items: flex-start;
+}
+
+.settings-form--account .settings-input,
+.settings-form--account .ui-button--large {
+  width: 100%;
+}
+
+.settings-answers .settings-row-label {
+  flex-basis: 100%;
+}
+
+.settings-answers .settings-row--stacked {
+  align-items: center;
+}
+
+@media (min-width: 760px) {
+  .settings-form--account {
+    grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+  }
+
+  .settings-form--password {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .settings-form--password .settings-row--actions {
+    grid-column: 1 / -1;
+  }
+
+  .settings-answers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-answers .settings-row + .settings-row {
+    border-block-start: 0;
+    border-inline-start: 1px solid var(--separator);
+  }
+}
+
+@media (min-width: 1000px) {
+  .settings-group {
+    grid-template-columns: 13rem minmax(0, 1fr);
+  }
+}
+
 .settings-input {
-  width: min(100%, 22rem);
+  width: min(100%, 28rem);
+  min-height: 56px;
+  padding-inline: var(--space-4);
+  font-size: var(--text-body);
+}
+
+.settings-page .ui-button--large {
+  min-width: min(100%, 16rem);
+  min-height: 56px;
+  padding-inline: var(--space-6);
+  font-size: var(--text-body);
 }
 
 .settings-row--actions {
@@ -52,22 +139,25 @@
 
 .settings-answer-actions {
   display: flex;
+  width: 100%;
   gap: var(--space-2);
 }
 
 .settings-answer-button {
   display: inline-flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  min-width: 72px;
-  min-height: var(--tap-min);
-  padding-inline: var(--space-4);
+  min-width: 96px;
+  min-height: 56px;
+  padding-inline: var(--space-5);
+  padding-inline-end: calc(var(--space-5) + var(--space-4));
   border: 1px solid var(--border-control);
   border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: var(--text-control);
+  font-size: var(--text-body);
   font-weight: var(--weight-body);
   cursor: pointer;
   transition:
@@ -88,16 +178,37 @@
   transform: scale(0.97);
 }
 
-.settings-answer-yes[aria-pressed="true"] {
+/* The same rule as Today: the recorded answer is the ink field, the answer
+   itself is the word, and the selection carries a printed check. */
+.settings-answer-yes[aria-pressed="true"],
+.settings-answer-no[aria-pressed="true"] {
+  position: relative;
   border: 0;
-  background: var(--success);
+  background: var(--ink);
   color: var(--white);
 }
 
-.settings-answer-no[aria-pressed="true"] {
-  border: 0;
-  background: var(--danger);
-  color: var(--white);
+/* The recorded mark. A selected control in a monochrome system cannot be
+   recognised by its fill alone — a hover, a focus and a disabled state can all
+   darken a surface — so every selected control also carries this printed check
+   in its corner. It is drawn in CSS rather than placed in the markup, because
+   the state already exists in `aria-pressed` and the mark must never be a
+   second source of truth.
+
+   Two strokes, rotated: a real check, not a tick-shaped glyph that disappears
+   in forced colours. */
+.settings-answer-yes[aria-pressed="true"]::after,
+.settings-answer-no[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: var(--space-5);
+  inline-size: 9px;
+  block-size: 16px;
+  border-inline-end: 2.5px solid currentColor;
+  border-block-end: 2.5px solid currentColor;
+  transform: translateY(-50%) rotate(42deg);
+  pointer-events: none;
 }
 
 .settings-answer-button:disabled {
@@ -169,7 +280,7 @@
   border-radius: 999px;
   background: var(--ink-06);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1;
 }
@@ -182,7 +293,7 @@
   display: grid;
   gap: var(--space-2);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -244,7 +355,7 @@
   border-radius: var(--radius-tag);
   background: var(--surface-2);
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
@@ -258,7 +369,7 @@
   background: transparent;
   color: var(--text-primary);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   cursor: pointer;
   transition:

@@ -35,9 +35,9 @@ describe("Today composes each practice as one unit", () => {
     assert.match(
       css,
       /\.today-shell \{[^}]*padding-block-start:\s*0/,
-      "the horizon owns the boundary; the shell must not add a second one",
+      "the opening owns the boundary; the shell must not add a second one",
     );
-    assert.match(css, /\.today-page \.horizon \{[^}]*padding-block-end:\s*var\(--space-5\)/);
+    assert.match(css, /\.today-page \.today-opening \{[^}]*padding-block-end:\s*var\(--space-5\)/);
   });
 
   it("opens each Today chapter with the course rule and its waypoint", () => {
@@ -76,14 +76,14 @@ describe("Settings groups a heading with the rows it names", () => {
 
     assert.doesNotMatch(markup, /class="surface-panel settings-form"/, "no panel nested inside the group panel");
 
-    // The group is a record applied to the page, so its one boundary is now the
-    // shared sticker edge rather than a border restated in the page sheet. The
-    // rule that matters is unchanged: exactly one boundary, owned in one place.
-    assert.match(markup, /<section class="settings-group sticker-surface"/,
+    // The group is one region of the page, so its single boundary is the shared
+    // printed rule rather than a border restated in the page sheet. The rule
+    // that matters is unchanged: exactly one boundary, owned in one place.
+    assert.match(markup, /<section class="settings-group press-region"/,
       "the group itself carries the one boundary");
     assert.match(
       read("public/styles/components/material.css"),
-      /\.sticker-surface\s*\{[^}]*border:\s*1px solid var\(--sticker-edge\)/,
+      /\.press-region\s*\{[^}]*border:\s*1px solid var\(--rule\)/,
       "and that boundary has a single owner",
     );
     assert.doesNotMatch(
@@ -122,6 +122,20 @@ describe("Settings groups a heading with the rows it names", () => {
 
     assert.ok(answerRow, "the bordered answer panel owns explicit row inset spacing");
     assert.match(answerRow, /padding-inline:\s*var\(--space-4\)/);
+  });
+
+  it("gives settings fields and decisions a generous control size", () => {
+    const input = rule("public/styles/pages/settings.css", ".settings-input");
+    const answer = rule("public/styles/pages/settings.css", ".settings-answer-button");
+    const largeAction = rule("public/styles/pages/settings.css", ".settings-page .ui-button--large");
+    const markup = read("src/views/pages/partials/settings-content.ejs");
+
+    assert.match(input, /width:\s*min\(100%, 28rem\)/);
+    assert.match(input, /min-height:\s*56px/);
+    assert.match(answer, /min-width:\s*96px/);
+    assert.match(answer, /min-height:\s*56px/);
+    assert.match(largeAction, /min-height:\s*56px/);
+    assert.equal((markup.match(/ui-button--large/g) || []).length, 2, "both form submit actions use the large button size");
   });
 });
 

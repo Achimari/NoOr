@@ -13,7 +13,7 @@
     <div class="battle-figure-facing">
       <div class="battle-figure-idle">
         <div class="battle-figure-pose">
-          <img class="battle-figure-image" data-character-image alt="" decoding="async" draggable="false" />
+          <img class="battle-figure-image" data-character-image alt="" width="200" height="320" decoding="async" loading="lazy" draggable="false" />
           <span class="battle-figure-silhouettes">
             <% if (side === "you") { %>
               <%- include("./battle-silhouette", { kind: "guardian", uid: "you" }) %>

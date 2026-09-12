@@ -30,7 +30,7 @@
   min-height: 0;
   margin: 0 0 var(--space-4);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   text-align: center;
 }
@@ -94,7 +94,7 @@
 .dashboard-label {
   margin: 0 0 var(--space-1);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -147,7 +147,7 @@
 
 .dashboard-card-head span {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   white-space: nowrap;
 }
@@ -238,12 +238,15 @@
 }
 
 .leaderboard-head-label,
+/* A name in a leaderboard is a link to that member's profile, so it is a real
+   target in both axes — a short name would otherwise be under 44px wide. */
 .leaderboard-user,
 .leaderboard-streak {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 32px;
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
   line-height: 1.4;
 }
 
@@ -272,7 +275,7 @@ a.leaderboard-user {
   border-radius: var(--radius-tag);
   background: var(--danger-tint);
   color: var(--danger);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
   white-space: nowrap;
@@ -313,7 +316,7 @@ a.leaderboard-user {
   background: var(--ink-06);
   color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
   white-space: nowrap;
@@ -358,15 +361,19 @@ a.leaderboard-user {
   transition: color var(--duration-fast) var(--ease-out);
 }
 
+/* A member's name is a link to their profile, so it is a real target in both
+   axes. `min-width: 0` was here to let a long name wrap inside a table cell;
+   `max-width: 100%` plus `overflow-wrap` already does that, and the floor is
+   what keeps a two-letter name aimable. */
 .user-link {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-width: 0;
+  min-width: var(--tap-min);
   max-width: 100%;
   width: fit-content;
   overflow-wrap: anywhere;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
 }
 
 .leaderboard-table td.leaderboard-empty {
@@ -399,7 +406,7 @@ p.leaderboard-empty {
   display: block;
   margin-top: 4px;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.45;
 }
@@ -458,7 +465,7 @@ p.leaderboard-empty {
 .info-quote-source {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -483,7 +490,7 @@ p.leaderboard-empty {
 .info-resource .dashboard-label {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -500,7 +507,7 @@ p.leaderboard-empty {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
   background: var(--ink-06);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -514,7 +521,7 @@ p.leaderboard-empty {
 .info-resource-source {
   margin-top: 2px;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -539,7 +546,7 @@ p.leaderboard-empty {
 .info-resource-action > p:last-child {
   max-width: 56ch;
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.5;
 }
@@ -553,7 +560,7 @@ p.leaderboard-empty {
   margin-top: auto;
   border-radius: var(--radius-tag);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
   text-decoration: none;
@@ -583,7 +590,7 @@ p.leaderboard-empty {
   width: 100%;
   min-height: 52px;
   margin-top: auto;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   font-size: var(--text-control);
   font-weight: var(--weight-body);
 }
@@ -683,7 +690,7 @@ p.leaderboard-empty {
   background: transparent;
   color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   text-align: left;
   cursor: pointer;
@@ -694,12 +701,6 @@ p.leaderboard-empty {
 
 .action-menu-item[hidden] {
   display: none;
-}
-
-.action-menu-item .ui-icon {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
 }
 
 .action-menu-item:hover,
@@ -802,7 +803,7 @@ p.leaderboard-empty {
 .settings-confirm-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(13, 13, 13, 0.44);
+  background: rgb(0 0 0 / 55%);
   backdrop-filter: blur(4px);
   transition: opacity var(--duration-panel) var(--ease-out);
 }
@@ -824,7 +825,7 @@ p.leaderboard-empty {
   display: flex;
   gap: 6px;
   padding: 8px;
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
 }
 
 .missed-answer-dialog,
@@ -931,9 +932,27 @@ p.leaderboard-empty {
   transform: scale(0.97);
 }
 
+/* Hover on this control is a 10% ink wash. A selection therefore cannot also
+   be a wash — one step darker is not a state, it is a guess — so a chosen
+   reaction is ringed in solid ink and keeps a filled corner mark. Hover can
+   never produce either. */
 .prayer-reaction-choice[aria-pressed="true"] {
-  border-color: var(--border-strong);
-  background: var(--ink-18);
+  position: relative;
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+  background: var(--paper);
+  font-weight: var(--weight-strong);
+}
+
+.prayer-reaction-choice[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-end: 3px;
+  inline-size: 6px;
+  block-size: 6px;
+  background: var(--ink);
+  pointer-events: none;
 }
 
 .prayer-reaction-choice:disabled {
@@ -1002,7 +1021,7 @@ p.leaderboard-empty {
   padding: 0 var(--space-3);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -1048,7 +1067,7 @@ p.leaderboard-empty {
 
 .customer-details-list dt {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -1065,7 +1084,7 @@ p.leaderboard-empty {
   display: grid;
   gap: 0;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
 }
 
 .customer-prayer-item {
@@ -1085,7 +1104,7 @@ p.leaderboard-empty {
 
 .customer-prayer-item span {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.55;
 }
@@ -1243,7 +1262,7 @@ p.leaderboard-empty {
     padding: 0;
     border: 0;
     background: transparent;
-    font-size: var(--text-micro);
+    font-size: var(--text-meta);
     font-weight: var(--weight-body);
   }
 
@@ -1259,7 +1278,7 @@ p.leaderboard-empty {
 
   .leaderboard-inactive-tag::after {
     content: attr(data-mobile-label);
-    font-size: var(--text-micro);
+    font-size: var(--text-meta);
     line-height: 1.4;
   }
 

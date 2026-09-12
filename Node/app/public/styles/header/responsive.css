@@ -122,7 +122,7 @@
   .header-timezone-button {
     min-height: 36px;
     padding: 0 10px;
-    font-size: var(--text-micro);
+    font-size: var(--text-meta);
   }
 
   .header-timezone-menu {
@@ -187,7 +187,7 @@
   .header-timezone-button {
     min-height: 36px;
     padding: 0 8px;
-    font-size: var(--text-micro);
+    font-size: var(--text-meta);
   }
 }
 
@@ -237,7 +237,7 @@
     flex: 0 1 auto;
     max-width: 46%;
     overflow: hidden;
-    font-size: var(--text-micro);
+    font-size: var(--text-meta);
     font-weight: var(--weight-body);
     line-height: 1.4;
     text-align: right;

@@ -23,7 +23,7 @@ body.reading-modal-open {
 .reading-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(13, 13, 13, 0.44);
+  background: rgb(0 0 0 / 55%);
   backdrop-filter: blur(4px);
   transition: opacity var(--duration-panel) var(--ease-out);
 }
@@ -127,7 +127,7 @@ body.reading-modal-open {
 .reading-passage-title {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -139,7 +139,7 @@ body.reading-modal-open {
   background: transparent;
   color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   cursor: pointer;
   transition:
@@ -238,7 +238,7 @@ body.reading-modal-open {
   border-radius: var(--radius-tag);
   background: var(--ink-06);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -265,7 +265,7 @@ body.reading-modal-open {
 .reading-reflection-count {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   text-align: right;
   font-variant-numeric: tabular-nums;

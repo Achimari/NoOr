@@ -178,11 +178,20 @@ describe("motion contract", () => {
     }
   });
 
-  it("keeps at most one short opacity response on the sky after an answer", () => {
+  it("leaves no ambient layer behind the page to animate at all", () => {
+    // The shared sky is retired (CONSTRAINTS.md, 2026-09-11), and with it the
+    // tinted response an answer used to trigger behind the whole document. The
+    // page ground is now a flat colour and one fixed, unanimated fibre layer,
+    // so there is nothing left back there that can move.
     const material = stripComments(style("components/material.css"));
-    const tint = material.match(/\.ambient-video__tint\s*{([^}]*)}/s)?.[1] || "";
 
-    assert.doesNotMatch(tint, /1000ms/, "a one-second video filter change is not feedback");
-    assert.doesNotMatch(tint, /background-color\s+\d+ms/, "only opacity responds");
+    assert.doesNotMatch(material, /\.ambient-video|\.app-sky/, "no ambient layer survives");
+
+    const fibre = material.match(/body::before\s*\{([^}]*)\}/s)?.[1] || "";
+    assert.ok(fibre, "the one decorative layer must still be declared");
+    assert.doesNotMatch(fibre, /animation|transition|will-change/, "and it must never animate");
+
+    const main = material.match(/(?:^|\n)main\s*\{([^}]*)\}/s)?.[1] || "";
+    assert.doesNotMatch(main, /animation|transition/, "the page ground itself never moves");
   });
 });

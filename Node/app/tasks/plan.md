@@ -1,5 +1,20 @@
 # Implementation Plan: NoOr gamification, profiles, exploration, and combat
 
+## Current visual handoff — Wave 2: Monochrome Press
+
+Prepared 2026-09-12 at the owner's request; implementation is for the next Claude session. The completed gamification plan below is preserved as history, not reopened.
+
+Authoritative brief: `docs/sacred-press-redesign/CLAUDE_SECOND_WAVE_PROMPT.md`.
+Source findings and rationale: `docs/sacred-press-redesign/SECOND_WAVE_ANALYSIS.md`.
+
+Decisions: preserve Sacred Press typography, stack, behavior and quality floors; replace warm paper/vermilion with white, black and neutral grayscale; preserve state meaning without hue; rebuild baked-tint assets; complete four original plate briefs; capture Help from genuine development states after integration.
+
+Dependency order: measured baseline and contract map → palette/state pilot → shared propagation and existing-asset retone → individual missing-art integrations → targeted composition polish → Help captures → full verification. Each numbered section in the authoritative brief contains acceptance criteria and implementation boundaries; the Wave 2 section of `tasks/todo.md` records progress.
+
+Risks: baked image color survives token changes; monochrome can collapse state distinction; portrait insertion can obscure the chosen emblem; arena art can duplicate live fighters; old tests pin intentionally superseded visuals. Mitigations and exact source locations are in the brief. Image-generation capability and safe screenshot fixtures must be checked at execution, not assumed unavailable. No application implementation is performed by preparing this handoff.
+
+## Completed gamification plan (historical)
+
 Approved at the specification gate. Module ids are stable and are the index of
 what exists; do not rename them.
 

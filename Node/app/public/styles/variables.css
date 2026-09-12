@@ -1,9 +1,68 @@
-
+/* Sacred Press ships three self-hosted OFL families and no fourth.
+ *
+ * Every face below is same-origin, WOFF2, and vendored from its official
+ * upstream by `scripts/vendor-sacred-press-fonts.py`; `public/fonts/README.md`
+ * carries the provenance and SHA-256 manifest. The product makes no font
+ * request to Google Fonts or any other third-party origin.
+ *
+ * Unbounded is one variable file spanning 400-900, so every display weight the
+ * interface names is a real interpolated instance rather than a synthesised
+ * one. IBM Plex ships static 400 and 600 faces, which are the only two weights
+ * any Plex role is allowed to ask for — see `font-synthesis: none` in globals.
+ */
 
 @font-face {
-  font-family: "Achimari Hand";
-  src: url("/fonts/achimari-hand/AchimariHand-Regular.otf") format("opentype");
+  font-family: "Unbounded";
+  src: url("/fonts/unbounded/Unbounded-Variable.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Condensed";
+  src: url("/fonts/ibm-plex-sans-condensed/IBMPlexSansCondensed-Regular.woff2") format("woff2");
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans Condensed";
+  src: url("/fonts/ibm-plex-sans-condensed/IBMPlexSansCondensed-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/ibm-plex-sans/IBMPlexSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/ibm-plex-sans/IBMPlexSans-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono/IBMPlexMono-SemiBold.woff2") format("woff2");
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
@@ -12,113 +71,182 @@
 
   --white: #ffffff;
 
-  /* Clean white journal paper. The sky washes down into this, and the whole
-     working field continues on it, so every ink role below is measured against
-     it. What makes it read as a sheet is light and fibre, not warmth: an ivory
-     field under a grey sky reads as aged parchment. */
+  /* Achimari Monochrome Press paper.
+   *
+   * The sheet is white. Not off-white, not mineral, not warm: a printed page
+   * whose whole identity is black ink, white space and the rules between them.
+   * Every ink role below is measured against the two real grounds the product
+   * sets text on — the white page and the recessed step — and every one of them
+   * clears WCAG 2.2 AA on both; `test/ink-on-paper.test.js` computes the ratios
+   * from these values rather than trusting the comments.
+   *
+   * Separation is made by space and by rules, never by elevation, which is why
+   * there is no lighter paper above white to raise a surface onto.
+   */
   --paper: #ffffff;
 
-  /* A raised panel is the same white. It is separated by its border and the
-     space around it, never by a lighter shade — there is nothing lighter than
-     white, and tinting it is what turned every region into a beige rectangle.
-     Only the recessed step differs, and only just. */
-  --paper-raised: #ffffff;
-  --paper-muted: #f3f3f0;
+  /* Kept as a name because components still ask to be "raised". It resolves to
+     the same sheet: a region separates itself with spacing or a rule, and a
+     tint step above white does not exist. */
+  --paper-raised: var(--paper);
 
-  --canvas: #fcfcfa;
+  /* The one recessed step — meter tracks, insets, the deselected half of a
+     pair, a table's zebra. The only fill that is neither paper nor field. */
+  --paper-muted: #f2f2f2;
 
-  --ink: #111111;
-  --ink-raised: #242424;
-  --ink-muted: #5c5c58;
+  /* The whole document is one sheet, so the page ground is the paper. */
+  --canvas: var(--paper);
 
-  /* 8.2:1 on paper. For small, muted or image-adjacent copy that has to clear
-     roughly 7:1 where --ink-muted's 6.7:1 is only just enough. */
-  --ink-secondary-strong: #4f4f4a;
+  /* The black field. Navigation, primary actions, image plates, the battle
+     stage and the rare inverse region. Reserved: a black block is a rhythm
+     reset, not decoration, and the working page stays predominantly white. */
+  --field: #000000;
+  --field-raised: #1a1a1a;
 
-  /* Text that floats on the horizon image. The darkest composited cloud pixel
-     there measures rgb(158,158,158): full ink holds 7.05:1, every muted ink
-     falls under 3.1:1, so anything over the sky takes this. */
-  --ink-on-sky: var(--ink);
+  --ink: #000000;
+  --ink-raised: #1a1a1a;
 
-  /* 3.5:1 on --paper — a rule and divider colour, never a text colour. */
+  /* Secondary copy. 7.82:1 on white and 6.98:1 on the recessed step — AA on
+     every surface the product actually sets text on, so a muted label never
+     has to be audited against which ground it happens to sit over. */
+  --ink-muted: #525252;
+
+  /* 12.63:1 on white. For small, muted or plate-adjacent copy that has to clear
+     roughly 7:1 where --ink-muted's 7.82:1 is only just comfortable. */
+  --ink-secondary-strong: #333333;
+
+  /* 3.45:1 on white — quiet decoration only. It clears the 3:1 non-text floor,
+     so it may draw a graphic or a mark, and it is never essential small text. */
   --ink-quiet: #8a8a8a;
 
-  /* Neutral rules. On white paper a warm beige divider is the thing that reads
-     as a printing error, so the structural greys go neutral with the surface. */
-  --rule: #d2d4d2;
+  /* Structural rules, drawn from the ink itself so they read as printing rather
+     than as a UI border.
 
-  /* The control-boundary colour, which has a 3:1 floor. Measured against the
-     darkest composited texture sample on the darkest paper step it holds
-     3.37:1 — #828282 landed at 3.06 there, with almost no headroom. */
-  --rule-strong: #808080;
+     --rule is decoration: it organises content and is never the only thing
+     marking a control's edge. --rule-strong is the control-boundary colour and
+     is a solid #767676, which clears the 3:1 component floor on white (4.54:1)
+     and on the recessed step (4.06:1) — a translucent rule would have drifted
+     below the floor over the darker of the two. */
+  --rule: rgb(0 0 0 / 18%);
+  --rule-strong: #767676;
 
   --surface: var(--paper);
   --surface-subtle: var(--paper-muted);
   --ink-secondary: var(--ink-muted);
   --separator: var(--rule);
 
-  --brand: #315f73;
-  --brand-hover: #244b5c;
+  /* Filled actions use the black field. Green and red are reserved for
+     positive and negative state, so a button never competes with feedback. */
+  --accent: var(--ink);
+  --accent-hover: var(--ink-raised);
+  --accent-ink: var(--ink);
+  --on-accent: var(--white);
 
-  --success: #14713c;
-  --success-soft: #e9f4ed;
-  --danger: #b3261e;
-  --danger-soft: #fbebea;
+  /* Green and red reinforce the labels, checks, and warning marks already
+     used for state. The pale fills keep notices quiet and text readable. */
+  --success: #1d704e;
+  --success-soft: #edf7f0;
+  --danger: #b73535;
+  --danger-soft: #fff0ee;
 
-  /* One visible family. Achimari Hand carries the whole product — display,
-     interface, prose, forms, tables, figures and HUD alike. `cursive` is the
-     generic fallback for a failed load or a glyph the face does not draw; it is
-     not a companion font and no token or component may select a stack instead. */
-  --font-brand: "Achimari Hand", cursive;
+  /* Navigation and ordinary links retain the neutral ink. */
+  --brand: var(--ink);
+  --brand-hover: var(--ink-raised);
 
-  --font-display: var(--font-brand);
-  --font-ui: var(--font-brand);
-  --font-body: var(--font-brand);
-  --font-reading: var(--font-brand);
-  --font-data: var(--font-brand);
+  /* Four roles, three families. The role a piece of text has decides its
+     family; nothing picks a font by taste.
 
-  /* Achimari Hand ships Regular only. Hierarchy is drawn with size, space,
-     colour, casing and grouping — never with a weight the face cannot serve,
-     and never with a synthesised one (see font-synthesis: none in globals). */
+     display — the wordmark, h1, a selected h2, and a small number of major
+       editorial numerals. Never a label, a button, a form or a table.
+     ui      — navigation, buttons, inputs, menus, filters, tables and compact
+       labels. Condensed, because the interface is dense and the page is not.
+     body    — prose and descriptions, where the wider face is easier to read.
+     data    — dates, timers, chart values and metadata, where a fixed advance
+       makes columns line up and a changing number stop jumping.
+
+     Each stack ends in a real system fallback, so a failed font request leaves
+     a usable page rather than a default serif. */
+  --font-display: "Unbounded", system-ui, sans-serif;
+  --font-ui: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Long-form reading is the body role. Kept as its own name because the
+     reading surfaces ask for it by that name. */
+  --font-reading: var(--font-body);
+
+  /* IBM Plex ships 400 and 600 here, and those are the only two weights a Plex
+     role may request: `font-synthesis: none` is set globally, so a request for
+     500 or 700 would quietly resolve to one of these anyway, and naming a
+     weight the repository does not ship is how that drift starts.
+
+     The display face is variable across 400-900, so its two steps are real
+     interpolated instances. */
   --weight-body: 400;
+  --weight-strong: 600;
+  --weight-display: 700;
+  --weight-display-heavy: 800;
 
-  --text-display: 2.5rem;
-  --text-page-title: 2rem;
-  --text-title: 1.75rem;
+  /* The page opening. Editorial scale, so it is fluid — but bounded: the cap is
+     88px, under the 96px ceiling, and the floor is high enough that the word
+     still reads as display type on a phone. */
+  --text-display: clamp(2.75rem, 7.5vw, 5.5rem);
+
+  /* A section opening, one step below the page opening. The 28px floor keeps
+     the longest route name on one line inside the 320px shared shell. */
+  --text-page-title: clamp(1.75rem, 4vw, 3rem);
+
+  --text-title: 2rem;
   --text-subtitle: 1.5rem;
 
   /* Card and panel headings. Named because the sheets carried a dozen one-off
      sizes that all meant the same thing. */
-  --text-component: 1.375rem;
+  --text-component: 1.25rem;
 
-  /* A statistic read at a glance: a streak count, a stat total, a timer. */
-  --text-figure: 1.625rem;
+  /* A statistic read at a glance: a streak count, a stat total, a timer. Set in
+     the display face, so it carries at this size. */
+  --text-figure: 2.25rem;
 
-  /* Long-form reading. A handwritten face carries less information per pixel
-     than a grotesque, so the body step sits where a sans would put a lede. */
-  --text-body: 1.25rem;
+  /* Long-form reading. IBM Plex Sans is drawn for screen text and carries more
+     information per pixel than the handwritten face this replaced, so the body
+     step moves from 20px to 17px without losing legibility. */
+  --text-body: 1.0625rem;
 
   /* Ordinary interface copy, inputs and primary controls. */
-  --text-control: 1.125rem;
+  --text-control: 1rem;
 
   /* Labels, and the critical HUD and statistics values. */
-  --text-label: 1.0625rem;
+  --text-label: 0.9375rem;
 
-  --text-meta: var(--text-label);
+  /* Dates, timers, counts and compact metadata, set in the mono role. This is
+     the smallest step anything a reader has to read actually uses. */
+  --text-meta: 0.875rem;
 
-  /* The floor. Nothing that carries meaning is set below this. */
-  --text-micro: 1rem;
+  /* The floor, and a narrow one: the mono margin marks that run beside a
+     composition. Short, uppercase, tracked, and never the only place a fact
+     appears — a reader can ignore every one of them and lose nothing. */
+  --text-mark: 0.8125rem;
 
-  --leading-display: 1.15;
-  --leading-title: 1.3;
-  --leading-body: 1.65;
-  --leading-meta: 1.5;
-  --leading-control: 1.4;
+  /* Display type is set tight, because the letterforms are large enough to
+     carry the line on their own. Prose keeps a generous rhythm. */
+  --leading-display: 0.92;
+  --leading-title: 1.12;
+  --leading-body: 1.6;
+  --leading-meta: 1.45;
+  --leading-control: 1.35;
 
-  --radius-row: 8px;
-  --radius-control: 10px;
-  --radius-panel: 16px;
-  --radius-feature: 24px;
+  /* The one tracking the system uses, on short mono labels set in capitals,
+     where default spacing collides the letterforms. Display type never goes
+     tighter than -0.02em. */
+  --tracking-mark: 0.08em;
+  --tracking-display: -0.02em;
+
+  /* Corners scale with the surface: compact rows, comfortable controls,
+     and gently rounded panels. Circular geometry keeps its own token. */
+  --radius-row: 6px;
+  --radius-control: 8px;
+  --radius-panel: 12px;
+  --radius-feature: 16px;
   --radius-capsule: 999px;
 
   --space-1: 4px;
@@ -145,33 +273,37 @@
   --measure-focus: 820px;
   --measure-reading: 680px;
 
-  /* Long-form prose. Deliberately not expressed in `ch`: the CSS `ch` unit is
-     the advance of "0", and Achimari Hand's zero (618 units) is far wider than
-     its lowercase, so `68ch` lets a paragraph run to ~91 real characters. This
-     value is calibrated against measured prose — ~64 characters per line at
-     --text-body. */
-  --measure-prose: 33rem;
+  /* Long-form prose, capped at a real 65-75 character measure. `ch` is the
+     advance of "0", and IBM Plex Sans draws a normal-width zero, so the unit
+     now means what it says — unlike the handwritten face this replaced, whose
+     very wide zero made 68ch run to ~91 characters. */
+  --measure-prose: 68ch;
   --measure-dialog: 520px;
 
   --tap-min: 44px;
 
-  --shadow-float: 0 12px 36px rgba(0, 0, 0, 0.12);
-  --shadow-dialog: 0 24px 64px rgba(0, 0, 0, 0.18);
+  /* Nothing on the page floats. The only surface allowed a shadow is one that
+     genuinely sits above the document — a modal over its backdrop — and even
+     that is a single soft drop, not a lifted card.
+     --shadow-float is kept as a name because components still ask for it, and
+     is deliberately `none`: a region groups with space, a rule, a tonal fill or
+     a black field, never by being lifted off the sheet. */
+  --shadow-float: none;
+  --shadow-dialog: 0 24px 64px rgb(0 0 0 / 26%);
 
-  --chrome: var(--ink);
-  --chrome-raised: var(--ink-raised);
+  --chrome: var(--field);
+  --chrome-raised: var(--field-raised);
   --header-height: 56px;
   --header-height-compact: 52px;
 
-  --header-bg: rgba(17, 17, 17, 0.84);
+  --header-bg: var(--field);
   --header-bg-solid: var(--chrome);
   --header-active: var(--white);
   --header-active-line: var(--white);
   --logo-title: var(--white);
   --footer-bg: var(--chrome);
-  --footer-text: rgba(255, 255, 255, 0.72);
+  --footer-text: rgb(255 255 255 / 78%);
   --footer-icon-hover: var(--white);
-  --glass-blur: blur(20px) saturate(1.6);
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -181,64 +313,37 @@
   --duration-ui: 160ms;
   --duration-panel: 220ms;
 
-  --ambient-base: #d9d9d9;
-  --ambient-filter: grayscale(1) contrast(1.06) brightness(1.24);
-  --ambient-scrim: rgba(255, 255, 255, 0.40);
+  /* The page opening — the band a route's display title and its plate live in.
+     A layout measure, not a backdrop: the shared ambient sky it used to hold is
+     retired (CONSTRAINTS.md, 2026-09-11). */
+  --opening-height: clamp(176px, 21vh, 236px);
 
-  --sky-scrim: rgba(255, 255, 255, 0.62);
-  --ambient-vignette: rgba(17, 17, 17, 0.10);
+  /* The paper fibre. One decorative layer, owned by material.css and nowhere
+     else. Generated by scripts/build-paper-texture.py and served locally; never
+     fetched from another origin.
 
-  --horizon-height: clamp(176px, 21vh, 236px);
-
-  /* How far the sky washes into the paper. Long enough that the clouds
-     dissolve rather than stop at a line; see material.css for the ramp. */
-  --horizon-fade: 112px;
-
-  /* The ruling. 20px body copy at 1.65 leading is a 33px line, so the interval
-     is the body rhythm drawn rather than a number picked to look like paper.
-     The colour is the brand blue-teal at a fraction of its strength, so the
-     lines read as the sky continuing into the sheet rather than as a school
-     notebook — a blue-grey ghost of the horizon, not a ruled exercise book.
-
-     7%. At 5% the page was technically ruled and perceptually blank — the paper
-     never announced itself. 7% is the point where a blank margin reads as a
-     sheet at a glance while the lines still disappear under running text. */
-  --paper-line-step: 2.0625rem;
-  --paper-line-width: 1px;
-  --paper-rule: rgb(49 95 115 / 7%);
-
-  /* Stickers: a record applied to the page.
-     White label on white paper, so it is read by its edge and by the shadow
-     directly under it — never by being a different colour, which is what turned
-     regions into beige rectangles before. The shadow is deliberately tight: a
-     wide soft blur is a floating dashboard card, not a label lying on a sheet. */
-  --sticker-bg: #ffffff;
-  --sticker-edge: rgb(17 17 17 / 18%);
-  --sticker-edge-strong: rgb(17 17 17 / 28%);
-  --sticker-shadow:
-    0 1px 0 rgb(17 17 17 / 8%),
-    0 4px 12px rgb(17 17 17 / 8%);
-  --sticker-shadow-hover:
-    0 2px 0 rgb(17 17 17 / 9%),
-    0 8px 18px rgb(17 17 17 / 10%);
-  --sticker-radius: 10px;
-
-  /* Two fixed angles, chosen rather than generated: a runtime-random tilt is
-     the thing that makes an interface look like a scrapbook. Small enough to be
-     felt before it is seen. */
-  --sticker-tilt-a: -0.3deg;
-  --sticker-tilt-b: 0.25deg;
-
-  /* Decorative paper fibre. Generated by scripts/build-paper-texture.py and
-     served locally; never fetched from another origin. */
+     There is no ruling token here and no ruling layer anywhere. The full-page
+     repeating horizontal rule was the loudest childish signal in the old
+     system, and it is superseded (CONSTRAINTS.md, 2026-09-11). Paper is read
+     through fibre and print edges; rules appear only where they organise real
+     content. */
   --paper-texture: url("/textures/paper-fiber.webp");
   --paper-texture-size: 320px;
 
-  --focus-ring-color: var(--brand);
+  /* How much of the fibre is allowed through. On a mineral ground this was 0.5;
+     on white, the same layer would turn the sheet grey, and white has to read
+     as white at ordinary zoom. Measured: the lightest pixel of the composited
+     page stays at #ffffff and the mean sits above 253/255. */
+  --paper-texture-opacity: 0.22;
+
+  /* The focus ring is ink on the page and white on the field. Both are named,
+     because a black ring on a black field is not a ring — every inverse surface
+     in the system sets --focus-ring-color to --focus-ring-on-deep locally, and
+     `test/interaction-states.test.js` proves each one does. */
+  --focus-ring-color: var(--ink);
   --focus-ring-on-deep: var(--white);
 
   --z-background: 0;
-  --z-sky: 0;
 
   /* Decorative paper fibre: below every child of the working field, above the
      field's own paper fill. Negative, and therefore confined to main's own
@@ -252,12 +357,12 @@
   --z-page-transition: 400;
   --z-skip-link: 500;
 
-  --ink-92: rgba(17, 17, 17, 0.92);
-  --ink-72: rgba(17, 17, 17, 0.72);
-  --ink-54: rgba(17, 17, 17, 0.54);
+  --ink-92: rgb(0 0 0 / 92%);
+  --ink-72: rgb(0 0 0 / 72%);
+  --ink-54: rgb(0 0 0 / 54%);
   --ink-18: var(--separator);
-  --ink-10: rgba(17, 17, 17, 0.08);
-  --ink-06: rgba(17, 17, 17, 0.045);
+  --ink-10: rgb(0 0 0 / 10%);
+  --ink-06: rgb(0 0 0 / 6%);
 
   --white-92: rgba(255, 255, 255, 0.92);
   --white-72: rgba(255, 255, 255, 0.78);
@@ -266,19 +371,41 @@
   --white-10: rgba(255, 255, 255, 0.13);
   --white-06: rgba(255, 255, 255, 0.08);
 
+  /* ---------------------------------------------------- identity patterns */
+
+  /* The profile accent used to be a hue: Green, Amber, Blue, Rose, Neutral.
+   * A monochrome press cannot show a hue, and five identical grey swatches
+   * would be a lie told five times, so the choice survives as what a press
+   * would actually have used — five printed fills.
+   *
+   * Every pattern is drawn in `currentColor`, so the same five read as ink on
+   * the white sheet and as white on the black chrome without a second set.
+   * The stored key is untouched: `green` still means `green` in the database
+   * and in the API, and only its presentation and its label changed.
+   * See CONSTRAINTS.md, 2026-09-12. */
+  --accent-pattern-solid: linear-gradient(currentColor, currentColor);
+  --accent-pattern-hatch: repeating-linear-gradient(45deg, currentColor 0 1.5px, transparent 1.5px 4px);
+  --accent-pattern-cross:
+    repeating-linear-gradient(45deg, currentColor 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(-45deg, currentColor 0 1px, transparent 1px 4px);
+  --accent-pattern-stipple: radial-gradient(currentColor 0.8px, transparent 0.9px);
+  --accent-pattern-stipple-size: 3.5px 3.5px;
+  --accent-pattern-bar: repeating-linear-gradient(0deg, currentColor 0 1.5px, transparent 1.5px 4.5px);
+
   --paper-quiet: var(--surface-subtle);
 
+  /* Primary actions use the black field and its dark-grey hover step. */
   --action: var(--ink);
   --action-hover: var(--ink-raised);
   --on-action: var(--white);
-  --accent: var(--action);
-  --accent-hover: var(--action-hover);
   --btn-text: var(--on-action);
 
+  /* State borders follow their colors. Notices also retain different rule
+     weights and explicit labels so their meaning does not depend on hue. */
   --success-tint: var(--success-soft);
-  --success-line: rgba(20, 113, 60, 0.42);
+  --success-line: var(--success);
   --danger-tint: var(--danger-soft);
-  --danger-line: rgba(179, 38, 30, 0.36);
+  --danger-line: var(--danger);
 
   --bg: var(--canvas);
   --bg-page: var(--canvas);
@@ -308,8 +435,8 @@
   --favicon-chip-bg: var(--ink-06);
   --favicon-chip-border: var(--separator);
 
-  --shadow-ink-10: rgba(17, 17, 17, 0.07);
-  --shadow-ink-18: rgba(17, 17, 17, 0.12);
+  --shadow-ink-10: rgb(0 0 0 / 7%);
+  --shadow-ink-18: rgb(0 0 0 / 12%);
   --shadow-soft: none;
   --shadow-card-hover: none;
   --shadow-panel: var(--shadow-float);

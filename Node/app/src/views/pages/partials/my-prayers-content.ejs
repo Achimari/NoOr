@@ -1,9 +1,12 @@
 <main id="main-content" tabindex="-1" class="dashboard-page prayer-page" data-prayer-page>
   <div class="page-shell">
 
-    <header class="page-head">
-      <h1 class="page-head-title">My prayers</h1>
-      <p class="page-head-lede">Review the requests you have shared and mark them answered when the time comes.</p>
+    <header class="page-head prayers-opening">
+      <div class="page-head-copy">
+        <h1 class="page-head-title">My prayers</h1>
+        <p class="page-head-lede">Review the requests you have shared and mark them answered when the time comes.</p>
+      </div>
+
     </header>
 
     <section class="page-section section-frame section-frame--ruled" aria-labelledby="prayer-composer-title">
@@ -21,11 +24,11 @@
             maxlength="500"
             required
           ></textarea>
-          <span class="field-hint">Up to 500 characters. Visible to everyone in the community.</span>
+          <span class="field-hint"><%- include("../../components/ui/icon", { name: "globe", className: "ui-icon--sm" }) %>Up to 500 characters. Visible to everyone in the community.</span>
         </div>
 
         <div class="ui-button-group prayer-composer-actions">
-          <button class="ui-button ui-button--primary" type="submit">Share request</button>
+          <button class="ui-button ui-button--primary" type="submit"><%- include("../../components/ui/icon", { name: "send", className: "ui-icon--sm" }) %>Share request</button>
           <p class="prayer-form-status" data-prayer-status role="status" aria-live="polite"></p>
         </div>
       </form>

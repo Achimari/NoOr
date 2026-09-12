@@ -5,6 +5,8 @@ import { describe, it } from "node:test";
 import vm from "node:vm";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 import { resolveStreakView } from "../src/domain/streakViews.js";
 
 const templatePath = fileURLToPath(
@@ -63,6 +65,7 @@ function statisticsSummary() {
 
 async function renderStatistics() {
   return ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
     leaderboards: { recovery: board(), reading: board(), goals: board() },
     statistics: statisticsSummary(),
     activeStreak: resolveStreakView("strong"),
@@ -84,6 +87,32 @@ function renderMissedTag(entry, currentUserId) {
     `${source.slice(start, end)}\n${source.slice(escapeStart, escapeEnd)}\nrenderMissedDaysTag(entry);`,
     { entry, currentUserId },
   );
+}
+
+function token(name) {
+  const variables = readFileSync(fileURLToPath(new URL("../public/styles/variables.css", import.meta.url)), "utf8");
+  return (variables.match(new RegExp(`${name}:\\s*([^;]+);`)) || [])[1]?.trim() || null;
+}
+
+/** Follows a `var(--x)` chain down to the hex it really is. */
+function resolveColour(value, depth = 0) {
+  const trimmed = (value || "").trim();
+  if (!trimmed || depth > 6) return trimmed;
+  const reference = trimmed.match(/^var\((--[\w-]+)\)$/);
+  return reference ? resolveColour(token(reference[1]), depth + 1) : trimmed;
+}
+
+function luminance(hex) {
+  const channels = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+}
+
+function contrast(a, b) {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
 }
 
 describe("statistics missed indicators", () => {
@@ -129,9 +158,24 @@ describe("statistics missed indicators", () => {
     for (const [file, selector, base, hover] of owners) {
       assert.ok(base, `${file}: ${selector} has a base rule`);
       assert.ok(hover, `${file}: ${selector} has a hover rule`);
-      assert.match(base, /color:\s*var\(--brand\)/, `${file}: ${selector} rests on the brand colour`);
-      assert.match(hover, /color:\s*var\(--brand-hover\)/, `${file}: ${selector} darkens on hover`);
-      assert.doesNotMatch(hover, /color:\s*var\(--white\)/, `${file}: ${selector} must never go white`);
+      // Asserted on the resolved colour rather than on a token name: Sacred
+      // Press retired the blue-teal brand and pointed `--brand` at the ink, so
+      // a name check would pass while saying nothing. What matters is that a
+      // username is dark enough to read on the row it sits in, and never
+      // inverts on hover.
+      const baseColour = resolveColour(base.match(/color:\s*([^;]+)/)?.[1]);
+      const hoverColour = resolveColour(hover.match(/color:\s*([^;]+)/)?.[1]);
+
+      assert.ok(baseColour, `${file}: ${selector} must state a colour`);
+      assert.ok(
+        contrast(baseColour, token("--paper")) >= 4.5,
+        `${file}: ${selector} rests at ${contrast(baseColour, token("--paper")).toFixed(2)}:1 on paper`,
+      );
+      assert.ok(
+        contrast(hoverColour, token("--paper-muted")) >= 4.5,
+        `${file}: ${selector} is unreadable on the row hover`,
+      );
+      assert.notEqual(hoverColour.toLowerCase(), "#ffffff", `${file}: ${selector} must never go white`);
     }
 
     const dashboard = readFileSync(dashboardStylesPath, "utf8");

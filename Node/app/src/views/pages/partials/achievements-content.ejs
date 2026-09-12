@@ -25,8 +25,10 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
   <div class="page-shell achievements-container">
 
       <header class="page-head achievements-hero">
-        <h1 class="page-head-title achievements-title">Achievements</h1>
-        <p class="page-head-lede achievements-lede">Milestones earned through your daily practice and battles.</p>
+        <div class="page-head-copy achievements-hero-text">
+          <h1 class="page-head-title">Achievements</h1>
+          <p class="page-head-lede">Milestones earned through your daily practice and battles.</p>
+        </div>
         <div class="achievements-hero-progress">
           <p class="achievements-count">
             <strong><%= summary.earned %></strong> of <%= achievements.total %> earned

@@ -1,26 +1,14 @@
 
 
+/* The page carries `data-accent` so the reader's identity fill is available to
+   anything on it that wants to stamp in their own texture. Nothing here asks
+   for it today: a seal's meaning is earned / in progress / not started, and
+   printing three of those in a personal texture would weaken the one
+   distinction the page exists to make. The five hue variables this block used
+   to declare are gone with the vermilion system (CONSTRAINTS.md, 2026-09-12);
+   they had no consumer even before it. */
 .achievements-page {
-  --ach-accent: #8a8a8a;
-  --ach-accent-soft: rgba(138, 138, 138, 0.42);
   --ach-seal-size: 56px;
-}
-
-.achievements-page[data-accent="green"] {
-  --ach-accent: #14713c;
-  --ach-accent-soft: rgba(20, 113, 60, 0.42);
-}
-.achievements-page[data-accent="amber"] {
-  --ach-accent: #8a6c33;
-  --ach-accent-soft: rgba(138, 108, 51, 0.42);
-}
-.achievements-page[data-accent="blue"] {
-  --ach-accent: #2f5b73;
-  --ach-accent-soft: rgba(47, 91, 115, 0.42);
-}
-.achievements-page[data-accent="rose"] {
-  --ach-accent: #a34a5c;
-  --ach-accent-soft: rgba(163, 74, 92, 0.42);
 }
 
 .achievements-container {
@@ -49,20 +37,26 @@
   display: block;
 }
 
+/* A seal is one of the few circles the system allows, and it is drawn like
+   everything else on the sheet: the paper's own raised tone inside a printed
+   rule, at the icon family's weight. */
 .ach-seal-body {
-  fill: var(--surface-2);
-  stroke: var(--border-strong);
-  stroke-width: 1;
+  fill: var(--paper-raised);
+  stroke: var(--rule-strong);
+  stroke-width: 1.5;
 }
 
 .ach-seal-track {
   stroke: var(--ink-10);
-  stroke-width: 2;
+  stroke-width: 1.5;
 }
 
+/* Progress toward a seal is the one thing on this page worth urging, so the
+   ring carries the vermilion overprint. It is never the only signal: the same
+   progress is written beside every seal as "6 / 10". */
 .ach-seal-ring {
-  stroke: var(--ink-54);
-  stroke-width: 2;
+  stroke: var(--accent);
+  stroke-width: 1.5;
   stroke-linecap: round;
   stroke-dasharray: var(--ach-ring-length, 132);
   stroke-dashoffset: var(--ach-ring-offset, 132);
@@ -76,27 +70,19 @@
   color: var(--white);
 }
 
+/* An earned seal is struck: the ink field, with the mark reversed out of it. */
 .ach-seal[data-status="EARNED"] .ach-seal-body {
-  fill: var(--ink);
-  stroke: var(--ink);
+  fill: var(--field);
+  stroke: var(--field);
 }
 
 .ach-seal[data-status="EARNED"] .ach-seal-ring {
-  stroke: var(--ach-accent);
-  stroke-width: 2.4;
+  stroke: var(--paper);
+  stroke-width: 1.5;
 }
 
 .ach-seal[data-status="EARNED"] .ach-seal-track {
   stroke: var(--ink-18);
-}
-
-.ach-seal[data-status="EARNED"]::after {
-  content: "";
-  position: absolute;
-  inset: 11.5%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.18), transparent 62%);
-  pointer-events: none;
 }
 
 .ach-seal[data-status="NOT_STARTED"] .ach-seal-ring {
@@ -111,25 +97,9 @@
   gap: var(--space-4);
 }
 
-.achievements-hero-text { min-width: 0; }
-
-.achievements-title {
-  margin: 0;
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3vw, var(--text-page-title));
-  font-weight: var(--weight-body);
-  letter-spacing: 0;
-  line-height: 1.15;
-}
-
-.achievements-lede {
-  margin: var(--space-2) 0 0;
-  color: var(--ink-on-sky);
-  font-size: var(--text-label);
-  font-weight: var(--weight-body);
-  line-height: 1.5;
-  max-width: var(--measure-reading);
+.achievements-hero-text {
+  flex: 1 1 var(--measure-prose);
+  min-width: 0;
 }
 
 .achievements-hero-progress {
@@ -211,8 +181,8 @@
 
 .achievements-panel-title {
   margin: 0 0 var(--space-4);
-  color: var(--ink-on-sky);
-  font-size: var(--text-micro);
+  color: var(--ink);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -239,7 +209,7 @@
 .achievements-latest-requirement {
   margin: var(--space-1) 0 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.5;
 }
@@ -247,7 +217,7 @@
 .achievements-latest-date {
   margin: var(--space-2) 0 0;
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
@@ -309,7 +279,7 @@
 
 .achievements-figure {
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -320,7 +290,7 @@
   display: inline-flex;
   align-items: center;
   color: var(--link);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -347,7 +317,7 @@
   min-height: var(--tap-min);
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border-control);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: var(--surface-1);
   color: var(--text-primary);
   font-family: inherit;
@@ -362,7 +332,7 @@
 
 .achievements-filter-count {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
@@ -391,7 +361,7 @@
 .achievements-result {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -420,7 +390,7 @@
 .achievements-category-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -428,7 +398,7 @@
 .achievements-category-count {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   font-variant-numeric: tabular-nums;
 }
@@ -481,7 +451,7 @@
 .achievements-card-tier {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -489,7 +459,7 @@
 .achievements-card-requirement {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -502,7 +472,7 @@
   gap: var(--space-1) var(--space-2);
   margin: 0;
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -536,10 +506,10 @@
   margin: 0;
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  .ach-seal[data-status="EARNED"]::after {
-    display: none;
-  }
+/* The in-progress count uses the text-safe accent role. That role is black so
+   colored feedback remains reserved for explicit success and danger states. */
+.achievements-card[data-status="IN_PROGRESS"] .achievements-figure {
+  color: var(--accent-ink);
 }
 
 @keyframes ach-seal-reveal {

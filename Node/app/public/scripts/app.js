@@ -249,7 +249,6 @@ function setSettingsAnswerState(answer) {
     const isSelected = button.dataset.settingsAnswerOption === answer;
     button.setAttribute("aria-pressed", String(isSelected));
   });
-  setAmbientAnswerState(answer);
 }
 
 async function loadSettingsAnswer() {
@@ -1025,8 +1024,6 @@ document.addEventListener("keydown", (event) => {
 window.addEventListener("resize", () => closePrayerActionsMenu());
 window.addEventListener("scroll", () => closePrayerActionsMenu(), true);
 
-const horizonBand = document.querySelector("[data-horizon]");
-
 const REVEAL_BATCH_CAP = 5;
 
 window.NoOrRevealNewRows = revealNewRows;
@@ -1050,11 +1047,6 @@ function revealNewRows(rows, previouslyVisible) {
   });
 }
 
-function setHorizonState(answer) {
-  if (!horizonBand) return;
-  horizonBand.dataset.state = answer === "YES" ? "yes" : answer === "NO" ? "no" : "neutral";
-}
-
 function setDailyActionSelection(answer) {
   if (yesButton) {
     yesButton.setAttribute("aria-pressed", String(answer === "YES"));
@@ -1062,8 +1054,6 @@ function setDailyActionSelection(answer) {
   if (noButton) {
     noButton.setAttribute("aria-pressed", String(answer === "NO"));
   }
-  setHorizonState(answer);
-  setAmbientAnswerState(answer);
 }
 
 async function updateLeaderboard(action) {
@@ -3114,22 +3104,32 @@ window.addEventListener("pageshow", (event) => {
 
 window.addEventListener("pagehide", resetPageTransition);
 
-let ambientRoot = null;
+/* The shared ambient sky is retired (CONSTRAINTS.md, 2026-09-11). The page
+   ground is paper and imagery is a printed plate, so there is no document-wide
+   video layer left to drive and no answer-tinted backdrop to keep in step. The
+   recorded answer is still reflected where it belongs: on the two controls
+   themselves, via `aria-pressed` and their selected fill. */
 
-function setAmbientAnswerState(answer) {
-  if (!ambientRoot) return;
-  ambientRoot.dataset.state = answer === "YES" ? "yes" : answer === "NO" ? "no" : "neutral";
-}
-
-function initAmbientArt() {
-  if (ambientRoot) return;
-
-  const sharedSky = document.querySelector("[data-app-sky]");
-  if (!sharedSky) return;
-
-  ambientRoot = sharedSky;
-  document.body.classList.add("has-ambient-video");
-  document.body.dataset.ambient = document.body.dataset.page === "battle" ? "scene" : "shared";
-}
-
-initAmbientArt();
+/* A plate whose file does not arrive.
+ *
+ * The box is already reserved by `--plate-ratio` and the plate already paints a
+ * flat tonal ground, so a failed load costs no layout shift and leaves a
+ * deliberate printed region rather than a hole. What it also leaves, in Chrome,
+ * is the browser's own broken-image glyph in the corner — a piece of chrome the
+ * page did not draw and cannot style.
+ *
+ * This removes that glyph and nothing else. `error` does not bubble, so it is
+ * caught on the way down; without JavaScript the page behaves exactly as it
+ * does today, which is why this is a polish listener and not a fallback
+ * mechanism. The fallback is the CSS. */
+document.addEventListener(
+  "error",
+  (event) => {
+    const image = event.target;
+    if (!(image instanceof HTMLImageElement)) return;
+    const plate = image.closest(".press-plate");
+    if (!plate) return;
+    plate.dataset.plateFailed = "true";
+  },
+  true,
+);

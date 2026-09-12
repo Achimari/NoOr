@@ -8,40 +8,52 @@
   padding-block-start: 0;
 }
 
-.today-page .horizon {
+.today-page .today-opening {
   margin-block-start: 0;
   justify-content: flex-start;
   padding-block-start: var(--section-gap);
   padding-block-end: var(--space-5);
 }
 
+/* The opening: the day's name at display scale with its date beneath it. */
+.today-opening-inner {
+  display: block;
+}
+
 .today-dateline {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 16px;
-  row-gap: 4px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
 }
 
-.today-title {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: clamp(1.625rem, 2.3vw, 1.75rem);
-  font-weight: var(--weight-body);
-  line-height: 1.1;
-  letter-spacing: 0;
-  text-transform: none;
-  text-wrap: balance;
-}
-
+/* A date is data: mono, tracked, and set beneath the word it dates rather than
+   beside it, so the opening reads as a masthead and its dateline. */
 .today-date {
   margin: 0;
-  color: var(--ink-on-sky);
-  font-family: var(--font-ui);
-  font-size: var(--text-control);
+  color: var(--ink-muted);
+  font-family: var(--font-data);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
-  line-height: 1.4;
+  line-height: var(--leading-meta);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------ the three practices */
+
+/* The three practices follow one vertical reading path. Each keeps the rule it
+   already carries, so the stack reads as sections of one page, not cards. */
+.today-practices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--gap-sibling);
+  align-items: start;
+}
+
+.today-practices > .practice {
+  margin-block-end: 0;
+  min-width: 0;
 }
 
 .practice {
@@ -84,7 +96,7 @@
 .today-page .dashboard-actions {
   margin-bottom: 0;
 
-  /* Surface delegated to .sticker-surface — this rule now only positions. */
+  /* Surface delegated to .press-region — this rule now only positions. */
 }
 
 .today-page .dashboard-action {
@@ -140,7 +152,7 @@
 .today-page .dashboard-timer-label {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -190,10 +202,10 @@
   min-height: var(--tap-min);
   margin-block-start: var(--space-3);
   padding-inline: var(--space-4);
-  border: 1px solid var(--border-control);
+  border: 1px solid var(--action);
   border-radius: var(--radius-control);
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--action);
+  color: var(--on-action);
   font: inherit;
   font-size: var(--text-control);
   font-weight: var(--weight-body);
@@ -206,8 +218,8 @@
 
 @media (hover: hover) and (pointer: fine) {
   .daily-goals-add:hover:not(:disabled) {
-    background: var(--surface-subtle);
-    border-color: var(--ink-muted);
+    background: var(--action-hover);
+    border-color: var(--action-hover);
   }
 }
 
@@ -242,22 +254,6 @@
   display: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .today-page .ambient-video--band .ambient-video__media {
-
-    animation: none;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .today-page .dashboard-actions,
-  .today-page .daily-goals-body {
-    background: var(--surface);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-}
-
 .dashboard-actions {
   position: relative;
   display: grid;
@@ -266,10 +262,10 @@
   width: 100%;
   margin-bottom: var(--space-4);
 
-  /* Surface delegated to .sticker-surface: the answer panel is a record applied
-     to the page, so its edge, radius, fill and contact shadow are the sticker's
-     to own. Restating them here would silently override the primitive.
-     `overflow` stays clipped so the two answer halves meet the rounded edge. */
+  /* Surface delegated to .press-region: the answer panel is one group on the
+     page, so its edge, radius and fill are the primitive's to own. Restating
+     them here would silently override it. `overflow` stays clipped so the two
+     answer halves meet the region's cut edge exactly. */
   overflow: hidden;
 }
 
@@ -325,16 +321,22 @@
 
 .dashboard-action-yes {
   --state-fill: var(--success);
+  --state-tint: var(--success-soft);
   background: transparent;
 }
 
 .dashboard-action-no {
   --state-fill: var(--danger);
+  --state-tint: var(--danger-soft);
   background: transparent;
 }
 
 .dashboard-action:focus-visible:not([aria-pressed="true"]) {
-  background: var(--ink-06);
+  background: var(--state-tint);
+}
+
+.dashboard-action:not([aria-pressed="true"]) .dashboard-action-label {
+  color: var(--state-fill);
 }
 
 .dashboard-action:focus-visible:not([aria-pressed="true"]) .dashboard-action-subtitle {
@@ -343,7 +345,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .dashboard-action:hover:not(:disabled):not([aria-pressed="true"]) {
-    background: var(--ink-06);
+    background: var(--state-tint);
   }
 
   .dashboard-action:hover:not(:disabled):not([aria-pressed="true"]) .dashboard-action-subtitle {
@@ -355,12 +357,39 @@
   transform: scale(0.97);
 }
 
+/* A recorded answer fills green or red and keeps its white label and check,
+   so the selected state remains clear even without colour. */
 .dashboard-action-yes[aria-pressed="true"],
 .dashboard-action-no[aria-pressed="true"] {
+  position: relative;
   border: 0;
   background: var(--state-fill);
   color: var(--white);
 }
+
+/* The recorded mark. A selected control in a monochrome system cannot be
+   recognised by its fill alone — a hover, a focus and a disabled state can all
+   darken a surface — so every selected control also carries this printed check
+   in its corner. It is drawn in CSS rather than placed in the markup, because
+   the state already exists in `aria-pressed` and the mark must never be a
+   second source of truth.
+
+   Two strokes, rotated: a real check, not a tick-shaped glyph that disappears
+   in forced colours. */
+.dashboard-action-yes[aria-pressed="true"]::after,
+.dashboard-action-no[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 12px;
+  inline-size: 9px;
+  block-size: 16px;
+  border-inline-end: 2.5px solid currentColor;
+  border-block-end: 2.5px solid currentColor;
+  transform: rotate(42deg);
+  pointer-events: none;
+}
+
 
 .dashboard-action[aria-pressed="true"] .dashboard-action-label,
 .dashboard-action[aria-pressed="true"] .dashboard-action-subtitle {
@@ -384,7 +413,7 @@
 .dashboard-timer-label {
   margin: 0 0 var(--space-1);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -485,13 +514,24 @@
   border-radius: var(--radius-tag);
   background: var(--ink-10);
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
 
+/* A recorded Yes and a recorded No used to be a green tint and the default
+   grey. Both tints are the same neutral now, so the badge states the answer by
+   reversing it out of the ink instead — a Yes is struck, a No is printed — and
+   the badge's own text always spells the word either way. */
 .reading-summary-badge[data-answer="yes"] {
-  background: var(--success-tint);
+  background: var(--ink);
+  color: var(--white);
+  font-weight: var(--weight-strong);
+}
+
+.reading-summary-badge[data-answer="no"] {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
   color: var(--text-primary);
 }
 
@@ -520,7 +560,7 @@
   border-radius: var(--radius-tag);
   background: var(--surface-2);
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -557,7 +597,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-tag);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   white-space: nowrap;
 }
@@ -565,7 +605,7 @@
 .daily-goals-hint {
   margin: calc(var(--space-2) * -1) 0 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.45;
 }
@@ -674,7 +714,7 @@
   background: transparent;
   color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   cursor: pointer;
   transition:
@@ -723,7 +763,7 @@
 .daily-goals-progress {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -756,7 +796,7 @@
 
 .daily-goal-field label {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -790,7 +830,7 @@
 .daily-goal-confirm-copy {
   margin: 0;
   color: var(--text-primary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -824,7 +864,7 @@
 .catch-up-count {
   flex: 0 0 auto;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   white-space: nowrap;
 }
@@ -854,7 +894,7 @@
   background: var(--ink-06);
   color: var(--text-primary);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   cursor: pointer;
   transition:
@@ -888,15 +928,20 @@
   display: none;
 }
 
+/* A row inside a region is divided from its neighbours, not boxed away from
+   them: boxing each one is the nested-card habit, and it is what made the
+   catch-up panel read as a tray of smaller trays. */
 .catch-up-item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   min-width: 0;
-  padding: var(--space-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-control);
-  background: var(--ink-06);
+  padding-block: var(--space-3);
+  border-block-start: 1px solid var(--rule);
+}
+
+.catch-up-item:first-child {
+  border-block-start: 0;
 }
 
 .catch-up-item-copy {
@@ -926,7 +971,7 @@
 .catch-up-item-note {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -940,7 +985,7 @@
   background: var(--action);
   color: var(--on-action);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   white-space: nowrap;
   cursor: pointer;
@@ -1085,7 +1130,7 @@ body.catch-up-modal-open {
 .catch-up-tasks-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(13, 13, 13, 0.44);
+  background: rgb(0 0 0 / 55%);
   backdrop-filter: blur(4px);
   transition: opacity var(--duration-panel) var(--ease-out);
 }
@@ -1167,7 +1212,7 @@ body.catch-up-modal-open {
 .catch-up-tasks-error {
   margin: 0;
   color: var(--danger);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
@@ -1236,7 +1281,7 @@ body.catch-up-modal-open {
     align-self: flex-end;
     min-height: 36px;
     padding: 0 var(--space-3);
-    font-size: var(--text-micro);
+    font-size: var(--text-meta);
   }
 }
 

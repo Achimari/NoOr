@@ -38,79 +38,110 @@ describe("Quiet Light design tokens", () => {
   it("defines the approved semantic surface and ink roles", () => {
     const variables = read("public/styles/variables.css");
 
-    assert.match(variables, /--canvas:\s*#fcfcfa/i);
+    // Monochrome Press, 2026-09-12: white paper and black ink replace the
+    // mineral sheet and the graphite. `test/ink-on-paper.test.js` computes the
+    // contrast ratios and proves the whole system is neutral; this suite pins
+    // the token architecture around those values.
     assert.match(variables, /--paper:\s*#ffffff/i);
-    assert.match(variables, /--paper-raised:\s*#ffffff/i);
-    assert.match(variables, /--paper-muted:\s*#f3f3f0/i);
+    assert.match(variables, /--paper-raised:\s*var\(--paper\)/i);
+    assert.match(variables, /--paper-muted:\s*#f2f2f2/i);
+    assert.match(variables, /--canvas:\s*var\(--paper\)/i);
+    assert.match(variables, /--field:\s*#000000/i);
     assert.match(variables, /--surface:\s*var\(--paper\)/i);
     assert.match(variables, /--surface-subtle:\s*var\(--paper-muted\)/i);
-    assert.match(variables, /--ink:\s*#111111/i);
+    assert.match(variables, /--ink:\s*#000000/i);
     assert.match(variables, /--ink-secondary:\s*var\(--ink-muted\)/i);
     assert.match(variables, /--separator:\s*var\(--rule\)/i);
-    assert.match(variables, /--brand:\s*#315f73/i);
-    assert.match(variables, /--brand-hover:\s*#244b5c/i);
+
+    // Filled actions remain black; green and red are reserved for state.
+    assert.match(variables, /--accent:\s*var\(--ink\)/i);
+    assert.match(variables, /--action:\s*var\(--ink\)/i);
+    assert.match(variables, /--action-hover:\s*var\(--ink-raised\)/i);
+    assert.match(variables, /--brand:\s*var\(--ink\)/i);
+    assert.match(variables, /--brand-hover:\s*var\(--ink-raised\)/i);
   });
 
-  it("keeps the approved semantic Yes/No colours", () => {
+  it("keeps green Yes and red No semantic roles with their own state rules", () => {
     const variables = read("public/styles/variables.css");
 
-    assert.match(variables, /--success:\s*#14713c/i);
-    assert.match(variables, /--danger:\s*#b3261e/i);
+    assert.match(variables, /--success:\s*#1d704e/i);
+    assert.match(variables, /--danger:\s*#b73535/i);
+    assert.match(variables, /--success-line:\s*var\(--success\)/i);
+    assert.match(variables, /--danger-line:\s*var\(--danger\)/i);
   });
 
-  it("sets the whole interface in one visible family", () => {
+  it("sets each role in the family that role is for", () => {
     const variables = read("public/styles/variables.css");
 
-    // Achimari Hand is named once and every role follows it. `cursive` sits
-    // behind it for a failed load or a glyph the face does not draw; it is a
-    // generic fallback, not a companion typeface a reader would ever see.
-    assert.match(variables, /--font-brand:\s*"Achimari Hand",\s*cursive/);
+    // Sacred Press, 2026-09-11: four semantic roles across three self-hosted
+    // OFL families. The single-handwritten-family rule this replaces is
+    // recorded as superseded in CONSTRAINTS.md.
+    assert.match(variables, /--font-display:\s*"Unbounded",/);
+    assert.match(variables, /--font-ui:\s*"IBM Plex Sans Condensed",/);
+    assert.match(variables, /--font-body:\s*"IBM Plex Sans",/);
+    assert.match(variables, /--font-data:\s*"IBM Plex Mono",/);
+    assert.match(variables, /--font-reading:\s*var\(--font-body\)/);
 
-    for (const role of ["--font-display", "--font-ui", "--font-body", "--font-reading", "--font-data"]) {
-      assert.match(
-        variables,
-        new RegExp(`${role}:\\s*var\\(--font-brand\\)`),
-        `${role} must resolve to Achimari Hand, not to a second family`,
-      );
-    }
-
-    assert.doesNotMatch(variables, /--font-system:/, "the system stack is no longer a typography role");
+    assert.doesNotMatch(variables, /--font-brand:/, "the one-family token is retired");
+    assert.doesNotMatch(variables, /--font-system:/, "the system stack is not a typography role");
+    assert.doesNotMatch(variables, /Achimari Hand/, "the handwritten face is in no role");
     assert.doesNotMatch(variables, /font-family:\s*"(?:Kitaro Road|Sagfield)"/);
     assert.doesNotMatch(variables, /url\([^)]*SF[- ]?Pro/i);
-    assert.match(variables, /url\("\/fonts\/achimari-hand\/AchimariHand-Regular\.otf"\)/);
-    assert.doesNotMatch(variables, /url\(["']?(?:https?:)?\/\//i);
+    assert.doesNotMatch(variables, /url\(["']?(?:https?:)?\/\//i, "every face is same-origin");
+
+    // Seven faces, every one of them served from this repository.
+    const sources = [...variables.matchAll(/src:\s*url\("([^"]+)"\)/g)].map(([, url]) => url);
+    assert.equal(sources.length, 7);
+    for (const url of sources) {
+      assert.match(url, /^\/fonts\/.+\.woff2$/, `${url} must be a local WOFF2`);
+      assert.ok(existsSync(path.join(publicDir, url.replace(/^\//, ""))), `${url} must exist`);
+    }
   });
 
   it("keeps the accessible secondary ink and holds the quiet ink off text", () => {
     const variables = read("public/styles/variables.css");
 
-    // #8a8a8a is 3.5:1 on white — a rule colour, not a text colour. The darker
-    // secondary is 8.2:1, so small and image-adjacent copy clears roughly 7:1.
+    // --ink-quiet is deliberately below the text floor on paper: it is a rule
+    // and divider colour, and ink-on-paper.test.js proves nothing sets text in
+    // it. The two secondary inks both clear AA on every paper step.
     assert.match(variables, /--ink-quiet:\s*#8a8a8a/i);
-    assert.match(variables, /--ink-secondary-strong:\s*#4f4f4a/i);
-    assert.match(variables, /--ink-muted:\s*#5c5c58/i);
-    assert.match(variables, /--ink-on-sky:\s*var\(--ink\)/);
+    assert.match(variables, /--ink-secondary-strong:\s*#333333/i);
+    assert.match(variables, /--ink-muted:\s*#525252/i);
+    assert.doesNotMatch(variables, /--ink-on-sky:/, "the sky is retired, and so is the ink role that floated on it");
   });
 
-  it("publishes a type scale whose every step stays readable in a handwritten face", () => {
+  it("publishes a type scale with real contrast between its steps", () => {
     const variables = read("public/styles/variables.css");
     const step = (name) => Number(variables.match(new RegExp(`${name}:\\s*([\\d.]+)rem`))[1]) * 16;
 
-    assert.equal(step("--text-body"), 20, "long-form copy sits at 20px");
-    assert.equal(step("--text-control"), 18, "ordinary copy, inputs and controls sit at 18px");
-    assert.equal(step("--text-label"), 17, "labels and critical data sit at 17px");
-    assert.equal(step("--text-micro"), 16, "nothing meaningful is set below this");
-    assert.equal(step("--text-page-title"), 32, "a page title sits at 32px");
-    assert.ok(step("--text-component") >= 20 && step("--text-component") <= 24);
+    assert.equal(step("--text-body"), 17, "long-form copy sits at 17px");
+    assert.equal(step("--text-control"), 16, "interface copy, inputs and controls sit at 16px");
+    assert.equal(step("--text-label"), 15, "labels sit at 15px");
+    assert.equal(step("--text-meta"), 14, "dates, timers and metadata sit at 14px");
+    assert.equal(step("--text-mark"), 13, "the mono margin mark is the floor");
+    assert.ok(step("--text-component") >= 18 && step("--text-component") <= 24);
+
+    // The old scale ran 16/17/18/20 — four steps inside four pixels, which is
+    // no hierarchy at all. Every adjacent pair must now actually differ, and
+    // the span from the floor to the figure must be a real ratio.
+    const ramp = ["--text-mark", "--text-meta", "--text-label", "--text-control", "--text-body"].map(step);
+    for (let i = 1; i < ramp.length; i += 1) {
+      assert.ok(ramp[i] > ramp[i - 1], "every step in the ramp must be larger than the one below it");
+    }
+    assert.ok(step("--text-figure") / step("--text-body") >= 2, "a major figure towers over body copy");
   });
 
-  it("publishes one weight, because the face ships one", () => {
+  it("publishes only weights the shipped faces can draw", () => {
     const variables = read("public/styles/variables.css");
 
     assert.match(variables, /--weight-body:\s*400/);
-    for (const retired of ["--weight-medium", "--weight-semibold", "--weight-strong"]) {
-      assert.doesNotMatch(variables, new RegExp(`${retired}:`), `${retired} promises a weight that does not exist`);
-    }
+    assert.match(variables, /--weight-strong:\s*600/, "IBM Plex ships a real 600 here");
+    assert.match(variables, /--weight-display:\s*700/);
+    assert.match(variables, /--weight-display-heavy:\s*800/);
+
+    // 500 was never shipped by any face in this repository, and asking for it
+    // is how a synthesised weight creeps back in.
+    assert.doesNotMatch(variables, /--weight-medium:/, "--weight-medium promises a weight nothing ships");
   });
 });
 

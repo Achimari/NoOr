@@ -52,14 +52,14 @@
   top: var(--space-2);
   right: var(--space-3);
   color: var(--text-secondary);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
 .roadmap-step-icon {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   border: 1px solid var(--border);
   background: var(--surface-soft);
   color: var(--icon-text);
@@ -160,7 +160,7 @@
 .icon-chip-sm {
   width: 34px;
   height: 34px;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   font-size: var(--text-control);
   --chip-icon-size: 16px;
 }
@@ -168,7 +168,7 @@
 .icon-chip-md {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--radius-control);
   font-size: var(--text-control);
   --chip-icon-size: 16px;
 }
@@ -246,7 +246,7 @@
 .useful-subtitle {
   color: var(--text-secondary);
   margin: 0 0 var(--space-2);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
 }
 
 .useful-track {
@@ -266,14 +266,14 @@
 
 .useful-track::-webkit-scrollbar-thumb {
   background: var(--track-thumb);
-  border-radius: 20px;
+  border-radius: var(--radius-control);
 }
 
 .useful-link-card {
   flex: 0 0 clamp(260px, 28vw, 320px);
   min-height: 78px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-control);
   background: var(--surface);
   padding: 12px var(--space-3);
   display: flex;
@@ -293,14 +293,14 @@
 @media (hover: hover) and (pointer: fine) {
   .useful-link-card:hover {
     border-color: var(--link-card-hover-border);
-    box-shadow: 0 4px 10px var(--link-card-hover-shadow);
+    box-shadow: none;
   }
 }
 
 .useful-link-logo-box {
   width: 34px;
   height: 34px;
-  border-radius: 9px;
+  border-radius: var(--radius-control);
   border: 1px solid var(--favicon-chip-border);
   background: var(--favicon-chip-bg);
   display: inline-flex;
@@ -312,7 +312,7 @@
 .useful-link-logo {
   width: 22px;
   height: 22px;
-  border-radius: 5px;
+  border-radius: var(--radius-control);
   display: block;
   object-fit: contain;
 }

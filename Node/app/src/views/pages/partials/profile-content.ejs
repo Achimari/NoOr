@@ -74,7 +74,7 @@
                   <%= stat.charAt(0).toUpperCase() + stat.slice(1) %>
                 </label>
                 <div class="profile-allocation-control">
-                  <button class="profile-step" type="button" data-allocation-step="-1" data-allocation-stat="<%= stat %>" aria-label="Remove a point from <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>>&minus;</button>
+                  <button class="profile-step" type="button" data-allocation-step="-1" data-allocation-stat="<%= stat %>" aria-label="Remove a point from <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "minus", className: "ui-icon--sm" }) %></button>
                   <input
                     class="profile-allocation-input"
                     id="allocate-<%= stat %>"
@@ -87,7 +87,7 @@
                     data-allocation-input="<%= stat %>"
                     <%= profile.allocation.locked ? "disabled" : "" %>
                   />
-                  <button class="profile-step" type="button" data-allocation-step="1" data-allocation-stat="<%= stat %>" aria-label="Add a point to <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>>+</button>
+                  <button class="profile-step" type="button" data-allocation-step="1" data-allocation-stat="<%= stat %>" aria-label="Add a point to <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "plus", className: "ui-icon--sm" }) %></button>
                 </div>
                 <p class="profile-allocation-earned">+<%= profile.earned[stat] %> earned this month</p>
               </div>
@@ -189,7 +189,7 @@
 
         <section class="profile-pane profile-privacy" aria-labelledby="privacy-title">
           <header class="dashboard-card-head">
-            <h2 id="privacy-title">Privacy</h2>
+            <h2 id="privacy-title"><%- include("../../components/ui/icon", { name: "lock", className: "practice-mark" }) %>Privacy</h2>
           </header>
           <p class="profile-note">
             Sharing is off by default. When an item is private, other members see

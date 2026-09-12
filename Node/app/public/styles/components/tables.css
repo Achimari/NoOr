@@ -14,9 +14,11 @@
   border-collapse: collapse;
   font-family: var(--font-data);
 
-  /* Achimari Hand draws proportional digits and ships no `tnum` feature, so
-     columns are held by alignment and a reserved width, not by the font.
-     This line is harmless progressive enhancement if a fallback face renders. */
+  /* The data role is IBM Plex Mono, whose digits already share one advance, so
+     a column of figures lines up without help. The declaration stays for the
+     fallback stack, where a proportional face would otherwise let the rank and
+     figure columns shift under each other. Alignment and the reserved widths
+     below remain the load-bearing mechanism either way. */
   font-variant-numeric: tabular-nums;
 }
 
@@ -98,7 +100,7 @@
 .data-table-you {
   margin-inline-start: var(--space-2);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }

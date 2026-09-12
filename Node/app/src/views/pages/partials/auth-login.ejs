@@ -6,13 +6,16 @@
   const generalErrors = formErrors.filter((message) => !attributed.has(message));
 %>
 <main id="main-content" tabindex="-1" class="auth-page">
-  <section class="section auth-section">
-    <div class="container auth-container">
-      <div class="auth-brand">
-        <%- include("../../components/ui/brand-mark", { tone: "chrome", size: "lead" }) %>
-      </div>
+  <section class="auth-gateway">
 
-      <form class="auth-card sticker-surface" action="/login" method="post" novalidate>
+    <header class="auth-masthead">
+      <%- include("../../components/ui/brand-mark", { tone: "paper", size: "masthead" }) %>
+    </header>
+
+    <div class="auth-body">
+
+      <div class="auth-form-column">
+        <form class="auth-card press-region" action="/login" method="post" novalidate>
         <header class="auth-head">
           <h1 class="auth-title"><%= t("auth.login.title") %></h1>
           <% if (t("auth.login.subtitle")) { %>
@@ -22,6 +25,7 @@
 
         <% if (generalErrors.length) { %>
           <div class="auth-errors" role="alert">
+            <%- include("../../components/ui/icon", { name: "warning", className: "ui-icon--sm" }) %>
             <% generalErrors.forEach((error) => { %>
               <p><%= error %></p>
             <% }) %>
@@ -43,7 +47,7 @@
             required
           />
           <% if ((byField.name || byField.login || []).length) { %>
-            <p class="field-error" id="login-name-error"><%= (byField.name || byField.login).join(" ") %></p>
+            <p class="field-error" id="login-name-error"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= (byField.name || byField.login).join(" ") %></p>
           <% } %>
         </div>
 
@@ -59,15 +63,17 @@
             required
           />
           <% if ((byField.password || []).length) { %>
-            <p class="field-error" id="login-password-error"><%= byField.password.join(" ") %></p>
+            <p class="field-error" id="login-password-error"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= byField.password.join(" ") %></p>
           <% } %>
         </div>
 
         <div class="auth-actions">
-          <button class="ui-button ui-button--primary auth-submit" type="submit"><%= t("auth.login.submit") %></button>
-          <a class="ui-button ui-button--secondary auth-secondary" href="/onboarding"><%= t("auth.login.onboardingLink") %></a>
+          <button class="ui-button ui-button--accent auth-submit" type="submit"><%= t("auth.login.submit") %><%- include("../../components/ui/icon", { name: "arrow-right", className: "ui-icon--sm" }) %></button>
+          <a class="ui-button ui-button--quiet auth-secondary" href="/onboarding"><%= t("auth.login.onboardingLink") %></a>
         </div>
-      </form>
+        </form>
+      </div>
+
     </div>
   </section>
 </main>

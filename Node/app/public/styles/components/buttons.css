@@ -45,17 +45,36 @@
   transform: none;
 }
 
+/* A focus ring has to be visible against the thing it rings. The two filled
+   controls are black fields, so their ring is white; the destructive control is
+   paper now, so it keeps the ordinary ink ring. */
 .ui-button--primary:focus-visible,
-.ui-button--danger:focus-visible {
+.ui-button--accent:focus-visible {
   outline-color: var(--focus-ring-on-deep);
 }
 
 .ui-button--primary {
-  background: var(--ink);
-  color: var(--white);
+  background: var(--action);
+  color: var(--on-action);
+}
+
+/* Accent and primary actions share the same black field. */
+.ui-button--accent {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: transparent;
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .ui-button--accent:hover:not(:disabled) {
+    background: var(--accent-hover);
+  }
+
+  .ui-button--danger:hover:not(:disabled) {
+    background: var(--danger-soft);
+    border-inline-start-color: var(--danger-line);
+  }
+
   .ui-button--primary:hover:not(:disabled) {
     background: var(--action-hover);
   }
@@ -101,24 +120,18 @@
   color: var(--ink);
 }
 
+/* Destructive actions use red text and a heavy leading rule. */
 .ui-button--danger {
-  border-color: color-mix(in srgb, var(--danger) 34%, transparent);
-  background: var(--danger-soft);
+  border-color: var(--rule-strong);
+  border-inline-start: 3px solid var(--danger-line);
+  background: var(--paper);
   color: var(--danger);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .ui-button--danger:hover:not(:disabled) {
-    background: var(--danger);
-    color: var(--white);
-    border-color: var(--danger);
-  }
+  font-weight: var(--weight-strong);
 }
 
 .ui-button--danger:focus-visible {
-  background: var(--danger);
-  color: var(--white);
-  border-color: var(--danger);
+  background: var(--danger-soft);
+  border-inline-start-color: var(--danger-line);
 }
 
 .ui-button--icon {
@@ -154,8 +167,10 @@
   animation: ui-button-spin 620ms linear infinite;
 }
 
+/* The spinner rides whatever the control's own ground is: white on the filled
+   primary, ink on the paper-ground destructive control. */
 .ui-button--primary[data-loading="true"]::after,
-.ui-button--danger[data-loading="true"]::after {
+.ui-button--accent[data-loading="true"]::after {
   color: var(--white);
 }
 

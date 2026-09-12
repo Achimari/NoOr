@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import ejs from "ejs";
+
+import { sharedViewLocals } from "./helpers/viewLocals.js";
 import en from "../src/i18n/locales/en.js";
 import { getPageAssets } from "../src/middleware/viewLocals.js";
 
@@ -107,7 +109,8 @@ function withLoadout(equipped = ["clear-sight"]) {
 }
 
 async function renderSpells(value) {
-  return ejs.renderFile(spellsPartialPath, { profile: value });
+  return ejs.renderFile(spellsPartialPath, {
+    ...sharedViewLocals, profile: value });
 }
 
 describe("Profile spell exploration", () => {

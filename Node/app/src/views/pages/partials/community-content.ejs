@@ -1,9 +1,12 @@
 <main id="main-content" tabindex="-1" class="dashboard-page community-page">
   <div class="page-shell">
 
-    <header class="page-head">
-      <h1 class="page-head-title">Community</h1>
-      <p class="page-head-lede">Find today's encouragement, practical support, and prayers from the community.</p>
+    <header class="page-head prayers-opening">
+      <div class="page-head-copy">
+        <h1 class="page-head-title">Community</h1>
+        <p class="page-head-lede">Find today's encouragement, practical support, and prayers from the community.</p>
+      </div>
+
     </header>
 
     <section class="page-section section-frame section-frame--ruled community-editorial" aria-labelledby="community-encouragement-title">
@@ -59,7 +62,7 @@
           <div class="prayer-select">
             <button class="prayer-filter-control prayer-select-trigger" type="button" data-prayer-time-toggle aria-expanded="false" aria-controls="prayer-time-menu" aria-labelledby="prayer-time-label prayer-time-value">
               <span id="prayer-time-value" data-prayer-time-label>Newest first</span>
-              <span class="prayer-select-chevron" aria-hidden="true"></span>
+              <span class="prayer-select-chevron" aria-hidden="true"><%- include("../../components/ui/icon", { name: "chevron", className: "ui-icon--sm" }) %></span>
             </button>
             <div class="prayer-filter-menu" id="prayer-time-menu" data-prayer-time-menu hidden>
               <button type="button" data-prayer-time-option="newest">Newest first</button>

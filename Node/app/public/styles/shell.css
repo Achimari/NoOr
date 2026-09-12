@@ -90,9 +90,28 @@
 
 .t-eyebrow {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   line-height: 1.4;
   letter-spacing: 0.01em;
+}
+
+/* The page opening: a typographic band aligned to the same grid as every
+   operational region below it, so the title and content share one left edge. */
+.page-opening {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: max(calc(50vw - 50%), env(safe-area-inset-left));
+  padding-block: var(--section-gap) var(--space-5);
+  min-block-size: var(--opening-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.page-opening-inner {
+  width: 100%;
+  max-width: var(--measure-wide);
+  margin-inline: auto;
+  padding-inline: var(--padding);
 }
 
 .page-head {
@@ -103,31 +122,47 @@
 }
 
 .page-head-eyebrow {
-  color: var(--ink-on-sky);
+  color: var(--ink-muted);
+  font-family: var(--font-data);
   font-weight: var(--weight-body);
-  font-size: var(--text-meta);
+  font-size: var(--text-mark);
   line-height: var(--leading-meta);
-  letter-spacing: 0.01em;
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
 }
 
+/* A route names itself once, at display scale, in the one expressive face the
+   system has. Capitals here are a typographic treatment: the markup writes the
+   title in sentence case, which is what a screen reader announces. */
 .page-head-title {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-display);
   font-size: var(--text-page-title);
-  font-weight: var(--weight-body);
+  font-weight: var(--weight-display-heavy);
   line-height: var(--leading-display);
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
+/* The line under the title is the page's own sentence, set in the body face at
+   a real reading measure. */
 .page-head-lede {
   max-width: var(--measure-prose);
   margin: 0;
-  color: var(--ink-on-sky);
+  color: var(--ink-muted);
+  font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: var(--leading-body);
   text-wrap: pretty;
+}
+
+.page-head-copy {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .page-head--with-action {
@@ -176,28 +211,38 @@
 
 .section-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-2) var(--space-4);
   margin-block-end: var(--space-4);
 }
 
+/* A section opening, one step below the page opening. Fluid, because a long
+   heading in the display face is the one thing that reliably breaks a 320px
+   screen, and `overflow-wrap` is the floor under that rather than the plan. */
 .section-head-title {
   margin: 0;
+  min-width: 0;
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: var(--text-title);
-  font-weight: var(--weight-body);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  overflow-wrap: break-word;
+  font-weight: var(--weight-display);
   line-height: var(--leading-title);
-  letter-spacing: 0;
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 
 .section-head-note {
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
   color: var(--ink-muted);
+  font-family: var(--font-data);
   font-size: var(--text-meta);
   line-height: var(--leading-meta);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
 }
 
 .section-lede {

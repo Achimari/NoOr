@@ -24,16 +24,32 @@ body:has([data-battle-page][data-battle-focus="true"]) main { min-height: 0; }
 
 .battle-active {
 
-  --hp: var(--success);
-  --hp-lag: rgba(20, 113, 60, 0.3);
-  --hp-danger: var(--danger);
-  --mana: #2f5d9e;
-  --resolve: #b07d28;
-  --resolve-ink: #8a5f18;
-  --hit: var(--danger);
+  /* Every meter on this page is ink on white, so none of them may be told apart
+     by colour. Each is given its own printed fill instead — solid, stipple,
+     bar — and each states its own numbers as text beside it and carries its own
+     label. A reader who cannot see the bar at all still has the figures, and a
+     reader who can never has to decide which grey is which.
 
-  --plate-bg: rgba(255, 255, 255, 0.9);
-  --plate-border: rgba(13, 13, 13, 0.16);
+       health           solid ink
+       health (low)     ink under a reversed diagonal hatch
+       mana             ink under a stipple
+       resolve          muted ink under a reversed bar
+
+     The lag bar behind health is the same ink at 30%, so a hit reads as the
+     solid bar dropping away from a ghost rather than as a second colour. */
+  --hp: var(--ink);
+  --hp-lag: rgb(0 0 0 / 30%);
+  --hp-danger: var(--ink);
+  --mana: var(--ink);
+  --resolve: var(--ink-muted);
+  --resolve-ink: var(--ink-secondary-strong);
+
+  /* The impact mark. It was the vermilion overprint; it is the ink now, and it
+     is distinguished by being a struck mark rather than by being a hue. */
+  --hit: var(--ink);
+
+  --plate-bg: var(--paper-raised);
+  --plate-border: var(--rule);
 
   position: fixed;
   inset: 0;
@@ -41,19 +57,11 @@ body:has([data-battle-page][data-battle-focus="true"]) main { min-height: 0; }
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
-  background:
-    radial-gradient(140% 90% at 50% 8%, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.34) 52%, rgba(255, 255, 255, 0.12) 100%),
-    var(--ambient-base);
-  color: var(--text-primary);
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .battle-active[hidden] { display: none; }
-
-body.has-ambient-video .battle-active {
-  background:
-    radial-gradient(140% 90% at 50% 8%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2) 55%, rgba(255, 255, 255, 0) 100%),
-    transparent;
-}
 
 .battle-stage {
   position: relative;
@@ -82,14 +90,22 @@ body.has-ambient-video .battle-active {
   min-height: 0;
 }
 
+/* The ground the figures stand on: a halftone band that thickens toward the
+   bottom of the stage, screened rather than blurred, so it reads as ink laid on
+   the sheet rather than as a soft drop shadow under the scene. */
 .battle-ground {
   position: absolute;
   inset-inline: -6%;
   bottom: 0;
   height: 44%;
   pointer-events: none;
-  background:
-    radial-gradient(110% 78% at 50% 104%, rgba(13, 13, 13, 0.13), rgba(13, 13, 13, 0) 72%);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 22%) 0 1px,
+    transparent 1px 5px
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 100%);
 }
 
 .battle-figure {
@@ -134,7 +150,7 @@ body.has-ambient-video .battle-active {
   width: calc(var(--figure-height) * 0.5);
   height: calc(var(--figure-height) * 0.07);
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(13, 13, 13, 0.24), rgba(13, 13, 13, 0));
+  background: radial-gradient(closest-side, rgb(0 0 0 / 24%), rgb(0 0 0 / 0));
   pointer-events: none;
 }
 
@@ -235,14 +251,17 @@ body.has-ambient-video .battle-active {
 }
 
 .battle-ward {
-  border: 1.5px solid rgba(13, 13, 13, 0.42);
+  border: 1.5px solid rgb(0 0 0 / 42%);
   border-bottom-color: transparent;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0));
+  background: linear-gradient(180deg, rgb(255 255 255 / 34%), rgb(255 255 255 / 0));
 }
 
 .battle-shield-ring {
-  border: 1.5px dashed rgba(47, 93, 158, 0.6);
-  background: radial-gradient(closest-side, rgba(47, 93, 158, 0.09), transparent);
+  /* A ward is a solid outline and a shield is a dashed one: the two protective
+     states differ by stroke, not by colour, and each is named in the status
+     row beside the figure. */
+  border: 1.5px dashed rgb(0 0 0 / 62%);
+  background: radial-gradient(closest-side, rgb(0 0 0 / 9%), transparent);
 }
 
 .battle-figure[data-guarding="true"] .battle-ward { opacity: 1; }
@@ -273,12 +292,20 @@ body.has-ambient-video .battle-active {
   100% { opacity: 0; transform: translateY(-42px) scale(1.05); }
 }
 
+/* One vermilion overprint on a resolved hit, and nothing else on the stage
+   carries this colour. It is transient: at rest its opacity is 0, and the
+   choreography raises and clears it around a beat the server already decided. */
 .battle-impact {
   width: calc(var(--figure-height) * 0.46);
   height: calc(var(--figure-height) * 0.46);
   bottom: 38%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 250, 235, 0.95), rgba(255, 244, 214, 0.35) 46%, rgba(255, 244, 214, 0) 78%);
+  background: radial-gradient(
+    closest-side,
+    var(--accent) 0 18%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 34%,
+    color-mix(in srgb, var(--accent) 0%, transparent) 74%
+  );
 }
 
 .battle-glyph {
@@ -308,7 +335,7 @@ body.has-ambient-video .battle-active {
   font-weight: var(--weight-body);
   letter-spacing: 0;
   color: var(--hit);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85), 0 6px 18px rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 0 var(--paper), 0 6px 18px var(--paper);
 }
 
 .battle-hit[data-tier="large"] { font-size: clamp(2rem, 1.1rem + 5vw, 4.6rem); }
@@ -361,12 +388,8 @@ body.has-ambient-video .battle-active {
 
 .battle-hud-them .battle-plate { flex-direction: row-reverse; text-align: right; }
 
-@supports (backdrop-filter: blur(8px)) {
-  .battle-plate { backdrop-filter: var(--glass-blur); }
-}
-
 @media (prefers-reduced-transparency: reduce) {
-  .battle-plate { background: var(--surface-1); backdrop-filter: none; }
+  .battle-plate { background: var(--paper-raised); }
 }
 
 .battle-plate-emblem {
@@ -453,18 +476,25 @@ body.has-ambient-video .battle-active {
 
 .battle-track-health[data-danger="true"] .battle-track-fill {
   background:
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.5) 0 3px, transparent 3px 6px),
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 60%) 0 3px, transparent 3px 6px),
     var(--hp-danger);
 }
 
 .battle-track-mana { height: 5px; }
-.battle-track-mana .battle-track-fill { background: var(--mana); }
+
+/* Mana is stippled, so it is never the same printed field as health. */
+.battle-track-mana .battle-track-fill {
+  background:
+    radial-gradient(rgb(255 255 255 / 85%) 0.7px, transparent 0.8px) 0 0 / 3px 3px,
+    var(--mana);
+}
 
 .battle-track-resolve { height: 6px; }
 
 .battle-track-resolve .battle-track-fill {
+  /* Barred, not hatched: the reversed diagonal already means "health is low". */
   background:
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.55) 0 3px, transparent 3px 6px),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 55%) 0 1.5px, transparent 1.5px 4px),
     var(--resolve);
 }
 
@@ -541,7 +571,7 @@ body.has-ambient-video .battle-active {
   justify-self: center;
   margin: 0 0 clamp(var(--space-2), 2vh, var(--space-5));
   padding: 6px var(--space-4);
-  border: 1px solid rgba(13, 13, 13, 0.6);
+  border: 1px solid rgb(0 0 0 / 60%);
   border-radius: 999px;
   background: var(--ink-92);
   color: var(--on-action);
@@ -616,12 +646,8 @@ body.has-ambient-video .battle-active {
   box-shadow: var(--edge-light), var(--shadow-panel);
 }
 
-@supports (backdrop-filter: blur(8px)) {
-  .battle-dock-inner { backdrop-filter: var(--glass-blur); }
-}
-
 @media (prefers-reduced-transparency: reduce) {
-  .battle-dock-inner { background: var(--surface-1); backdrop-filter: none; }
+  .battle-dock-inner { background: var(--paper-raised); }
 }
 
 .battle-dock-actions {
@@ -670,8 +696,11 @@ body.has-ambient-video .battle-active {
   color: var(--on-action);
 }
 
+/* Surge spends resolve, so it is marked apart from the ordinary moves — by the
+   resolve tone the meter above it already uses, not by a gold this system does
+   not have. The label says "Surge" either way. */
 .battle-move[data-action="SURGE"]:not(:disabled) {
-  border-color: rgba(176, 125, 40, 0.7);
+  border-color: var(--rule-strong);
   color: var(--resolve-ink);
 }
 
@@ -717,7 +746,7 @@ body.has-ambient-video .battle-active {
   border: 1px solid var(--plate-border);
   border-radius: var(--radius-panel);
   background: var(--surface-1);
-  box-shadow: var(--shadow-pop);
+  box-shadow: none;
 }
 
 .battle-spells { display: grid; gap: var(--space-2); }
@@ -836,7 +865,7 @@ body.has-ambient-video .battle-active {
   display: grid;
   place-items: center;
   padding: var(--space-5);
-  background: rgba(255, 255, 255, 0.55);
+  background: rgb(255 255 255 / 55%);
   animation: battle-outcome-in var(--duration-panel) var(--ease-out) both;
 }
 
@@ -853,7 +882,7 @@ body.has-ambient-video .battle-active {
   border: 1px solid var(--plate-border);
   border-radius: var(--radius-panel);
   background: var(--surface-1);
-  box-shadow: var(--shadow-pop);
+  box-shadow: none;
   text-align: center;
   animation: battle-outcome-card-in var(--duration-panel) var(--ease-out) both;
 }

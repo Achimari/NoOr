@@ -7,7 +7,7 @@
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  background: rgba(29, 29, 31, 0.40);
+  background: rgb(0 0 0 / 55%);
   opacity: 0;
   transition: opacity var(--duration-panel) var(--ease-out);
 }

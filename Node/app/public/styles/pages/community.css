@@ -34,7 +34,7 @@
 .community-quote-source {
   margin-block-start: var(--space-2);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
 }
 
 .community-resource {
@@ -54,7 +54,7 @@
 .community-resource-meta {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
 }
 
 .community-resource-summary {
@@ -81,7 +81,7 @@
   display: block;
   margin-block-end: 2px;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   letter-spacing: 0.02em;
 }
@@ -135,7 +135,7 @@
   margin: 0 0 var(--space-4);
   padding: var(--space-3);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: var(--radius-panel);
   background: var(--surface-2);
   animation: panel-in var(--duration-panel) var(--ease-drawer);
 }
@@ -145,7 +145,7 @@
   display: grid;
   gap: var(--space-1);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
@@ -206,18 +206,24 @@
   transform: scale(0.97);
 }
 
+/* The chevron is the shared registry icon, so the select's affordance is drawn
+   in the same family and weight as every other mark on the page. It rotates a
+   half-turn when the menu opens; the rotation is the only thing this rule
+   owns, because the icon's size and colour come from the shared geometry. */
 .prayer-select-chevron {
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  opacity: 0.72;
-  transform: rotate(45deg) translateY(-2px);
+  display: inline-flex;
+  color: var(--ink-muted);
   transition: transform var(--duration-ui) var(--ease-out);
 }
 
 .prayer-select-trigger[aria-expanded="true"] .prayer-select-chevron {
-  transform: rotate(225deg) translateY(-2px);
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prayer-select-chevron {
+    transition: none;
+  }
 }
 
 .prayer-filter-menu {
@@ -225,7 +231,7 @@
   top: calc(100% + var(--space-1));
   left: 0;
   right: 0;
-  z-index: 5;
+  z-index: var(--z-dropdown);
   max-height: 190px;
   overflow-y: auto;
   padding: var(--space-2);
@@ -290,7 +296,7 @@
   display: block;
   padding: var(--space-2);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 

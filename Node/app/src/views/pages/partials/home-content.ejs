@@ -13,8 +13,8 @@
 %>
 <main id="main-content" tabindex="-1" class="home-page dashboard-page today-page" data-daily-check-in data-current-user-id="<%= checkIn.id %>">
 
-  <div class="horizon" data-horizon data-state="neutral">
-    <div class="horizon-content">
+  <div class="page-opening today-opening">
+    <div class="page-opening-inner today-opening-inner">
 
       <div class="today-dateline">
         <h1 class="page-head-title today-title">Today</h1>
@@ -30,11 +30,15 @@
 
     <%- include("./catch-up", { missedActivities: missed, dateLocale: dayLocale }) %>
 
+    <div class="today-practices">
+
     <section class="practice section-frame section-frame--ruled" data-waypoint="open" aria-labelledby="practice-strong-title">
-      <h2 class="practice-title" id="practice-strong-title">Strong</h2>
+      <h2 class="practice-title" id="practice-strong-title">
+        <%- include("../../components/ui/icon", { name: "shield", className: "practice-mark" }) %>Strong
+      </h2>
       <p class="practice-lede">Did you stay strong today?</p>
 
-      <div class="dashboard-actions sticker-surface" role="group" aria-label="Daily action">
+      <div class="dashboard-actions press-region" role="group" aria-label="Daily action">
         <button class="dashboard-action dashboard-action-yes" type="button" aria-pressed="false">
           <span class="dashboard-action-copy">
             <span class="dashboard-action-label">YES</span>
@@ -54,7 +58,7 @@
       <div class="dashboard-timer-card" data-check-in-timer hidden aria-live="polite">
         <div class="dashboard-timer-copy">
           <div>
-            <p class="dashboard-timer-label">Next answer</p>
+            <p class="dashboard-timer-label"><%- include("../../components/ui/icon", { name: "clock", className: "ui-icon--sm" }) %>Next answer</p>
           </div>
           <span class="dashboard-timer-value" data-check-in-message>00:00:00</span>
         </div>
@@ -66,10 +70,12 @@
     </section>
 
     <section class="practice reading-check section-frame section-frame--ruled" data-waypoint="open" data-reading-check tabindex="-1" aria-labelledby="practice-bible-title">
-      <h2 class="practice-title" id="practice-bible-title">Bible reading</h2>
+      <h2 class="practice-title" id="practice-bible-title">
+        <%- include("../../components/ui/icon", { name: "book", className: "practice-mark" }) %>Bible reading
+      </h2>
       <p class="practice-lede">Did you read the Bible today?</p>
 
-      <div class="dashboard-actions reading-check-actions sticker-surface" data-reading-actions role="group" aria-label="Did you read the Bible today?">
+      <div class="dashboard-actions reading-check-actions press-region" data-reading-actions role="group" aria-label="Did you read the Bible today?">
         <button class="dashboard-action dashboard-action-yes reading-action reading-action-yes" type="button" data-reading-answer="YES" aria-pressed="false" aria-haspopup="dialog">
           <span class="dashboard-action-copy">
             <span class="dashboard-action-label">YES</span>
@@ -96,7 +102,7 @@
       <div class="dashboard-timer-card reading-check-timer" data-reading-timer hidden aria-live="polite">
         <div class="dashboard-timer-copy">
           <div>
-            <p class="dashboard-timer-label">Next reading answer</p>
+            <p class="dashboard-timer-label"><%- include("../../components/ui/icon", { name: "clock", className: "ui-icon--sm" }) %>Next reading answer</p>
           </div>
           <span class="dashboard-timer-value" data-reading-timer-message>00:00:00</span>
         </div>
@@ -109,7 +115,9 @@
 
     <section class="practice daily-goals section-frame section-frame--ruled" data-waypoint="open" data-daily-goals tabindex="-1" aria-labelledby="daily-goals-title">
       <div class="practice-head">
-        <h2 class="practice-title" id="daily-goals-title">Tasks</h2>
+        <h2 class="practice-title" id="daily-goals-title">
+        <%- include("../../components/ui/icon", { name: "tasks", className: "practice-mark" }) %>Tasks
+      </h2>
         <span class="daily-goals-count" data-daily-goal-count>0 of 5</span>
       </div>
       <p class="practice-lede">Plan up to five tasks for today. Check them off as you finish.</p>
@@ -135,6 +143,8 @@
         <button class="daily-goals-add" type="button" data-daily-goal-add>Add task</button>
       </div>
     </section>
+
+    </div>
 
   </div>
 

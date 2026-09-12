@@ -6,6 +6,7 @@ import { siteData } from "../data/siteData.js";
 import { paths } from "../config/paths.js";
 import { pageBundles, sharedScripts, sharedStyles, toUrl } from "../config/assetSources.js";
 import { getTimezoneLabel, getTimezoneOptions } from "../utils/timezones.js";
+import { ICON_NAMES, renderIcon } from "../utils/icons.js";
 
 function loadAssetManifest() {
   const manifestPath = path.join(paths.public, "assets", "manifest.json");
@@ -58,6 +59,8 @@ export function viewLocals(req, res, next) {
     auth: req.user || null,
     timezoneOptions: getTimezoneOptions(),
     getTimezoneLabel,
+    renderIcon,
+    iconNames: ICON_NAMES,
   };
   next();
 }

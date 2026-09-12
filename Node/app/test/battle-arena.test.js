@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import vm from "node:vm";
 import ejs from "ejs";
+
+import { sharedViewLocals } from "./helpers/viewLocals.js";
 import {
   ACTIONS,
   SIDES,
@@ -72,6 +74,7 @@ function sliceFor(before, after) {
 
 async function renderBattlePage(overrides = {}) {
   return ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
     pve: {
       activeBattleId: null,
       encounters: [

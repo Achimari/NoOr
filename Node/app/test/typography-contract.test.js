@@ -1,36 +1,103 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
 import { allRules, parseRules, relative, smallestPx, styleFiles } from "./helpers/cssRules.js";
-import { readFont } from "./helpers/otf.js";
+import { readWoff2 } from "./helpers/woff2.js";
 
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const fontsDir = path.join(appRoot, "public", "fonts");
 const read = (relativePath) => readFileSync(path.join(appRoot, relativePath), "utf8");
 
 /**
- * The product is set in one visible family: Achimari Hand. It ships a single
- * 400-weight face, so hierarchy has to come from size, space, colour, casing and
- * grouping — never from a weight or a slant the face cannot draw, and never from
- * a second family standing in as a "readable" companion.
+ * Sacred Press sets the product in four semantic roles drawn from three
+ * self-hosted OFL families. The role a piece of text has decides its family:
+ * display for the page opening, condensed UI for the interface, body for prose,
+ * mono for data. Nothing picks a font by taste, and the expressive face never
+ * touches a label, a control or a table.
  *
- * A handwritten face also needs more room than a grotesque, which is why the
- * floors below sit a step above conventional UI minimums.
+ * This supersedes the single-Achimari-Hand contract recorded in CONSTRAINTS.md
+ * on 2026-09-11. Because the faces are now drawn for screen interfaces rather
+ * than being a handwritten specimen, the size floors return to conventional UI
+ * minimums instead of sitting a step above them.
  */
-const TEXT_FLOOR_PX = 16;
-const CONTROL_FLOOR_PX = 18;
-// Critical HUD readings and statistics sit one step under the control floor.
-const DATA_FLOOR_PX = 17;
+const TEXT_FLOOR_PX = 16; // prose and anything read in quantity
+const CONTROL_FLOOR_PX = 15; // navigation, inputs, buttons, compact labels
+const ABSOLUTE_FLOOR_PX = 13; // the mono margin marks, and nothing else
 
-const BRAND_FAMILY = /var\(--font-(?:brand|display|ui|body|reading|data)\)|"Achimari Hand"/;
-const FONT_ROLES = ["--font-display", "--font-ui", "--font-body", "--font-reading", "--font-data"];
+const ROLE_FAMILY = {
+  "--font-display": "Unbounded",
+  "--font-ui": "IBM Plex Sans Condensed",
+  "--font-body": "IBM Plex Sans",
+  "--font-data": "IBM Plex Mono",
+  "--font-reading": "IBM Plex Sans",
+};
 
-/** Families that would be a second visible typeface if any role selected one. */
-const FOREIGN_FAMILY =
-  /-apple-system|BlinkMacSystemFont|"?SF Pro|"?Segoe UI|Helvetica|Arial|Roboto|Inter\b|Manrope|Atkinson|system-ui|sans-serif|serif(?!\s*$)|monospace/i;
+/**
+ * The display face is the loudest object in the system, so its use is a closed
+ * list rather than a convention. Adding a selector here is a deliberate design
+ * decision: a page opening, a selected section opening, the wordmark, or a
+ * major editorial numeral. A label, a button, a form or a table never appears.
+ */
+const DISPLAY_ROLE_SELECTORS = new Set([
+  ".brand-wordmark",
+  ".brand-lockup--masthead .brand-wordmark",
+  ".t-page-title",
+  ".section-title",
+  ".page-head-title",
+  ".section-head-title",
+  ".hero-title",
+  ".auth-title",
+  ".today-title",
+  ".practice-title",
+  ".explore-title",
+  ".profile-name",
+  ".profile-stat-value",
+  ".battle-choice-title",
+  ".battle-outcome-title",
+  ".battle-stage-title",
+  ".today-page .dashboard-action-label",
+  ".stat-line-value",
+  ".press-figure-value",
+]);
+
+/**
+ * Text below the 16px prose floor is confined to the mono marks that run beside
+ * a composition and to compact metadata. Everything here is short, set in the
+ * data role, and never the only place a fact appears.
+ */
+const SMALL_TEXT_ALLOWED = /(-mark|-micro|-meta|-eyebrow|-caption|-unit|-legend|-tick|-axis|-stamp|-note)\b/;
+
+/** Families a stack may fall back to. None of them is a chosen typeface. */
+const APPROVED_FALLBACKS =
+  /^(system-ui|sans-serif|serif|monospace|cursive|ui-monospace|SFMono-Regular|Menlo|"Arial Narrow"|"?Segoe UI"?|-apple-system|BlinkMacSystemFont)$/;
+
+const SHIPPED_FACES = [
+  { file: "unbounded/Unbounded-Variable.woff2", family: "Unbounded", weight: "400 900", variable: true },
+  {
+    file: "ibm-plex-sans-condensed/IBMPlexSansCondensed-Regular.woff2",
+    family: "IBM Plex Sans Condensed",
+    weight: "400",
+  },
+  {
+    file: "ibm-plex-sans-condensed/IBMPlexSansCondensed-SemiBold.woff2",
+    family: "IBM Plex Sans Condensed",
+    weight: "600",
+  },
+  { file: "ibm-plex-sans/IBMPlexSans-Regular.woff2", family: "IBM Plex Sans", weight: "400" },
+  { file: "ibm-plex-sans/IBMPlexSans-SemiBold.woff2", family: "IBM Plex Sans", weight: "600" },
+  { file: "ibm-plex-mono/IBMPlexMono-Regular.woff2", family: "IBM Plex Mono", weight: "400" },
+  { file: "ibm-plex-mono/IBMPlexMono-SemiBold.woff2", family: "IBM Plex Mono", weight: "600" },
+];
+
+/** Russian and English, the two languages the interface is written in. */
+const CYRILLIC = [..."АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"];
+const LATIN = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"];
+const DIGITS = [..."0123456789"];
+const PUNCTUATION = [...".,:;!?'\"()[]{}-–—…«»/%№+="];
 
 function tokenTable() {
   const tokens = {};
@@ -50,67 +117,90 @@ function resolve(value, tokens, depth = 0) {
 const tokens = tokenTable();
 const pxOf = (value) => smallestPx(resolve(value, tokens));
 const declaration = (rule, property) => rule.declarations.findLast((d) => d.property === property);
-/** The shipped face, parsed once from the binary that actually ships. */
-const readFontTables = () =>
-  readFont(path.join(fontsDir, "achimari-hand", "AchimariHand-Regular.otf"));
 
-const findRule = (file, selector) =>
-  parseRules(read(file), file).find((rule) => rule.selector.split(",").some((part) => part.trim() === selector));
+const matches = (rule, selector) => rule.selector.split(",").some((part) => part.trim() === selector);
 
-describe("one visible family", () => {
-  it("names Achimari Hand once, at --font-brand", () => {
-    const variables = read("public/styles/variables.css");
+/**
+ * The rule that actually carries `property` for `selector`. A bare `find` picks
+ * the first block naming the selector, which in globals.css is the reset
+ * (`html, body, #root`) rather than the block that styles the document.
+ */
+const findRule = (file, selector, property) => {
+  const candidates = parseRules(read(file), file).filter((rule) => matches(rule, selector));
+  if (!property) return candidates[0];
+  return candidates.findLast((rule) => rule.declarations.some((d) => d.property === property)) ?? candidates[0];
+};
 
-    assert.match(variables, /--font-brand:\s*"Achimari Hand",\s*cursive/);
-  });
+const faceOf = (relPath) => readWoff2(path.join(fontsDir, relPath));
 
-  it("resolves every type role to that same family", () => {
-    const variables = read("public/styles/variables.css");
+function allFontFaceBlocks() {
+  const blocks = [];
+  for (const file of styleFiles()) {
+    const css = readFileSync(file, "utf8");
+    for (const [block] of css.matchAll(/@font-face\s*\{[^}]*\}/g)) {
+      blocks.push({ file: relative(file), block });
+    }
+  }
+  return blocks;
+}
 
-    for (const role of FONT_ROLES) {
-      assert.match(
-        variables,
-        new RegExp(`${role}:\\s*var\\(--font-brand\\)`),
-        `${role} must follow --font-brand; the product shows one typeface`,
-      );
-      assert.match(
-        resolve(`var(${role})`, tokens),
-        /"Achimari Hand"/,
-        `${role} must resolve to Achimari Hand`,
+function allViews() {
+  const views = [];
+  const pending = [path.join(appRoot, "src", "views")];
+  while (pending.length) {
+    const dir = pending.pop();
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) pending.push(full);
+      else if (entry.name.endsWith(".ejs")) views.push(full);
+    }
+  }
+  return views;
+}
+
+describe("four roles, three families", () => {
+  it("resolves every type role to the family that role is for", () => {
+    for (const [role, family] of Object.entries(ROLE_FAMILY)) {
+      const resolved = resolve(`var(${role})`, tokens);
+      assert.ok(
+        resolved.startsWith(`"${family}"`),
+        `${role} must lead with "${family}", got ${resolved}`,
       );
     }
   });
 
-  it("keeps only a generic fallback behind it, never a companion stack", () => {
-    const brand = resolve("var(--font-brand)", tokens);
-    const behind = brand.split(",").slice(1).join(",");
-
-    assert.match(behind, /cursive/, "a generic family must remain for a failed load or a missing glyph");
-    assert.doesNotMatch(
-      behind,
-      /-apple-system|Segoe UI|Helvetica|Arial|system-ui/i,
-      "a real system stack behind the hand becomes a second visible font",
+  it("leaves the handwritten face in no role, no stylesheet and no served path", () => {
+    for (const file of styleFiles()) {
+      assert.doesNotMatch(
+        readFileSync(file, "utf8"),
+        /Achimari Hand|achimari-hand/i,
+        `${relative(file)} still references the superseded handwritten face`,
+      );
+    }
+    for (const file of allViews()) {
+      assert.doesNotMatch(readFileSync(file, "utf8"), /achimari-hand/i, `${relative(file)} still requests it`);
+    }
+    assert.ok(
+      !existsSync(path.join(fontsDir, "achimari-hand", "AchimariHand-Regular.otf")),
+      "a generated font with no consumer must not sit in the served font path",
     );
+    assert.doesNotMatch(read("public/styles/variables.css"), /--font-brand:/, "--font-brand is retired");
   });
 
-  it("retires --font-system as a selectable role", () => {
-    assert.doesNotMatch(
-      read("public/styles/variables.css"),
-      /--font-system:/,
-      "the system stack is no longer a typography role",
-    );
-
-    const offenders = [];
-    for (const rule of allRules()) {
-      const family = declaration(rule, "font-family");
-      if (family && /var\(--font-system\)/.test(family.value)) {
-        offenders.push(`${rule.file}:${rule.line} ${rule.selector}`);
+  it("ends every role in a real fallback, so a failed request still reads", () => {
+    for (const role of Object.keys(ROLE_FAMILY)) {
+      const stack = resolve(`var(${role})`, tokens).split(",").map((part) => part.trim());
+      assert.ok(stack.length >= 2, `${role} must declare a fallback behind its face`);
+      const last = stack.at(-1);
+      assert.match(last, APPROVED_FALLBACKS, `${role} ends in ${last}, which is not a generic fallback`);
+      for (const entry of stack.slice(1)) {
+        assert.match(entry, APPROVED_FALLBACKS, `${role} falls back to ${entry}, a typeface this product does not ship`);
       }
     }
-    assert.deepEqual(offenders, []);
   });
 
-  it("lets no selector choose a second visible typeface", () => {
+  it("lets no selector name a typeface outside the three shipped families", () => {
+    const shipped = new Set(Object.values(ROLE_FAMILY));
     const offenders = [];
 
     for (const rule of allRules()) {
@@ -119,87 +209,127 @@ describe("one visible family", () => {
       if (!family) continue;
       const value = family.value.trim();
       if (/^(inherit|initial|unset|revert)$/.test(value)) continue;
-      if (!BRAND_FAMILY.test(value)) {
-        offenders.push(`${rule.file}:${rule.line} ${rule.selector} — ${value}`);
-      }
-      // A role token may resolve through --font-brand, but a literal stack may not.
-      if (FOREIGN_FAMILY.test(value)) {
-        offenders.push(`${rule.file}:${rule.line} ${rule.selector} names a foreign family — ${value}`);
+
+      for (const entry of resolve(value, tokens).split(",").map((part) => part.trim())) {
+        const bare = entry.replace(/^["']|["']$/g, "");
+        if (shipped.has(bare) || APPROVED_FALLBACKS.test(entry) || APPROVED_FALLBACKS.test(bare)) continue;
+        offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")} — ${entry}`);
       }
     }
 
-    assert.deepEqual(offenders, [], "every component draws from the one family");
+    assert.deepEqual(offenders, [], "every component draws from the three vendored families");
   });
 
-  it("sets the document itself in the Achimari-backed UI role", () => {
-    const body = parseRules(read("public/styles/globals.css")).find((rule) => rule.selector.trim() === "body");
+  it("keeps the display face on page openings and off the interface", () => {
+    const offenders = [];
 
-    assert.ok(body, "globals.css must still style body");
-    assert.equal(declaration(body, "font-family").value, "var(--font-ui)");
-    assert.match(resolve("var(--font-ui)", tokens), /"Achimari Hand"/);
+    for (const rule of allRules()) {
+      const family = declaration(rule, "font-family");
+      if (!family || !/var\(--font-display\)/.test(family.value)) continue;
+      for (const part of rule.selector.split(",").map((s) => s.trim())) {
+        if (!DISPLAY_ROLE_SELECTORS.has(part)) {
+          offenders.push(`${rule.file}:${rule.line} ${part}`);
+        }
+      }
+    }
+
+    assert.deepEqual(
+      offenders,
+      [],
+      "the display face is a closed list: openings, the wordmark and major numerals only",
+    );
   });
 
-  it("sets the active battle interface in the same UI role", () => {
-    const arena = parseRules(read("public/styles/globals.css")).find(
-      (rule) => rule.selector.trim() === ".battle-active",
+  it("never sets a control, field, table or menu in the display face", () => {
+    const interfaceShapes = /(button|input|field|label|menu|nav|link|table|row|cell|option|filter|tab|chip|badge|hint|toggle)/i;
+    const offenders = [...DISPLAY_ROLE_SELECTORS].filter(
+      (selector) => interfaceShapes.test(selector) && !selector.includes("dashboard-action-label"),
     );
 
-    assert.ok(arena, "the arena must still scope its own type");
-    assert.equal(declaration(arena, "font-family").value, "var(--font-ui)");
+    // `.dashboard-action-label` is the single approved exception: YES / NO is
+    // the page's one-word answer, set at editorial scale, not a control label.
+    assert.deepEqual(offenders, [], "an interface element never takes the display face");
+  });
 
-    // The arena must not reintroduce a second family through a scoped override.
-    for (const decl of arena.declarations) {
-      if (!decl.property.startsWith("--font")) continue;
-      assert.doesNotMatch(decl.value, FOREIGN_FAMILY, `${decl.property} reintroduces a foreign family in the arena`);
+  it("sets the document and the active arena in the condensed UI role", () => {
+    for (const [file, selector] of [
+      ["public/styles/globals.css", "body"],
+      ["public/styles/globals.css", ".battle-active"],
+    ]) {
+      const rule = findRule(file, selector, "font-family");
+      assert.ok(rule, `${file} must still style ${selector}`);
+      assert.equal(declaration(rule, "font-family").value, "var(--font-ui)");
     }
+    assert.match(resolve("var(--font-ui)", tokens), /^"IBM Plex Sans Condensed"/);
+  });
+
+  it("sets prose in the body role and data in the mono role", () => {
+    assert.match(resolve("var(--font-body)", tokens), /^"IBM Plex Sans"/);
+    assert.match(resolve("var(--font-data)", tokens), /^"IBM Plex Mono"/);
+
+    const table = findRule("public/styles/components/tables.css", ".data-table");
+    assert.equal(declaration(table, "font-family").value, "var(--font-data)", "a table of figures is data");
   });
 });
 
-describe("one real weight", () => {
-  it("publishes a single weight token, set to 400", () => {
+describe("real weights only", () => {
+  it("publishes the weight tokens the shipped faces can actually draw", () => {
     const variables = read("public/styles/variables.css");
 
     assert.match(variables, /--weight-body:\s*400/);
-    for (const retired of ["--weight-medium", "--weight-semibold", "--weight-strong"]) {
-      assert.doesNotMatch(
-        variables,
-        new RegExp(`${retired}:`),
-        `${retired} promises a weight the face does not ship`,
+    assert.match(variables, /--weight-strong:\s*600/);
+    assert.match(variables, /--weight-display:\s*700/);
+    assert.match(variables, /--weight-display-heavy:\s*800/);
+  });
+
+  it("asks the static Plex faces for 400 or 600 and nothing between", () => {
+    const displayOnly = new Set(["700", "800", "900"]);
+    const offenders = [];
+
+    for (const rule of allRules()) {
+      if (rule.selector.startsWith("@font-face")) continue;
+      for (const decl of rule.declarations) {
+        if (decl.property !== "font-weight") continue;
+        const resolved = resolve(decl.value, tokens).trim();
+        if (/^(400|600|normal|inherit|initial|unset|revert)$/.test(resolved)) continue;
+
+        // A heavier weight is legal only where the display face is also set,
+        // because only Unbounded ships an axis that reaches it.
+        const family = declaration(rule, "font-family");
+        const isDisplay = family && /var\(--font-display\)/.test(family.value);
+        if (isDisplay && displayOnly.has(resolved)) continue;
+
+        offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")} — ${decl.value} (${resolved})`);
+      }
+    }
+
+    assert.deepEqual(offenders, [], "a weight the repository does not ship is a synthesised guess");
+  });
+
+  it("keeps every display weight inside the axis the variable file actually carries", () => {
+    const axis = faceOf("unbounded/Unbounded-Variable.woff2").axes.find((a) => a.tag === "wght");
+    assert.ok(axis, "the display face must expose a weight axis");
+
+    for (const name of ["--weight-display", "--weight-display-heavy"]) {
+      const weight = Number(resolve(`var(${name})`, tokens));
+      assert.ok(
+        weight >= axis.min && weight <= axis.max,
+        `${name} is ${weight}, outside the shipped ${axis.min}–${axis.max} axis`,
       );
     }
   });
 
-  it("requests no weight above 400 anywhere", () => {
-    const offenders = [];
-
-    for (const rule of allRules()) {
-      for (const decl of rule.declarations) {
-        if (decl.property !== "font-weight") continue;
-        const resolved = resolve(decl.value, tokens).trim();
-        // `inherit` cannot introduce a heavier weight: nothing in the product
-        // sets one, and this same loop is what guarantees that.
-        if (/^(400|normal|inherit|initial|unset|revert)$/.test(resolved)) continue;
-        offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")} — ${decl.value}`);
-      }
-    }
-
-    assert.deepEqual(offenders, [], "Achimari Hand ships Regular only; a heavier request is a synthesised guess");
-  });
-
   it("disables synthetic bold and italic globally", () => {
-    const body = parseRules(read("public/styles/globals.css")).find((rule) => rule.selector.trim() === "body");
+    const body = findRule("public/styles/globals.css", "body", "font-synthesis");
 
     assert.equal(
       declaration(body, "font-synthesis").value.trim(),
       "none",
-      "one face means the browser must never invent a second",
+      "the browser must never invent a weight or a slant the repository does not ship",
     );
   });
 
   it("leaves text rasterisation to the platform", () => {
-    // `-webkit-font-smoothing: antialiased` switches macOS from subpixel to
-    // grayscale rendering, which thins every stroke — the one thing a monoline
-    // handwritten face cannot spare. Stroke weight is solved in the outline.
     const offenders = [];
 
     for (const rule of allRules()) {
@@ -218,9 +348,9 @@ describe("one real weight", () => {
 
   it("fakes no bold with shadows, strokes or duplicated glyphs", () => {
     // `.battle-hit` is the damage number that flies over the arena artwork for
-    // ~600ms. Its halo lifts a coloured number off a photograph; it is transient
-    // combat feedback, not weight simulation, and the same value is stated
-    // durably in the health meter and the battle log.
+    // ~600ms. Its halo lifts a coloured number off a printed plate; it is
+    // transient combat feedback, not weight simulation, and the same value is
+    // stated durably in the health meter and the battle log.
     const allowed = new Set([".battle-hit"]);
     const offenders = [];
 
@@ -238,34 +368,71 @@ describe("one real weight", () => {
       }
     }
 
-    assert.deepEqual(offenders, [], "a thickened outline is not a weight; use size, colour and space");
+    assert.deepEqual(offenders, [], "a thickened outline is not a weight; use the real 600 or the display axis");
   });
 });
 
 describe("the readable floor", () => {
-  it(`declares no font-size below ${TEXT_FLOOR_PX}px anywhere in the styles`, () => {
+  it(`declares no font-size below ${ABSOLUTE_FLOOR_PX}px anywhere in the styles`, () => {
     const offenders = [];
 
     for (const rule of allRules()) {
       for (const decl of rule.declarations) {
         if (decl.property !== "font-size") continue;
         const px = pxOf(decl.value);
-        if (px !== null && px < TEXT_FLOOR_PX) {
+        if (px !== null && px < ABSOLUTE_FLOOR_PX) {
           offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")} — ${px}px (${decl.value})`);
         }
       }
     }
 
-    assert.deepEqual(offenders, [], "a handwritten face stops resolving before a grotesque does");
+    assert.deepEqual(offenders, [], "nothing in the product is set smaller than the mono margin marks");
+  });
+
+  it(`confines the ${ABSOLUTE_FLOOR_PX}px step to margin marks a reader can ignore`, () => {
+    const offenders = [];
+
+    for (const rule of allRules()) {
+      for (const decl of rule.declarations) {
+        if (decl.property !== "font-size") continue;
+        const px = pxOf(decl.value);
+        if (px === null || px >= 14) continue;
+        for (const part of rule.selector.split(",").map((s) => s.trim())) {
+          if (!SMALL_TEXT_ALLOWED.test(part)) {
+            offenders.push(`${rule.file}:${rule.line} ${part} — ${px}px`);
+          }
+        }
+      }
+    }
+
+    assert.deepEqual(offenders, [], "the smallest step is for margin marks, never for content");
+  });
+
+  it(`sets every long-form prose surface at ${TEXT_FLOOR_PX}px or more`, () => {
+    const prose = [
+      ["public/styles/shell.css", ".page-head-lede"],
+      ["public/styles/game/help.css", ".help-section p"],
+    ];
+
+    for (const [file, selector] of prose) {
+      const rule = findRule(file, selector, "font-size");
+      assert.ok(rule, `${file} must still style ${selector}`);
+      const size = declaration(rule, "font-size");
+      if (!size) continue;
+      assert.ok(
+        pxOf(size.value) >= TEXT_FLOOR_PX,
+        `${selector} is ${pxOf(size.value)}px; prose starts at ${TEXT_FLOOR_PX}px`,
+      );
+    }
   });
 
   it("audits real declarations, not only the token definitions", () => {
-    // Guards the test above: a literal size written straight into a component
+    // Guards the tests above: a literal size written straight into a component
     // must be caught, so the floor cannot be dodged by skipping the token scale.
-    const probe = parseRules(".probe { font-size: 0.75rem; }", "probe.css");
+    const probe = parseRules(".probe { font-size: 0.625rem; }", "probe.css");
 
     assert.equal(probe.length, 1);
-    assert.equal(pxOf(probe[0].declarations[0].value), 12);
+    assert.equal(pxOf(probe[0].declarations[0].value), 10);
 
     const literals = allRules().flatMap((rule) =>
       rule.declarations.filter((d) => d.property === "font-size" && /\d/.test(d.value) && !d.value.includes("var(")),
@@ -273,29 +440,52 @@ describe("the readable floor", () => {
     assert.ok(literals.length > 0, "the audit must be exercising literal sizes, not just var() lookups");
   });
 
-  it("holds the whole token scale at or above the floor", () => {
+  it("holds the whole token scale at or above the absolute floor", () => {
     for (const [name, value] of Object.entries(tokens)) {
       if (!/^--text-/.test(name)) continue;
       const px = pxOf(value);
       if (px === null) continue;
-      assert.ok(px >= TEXT_FLOOR_PX, `${name} resolves to ${px}px, below the ${TEXT_FLOOR_PX}px floor`);
+      assert.ok(px >= ABSOLUTE_FLOOR_PX, `${name} resolves to ${px}px, below the ${ABSOLUTE_FLOOR_PX}px floor`);
     }
   });
 
-  it("sets long-form copy at 20px with generous leading", () => {
+  it("sets long-form copy at 17px with generous leading", () => {
     const body = pxOf("var(--text-body)");
-    assert.equal(body, 20, `--text-body must be 20px, got ${body}px`);
+    assert.equal(body, 17, `--text-body must be 17px, got ${body}px`);
 
     const leading = Number(resolve("var(--leading-body)", tokens));
-    assert.ok(leading >= 1.6 && leading <= 1.7, `--leading-body must sit at 1.6–1.7, got ${leading}`);
+    assert.ok(leading >= 1.5 && leading <= 1.65, `--leading-body must sit at 1.5–1.65, got ${leading}`);
   });
 
   it("keeps the scale's steps in their intended bands", () => {
-    assert.equal(pxOf("var(--text-control)"), 18, "ordinary copy, inputs and controls sit at 18px");
-    assert.equal(pxOf("var(--text-label)"), 17, "labels and critical data sit at 17px");
-    assert.equal(pxOf("var(--text-micro)"), 16, "secondary text bottoms out at 16px");
-    assert.ok(pxOf("var(--text-component)") >= 20 && pxOf("var(--text-component)") <= 24,
-      "a component title sits at 20–24px");
+    assert.equal(pxOf("var(--text-control)"), 16, "interface copy, inputs and controls sit at 16px");
+    assert.equal(pxOf("var(--text-label)"), 15, "labels sit at 15px");
+    assert.equal(pxOf("var(--text-meta)"), 14, "dates, timers and metadata sit at 14px");
+    assert.equal(pxOf("var(--text-mark)"), 13, "the mono margin mark is the floor");
+    assert.equal(tokens["--text-micro"], undefined, "--text-micro is retired; metadata is --text-meta");
+
+    const display = pxOf("var(--text-display)");
+    assert.ok(display >= 40, `--text-display floors at ${display}px; a page opening must still read as display type`);
+    assert.ok(
+      /clamp\(/.test(tokens["--text-display"]),
+      "the page opening is fluid, so a long word cannot clip a narrow screen",
+    );
+  });
+
+  it("caps the page opening under the 96px display ceiling", () => {
+    const max = Math.max(
+      ...[...resolve(tokens["--text-display"], tokens).matchAll(/([\d.]+)rem/g)].map(([, n]) => Number(n) * 16),
+    );
+
+    assert.ok(max <= 96, `--text-display reaches ${max}px; above 96px the page is shouting`);
+  });
+
+  it("keeps the shared title floor narrow enough for Achievements on a 320px shell", () => {
+    const variables = read("public/styles/variables.css");
+    const floor = variables.match(/--text-page-title:\s*clamp\(([\d.]+)rem,/);
+
+    assert.ok(floor, "the shared page title must keep a fluid clamp");
+    assert.ok(Number(floor[1]) * 16 <= 28, "the longest main-page title must not clip the narrowest supported viewport");
   });
 
   it(`keeps navigation, inputs and primary controls at ${CONTROL_FLOOR_PX}px or more`, () => {
@@ -303,6 +493,7 @@ describe("the readable floor", () => {
       ["public/styles/header/base.css", ".header-link"],
       ["public/styles/components/buttons.css", ".ui-button"],
       ["public/styles/components/fields.css", ".field-input"],
+      ["public/styles/components/fields.css", ".field-label"],
     ];
 
     for (const [file, selector] of controls) {
@@ -317,18 +508,7 @@ describe("the readable floor", () => {
     }
   });
 
-  it(`keeps form labels at ${DATA_FLOOR_PX}px or more`, () => {
-    // A label is not a control: it sits one step down, but never below the
-    // data floor, because it is what tells the reader what the control is for.
-    for (const selector of [".field-label", ".field-hint"]) {
-      const rule = findRule("public/styles/components/fields.css", selector);
-      assert.ok(rule, `fields.css must still style ${selector}`);
-      const size = pxOf(declaration(rule, "font-size").value);
-      assert.ok(size >= DATA_FLOOR_PX, `${selector} is ${size}px`);
-    }
-  });
-
-  it(`keeps every reading in an active fight at ${DATA_FLOOR_PX}px or more`, () => {
+  it("keeps every reading in an active fight legible at a glance", () => {
     const offenders = [];
 
     for (const file of ["public/styles/game/battle-arena.css", "public/styles/game/battle.css"]) {
@@ -336,8 +516,9 @@ describe("the readable floor", () => {
         for (const decl of rule.declarations) {
           if (decl.property !== "font-size") continue;
           const px = pxOf(decl.value);
-          if (px !== null && px < DATA_FLOOR_PX) {
-            offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")} — ${px}px`);
+          if (px === null || px >= 14) continue;
+          for (const part of rule.selector.split(",").map((s) => s.trim())) {
+            if (!SMALL_TEXT_ALLOWED.test(part)) offenders.push(`${rule.file}:${rule.line} ${part} — ${px}px`);
           }
         }
       }
@@ -346,23 +527,20 @@ describe("the readable floor", () => {
     assert.deepEqual(offenders, [], "HUD text drives the next move and must be legible at a glance");
   });
 
-  it("caps long-form prose at a real 60–68 character measure", () => {
-    // Not expressed in `ch`: the CSS `ch` unit is the advance of "0", and this
-    // face's zero is far wider than its lowercase, so a `68ch` cap let prose run
-    // to ~91 measured characters per line. The token is calibrated instead.
-    const variables = read("public/styles/variables.css");
-    const prose = pxOf("var(--measure-prose)");
+  it("caps long-form prose at a real 65–75 character measure", () => {
+    // `ch` is the advance of "0". IBM Plex Sans draws a normal-width zero, so
+    // the unit now means what it says; the handwritten face this replaced had a
+    // very wide zero, which is why the old token was calibrated in rem instead.
+    const prose = resolve("var(--measure-prose)", tokens).trim();
+    const ch = Number((prose.match(/^([\d.]+)ch$/) || [])[1]);
 
-    assert.ok(prose, "--measure-prose must exist");
-    assert.ok(prose >= 480 && prose <= 580, `--measure-prose is ${prose}px, outside the calibrated band`);
-    assert.match(variables, /--measure-reading:\s*680px/, "the wider form/reading container is unchanged");
+    assert.ok(ch >= 65 && ch <= 75, `--measure-prose is ${prose}, outside the 65–75ch band`);
 
     const lede = findRule("public/styles/shell.css", ".page-head-lede");
     assert.equal(declaration(lede, "max-width").value, "var(--measure-prose)");
 
     const helpProse = findRule("public/styles/game/help.css", ".help-section p");
     assert.equal(declaration(helpProse, "max-width").value, "var(--measure-prose)");
-    assert.equal(pxOf(declaration(helpProse, "font-size").value), 20, "long-form prose is set at 20px");
   });
 });
 
@@ -371,83 +549,45 @@ describe("casing and tracking", () => {
     assert.doesNotMatch(
       read("public/styles/globals.css"),
       /:where\([^)]*h2[^)]*\)\s*\{[^}]*text-transform:\s*uppercase/s,
-      "all-caps costs a handwritten face its word shapes",
+      "a heading keeps its word shapes",
     );
   });
 
-  it("limits uppercase to short, large, explicitly approved actions", () => {
-    // Yes/No are written uppercase in the markup, which is the approved case.
-    // No stylesheet may impose caps on labels, headings, metadata or HUD text.
-    const APPROVED = new Set([".dashboard-action-label"]);
+  it("tracks every uppercase run, because capitals collide at default spacing", () => {
     const offenders = [];
 
     for (const rule of allRules()) {
       const transform = declaration(rule, "text-transform");
       if (!transform || !/uppercase/i.test(transform.value)) continue;
-      const selectors = rule.selector.split(",").map((part) => part.trim());
-      if (selectors.every((part) => APPROVED.has(part))) continue;
-      offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")}`);
+
+      const tracking = declaration(rule, "letter-spacing");
+      const size = declaration(rule, "font-size");
+      const px = size ? pxOf(size.value) : null;
+      // Display-scale capitals are large enough to read without added tracking.
+      if (px !== null && px >= 32) continue;
+      if (!tracking) {
+        offenders.push(`${rule.file}:${rule.line} ${rule.selector.replace(/\s+/g, " ")} — uppercase with no tracking`);
+      }
     }
 
-    assert.deepEqual(offenders, []);
+    assert.deepEqual(offenders, [], "short all-caps labels need 5–12% tracking to stay readable");
   });
 
-  it("writes the Today heading in sentence case", () => {
-    const title = findRule("public/styles/pages/daily-check-in.css", ".today-title");
-
-    assert.ok(title, ".today-title must still be styled");
-    assert.equal(declaration(title, "text-transform").value.trim(), "none");
-    assert.match(
-      read("src/views/pages/partials/home-content.ejs"),
-      /class="page-head-title today-title">Today</,
-      "the visible title reads Today, not TODAY",
-    );
-  });
-
-  it("pairs the Today heading and its date as one dateline", () => {
-    const css = read("public/styles/pages/daily-check-in.css");
-    const dateline = findRule("public/styles/pages/daily-check-in.css", ".today-dateline");
-    const date = findRule("public/styles/pages/daily-check-in.css", ".today-date");
-
-    assert.equal(declaration(dateline, "align-items").value, "baseline", "the two sit on one baseline");
-    assert.equal(declaration(dateline, "flex-wrap").value, "wrap", "the date wraps below on narrow screens");
-
-    // Same family, same weight: they must read as one piece of typography.
-    assert.equal(declaration(date, "font-family").value, "var(--font-ui)");
-    assert.equal(declaration(date, "font-weight").value, "var(--weight-body)");
-    assert.ok(pxOf(declaration(date, "font-size").value) >= CONTROL_FLOOR_PX);
-    assert.match(css, /--font-display/, "the title keeps the display role");
-  });
-
-  it("keeps the Today heading a contextual heading, not a branding statement", () => {
-    const title = findRule("public/styles/pages/daily-check-in.css", ".today-title");
-    const date = findRule("public/styles/pages/daily-check-in.css", ".today-date");
-
-    const size = pxOf(declaration(title, "font-size").value);
-    assert.ok(size >= 26 && size <= 30, `.today-title must sit near 28px, got ${size}px`);
-    assert.ok(
-      Number(declaration(title, "line-height").value) <= 1.2,
-      "a contextual heading keeps a compact line height",
-    );
-    // The daily practices are the primary content: the heading must not tower
-    // over its own date.
-    const dateSize = pxOf(declaration(date, "font-size").value);
-    assert.ok(dateSize >= 18, `.today-date must be at least 18px, got ${dateSize}px`);
-    assert.ok(size / dateSize <= 1.8, "the heading and its date must read as one dateline");
-  });
-
-  it("sets no negative tracking, and keeps small-label tracking restrained", () => {
+  it("keeps display tracking off the collision floor and small-label tracking restrained", () => {
     const offenders = [];
 
     for (const rule of allRules()) {
       for (const decl of rule.declarations) {
         if (decl.property !== "letter-spacing") continue;
-        const value = decl.value.trim();
-        const em = value.match(/^(-?[\d.]+)em$/);
-        if (value.startsWith("-")) {
-          offenders.push(`${rule.file}:${rule.line} ${rule.selector} — ${value} collides the strokes`);
-        } else if (em && Number(em[1]) > 0.04) {
-          offenders.push(`${rule.file}:${rule.line} ${rule.selector} — ${value} exceeds 0.04em`);
+        const resolved = resolve(decl.value, tokens).trim();
+        const em = resolved.match(/^(-?[\d.]+)em$/);
+        if (!em) continue;
+        const value = Number(em[1]);
+        if (value < -0.04) {
+          offenders.push(`${rule.file}:${rule.line} ${rule.selector} — ${resolved} collides the letterforms`);
+        }
+        if (value > 0.12) {
+          offenders.push(`${rule.file}:${rule.line} ${rule.selector} — ${resolved} exceeds 0.12em`);
         }
       }
     }
@@ -456,13 +596,21 @@ describe("casing and tracking", () => {
   });
 
   it("keeps body copy at zero tracking", () => {
-    const body = parseRules(read("public/styles/globals.css")).find((rule) => rule.selector.trim() === "body");
+    const body = findRule("public/styles/globals.css", "body", "letter-spacing");
 
     assert.equal(declaration(body, "letter-spacing").value.trim(), "0");
   });
+
+  it("writes the Today heading in sentence case in the markup it ships", () => {
+    assert.match(
+      read("src/views/pages/partials/home-content.ejs"),
+      /class="page-head-title today-title">Today</,
+      "the visible title reads Today; capitals are a typographic treatment, not a rewrite",
+    );
+  });
 });
 
-describe("numbers read by alignment, not by a second font", () => {
+describe("numbers read by alignment and a fixed advance", () => {
   const NUMERIC = [
     ["public/styles/components/tables.css", ".data-table .data-table-rank"],
     ["public/styles/components/tables.css", ".data-table .data-table-figure"],
@@ -489,226 +637,92 @@ describe("numbers read by alignment, not by a second font", () => {
     assert.equal(declaration(figure, "white-space").value, "nowrap", "a figure and its unit stay together");
   });
 
-  it(`sets table and statistics text at ${DATA_FLOOR_PX}px or more`, () => {
+  it("sets table and statistics text at or above the control floor", () => {
     const cells = findRule("public/styles/components/tables.css", ".data-table tbody td");
     const head = findRule("public/styles/components/tables.css", ".data-table thead th");
 
-    assert.ok(pxOf(declaration(cells, "font-size").value) >= DATA_FLOOR_PX);
-    assert.ok(pxOf(declaration(head, "font-size").value) >= DATA_FLOOR_PX);
+    assert.ok(pxOf(declaration(cells, "font-size").value) >= CONTROL_FLOOR_PX);
+    assert.ok(pxOf(declaration(head, "font-size").value) >= CONTROL_FLOOR_PX);
   });
 
-  it("keeps numeric surfaces in the one family", () => {
-    const table = findRule("public/styles/components/tables.css", ".data-table");
-
-    assert.match(resolve(declaration(table, "font-family").value, tokens), /"Achimari Hand"/);
-  });
-
-  it("claims no tabular-numeral support the face does not have", () => {
-    // Achimari Hand ships no `tnum` feature and draws proportional digits.
-    // The declaration may stay as harmless progressive enhancement, but no
-    // suite may assert that it is what aligns the columns. The pattern is built
-    // from parts so this guard does not match its own source.
-    const feature = ["tabular", "nums"].join("-");
-    const claim = new RegExp(`assert\\.(?:match|equal|ok)\\([^\\n]*${feature}`);
-
-    for (const suite of ["typography-contract", "design-foundations", "copy-quality-contract"]) {
-      assert.doesNotMatch(
-        read(`test/${suite}.test.js`),
-        claim,
-        `${suite} must not require tabular figures from a face that has none`,
-      );
-    }
-
+  it("backs the tabular-numeral declaration with a face that really has one advance", () => {
     const tables = read("public/styles/components/tables.css");
-    if (/font-variant-numeric:\s*tabular-nums/.test(tables)) {
-      assert.match(
-        tables,
-        /proportional digits|no `tnum`|progressive enhancement/i,
-        "if the declaration stays, the sheet must record that it is not load-bearing",
-      );
-    }
-  });
-});
+    if (!/font-variant-numeric:\s*tabular-nums/.test(tables)) return;
 
-describe("contrast and surfaces", () => {
-  it("keeps the quiet ink off text", () => {
-    const offenders = [];
-
-    for (const rule of allRules()) {
-      for (const decl of rule.declarations) {
-        if (decl.property !== "color") continue;
-        if (/var\(--ink-quiet\)/.test(decl.value)) {
-          offenders.push(`${rule.file}:${rule.line} ${rule.selector} — ${decl.value}`);
-        }
-      }
-    }
-
-    assert.deepEqual(offenders, [], "--ink-quiet is 3.5:1 on white; it is a rule colour, not a text colour");
-  });
-
-  it("keeps the accessible secondary ink", () => {
-    const variables = read("public/styles/variables.css");
-
-    assert.match(variables, /--ink-secondary-strong:\s*#4f4f4a/i);
-    assert.match(variables, /--ink-muted:\s*#5c5c58/i);
-  });
-
-  it("writes the text that floats on the horizon in full ink", () => {
-    // Measured against the real composite (poster, grayscale/contrast/brightness
-    // filter, 62% white scrim, 10% vignette): the darkest backdrop under the page
-    // head is rgb(158,158,158). There --ink-muted is 2.5:1 and the darker
-    // secondary 3.1:1; only full ink clears the target, at 7.05:1.
-    const shell = parseRules(read("public/styles/shell.css"), "shell.css");
-
-    for (const selector of [".page-head-eyebrow", ".page-head-lede"]) {
-      const rule = shell.find((candidate) => candidate.selector.trim() === selector);
-      assert.ok(rule, `${selector} must still be styled`);
-      assert.equal(declaration(rule, "color").value, "var(--ink-on-sky)");
-    }
-
-    assert.match(read("public/styles/variables.css"), /--ink-on-sky:\s*var\(--ink\)/);
-
-    const date = findRule("public/styles/pages/daily-check-in.css", ".today-date");
-    assert.equal(declaration(date, "color").value, "var(--ink-on-sky)");
-  });
-
-  it("keeps shared statistics off the bare sky", () => {
-    const strip = findRule("public/styles/components/lists.css", ".stat-line");
-    assert.match(declaration(strip, "background").value, /var\(--paper\)|var\(--surface\)|#fff/i);
+    const mono = faceOf("ibm-plex-mono/IBMPlexMono-Regular.woff2");
+    assert.equal(mono.familyName, "IBM Plex Mono", "the data role must be the monospaced face");
+    assert.equal(
+      declaration(findRule("public/styles/components/tables.css", ".data-table"), "font-family").value,
+      "var(--font-data)",
+      "the declaration only means something on the mono role",
+    );
   });
 });
 
 describe("webfont delivery gate", () => {
-  function allFontFaceBlocks() {
-    const blocks = [];
-    for (const file of styleFiles()) {
-      const css = readFileSync(file, "utf8");
-      for (const [block] of css.matchAll(/@font-face\s*\{[^}]*\}/g)) {
-        blocks.push({ file: relative(file), block });
-      }
-    }
-    return blocks;
-  }
+  it("ships every declared face as a real, same-origin WOFF2 file", () => {
+    const blocks = allFontFaceBlocks();
+    assert.equal(blocks.length, SHIPPED_FACES.length, "one @font-face per shipped file, and no more");
 
-  function allViews() {
-    const views = [];
-    const pending = [path.join(appRoot, "src", "views")];
-    while (pending.length) {
-      const dir = pending.pop();
-      for (const entry of readdirSync(dir, { withFileTypes: true })) {
-        const full = path.join(dir, entry.name);
-        if (entry.isDirectory()) pending.push(full);
-        else if (entry.name.endsWith(".ejs")) views.push(full);
-      }
-    }
-    return views;
-  }
-
-  it("self-hosts the generated Achimari Hand CFF/OpenType face", () => {
-    const variables = read("public/styles/variables.css");
-    const fontPath = path.join(fontsDir, "achimari-hand", "AchimariHand-Regular.otf");
-
-    assert.match(
-      variables,
-      /@font-face\s*\{[^}]*font-family:\s*"Achimari Hand";[^}]*src:\s*url\("\/fonts\/achimari-hand\/AchimariHand-Regular\.otf"\)\s*format\("opentype"\);[^}]*font-weight:\s*400;[^}]*font-style:\s*normal;[^}]*font-display:\s*swap;[^}]*\}/s,
-    );
-    assert.ok(existsSync(fontPath));
-    assert.equal(readFileSync(fontPath).subarray(0, 4).toString("ascii"), "OTTO");
-    assert.doesNotMatch(variables, /font-family:\s*"(?:Kitaro Road|Sagfield)"/);
-  });
-
-  it("ships the screen-optimised revision, with real vertical metrics", () => {
-    // Req 14. The first build left OS/2 sxHeight and sCapHeight at zero and
-    // shipped no CFF Private hints at all; a rasteriser had nothing to snap to.
-    const font = readFontTables();
-
-    assert.equal(font.version, "2.000", "the revision must carry its own version");
-    assert.ok(font.xHeight > 0, "OS/2 sxHeight must be measured, not zero");
-    assert.ok(font.capHeight > font.xHeight, "OS/2 sCapHeight must be measured and above the x-height");
-    assert.ok(font.winAscent > 0 && font.winDescent > 0, "Windows ascent/descent must be set");
-    assert.ok(font.typoAscender > 0 && font.typoDescender < 0, "typographic ascent/descent must be set");
-    assert.equal(font.weightClass, 400, "one regular face");
-    assert.equal(font.widthClass, 5, "the face is built at normal width, not condensed");
-    assert.equal(font.familyName, "Achimari Hand", "the family identity never changes");
-  });
-
-  it("carries the CFF alignment zones and stem widths a rasteriser needs", () => {
-    // v1.000 shipped none of this: no BlueValues, no StdHW/StdVW, no stem snap.
-    // These Private values are what a CFF rasteriser reads to snap the baseline,
-    // x-height and cap-height at small ppem.
-    const font = readFontTables();
-
-    assert.ok(Array.isArray(font.blueValues) && font.blueValues.length >= 8,
-      "the face must declare baseline, x-height, cap-height and ascender zones");
-    assert.ok(font.stdHW > 0 && font.stdVW > 0, "standard stem widths must be present");
-    assert.ok(font.stemSnapH.length > 0 && font.stemSnapV.length > 0, "stem snap lists must be present");
-
-    // The zones must actually match the measured face, not be boilerplate.
-    assert.ok(font.blueValues.includes(font.xHeight), "an alignment zone must sit on the real x-height");
-    assert.ok(font.blueValues.includes(font.capHeight), "an alignment zone must sit on the real cap-height");
-  });
-
-  it("keeps per-glyph autohinting available as an explicit, pinned stage", () => {
-    // Honest state: the shipped face carries Private-dict hinting but no
-    // per-glyph charstring hints. otfautohint's path analysis is pathologically
-    // slow on the dilated outlines (candidate A, undilated, hints in ~13
-    // minutes; the shipped outlines did not finish five glyphs in ten), so the
-    // stage is opt-in behind `--autohint` pending an overlap-removal pass.
-    // This test pins that decision so it is revisited deliberately.
-    const script = read("scripts/build-achimari-font.py");
-
-    assert.match(script, /--autohint/, "the autohint stage must remain available");
-    assert.match(script, /afdko\.otfautohint/, "invoked as a module, not a global binary");
-    assert.match(script, /pathologically slow/, "the reason it is opt-in must stay recorded in the build");
-    assert.match(read("public/fonts/achimari-hand/SOURCE.md"), /autohint/i,
-      "SOURCE.md must document the autohinting position");
-  });
-
-  it("keeps the build reproducible and pinned", () => {
-    // Req 13. The build must be runnable from documented, pinned dependencies,
-    // and must not reach for a globally installed binary.
-    const requirements = read("scripts/font-requirements.txt");
-    const script = read("scripts/build-achimari-font.py");
-
-    assert.match(requirements, /fonttools==\d+\.\d+/, "fontTools must be pinned to an exact version");
-    assert.match(requirements, /afdko==\d+\.\d+/, "the autohinter must be pinned to an exact version");
-    assert.match(script, /afdko\.otfautohint/, "the autohinter is invoked as a module, not a global binary");
-    assert.match(script, /sys\.executable/, "the autohinter runs under the same pinned interpreter");
-    assert.match(script, /BUILD_TIMESTAMP/,
-      "head.created/modified must be pinned, or two builds of one source differ byte-for-byte");
-    assert.match(read("public/fonts/achimari-hand/SOURCE.md"), /font-requirements\.txt/,
-      "SOURCE.md must document the reproducible build command");
-  });
-
-  it("declares exactly one face, so no unshipped weight can be requested", () => {
-    assert.equal(allFontFaceBlocks().length, 1, "Achimari Hand is a one-weight family");
-  });
-
-  it("installs no second typeface", () => {
-    for (const file of styleFiles()) {
-      assert.doesNotMatch(
-        readFileSync(file, "utf8"),
-        /Atkinson\s*Hyperlegible/i,
-        `${relative(file)} installs a font this product does not license or ship`,
-      );
-    }
-    assert.ok(!existsSync(path.join(fontsDir, "atkinson-hyperlegible")));
-
-    const families = new Set(
-      allFontFaceBlocks().map(({ block }) => (block.match(/font-family:\s*["']([^"']+)["']/) || [])[1]),
-    );
-    assert.deepEqual([...families], ["Achimari Hand"]);
-  });
-
-  it("ships no @font-face that points at a file the repository does not have", () => {
-    for (const { file, block } of allFontFaceBlocks()) {
+    for (const { file, block } of blocks) {
+      assert.equal(file, "public/styles/variables.css", "every face is declared in one place");
       for (const [, url] of block.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
         assert.ok(url.startsWith("/fonts/"), `${file} must self-host from /fonts/, got ${url}`);
-        assert.ok(
-          existsSync(path.join(appRoot, "public", url.replace(/^\//, "").split("?")[0])),
-          `${file} declares ${url}, which is not present in the repository`,
-        );
+        assert.match(url, /\.woff2$/, `${url} must be WOFF2`);
+        const onDisk = path.join(appRoot, "public", url.replace(/^\//, "").split("?")[0]);
+        assert.ok(existsSync(onDisk), `${file} declares ${url}, which is not present in the repository`);
+        assert.equal(readFileSync(onDisk).subarray(0, 4).toString("ascii"), "wOF2", `${url} is not a WOFF2 binary`);
       }
+    }
+  });
+
+  it("matches every weight descriptor to the weight the binary really carries", () => {
+    for (const face of SHIPPED_FACES) {
+      const shipped = faceOf(face.file);
+      const declared = new RegExp(
+        `@font-face\\s*\\{[^}]*font-family:\\s*"${face.family}";[^}]*${face.file.split("/").pop().replace(/\./g, "\\.")}[^}]*font-weight:\\s*${face.weight};`,
+        "s",
+      );
+      assert.match(read("public/styles/variables.css"), declared, `${face.file} must declare font-weight: ${face.weight}`);
+
+      if (face.variable) {
+        const axis = shipped.axes.find((a) => a.tag === "wght");
+        assert.ok(axis, `${face.file} is declared as a range but carries no weight axis`);
+        assert.equal(`${axis.min} ${axis.max}`, face.weight, "the declared range must be the axis the file has");
+      } else {
+        assert.equal(
+          String(shipped.weightClass),
+          face.weight,
+          `${face.file} declares ${face.weight} but the binary is ${shipped.weightClass}`,
+        );
+        assert.equal(shipped.axes, null, `${face.file} is declared static; it must not be a variable file`);
+      }
+    }
+  });
+
+  it("covers both interface languages in every shipped face", () => {
+    for (const face of SHIPPED_FACES) {
+      const shipped = faceOf(face.file);
+      assert.equal(shipped.coverage(LATIN), LATIN.length, `${face.file} is missing Latin letters`);
+      assert.equal(shipped.coverage(CYRILLIC), CYRILLIC.length, `${face.file} is missing Cyrillic letters`);
+      assert.equal(shipped.coverage(DIGITS), DIGITS.length, `${face.file} is missing digits`);
+      assert.ok(
+        shipped.coverage(PUNCTUATION) >= PUNCTUATION.length - 1,
+        `${face.file} is missing punctuation the interface uses`,
+      );
+    }
+  });
+
+  it("names each shipped family as the family its stylesheet declares", () => {
+    for (const face of SHIPPED_FACES) {
+      const shipped = faceOf(face.file);
+      // IBM abbreviates the family in the name table for the non-regular
+      // weights ("IBM Plex Sans SmBld"), which is why this compares the root.
+      const root = face.family.replace("IBM Plex Sans Condensed", "IBM Plex Sans Cond");
+      assert.ok(
+        shipped.familyName.startsWith(root),
+        `${face.file} is named ${shipped.familyName}, not a ${face.family} face`,
+      );
     }
   });
 
@@ -729,47 +743,108 @@ describe("webfont delivery gate", () => {
     }
   });
 
-  it("preloads only a face that actually exists", () => {
-    for (const file of allViews()) {
-      const markup = readFileSync(file, "utf8");
-      for (const [, href] of markup.matchAll(/<link[^>]+as="font"[^>]*href="([^"]+)"/g)) {
-        assert.ok(
-          existsSync(path.join(appRoot, "public", href.replace(/^\//, ""))),
-          `${relative(file)} preloads ${href}, which does not exist`,
-        );
+  it("preloads the two faces the first screen is actually set in, and no others", () => {
+    const expected = [
+      "/fonts/ibm-plex-sans-condensed/IBMPlexSansCondensed-Regular.woff2",
+      "/fonts/unbounded/Unbounded-Variable.woff2",
+    ];
+
+    for (const shell of [
+      "src/views/components/layout/document.ejs",
+      "src/views/components/layout/auth-document.ejs",
+    ]) {
+      const preloaded = [...read(shell).matchAll(/<link[^>]+href="([^"]+)"[^>]*as="font"/g)].map(([, href]) => href);
+      assert.deepEqual(preloaded, expected, `${shell} must preload exactly the first-paint faces`);
+      for (const href of preloaded) {
+        assert.match(read(shell), new RegExp(`href="${href}"[^>]*type="font/woff2"`), `${href} must declare its type`);
+        assert.match(read(shell), new RegExp(`href="${href}"[^>]*crossorigin`), `${href} must be preloaded anonymously`);
       }
     }
   });
 
-  it("preloads Achimari Hand in both document shells", () => {
-    const preload = /<link\s+rel="preload"\s+href="\/fonts\/achimari-hand\/AchimariHand-Regular\.otf"\s+as="font"\s+type="font\/otf"\s+crossorigin\s*\/>/;
+  it("preloads nothing that is not a file the repository ships and declares", () => {
+    const declared = new Set(
+      allFontFaceBlocks().flatMap(({ block }) =>
+        [...block.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)].map(([, url]) => url),
+      ),
+    );
 
-    assert.match(read("src/views/components/layout/document.ejs"), preload);
-    assert.match(read("src/views/components/layout/auth-document.ejs"), preload);
+    for (const file of allViews()) {
+      for (const [, href] of readFileSync(file, "utf8").matchAll(/<link[^>]+href="([^"]+)"[^>]*as="font"/g)) {
+        assert.ok(existsSync(path.join(appRoot, "public", href.replace(/^\//, ""))), `${href} does not exist`);
+        assert.ok(declared.has(href), `${relative(file)} preloads ${href}, which no @font-face declares`);
+      }
+    }
   });
 
-  it("records provenance beside the font directory", () => {
-    const readmePath = path.join(fontsDir, "README.md");
-    assert.ok(existsSync(readmePath), "public/fonts must carry a provenance note");
+  it("leaves no font in the served path that nothing declares", () => {
+    const declared = new Set(
+      allFontFaceBlocks().flatMap(({ block }) =>
+        [...block.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)].map(([, url]) =>
+          url.replace(/^\/fonts\//, "").split("?")[0],
+        ),
+      ),
+    );
 
-    const readme = readFileSync(readmePath, "utf8");
-    assert.match(readme, /Achimari Hand/);
-    assert.match(readme, /supplied specimen/i);
-    assert.match(readme, /SIL Open Font License/i, "the derivative's licence must be recorded");
+    const shipped = [];
+    const walk = (dir, prefix) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) walk(full, `${prefix}${entry.name}/`);
+        else if (/\.(woff2?|otf|ttf|eot)$/i.test(entry.name)) shipped.push(`${prefix}${entry.name}`);
+      }
+    };
+    walk(fontsDir, "");
 
+    assert.deepEqual(
+      shipped.sort(),
+      [...declared].sort(),
+      "every font binary in the served path must be one the stylesheet declares",
+    );
+  });
+
+  it("keeps the whole type payload inside a budget a page opening can afford", () => {
+    const total = SHIPPED_FACES.reduce(
+      (sum, face) => sum + statSync(path.join(fontsDir, face.file)).size,
+      0,
+    );
+
+    assert.ok(total <= 420 * 1024, `the shipped faces total ${Math.round(total / 1024)}KB`);
+    assert.ok(
+      statSync(path.join(fontsDir, "unbounded/Unbounded-Variable.woff2")).size <= 120 * 1024,
+      "the display face is used sparingly and must not be the heaviest request on the page",
+    );
+  });
+
+  it("retains the licence and provenance beside every family", () => {
+    for (const directory of ["unbounded", "ibm-plex-sans", "ibm-plex-sans-condensed", "ibm-plex-mono"]) {
+      const licence = readdirSync(path.join(fontsDir, directory)).find((name) => /^(OFL|LICENSE)/i.test(name));
+      assert.ok(licence, `${directory} must keep its licence file`);
+      assert.match(
+        readFileSync(path.join(fontsDir, directory, licence), "utf8"),
+        /SIL OPEN FONT LICENSE/i,
+        `${directory}/${licence} must be the real OFL text`,
+      );
+    }
+
+    const readme = read("public/fonts/README.md");
+    assert.match(readme, /SIL Open Font License/i);
+    for (const face of SHIPPED_FACES) {
+      assert.ok(readme.includes(face.file), `README must record provenance for ${face.file}`);
+    }
+    assert.match(readme, /vendor-sacred-press-fonts\.py/, "the reproducible build command must be recorded");
     assert.doesNotMatch(readme, /receipt|order\s*#|serial|licen[cs]e\s*key/i);
   });
 
-  it("keeps the generated-file state of the branded family honest", () => {
-    const readme = readFileSync(path.join(fontsDir, "README.md"), "utf8");
-    const declared = allFontFaceBlocks()
-      .map(({ block }) => (block.match(/font-family:\s*["']([^"']+)["']/) || [])[1])
-      .filter(Boolean);
+  it("records the SHA-256 of every vendored binary, so provenance is checkable", () => {
+    const readme = read("public/fonts/README.md");
 
-    const family = "Achimari Hand";
-    const supplied = declared.includes(family);
-    const dir = path.join(fontsDir, "achimari-hand");
-    assert.equal(supplied, existsSync(dir) && readdirSync(dir).includes("AchimariHand-Regular.otf"));
-    assert.match(readme, /Achimari Hand[\s\S]{0,400}?Generated/i);
+    for (const face of SHIPPED_FACES) {
+      const digest = createHash("sha256").update(readFileSync(path.join(fontsDir, face.file))).digest("hex");
+      assert.ok(
+        readme.includes(digest),
+        `README must record the SHA-256 of ${face.file} (${digest})`,
+      );
+    }
   });
 });

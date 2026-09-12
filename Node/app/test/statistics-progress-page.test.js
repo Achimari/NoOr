@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import ejs from "ejs";
 
+import { sharedViewLocals } from "./helpers/viewLocals.js";
+
 import { STREAK_VIEWS, resolveStreakView } from "../src/domain/streakViews.js";
 
 const templatePath = fileURLToPath(
@@ -144,6 +146,7 @@ function figure(html, hook) {
 
 function renderWith(mutate, { streak, fixture = statisticsFixture } = {}) {
   return ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
     statistics: mutate(fixture()),
     leaderboards: {
       recovery: board({ id: "recovery" }),
@@ -620,6 +623,16 @@ describe("Progress page visual system", () => {
     for (const [name, value] of [["ledger", height], ["time zone", timezone]]) {
       assert.ok(value >= 14 && value <= 18, `the ${name} track is ${value}px`);
     }
+  });
+
+  it("keeps weekday totals on one comfortably readable line", () => {
+    const row = rule(".weekday-row");
+    const values = rule(".weekday-values");
+
+    assert.match(row, /grid-template-columns:\s*6\.5rem 3\.75rem minmax\(0, 1fr\) 14rem/);
+    assert.match(values, /font-size:\s*var\(--text-control\)/);
+    assert.match(values, /line-height:\s*var\(--leading-control\)/);
+    assert.match(values, /white-space:\s*nowrap/, "the total must not fall onto a second line");
   });
 
   it("compares the two panels side by side, then stacks them in the same order", () => {

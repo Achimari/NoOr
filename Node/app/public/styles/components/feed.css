@@ -1,5 +1,3 @@
-
-
 .prayer-form-status {
   margin: 0;
   color: var(--ink-secondary-strong);
@@ -54,14 +52,19 @@
   min-width: 0;
 }
 
+/* The byline on a record. Set in the data role and cased, so an entry reads
+   as a filed request rather than as a chat message. */
 .prayer-item-author {
   min-width: var(--tap-min);
   min-height: var(--tap-min);
   align-items: center;
   display: inline-flex;
-  color: var(--brand);
-  font-size: var(--text-label);
+  color: var(--ink);
+  font-family: var(--font-data);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -70,7 +73,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .prayer-item-author:hover {
-    color: var(--brand-hover);
+    color: var(--ink-raised);
     text-decoration: underline;
     text-underline-offset: 0.18em;
   }
@@ -204,13 +207,29 @@
   background: var(--ink-06);
   color: var(--ink-secondary-strong);
   font: inherit;
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
   line-height: 1.4;
 }
 
+/* Ringed and marked, for the same reason as the reaction choices above: a tint
+   alone is what a hover already does. */
 .prayer-reaction-button.selected {
-  border-color: var(--border-strong);
-  background: var(--ink-10);
+  position: relative;
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+  background: var(--paper);
   color: var(--text-primary);
+  font-weight: var(--weight-strong);
+}
+
+.prayer-reaction-button.selected::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-end: 3px;
+  inline-size: 6px;
+  block-size: 6px;
+  background: var(--ink);
+  pointer-events: none;
 }

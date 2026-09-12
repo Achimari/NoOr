@@ -51,7 +51,7 @@
 
 .group-row-note {
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -152,26 +152,34 @@
 }
 
 .stat-line-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-family: var(--font-data);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
 }
 
+/* A headline figure. Set in the display face, because a streak count is one of
+   the few numerals in the product the page is actually about — everything
+   smaller stays in the mono data role. */
 .stat-line-value {
   color: var(--ink);
-  font-family: var(--font-data);
+  font-family: var(--font-display);
   font-size: var(--text-figure);
-  font-weight: var(--weight-body);
+  font-weight: var(--weight-display);
   font-variant-numeric: tabular-nums;
-  line-height: 1.4;
-  letter-spacing: 0;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
 }
 
 .stat-line-note {
   color: var(--ink-secondary-strong);
   font-family: var(--font-data);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-variant-numeric: tabular-nums;
 }
 

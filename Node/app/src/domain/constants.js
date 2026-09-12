@@ -83,12 +83,22 @@ export const PRESET_EMBLEMS = [
   { key: "quiet-hill", label: "Quiet Hill" },
 ];
 
+/* The keys are the stored values and must not change: an account that chose
+   `green` years ago still holds `green`, and every API, validator and test
+   still speaks in these five words.
+ *
+ * The labels changed on 2026-09-12, when the interface became monochrome. A
+ * control called "Green" that shows no green is a promise the product cannot
+ * keep, so each preset is now named for the printed fill it actually renders —
+ * solid ink, a hatch, a cross-hatch, a stipple, a bar. Nothing is reset and no
+ * choice is lost; the same five options render as five distinguishable fills.
+ * Recorded in CONSTRAINTS.md. */
 export const PRESET_ACCENTS = [
-  { key: "neutral", label: "Neutral" },
-  { key: "green", label: "Green" },
-  { key: "amber", label: "Amber" },
-  { key: "blue", label: "Blue" },
-  { key: "rose", label: "Rose" },
+  { key: "neutral", label: "Solid" },
+  { key: "green", label: "Hatch" },
+  { key: "amber", label: "Cross-hatch" },
+  { key: "blue", label: "Stipple" },
+  { key: "rose", label: "Bar" },
 ];
 
 export const DEFAULT_EMBLEM_KEY = "dawn";

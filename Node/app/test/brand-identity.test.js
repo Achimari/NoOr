@@ -90,13 +90,23 @@ describe("Achimari wordmark and ascent mark", () => {
     }
   });
 
-  it("uses the light lockup wherever the auth screen gives it a dark plate", () => {
+  it("tones the lockup to the surface it is actually set on", () => {
+    // The gateway's black brand chip is retired: the wordmark is now the page's
+    // own display masthead, set in ink directly on the paper. The header keeps
+    // the light lockup, because the header is still a black field.
     for (const view of [
       "src/views/pages/partials/auth-login.ejs",
       "src/views/pages/partials/auth-onboarding.ejs",
     ]) {
-      assert.match(read(view), /brand-mark[^\n]*tone:\s*"chrome"/, `${view} must contrast its dark brand plate`);
+      assert.match(read(view), /brand-mark[^\n]*tone:\s*"paper"/, `${view} sets the wordmark on paper`);
+      assert.match(read(view), /brand-mark[^\n]*size:\s*"masthead"/, `${view} sets it at masthead scale`);
     }
+
+    assert.match(
+      read("src/views/components/layout/header.ejs"),
+      /brand-mark[^\n]*tone:\s*"chrome"/,
+      "the header is a black field and keeps the light lockup",
+    );
   });
 
   it("retires every legacy raster identity from the rendered product", () => {
@@ -144,7 +154,11 @@ describe("Achimari favicon and loader", () => {
 
     assert.equal(manifest.name, "Achimari");
     assert.equal(manifest.id, "/");
-    assert.equal(manifest.theme_color, "#111111");
+    // #111111 until 2026-09-12. The chrome the browser is being asked to match
+    // is a true black now, so the manifest states a true black; an installed
+    // window titled in near-black beside a black header reads as a seam.
+    assert.equal(manifest.theme_color, "#000000");
+    assert.equal(manifest.background_color, "#ffffff", "the splash ground is the sheet");
     assert.deepEqual(manifest.icons.map(({ src, sizes, purpose }) => ({ src, sizes, purpose })), [
       { src: "/brand/achimari-mark-192.png", sizes: "192x192", purpose: "any" },
       { src: "/brand/achimari-mark-512.png", sizes: "512x512", purpose: "any" },

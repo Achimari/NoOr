@@ -1,147 +1,192 @@
+/* One compact brand lockup and a focused form, grouped in the viewport. */
 
 .auth-page {
   position: relative;
   z-index: var(--z-content);
   min-height: 100dvh;
-  background: transparent;
-  color: var(--text-primary);
+  color: var(--ink);
   color-scheme: light;
 }
 
-.auth-section {
-  flex: 1;
+.auth-gateway {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(100%, 32rem);
+  margin-inline: auto;
+  min-height: 100dvh;
+  padding-inline: max(var(--padding), env(safe-area-inset-left), env(safe-area-inset-right));
+  padding-block: var(--space-6);
+}
+
+/* ---------------------------------------------------------------- masthead */
+
+/* The logo and the form share a center line and one outer gutter. */
+.auth-masthead {
   display: flex;
   align-items: center;
-  background: transparent;
-}
-
-.auth-container {
-  width: min(100%, 520px);
-}
-
-.auth-brand {
-  display: flex;
   justify-content: center;
-  width: fit-content;
-  margin: 0 auto clamp(var(--space-5), 5vw, var(--space-7));
-  padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius-panel);
-  background: var(--chrome);
-  box-shadow: var(--shadow-panel);
+  gap: var(--space-5);
+  inline-size: 100%;
+  padding-block-end: var(--space-5);
+}
+
+/* -------------------------------------------------------------------- body */
+
+.auth-body {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 100%;
+}
+
+.auth-form-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  inline-size: min(100%, 34rem);
 }
 
 .auth-card {
   width: 100%;
-  padding: clamp(var(--space-5), 4vw, var(--space-7));
-
-  /* Surface delegated to .sticker-surface. The form is the record you arrive
-     on: a solid white label on the page, not a pane of glass over the sky. */
+  max-width: 34rem;
+  padding: clamp(var(--space-4), 4vw, var(--space-6));
 }
 
-@supports not (backdrop-filter: blur(4px)) {
-  .auth-card {
-    background: rgba(255, 255, 255, 0.985);
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .auth-card {
-    background: var(--surface-1);
-    backdrop-filter: none;
-  }
-}
+/* -------------------------------------------------------------------- form */
 
 .auth-head {
   margin-bottom: var(--space-5);
-  text-align: center;
 }
 
 .auth-title {
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  letter-spacing: 0;
-  font-size: clamp(var(--text-page-title), 4vw, var(--text-display));
-  line-height: 1.15;
-  font-weight: var(--weight-body);
   margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: var(--weight-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .auth-subtitle {
   margin: var(--space-2) 0 0;
-  color: var(--ink-secondary-strong);
+  color: var(--ink-muted);
+  font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: var(--leading-body);
 }
 
 .auth-errors {
-  display: grid;
-  gap: var(--space-1);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
   margin-bottom: var(--space-4);
   padding: var(--space-3);
-
   border: 1px solid var(--danger-line);
   border-radius: var(--radius-control);
   background: var(--danger-tint);
-  color: var(--text-primary);
+  color: var(--ink);
+}
+
+.auth-errors .ui-icon {
+  color: var(--danger);
 }
 
 .auth-errors p {
+  flex: 1 1 12rem;
   margin: 0;
   font-size: var(--text-label);
   font-weight: var(--weight-body);
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .auth-field {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin-bottom: var(--space-4);
-  color: var(--text-primary);
+  color: var(--ink);
   font-size: var(--text-label);
   font-weight: var(--weight-body);
 }
 
+.auth-field .field-label {
+  font-family: var(--font-ui);
+  font-size: var(--text-control);
+  font-weight: var(--weight-strong);
+  color: var(--ink);
+}
+
+/* Match the comfortable, rounded controls used in Settings. */
 .auth-field input {
   width: 100%;
   min-width: 0;
-  height: 48px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border-control);
+  height: 56px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--rule-strong);
   border-radius: var(--radius-control);
-  background: var(--white);
-  color: var(--text-primary);
-
-  /* `font: inherit` resets font-size, so the control size must follow it. */
+  background: var(--paper-raised);
+  color: var(--ink);
   font: inherit;
-  font-size: var(--text-control);
+  font-size: var(--text-body);
   font-weight: var(--weight-body);
   transition:
     border-color var(--duration-ui) var(--ease-out),
     background-color var(--duration-ui) var(--ease-out);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .auth-field input:hover {
+    border-color: var(--ink-muted);
+  }
+}
+
 .auth-field input:focus {
-  background: var(--white);
+  background: var(--paper-raised);
+  border-color: var(--ink);
 }
 
 .auth-field input::placeholder {
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }
 
 .auth-hint {
   margin: 0;
   color: var(--ink-secondary-strong);
-  font-size: var(--text-micro);
+  font-size: var(--text-meta);
   font-weight: var(--weight-body);
 }
 
 .auth-actions {
   display: grid;
   gap: var(--space-3);
-  margin-top: var(--space-2);
+  margin-top: var(--space-5);
 }
 
-.auth-actions .auth-submit,
-.auth-actions .auth-secondary {
+/* Layout and typographic treatment only. The surface, every interaction state
+   and the target size belong to `.ui-button--accent` in the button component,
+   which this composes rather than overrides. */
+.auth-submit {
+  justify-content: center;
   width: 100%;
+  min-height: 56px;
+  font-size: var(--text-body);
+}
+
+/* Keep the alternative action centered beneath the primary. */
+.auth-secondary {
+  justify-self: center;
+  padding-inline: var(--space-3);
+}
+
+/* ------------------------------------------------------- reader preferences */
+
+@media (prefers-contrast: more) {
+  .auth-field input {
+    border-color: var(--ink);
+  }
 }
