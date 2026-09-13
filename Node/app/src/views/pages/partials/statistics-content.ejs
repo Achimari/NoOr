@@ -1,23 +1,23 @@
 <%
   const streakViews = [
-    { slug: "strong", key: "recovery", label: "Strong" },
-    { slug: "bible",  key: "reading",  label: "Bible"  },
-    { slug: "tasks",  key: "goals",    label: "Tasks"  },
+    { slug: "strong", key: "recovery", label: "Strong", caption: "Strong streak leaderboard, ranked by current streak", empty: "No Strong streaks yet.", emptyHint: "Answer today's question to start the first streak." },
+    { slug: "bible", key: "reading", label: "Bible", caption: "Bible reading streak leaderboard, ranked by current streak", empty: "No reading streaks yet.", emptyHint: "Answer the daily reading check to start the first streak." },
+    { slug: "tasks", key: "goals", label: "Tasks", caption: "Tasks streak leaderboard, ranked by current streak", empty: "No completed-task streaks yet.", emptyHint: "Complete every task you plan for a day to start a streak." },
   ];
-  const views = streakViews.map((view) => ({ ...view, board: leaderboards[view.key] }));
+  const hasPrefetchedStatistics = typeof statisticsBySource !== "undefined" && Boolean(statisticsBySource);
+  const availableStatistics = hasPrefetchedStatistics
+    ? statisticsBySource
+    : { [activeStreak.key]: statistics };
+  const views = streakViews.map((view) => ({
+    ...view,
+    board: leaderboards[view.key],
+    statistics: availableStatistics[view.key],
+  }));
   const active = views.find((view) => view.slug === activeStreak.slug) || views[0];
-  const activeBoard = active.board;
+  const renderedViews = hasPrefetchedStatistics ? views : [active];
 
   const dayWord = (value) => (value === 1 ? "day" : "days");
   const plural = (value, one, many) => `${value} ${value === 1 ? one : many}`;
-
-  // Every number on this page counts every answer ever stored for the selected
-  // practice. There is no period-filtered DTO, so the scope is said out loud.
-  const dataScope = `${active.label} · all recorded answers`;
-  const yours = statistics.yourAnswers;
-  const community = statistics.communityAnswers;
-  const weekdays = statistics.weekdayChart;
-  const weekdaySummary = statistics.weekdaySummary;
 
   const escape = (value) => String(value)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -88,28 +88,37 @@
     <section class="page-section section-frame section-frame--ruled" aria-labelledby="leaderboard-title">
       <div class="section-head">
         <h2 class="section-head-title" id="leaderboard-title"><%- include("../../components/ui/icon", { name: "trophy", className: "practice-mark" }) %>Streak leaderboard</h2>
-        <span class="section-head-note"><%= plural(activeBoard.leaders.length, "user", "users") %></span>
+        <span class="section-head-note" data-streak-board-count><%= plural(active.board.leaders.length, "user", "users") %></span>
       </div>
       <p class="section-lede">Compare current streaks across the community. Each one follows that member's time zone.</p>
 
       <nav class="segmented progress-segmented" aria-label="Choose a streak leaderboard">
         <% views.forEach((view) => { %>
-          <% if (view.slug === active.slug) { %>
+          <% if (!hasPrefetchedStatistics && view.slug === active.slug) { %>
             <span class="segmented-option" aria-current="page"><%= view.label %></span>
           <% } else { %>
-            <a class="segmented-option" href="/statistics?streak=<%= view.slug %>"><%= view.label %></a>
+            <a
+              class="segmented-option"
+              href="/statistics?streak=<%= view.slug %>"
+              data-progress-view="<%= view.slug %>"
+              data-user-count="<%= view.board.leaders.length %>"
+              <%- view.slug === active.slug ? 'aria-current="page"' : "" %>
+            ><%= view.label %></a>
           <% } %>
         <% }) %>
       </nav>
 
-      <article
-        class="progress-board"
-        data-streak-board="<%= active.key %>"
-        data-streak-board-label="<%= active.label %> streak"
-      >
+      <% renderedViews.forEach((view) => { %>
+        <article
+          class="progress-board"
+          data-streak-board="<%= view.key %>"
+          data-streak-board-label="<%= view.label %> streak"
+          data-progress-panel="<%= view.slug %>"
+          <%- view.slug === active.slug ? "" : "hidden" %>
+        >
         <div class="data-table-wrap">
           <table class="data-table data-table--stack">
-            <caption class="sr-only"><%= activeStreak.caption %></caption>
+            <caption class="sr-only"><%= view.caption %></caption>
             <thead>
               <tr>
                 <th scope="col" class="data-table-rank">Rank</th>
@@ -117,16 +126,16 @@
                 <th scope="col" class="data-table-figure">Streak</th>
               </tr>
             </thead>
-            <tbody id="streak-board-<%= active.key %>-body" data-streak-board-body data-leaderboard-body>
-              <% if (activeBoard.leaders.length) { %>
-                <% activeBoard.leaders.forEach((entry, index) => { %>
-                  <tr<%- entry.id === activeBoard.currentUserId ? ' data-current-user' : "" %><%- index >= 5 ? " hidden" : "" %>>
+            <tbody id="streak-board-<%= view.key %>-body" data-streak-board-body data-leaderboard-body>
+              <% if (view.board.leaders.length) { %>
+                <% view.board.leaders.forEach((entry, index) => { %>
+                  <tr<%- entry.id === view.board.currentUserId ? ' data-current-user' : "" %><%- index >= 5 ? " hidden" : "" %>>
                     <td class="data-table-rank"><%= entry.rank %></td>
                     <td>
                       <a class="leaderboard-user user-link" href="/customer/<%= entry.id %>">
                         <span class="data-table-name"><%= entry.name %></span>
                       </a>
-                      <% if (entry.id === activeBoard.currentUserId) { %>
+                      <% if (entry.id === view.board.currentUserId) { %>
                         <span class="data-table-you">You</span>
                       <% } %>
                     </td>
@@ -143,8 +152,8 @@
                 <tr>
                   <td colspan="3">
                     <div class="empty-state press-region">
-                      <p class="empty-state-title"><%= activeStreak.empty %></p>
-                      <p class="empty-state-note"><%= activeStreak.emptyHint %></p>
+                      <p class="empty-state-title"><%= view.empty %></p>
+                      <p class="empty-state-note"><%= view.emptyHint %></p>
                     </div>
                   </td>
                 </tr>
@@ -157,24 +166,43 @@
           class="ui-button ui-button--secondary progress-more"
           type="button"
           data-streak-board-toggle
-          aria-controls="streak-board-<%= active.key %>-body"
+          aria-controls="streak-board-<%= view.key %>-body"
           aria-expanded="false"
-          <%- activeBoard.leaders.length > 5 ? "" : "hidden" %>
+          <%- view.board.leaders.length > 5 ? "" : "hidden" %>
         >View more</button>
         <p class="sr-only" data-streak-board-status role="status" aria-live="polite"></p>
-      </article>
+        </article>
+      <% }) %>
+      <p class="sr-only" data-progress-view-status role="status" aria-live="polite"></p>
     </section>
 
-    <section class="page-section section-frame section-frame--ruled progress-answers" aria-labelledby="answers-title" data-statistics-source="<%= active.key %>">
+    <% renderedViews.filter((view) => view.statistics).forEach((view) => {
+      const dataScope = `${view.label} · all recorded answers`;
+      const yours = view.statistics.yourAnswers;
+      const community = view.statistics.communityAnswers;
+      const weekdays = view.statistics.weekdayChart;
+      const weekdaySummary = view.statistics.weekdaySummary;
+      const prayerWorld = view.statistics.prayerWorld;
+      const answersTitleId = view.slug === active.slug ? "answers-title" : `answers-title-${view.slug}`;
+      const comparisonTitleId = view.slug === active.slug ? "answer-comparison-title" : `answer-comparison-title-${view.slug}`;
+      const weekdayTitleId = view.slug === active.slug ? "weekday-chart-title" : `weekday-chart-title-${view.slug}`;
+    %>
+    <section
+      class="page-section section-frame section-frame--ruled progress-answers"
+      aria-labelledby="<%= answersTitleId %>"
+      data-statistics-source="<%= view.key %>"
+      data-progress-panel="<%= view.slug %>"
+      <%- view.slug === active.slug ? "" : "hidden" %>
+    >
       <div class="section-head">
-        <h2 class="section-head-title" id="answers-title">Answer patterns</h2>
+        <h2 class="section-head-title" id="<%= answersTitleId %>">Answer patterns</h2>
         <span class="section-head-note"><%= dataScope %></span>
       </div>
       <p class="section-lede">Compare what you recorded with the community. A Yes and a No are both recorded answers, kept exactly as they were given.</p>
 
-      <figure class="ledger-figure" data-answer-comparison aria-labelledby="answer-comparison-title">
+      <figure class="ledger-figure" data-answer-comparison aria-labelledby="<%= comparisonTitleId %>">
         <figcaption class="ledger-figure-head">
-          <h3 class="ledger-figure-title t-component-title" id="answer-comparison-title">Your answers and the community</h3>
+          <h3 class="ledger-figure-title t-component-title" id="<%= comparisonTitleId %>">Your answers and the community</h3>
           <p class="ledger-figure-note"><%= dataScope %></p>
         </figcaption>
 
@@ -185,27 +213,27 @@
             hook: "data-personal-patterns",
             title: "Your answers",
             split: yours,
-            emptyCopy: `No answers recorded yet. Your first ${active.label} answer fills this in.`,
+            emptyCopy: `No answers recorded yet. Your first ${view.label} answer fills this in.`,
           }) %>
           <%- answerPanel({
             hook: "data-community-patterns",
             title: "Community",
             split: community,
-            emptyCopy: `No ${active.label} answers recorded yet across the community.`,
+            emptyCopy: `No ${view.label} answers recorded yet across the community.`,
           }) %>
         </div>
       </figure>
 
-      <figure class="ledger-figure" data-weekday-chart aria-labelledby="weekday-chart-title">
+      <figure class="ledger-figure" data-weekday-chart aria-labelledby="<%= weekdayTitleId %>">
         <figcaption class="ledger-figure-head">
-          <h3 class="ledger-figure-title t-component-title" id="weekday-chart-title">Community rhythm by weekday</h3>
+          <h3 class="ledger-figure-title t-component-title" id="<%= weekdayTitleId %>">Community rhythm by weekday</h3>
           <p class="ledger-figure-note"><%= dataScope %></p>
         </figcaption>
 
         <% if (weekdaySummary.highest.hasData) { %>
           <p class="ledger-figure-insight"><%= shareSentence("Highest recorded Yes share", weekdaySummary.highest) %> <%= shareSentence("Lowest recorded Yes share", weekdaySummary.lowest) %></p>
         <% } else { %>
-          <p class="ledger-figure-insight">No answers recorded yet. Each weekday fills in once members record <%= active.label %> answers on that day.</p>
+          <p class="ledger-figure-insight">No answers recorded yet. Each weekday fills in once members record <%= view.label %> answers on that day.</p>
         <% } %>
 
         <%- legend() %>
@@ -236,13 +264,13 @@
       <div class="prayer-world" data-prayer-world>
         <div class="section-head">
           <h3 class="t-component-title">Community time zones</h3>
-          <span class="section-head-note">Most active · <%= statistics.prayerWorld.activeRegion %></span>
+          <span class="section-head-note">Most active · <%= prayerWorld.activeRegion %></span>
         </div>
         <p class="section-lede">Grouped from the time zone each member selected. Achimari does not track anyone's location.</p>
 
         <div class="prayer-world-layout">
           <ul class="prayer-world-regions">
-            <% statistics.prayerWorld.regions.forEach((region, index) => { %>
+            <% prayerWorld.regions.forEach((region, index) => { %>
               <li class="prayer-world-region<%= region.isActive ? " is-active" : "" %>" style="--reveal-index: <%= index %>">
                 <span class="prayer-world-region-name"><%= region.label %></span>
                 <span class="prayer-world-region-track" aria-hidden="true">
@@ -252,7 +280,7 @@
                 <span class="prayer-world-region-share"><%= region.percentage %>%</span>
               </li>
             <% }) %>
-            <% if (!statistics.prayerWorld.regions.length) { %>
+            <% if (!prayerWorld.regions.length) { %>
               <li class="prayer-world-region prayer-world-region--empty">
                 <span class="prayer-world-region-name">No time zones recorded yet</span>
               </li>
@@ -267,7 +295,7 @@
               <span class="prayer-globe-land prayer-globe-land-africa"></span>
               <span class="prayer-globe-land prayer-globe-land-asia"></span>
               <span class="prayer-globe-land prayer-globe-land-oceania"></span>
-              <% statistics.prayerWorld.regions.filter((region) => region.count > 0).forEach((region, index) => { %>
+              <% prayerWorld.regions.filter((region) => region.count > 0).forEach((region, index) => { %>
                 <span
                   class="prayer-globe-point<%= region.isActive ? " is-active" : "" %>"
                   style="left: <%= region.x %>%; top: <%= region.y %>%; --point-scale: <%= region.pointScale %>; --reveal-index: <%= index %>"
@@ -278,6 +306,7 @@
         </div>
       </div>
     </section>
+    <% }) %>
 
   </div>
 

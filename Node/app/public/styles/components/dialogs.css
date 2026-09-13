@@ -26,7 +26,9 @@
 .ui-dialog {
   width: 100%;
   max-width: var(--measure-dialog);
-  max-height: min(85vh, 46rem);
+  /* `dvh`: the visual viewport shrinks when the virtual keyboard opens, and a
+     `vh`-bounded dialog does not follow it. */
+  max-height: min(85dvh, 46rem);
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-panel);
@@ -89,7 +91,7 @@
 
   .ui-dialog {
     max-width: none;
-    max-height: 92vh;
+    max-height: 92dvh;
     border-start-start-radius: var(--radius-feature);
     border-start-end-radius: var(--radius-feature);
     border-end-start-radius: 0;

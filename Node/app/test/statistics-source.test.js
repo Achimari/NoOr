@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
-import { loadStatisticsAnswerRows } from "../src/services/statisticsService.js";
+import { getStatisticsSummaries, loadStatisticsAnswerRows } from "../src/services/statisticsService.js";
 
 function createRepository() {
   const calls = [];
@@ -52,16 +52,34 @@ function createRepository() {
 }
 
 describe("statistics answer source", () => {
-  it("passes the selected table source from the page controller into the statistics service", () => {
+  it("asks the statistics service for every table before rendering Progress", () => {
     const controller = readFileSync(
       new URL("../src/controllers/pageController.js", import.meta.url),
       "utf8",
     );
 
-    assert.match(
-      controller,
-      /const activeStreak = resolveStreakView\(req\.query\.streak\);[\s\S]*?getStatisticsSummary\(req\.user\.id, activeStreak\.key\)/,
-    );
+    assert.match(controller, /getStatisticsSummaries\(req\.user\.id\)/);
+  });
+
+  it("prefetches Strong, Bible and Tasks statistics while reading time zones once", async () => {
+    const { calls, repository } = createRepository();
+    let timezoneReads = 0;
+
+    const summaries = await getStatisticsSummaries(7, {
+      repository,
+      findTimezones: async () => {
+        timezoneReads += 1;
+        return [];
+      },
+    });
+
+    assert.deepEqual(Object.keys(summaries), ["recovery", "reading", "goals"]);
+    assert.deepEqual(calls, [
+      "all-recovery", "user-recovery-7",
+      "all-reading", "user-reading-7",
+      "all-goals", "user-goals-7",
+    ]);
+    assert.equal(timezoneReads, 1);
   });
 
   it("loads Bible answers when the Bible table is selected", async () => {

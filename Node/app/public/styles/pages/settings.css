@@ -381,3 +381,126 @@
 .settings-answer-no[aria-pressed="true"]:focus-visible {
   outline-color: var(--focus-ring-on-deep);
 }
+
+/* ------------------------------------------------------------ Settings, phone
+ *
+ * Three changes, and nothing else: a jump link to the correction controls, one
+ * consistent action width inside each group, and one inset fewer around the
+ * answer controls. The answer pair itself — its full-width halves, its centred
+ * labels, its black selected field and its visible current answer — is
+ * untouched, and it carries no check mark, by explicit owner instruction.
+ */
+
+/* An early route to the one control on this page a reader returns to daily.
+   It is an ordinary in-page link; `html`'s scroll-padding already clears the
+   masthead, and `scroll-margin-block-start` covers a browser that scrolls the
+   target itself. */
+.settings-jump {
+  margin-block-start: var(--space-3);
+}
+
+.settings-jump-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-control);
+  text-underline-offset: 0.18em;
+}
+
+#settings-answers {
+  scroll-margin-block-start: calc(var(--header-height) + var(--space-4));
+}
+
+/* The feedback the controller has always computed, stated where the field is
+   rather than only in a toast that has already faded. */
+.settings-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  font-size: var(--text-label);
+  line-height: 1.45;
+}
+
+.settings-feedback--error {
+  border: 2px solid var(--danger-line);
+  background: var(--danger-tint);
+  color: var(--ink);
+}
+
+.settings-feedback--success {
+  border: 1px solid var(--success-line);
+  background: var(--success-tint);
+  color: var(--ink);
+}
+
+.settings-feedback .field-error-mark {
+  flex: none;
+  margin-block-start: 2px;
+  color: var(--danger-line);
+}
+
+/* The password disclosure carries no surface of its own: the group it sits in
+   is already a region, and a second boundary inside it would be an inset too
+   many. */
+.settings-disclosure {
+  min-width: 0;
+}
+
+
+@media (max-width: 760px) {
+
+  /* One width and one alignment for every action in this page's own groups, so
+     Save nickname and Change password stop disagreeing about how wide a
+     primary action is. */
+  .settings-page .settings-form .ui-button--large {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings-page .settings-input {
+    width: 100%;
+  }
+
+  /* The answers panel was the third inset in a row: group padding, then the
+     panel's own border and padding, then the reading details inside it. On a
+     phone the panel gives up its box and lets the group it already lives in be
+     the region; the rule between Strong and Bible reading still separates
+     them. */
+  .settings-group > .surface-panel.settings-answers {
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  .settings-group > .surface-panel.settings-answers > .settings-row {
+    padding-inline: 0;
+  }
+
+  /* Strong and Bible reading stay stacked, each pair full width. */
+  .settings-answers {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-answer-button {
+    min-width: 0;
+    padding-inline: var(--space-3);
+  }
+
+  .settings-reading-details {
+    padding: var(--space-3) 0 0;
+    border: 0;
+    border-block-start: 1px solid var(--separator);
+    border-radius: 0;
+    background: none;
+  }
+
+  .settings-group {
+    padding: var(--space-4);
+  }
+}

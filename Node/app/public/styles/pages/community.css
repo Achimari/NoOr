@@ -381,3 +381,76 @@
     border-inline-start: 0;
   }
 }
+
+
+/* --------------------------------------------------------- Community, phone
+ *
+ * Encouragement still comes before the requests, the resource keeps its name
+ * and its source, the filters keep every control they had, and Telegram is
+ * untouched. What changes is how much blank paper sits between them, and that
+ * the optional parts fold.
+ */
+
+/* A direct route between reading the community's requests and finding one's
+   own — the two halves of the same activity, previously two menu steps apart. */
+.community-own-prayers {
+  margin-block: calc(var(--space-2) * -1) var(--space-4);
+}
+
+.community-own-prayers-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-control);
+  text-underline-offset: 0.18em;
+}
+
+
+.community-resource-body {
+  gap: var(--space-3);
+}
+
+/* The applied filters, stated on the expander while the row is closed. */
+.fold-summary-state {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-muted);
+  font-family: var(--font-data);
+  font-size: var(--text-meta);
+  text-align: end;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fold-summary-state[data-prayer-filter-applied="true"] {
+  color: var(--ink);
+  font-weight: var(--weight-strong);
+}
+
+@media (max-width: 760px) {
+
+  /* The editorial opening and the feed are two regions, not two pages. */
+  .community-editorial-grid {
+    gap: var(--space-4);
+  }
+
+  .community-resource-body {
+    padding-block-start: var(--space-2);
+  }
+
+  .prayer-filter-panel {
+    gap: var(--space-3);
+    padding-block-start: var(--space-3);
+  }
+}
+
+@media (min-width: 761px) {
+
+  .community-resource-body,
+  .prayer-filter-panel {
+    padding-block-start: 0;
+  }
+}

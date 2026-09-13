@@ -163,6 +163,27 @@ function render({ streak } = {}) {
   return renderWith((fixture) => fixture, { streak });
 }
 
+function renderPrefetched({ streak } = {}) {
+  const fixture = statisticsFixture();
+  return ejs.renderFile(templatePath, {
+    ...sharedViewLocals,
+    statistics: fixture,
+    statisticsBySource: {
+      recovery: fixture,
+      reading: fixture,
+      goals: fixture,
+    },
+    leaderboards: {
+      recovery: board({ id: "recovery" }),
+      reading: board({ id: "reading" }),
+      goals: board({ id: "goals" }),
+    },
+    activeStreak: resolveStreakView(streak),
+    siteData: { socialLinks: [] },
+    t: () => "",
+  });
+}
+
 describe("streak view resolution", () => {
   it("names the three practices the way the product does", () => {
     assert.deepEqual(STREAK_VIEWS.map((view) => view.slug), ["strong", "bible", "tasks"]);
@@ -183,6 +204,24 @@ describe("streak view resolution", () => {
 });
 
 describe("Progress page", () => {
+  it("pre-renders all three leaderboard and answer views for instant switching", async () => {
+    const html = await renderPrefetched({ streak: "bible" });
+
+    assert.equal((html.match(/data-streak-board="/g) || []).length, 3);
+    assert.equal((html.match(/data-statistics-source="/g) || []).length, 3);
+    assert.match(html, /data-progress-panel="strong"[^>]*hidden/);
+    assert.match(html, /data-progress-panel="bible"(?![^>]*hidden)/);
+    assert.match(html, /data-progress-view="tasks"/);
+  });
+
+  it("removes inactive prefetched panels from layout", () => {
+    assert.match(
+      pageStyles,
+      /\[data-progress-panel\]\[hidden\][^{]*\{[^}]*display:\s*none/s,
+      "a component display rule must not override the hidden prefetched views",
+    );
+  });
+
   it("states the page purpose in one visible h1", async () => {
     const html = await render();
 

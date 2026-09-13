@@ -1,5 +1,11 @@
 
 
+.battle-entry {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
 .battle-head {
   max-width: var(--measure-reading);
 }

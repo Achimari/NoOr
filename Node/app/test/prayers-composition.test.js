@@ -96,7 +96,7 @@ describe("the composer stays the task", () => {
   });
 
   it("keeps exactly one filled primary in the composer", () => {
-    const composer = myPrayers().match(/<form class="prayer-composer"[\s\S]*?<\/form>/)[0];
+    const composer = myPrayers().match(/<form class="prayer-composer[^"]*"[\s\S]*?<\/form>/)[0];
     const filled = (composer.match(/ui-button--primary|ui-button--accent/g) || []).length;
 
     assert.equal(filled, 1, "one group urges one action");

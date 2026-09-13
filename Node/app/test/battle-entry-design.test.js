@@ -77,6 +77,14 @@ function encounterBlock(html, key) {
 }
 
 describe("Battle entry follows the Achimari Course Ledger", () => {
+  it("keeps the footer at the bottom of tall viewports", () => {
+    assert.match(
+      styles,
+      /\.battle-entry\s*{[^}]*display:\s*flex[^}]*flex:\s*1\s+1\s+auto[^}]*flex-direction:\s*column/s,
+      "the entry wrapper must fill the page and give the footer's auto margin a flex column",
+    );
+  });
+
   it("uses the shared page shell and a direct page heading", () => {
     assert.match(entry, /class="page-shell battle-container"/);
     assert.match(entry, /class="page-head battle-head"/);

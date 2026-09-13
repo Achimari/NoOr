@@ -45,8 +45,12 @@
     white-space: normal;
   }
 
+  /* `auto-fit` with a real minimum rather than a fixed pair: at 320px with
+     200% text a two-column track is 136px wide, which no sentence fits into,
+     and the cards pushed the page sideways. `min(…, 100%)` keeps the minimum
+     from becoming a minimum wider than the screen itself. */
   .about-roadmap-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
   }
 
   .about-roadmap-grid:not(.visit-roadmap-grid)::before,

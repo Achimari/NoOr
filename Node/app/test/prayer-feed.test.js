@@ -10,6 +10,7 @@ const partialPath = fileURLToPath(
   new URL("../src/views/pages/partials/prayers-table.ejs", import.meta.url),
 );
 const appScript = readFileSync(new URL("../public/scripts/app.js", import.meta.url), "utf8");
+const dashboardCss = readFileSync(new URL("../public/styles/home/dashboard.css", import.meta.url), "utf8");
 
 function prayer(overrides = {}) {
   return {
@@ -85,5 +86,19 @@ describe("prayer feed", () => {
     assert.doesNotMatch(renderer, /colspan/);
     assert.match(renderer, /<li/);
     assert.match(renderer, /data-prayer-row/, "client-rendered items must carry the row hook too");
+  });
+
+  it("keeps the answered action's stroked checkmark from being filled", () => {
+    const iconRenderer = appScript.slice(
+      appScript.indexOf("function actionMenuItemIcon("),
+      appScript.indexOf("function getPrayerActionsMenu("),
+    );
+
+    assert.match(iconRenderer, /class="ui-icon action-menu-item-icon"/);
+    assert.match(
+      dashboardCss,
+      /\.action-menu-item-icon\s*\{[^}]*fill:\s*none/s,
+      "the shared filled-icon rule must not turn the open check path into a solid wedge",
+    );
   });
 });

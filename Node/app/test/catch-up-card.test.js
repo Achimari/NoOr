@@ -64,6 +64,7 @@ function fakeRow() {
 function renderCatchUpWithPayload(payload) {
   const card = { hidden: false };
   const count = fakeElement();
+  const summaryCount = fakeElement();
   const status = fakeElement();
   const more = fakeElement();
   const pageStatus = fakeElement();
@@ -87,6 +88,7 @@ function renderCatchUpWithPayload(payload) {
     catchUpList: list,
     catchUpTemplate: template,
     catchUpCount: count,
+    catchUpSummaryCount: summaryCount,
     catchUpStatus: status,
     catchUpMore: more,
     catchUpPageStatus: pageStatus,
@@ -98,7 +100,7 @@ function renderCatchUpWithPayload(payload) {
     { ...context, payload },
   );
 
-  return { card, count, status, more, pageStatus, rows: children, items: context.catchUpItems };
+  return { card, count, summaryCount, status, more, pageStatus, rows: children, items: context.catchUpItems };
 }
 
 async function renderDashboard() {
@@ -278,6 +280,23 @@ describe("catch-up rendering", () => {
     assert.equal(rendered.card.hidden, true);
     assert.equal(rendered.rows.length, 0);
     assert.match(rendered.status.textContent, /caught up/i);
+  });
+
+  it("keeps the collapsed expander's count equal to the real backlog", () => {
+    // The phone disclosure shows only this number while it is closed, so it is
+    // the one thing standing in for the whole list and must never lag it.
+    assert.equal(renderCatchUpWithPayload({ total: 0, items: [] }).summaryCount.textContent, "0");
+
+    const many = renderCatchUpWithPayload({
+      total: 12,
+      items: Array.from({ length: 12 }, (unused, index) => ({
+        dateKey: `2026-09-${String(index + 1).padStart(2, "0")}`,
+        activity: "STRONG",
+      })),
+    });
+    assert.equal(many.rows.filter((row) => !row.hidden).length, 5, "only the first page is shown");
+    assert.equal(many.summaryCount.textContent, "12", "but the count is the whole backlog, not the page");
+    assert.match(many.count.textContent, /12 left/);
   });
 
   it("shows one row per missed activity, oldest first", () => {

@@ -679,3 +679,27 @@
     border-inline-start: 1px solid var(--rule);
   }
 }
+
+
+/* The privacy toggle sits inside its own full-width label, which is the 44px
+   target. On a phone the box itself also clears the WCAG 2.2 AA 24px minimum,
+   so a reader aiming at the control rather than at the sentence can hit it. */
+@media (max-width: 760px) {
+
+  .profile-toggle input {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.profile-presentation-choices {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (max-width: 760px) {
+
+  .profile-presentation-choices {
+    padding-block-start: var(--space-3);
+  }
+}

@@ -13,7 +13,19 @@
       <h2 class="section-head-title" id="prayer-composer-title">Share a prayer request</h2>
       <p class="section-lede">Your request will be visible to everyone in the community. Share only what you are comfortable making public.</p>
 
-      <form class="prayer-composer" data-prayer-form novalidate>
+      <%#
+        The composer folds on a phone so the requests already shared are not
+        pushed a screen and a half down by an empty box. The sharing
+        explanation above stays outside the fold, so it is read before the
+        Share control is ever reached, and the form itself is rendered open —
+        with no script the composer is simply there, as it always was.
+      -%>
+      <details class="prayer-composer-disclosure" data-prayer-composer-disclosure data-phone-fold open>
+        <summary class="fold-summary" aria-controls="prayer-composer-form">
+          <span class="fold-summary-label">Write a request</span>
+        </summary>
+
+      <form class="prayer-composer fold-body" id="prayer-composer-form" data-prayer-form novalidate>
         <div class="field">
           <label class="field-label" for="prayer-composer-input">Prayer request</label>
           <textarea
@@ -32,6 +44,7 @@
           <p class="prayer-form-status" data-prayer-status role="status" aria-live="polite"></p>
         </div>
       </form>
+      </details>
     </section>
 
     <section class="page-section section-frame section-frame--ruled" aria-labelledby="prayer-active-title">

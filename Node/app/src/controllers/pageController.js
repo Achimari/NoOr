@@ -2,7 +2,7 @@ import { getDailyCheckInPageData } from "../services/checkInService.js";
 import { getLeaderboardSummary } from "../services/leaderboardService.js";
 import { getStreakLeaderboards } from "../services/streakLeaderboardService.js";
 import { getPrayers, getUserPrayers } from "../services/prayerService.js";
-import { getStatisticsSummary } from "../services/statisticsService.js";
+import { getStatisticsSummaries } from "../services/statisticsService.js";
 import { resolveStreakView } from "../domain/streakViews.js";
 import { getMissedActivities } from "../services/missedActivityService.js";
 import { readFileSync } from "node:fs";
@@ -61,13 +61,14 @@ export function renderPage({ view, pageId, titleKey }) {
 
     if (pageId === "statistics") {
       const activeStreak = resolveStreakView(req.query.streak);
-      const [statistics, recovery, streaks] = await Promise.all([
-        getStatisticsSummary(req.user.id, activeStreak.key),
+      const [statisticsBySource, recovery, streaks] = await Promise.all([
+        getStatisticsSummaries(req.user.id),
         getLeaderboardSummary(req.user.id, req.user.timezone),
         getStreakLeaderboards(req.user.id),
       ]);
 
-      viewData.statistics = statistics;
+      viewData.statistics = statisticsBySource[activeStreak.key];
+      viewData.statisticsBySource = statisticsBySource;
       viewData.activeStreak = activeStreak;
       viewData.leaderboards = {
         recovery: {

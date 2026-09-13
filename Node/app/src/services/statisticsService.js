@@ -213,12 +213,7 @@ export async function loadStatisticsAnswerRows(source, userId, repository = stat
   return { historyRows, currentUserHistoryRows };
 }
 
-export async function getStatisticsSummary(userId, source = "recovery") {
-  const [{ historyRows, currentUserHistoryRows }, timezoneRows] = await Promise.all([
-    loadStatisticsAnswerRows(source, userId),
-    findAuthUserTimezones(),
-  ]);
-
+function buildStatisticsSummary({ historyRows, currentUserHistoryRows }, prayerWorld) {
   const communityCounts = countAnswers(historyRows);
   const yourCounts = countAnswers(currentUserHistoryRows);
   const weekdayChart = buildWeekdayChart(historyRows);
@@ -228,6 +223,32 @@ export async function getStatisticsSummary(userId, source = "recovery") {
     communityAnswers: toAnswerSplit(communityCounts.yes, communityCounts.no),
     weekdayChart,
     weekdaySummary: buildWeekdaySummary(weekdayChart),
-    prayerWorld: buildPrayerWorld(timezoneRows),
+    prayerWorld,
   };
+}
+
+export async function getStatisticsSummary(userId, source = "recovery") {
+  const [answerRows, timezoneRows] = await Promise.all([
+    loadStatisticsAnswerRows(source, userId),
+    findAuthUserTimezones(),
+  ]);
+
+  return buildStatisticsSummary(answerRows, buildPrayerWorld(timezoneRows));
+}
+
+export async function getStatisticsSummaries(
+  userId,
+  { repository = statisticsRepository, findTimezones = findAuthUserTimezones } = {},
+) {
+  const sources = ["recovery", "reading", "goals"];
+  const [answerRowsBySource, timezoneRows] = await Promise.all([
+    Promise.all(sources.map((source) => loadStatisticsAnswerRows(source, userId, repository))),
+    findTimezones(),
+  ]);
+  const prayerWorld = buildPrayerWorld(timezoneRows);
+
+  return Object.fromEntries(sources.map((source, index) => [
+    source,
+    buildStatisticsSummary(answerRowsBySource[index], prayerWorld),
+  ]));
 }

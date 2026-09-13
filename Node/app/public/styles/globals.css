@@ -10,12 +10,6 @@ html {
   scroll-padding-top: calc(var(--header-height) + var(--space-3));
 }
 
-@media (max-width: 760px) {
-  html {
-    --header-height: var(--header-height-compact);
-  }
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -85,6 +79,13 @@ body {
   font-weight: var(--weight-body);
   line-height: var(--leading-title);
   text-wrap: balance;
+
+  /* A shared reflow correction, at zero specificity so any component rule
+     still wins. A heading is the one place the product reliably sets a long
+     unbreakable word at a large size, and under 200% text enlargement at
+     320px that word is what pushes a document sideways. Last-resort breaking
+     only: ordinary headings wrap between words exactly as before. */
+  overflow-wrap: break-word;
 }
 
 body:has(.dashboard-page),

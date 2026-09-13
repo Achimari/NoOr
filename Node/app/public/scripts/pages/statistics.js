@@ -82,4 +82,46 @@
   }
 
   document.querySelectorAll("[data-streak-board]").forEach(initializeBoardPreview);
+
+  const viewLinks = [...document.querySelectorAll("[data-progress-view]")];
+  const viewPanels = [...document.querySelectorAll("[data-progress-panel]")];
+  const boardCount = document.querySelector?.("[data-streak-board-count]");
+  const viewStatus = document.querySelector?.("[data-progress-view-status]");
+  const browserWindow = typeof window === "undefined" ? null : window;
+
+  function showProgressView(slug, { updateHistory = false, announce = false } = {}) {
+    const selectedLink = viewLinks.find((link) => link.dataset.progressView === slug);
+    const selectedPanels = viewPanels.filter((panel) => panel.dataset.progressPanel === slug);
+    if (!selectedLink || !selectedPanels.length) return false;
+
+    viewLinks.forEach((link) => {
+      if (link === selectedLink) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+    viewPanels.forEach((panel) => {
+      panel.hidden = panel.dataset.progressPanel !== slug;
+    });
+
+    const userCount = Number.parseInt(selectedLink.dataset.userCount, 10) || 0;
+    if (boardCount) boardCount.textContent = `${userCount} ${userCount === 1 ? "user" : "users"}`;
+    if (announce && viewStatus) viewStatus.textContent = `Showing ${selectedLink.textContent.trim()} progress.`;
+
+    if (updateHistory && browserWindow?.history?.pushState) {
+      browserWindow.history.pushState({}, "", selectedLink.getAttribute("href"));
+    }
+    return true;
+  }
+
+  viewLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (!showProgressView(link.dataset.progressView, { updateHistory: true, announce: true })) return;
+      event.preventDefault();
+    });
+  });
+
+  browserWindow?.addEventListener?.("popstate", () => {
+    const match = browserWindow.location.search.match(/(?:^|[?&])streak=([^&]+)/);
+    const slug = match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : "strong";
+    showProgressView(slug);
+  });
 })();

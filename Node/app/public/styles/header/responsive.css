@@ -9,241 +9,274 @@
 
 }
 
-@media (max-width: 920px) {
-  .header-container {
-    padding: 0 var(--space-3);
-    grid-template-columns: auto 1fr auto;
-    gap: var(--space-3);
-  }
-
-  .header-nav {
-    gap: var(--space-4);
-    grid-column: auto;
-    justify-content: center;
-  }
-
+/* ------------------------------------------------------ the Menu range
+ *
+ * One compact masthead — brand, the direct Help link, a labelled Menu — at the
+ * shared --header-height. The desktop row and the account control hand their
+ * destinations to the Menu panel, which opens directly under the masthead.
+ * There is no bottom navigation of any kind.
+ *
+ * 959px, not the 760px phone range: measured in Chromium, the five-link row
+ * wraps "My Prayers" below 800px at normal text and clips below 960px at 200%
+ * text. account-menu.js reads the same number.
+ */
+@media (max-width: 959px) {
   .logo-block {
     gap: var(--space-2);
   }
 
-}
-
-@media (max-width: 760px) {
-  .header {
-    padding: var(--space-2) 0;
-  }
-
-  .header.menu-open {
-    background: var(--footer-bg);
-    backdrop-filter: none;
-  }
-
+  /* Brand left, Help and Menu right, on one 56px row at normal text size. When
+     enlarged text makes the wordmark and the controls wider than the screen
+     (measured: 320px from 150% text, 390px at 200%), the controls wrap to a
+     second row, still right-aligned, instead of sliding over the brand. */
   .header-container {
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas: "logo actions";
-    column-gap: var(--space-3);
-    padding: 0 var(--space-3);
-  }
-
-  .header-left {
-    grid-area: logo;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    padding-inline: max(var(--space-3), env(safe-area-inset-left)) max(var(--space-3), env(safe-area-inset-right));
   }
 
   .header-actions {
-    grid-area: actions;
     gap: var(--space-2);
+    margin-inline-start: auto;
   }
 
-  .header-auth-actions {
-    gap: var(--space-2);
-  }
-
-  .header-nav {
-    --mobile-nav-link-size: 1.55rem;
-    grid-area: nav;
-    position: fixed;
-    top: 54px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    display: grid;
-    align-content: start;
-    gap: 0;
-    width: 100%;
-    min-height: 0;
-    padding: var(--space-5) var(--space-5) var(--space-6);
-    padding-bottom: max(var(--space-6), env(safe-area-inset-bottom));
-    border-top: 1px solid var(--white-10);
-    background: var(--header-bg-solid);
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-8px);
-    visibility: hidden;
-
-    transition:
-      opacity var(--duration-fast) var(--ease-out),
-      transform var(--duration-fast) var(--ease-out),
-      visibility var(--duration-fast) var(--ease-out);
-  }
-
-  .header-nav .header-link,
-  .header-nav .header-link:link,
-  .header-nav .header-link:visited {
-    padding: 13px 0;
-    color: var(--white-92);
-    font-size: var(--mobile-nav-link-size);
-    font-weight: var(--weight-body);
-    line-height: 1.4;
-    white-space: normal;
-  }
-
-  .header-auth-link {
-    font-size: var(--text-label);
-  }
-
-  .header-auth-button {
-    min-height: 36px;
-    padding: 0 10px;
-  }
-
-  .header-settings-link {
-    width: 36px;
-    height: 36px;
-  }
-
-  .header-settings-icon {
-    width: 15px;
-    height: 15px;
-  }
-
-  .header-timezone-button {
-    min-height: 36px;
-    padding: 0 10px;
-    font-size: var(--text-meta);
-  }
-
-  .header-timezone-menu {
-    right: -44px;
-    max-height: min(360px, calc(100dvh - 72px));
-  }
-
-  .header-menu-button {
-    display: inline-flex;
-    flex: 0 0 auto;
-  }
-
-  .header.menu-open .header-nav {
-
-    z-index: calc(var(--z-sticky) - 1);
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-    visibility: visible;
-    transition:
-      opacity var(--duration-panel) var(--ease-out),
-      transform var(--duration-panel) var(--ease-out),
-      visibility var(--duration-panel) var(--ease-out);
-  }
-
-  .header-link::after {
+  .header-nav,
+  .header-account {
     display: none;
   }
-}
 
-@media (max-width: 560px) {
-  .header-container {
-    column-gap: var(--space-2);
-    padding: 0 var(--space-3);
+  .site-menu {
+    display: block;
   }
 
-  .header-nav {
-    --mobile-nav-link-size: 1.35rem;
-    top: 50px;
-    padding: var(--space-5) var(--space-4) var(--space-6);
+  /* The two-line control the header used before the rail: a 44px target named
+     "Menu" for assistive technology, whose lines cross into an X while open, so
+     the state is a shape. Transform only. */
+  .site-menu-toggle {
+    position: relative;
+    display: block;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    border-radius: var(--radius-control);
+    color: var(--white);
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
   }
 
-  .header-auth-link {
-    font-size: var(--text-label);
+  .site-menu-toggle::-webkit-details-marker {
+    display: none;
   }
 
-  .header-auth-button {
-    min-height: 36px;
-    padding: 0 8px;
+  .site-menu-toggle:focus-visible {
+    background: var(--white-06);
   }
 
-  .header-settings-link {
-    width: 36px;
-    height: 36px;
+  .site-menu-line {
+    position: absolute;
+    inset-inline: 11px;
+    top: 21px;
+    height: 1.5px;
+    background: currentColor;
+    transform: translateY(-4px);
+    transition: transform var(--duration-ui) var(--ease-out);
   }
 
-  .header-settings-icon {
-    width: 14px;
-    height: 14px;
+  .site-menu-line + .site-menu-line {
+    transform: translateY(4px);
   }
 
-  .header-timezone-button {
-    min-height: 36px;
-    padding: 0 8px;
-    font-size: var(--text-meta);
-  }
-}
-
-@media (max-width: 420px) {
-  .header-nav {
-    --mobile-nav-link-size: 1.22rem;
+  .site-menu[open] .site-menu-line {
+    transform: rotate(45deg);
   }
 
-  .header-auth-link {
-    font-size: var(--text-label);
+  .site-menu[open] .site-menu-line + .site-menu-line {
+    transform: rotate(-45deg);
   }
 
-  .header-timezone-menu {
-    right: -54px;
-  }
-}
-
-@media (max-width: 760px) {
-  .header-account { display: none; }
-
-  .header-nav-account {
-    display: grid;
-    width: 100%;
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu-line {
+      transition: none;
+    }
   }
 
-  .header-nav .header-nav-account-link,
-  .header-nav .header-nav-timezone {
+  /* Forced colours replace backgrounds with Canvas, which would erase lines
+     drawn as fills; draw them in the system text colour instead. */
+  @media (forced-colors: active) {
+    .site-menu-line {
+      background: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+
+  /* Opened the way apple.com opens its menu: the black field takes the whole
+     screen under the masthead, the page stops scrolling behind it, and the
+     destinations arrive in sequence. The panel's top is the masthead's real
+     lower edge (account-menu.js measures it on press; 56px without script),
+     and the panel is its own single scroll area. */
+  html:has(.site-menu[open]) {
+    overflow: hidden;
+  }
+
+  .site-menu-panel {
+    position: fixed;
+    inset: var(--site-menu-top, var(--header-height)) 0 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-block: var(--space-4) var(--space-6);
+    padding-inline: max(var(--space-5), env(safe-area-inset-left)) max(var(--space-5), env(safe-area-inset-right));
+    background: var(--chrome);
+    text-align: start;
+    animation: site-menu-reveal var(--duration-panel) var(--ease-out) both;
+  }
+
+  /* The destinations are the page's headline while the Menu is open. */
+  .site-menu-list--primary .site-menu-link {
+    font-size: 1.55rem;
+    font-weight: var(--weight-strong);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .site-menu[open] .site-menu-list--primary > li,
+  .site-menu[open] .site-menu-group {
+    animation: site-menu-item-in var(--duration-panel) var(--ease-out) both;
+  }
+
+  .site-menu[open] .site-menu-list--primary > li:nth-child(1) { animation-delay: 40ms; }
+  .site-menu[open] .site-menu-list--primary > li:nth-child(2) { animation-delay: 70ms; }
+  .site-menu[open] .site-menu-list--primary > li:nth-child(3) { animation-delay: 100ms; }
+  .site-menu[open] .site-menu-list--primary > li:nth-child(4) { animation-delay: 130ms; }
+  .site-menu[open] .site-menu-list--primary > li:nth-child(5) { animation-delay: 160ms; }
+  .site-menu[open] .site-menu-group { animation-delay: 190ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu-panel {
+      animation-name: site-menu-fade;
+    }
+
+    .site-menu[open] .site-menu-list--primary > li,
+    .site-menu[open] .site-menu-group {
+      animation: none;
+    }
+  }
+
+  .site-menu-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-menu-group {
+    margin-block-start: var(--space-2);
+    padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--white-10);
+  }
+
+  .site-menu-mark {
+    margin: 0 0 var(--space-1);
+    color: var(--white-72);
+    font-family: var(--font-data);
+    font-size: var(--text-mark);
+    letter-spacing: var(--tracking-mark);
+    text-transform: uppercase;
+  }
+
+  /* Every row reserves a 2px leading rule; the current page draws it, so the
+     mark is a shape plus weight, and marking a row shifts nothing. */
+  .site-menu-link {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
     width: 100%;
-    padding: 13px 0;
+    min-height: var(--tap-min);
+    padding-block: var(--space-2);
+    padding-inline: var(--space-3) 0;
     border: 0;
+    border-inline-start: 2px solid transparent;
     background: transparent;
     color: var(--white-92);
-    font-family: inherit;
-    font-size: var(--mobile-nav-link-size);
-    font-weight: var(--weight-body);
-    line-height: 1.4;
-    text-align: left;
+    font: inherit;
+    font-size: var(--text-control);
+    line-height: 1.35;
+    text-align: start;
     text-decoration: none;
-    white-space: normal;
+    cursor: pointer;
   }
 
-  .header-nav-timezone-current {
+  .site-menu-link[aria-current="page"] {
+    border-inline-start-color: var(--white);
+    color: var(--white);
+    font-weight: var(--weight-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-menu-link:hover {
+      color: var(--white);
+    }
+
+    .site-menu-toggle:hover {
+      background: var(--white-06);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .site-menu-link[aria-current="page"] {
+      border-inline-start-color: Highlight;
+      text-decoration: underline;
+    }
+  }
+
+  .site-menu-logout {
+    margin: var(--space-2) 0 0;
+  }
+
+  .site-menu-timezone-current {
     flex: 0 1 auto;
-    max-width: 46%;
+    min-width: 0;
     overflow: hidden;
+    color: var(--white-72);
     font-size: var(--text-meta);
-    font-weight: var(--weight-body);
-    line-height: 1.4;
-    text-align: right;
+    text-align: end;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .header-nav-logout { width: 100%; }
+  .site-menu-timezone-panel {
+    margin-block-start: var(--space-2);
+  }
+
+  .site-menu-timezone-panel[hidden] {
+    display: none;
+  }
+
+  .site-menu-timezone-panel .header-timezone-list {
+    max-height: 40vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* The field grows down from the masthead; the rows follow it in. Opacity,
+   transform and clip only — nothing that moves layout. */
+@keyframes site-menu-reveal {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes site-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes site-menu-fade {
+  from {
+    opacity: 0;
+  }
 }

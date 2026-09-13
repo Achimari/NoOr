@@ -1,15 +1,39 @@
+<%
+  const passwordProblems = typeof passwordErrors === "undefined" || !passwordErrors ? [] : passwordErrors;
+  const passwordConfirmed = typeof passwordSuccess === "undefined" ? "" : passwordSuccess;
+  const nicknameProblems = typeof nicknameErrors === "undefined" || !nicknameErrors ? [] : nicknameErrors;
+  const nicknameConfirmed = typeof nicknameSuccess === "undefined" ? "" : nicknameSuccess;
+
+  /*
+    The password form is three fields a reader touches rarely, sitting between
+    the page's introduction and the answer correction they came for. On a phone
+    it folds; everywhere else it is the page as it was. It is never folded while
+    it is carrying a validation error — an error inside a closed disclosure is
+    an error nobody reads.
+  */
+  const foldPassword = passwordProblems.length === 0;
+%>
 <main id="main-content" tabindex="-1" class="dashboard-page settings-page" data-settings-toast="<%= toastMessage || "" %>" data-settings-toast-variant="<%= toastVariant || "default" %>">
   <div class="page-shell">
 
     <header class="page-head">
       <h1 class="page-head-title">Settings</h1>
       <p class="page-head-lede">Manage your account and correct today's recorded answers.</p>
+      <p class="settings-jump">
+        <a class="settings-jump-link" href="#settings-answers">Go to Today's answers</a>
+      </p>
     </header>
 
     <section class="settings-group press-region" aria-labelledby="settings-account-title">
       <header class="settings-group-heading">
         <h2 class="settings-group-title" id="settings-account-title"><%- include("../../components/ui/icon", { name: "user", className: "practice-mark" }) %>Account</h2>
       </header>
+
+      <% if (nicknameProblems.length) { %>
+        <p class="settings-feedback settings-feedback--error" role="alert"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= nicknameProblems.join(" ") %></p>
+      <% } else if (nicknameConfirmed) { %>
+        <p class="settings-feedback settings-feedback--success" role="status"><%= nicknameConfirmed %></p>
+      <% } %>
 
       <form class="settings-form settings-form--account" action="/settings/nickname" method="post">
         <div class="settings-row">
@@ -42,7 +66,18 @@
         <p class="settings-group-note">Changing your password does not sign out your other sessions.</p>
       </header>
 
-      <form class="settings-form settings-form--password" action="/settings/password" method="post">
+      <% if (passwordProblems.length) { %>
+        <p class="settings-feedback settings-feedback--error" role="alert"><%- include("../../components/ui/icon", { name: "warning-circle", className: "ui-icon--sm field-error-mark" }) %><%= passwordProblems.join(" ") %></p>
+      <% } else if (passwordConfirmed) { %>
+        <p class="settings-feedback settings-feedback--success" role="status"><%= passwordConfirmed %></p>
+      <% } %>
+
+      <details class="settings-disclosure" data-settings-password<%- foldPassword ? " data-phone-fold" : "" %> open>
+        <summary class="fold-summary" aria-controls="settings-password-form">
+          <span class="fold-summary-label">Change password</span>
+        </summary>
+
+      <form class="settings-form settings-form--password fold-body" id="settings-password-form" action="/settings/password" method="post">
         <div class="settings-row">
           <span class="settings-row-label">
             <label class="field-label" for="settings-current-password">Current password</label>
@@ -72,9 +107,10 @@
           <button class="ui-button ui-button--primary ui-button--large" type="submit">Change password</button>
         </div>
       </form>
+      </details>
     </section>
 
-    <section class="settings-group press-region" aria-labelledby="settings-today-title">
+    <section class="settings-group press-region" id="settings-answers" aria-labelledby="settings-today-title">
       <header class="settings-group-heading">
         <h2 class="settings-group-title" id="settings-today-title">Today's answers</h2>
         <p class="settings-group-note">Use this section to correct an answer. Record new answers on <a class="link" href="/daily-check-in">Today</a>.</p>

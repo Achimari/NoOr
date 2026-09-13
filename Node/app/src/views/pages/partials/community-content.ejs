@@ -29,16 +29,30 @@
           <p class="community-resource-meta">
             <%= recoveryResource.source %> · <%= recoveryResource.format %> · <%= recoveryResource.estimated_read_minutes %> min read
           </p>
-          <p class="community-resource-summary"><%= recoveryResource.user_takeaway %></p>
 
-          <p class="community-resource-action">
-            <span class="community-resource-action-label">Try this now</span>
-            <%= recoveryResource.suggested_action %>
-          </p>
+          <%#
+            The resource keeps its name, its source and how long it takes — the
+            three things a reader decides by. Its detail folds on a phone only,
+            and is rendered open, so with no script the article is whole.
+          -%>
+          <details class="community-resource-detail" data-community-resource data-phone-fold open>
+            <summary class="fold-summary" aria-controls="community-resource-body">
+              <span class="fold-summary-label">What it says</span>
+            </summary>
 
-          <p class="community-resource-more">
-            <a class="link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="Read <%= recoveryResource.title %> at <%= recoveryResource.source %> (opens in a new tab)">Optional further reading</a>
-          </p>
+            <div class="community-resource-body fold-body" id="community-resource-body">
+              <p class="community-resource-summary"><%= recoveryResource.user_takeaway %></p>
+
+              <p class="community-resource-action">
+                <span class="community-resource-action-label">Try this now</span>
+                <%= recoveryResource.suggested_action %>
+              </p>
+
+              <p class="community-resource-more">
+                <a class="link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="Read <%= recoveryResource.title %> at <%= recoveryResource.source %> (opens in a new tab)">Optional further reading</a>
+              </p>
+            </div>
+          </details>
         </article>
       </div>
     </section>
@@ -49,7 +63,22 @@
       </div>
       <p class="section-lede">Read community requests and let people know you are praying with them.</p>
 
-      <div class="prayer-filter-panel" id="prayer-filter-panel" data-prayer-filter-panel>
+      <p class="community-own-prayers">
+        <a class="community-own-prayers-link" href="/my-prayers">Go to My Prayers</a>
+      </p>
+
+      <%#
+        The filter row folds on a phone. Its expander states which filters are
+        applied while it is closed, so a reader never wonders why the feed looks
+        short, and Clear stays inside the row it belongs to.
+      -%>
+      <details class="prayer-filter-disclosure" data-prayer-filter-disclosure data-phone-fold open>
+        <summary class="fold-summary" aria-controls="prayer-filter-panel">
+          <span class="fold-summary-label">Filters</span>
+          <span class="fold-summary-state" data-prayer-filter-state>Newest first</span>
+        </summary>
+
+      <div class="prayer-filter-panel fold-body" id="prayer-filter-panel" data-prayer-filter-panel>
         <label class="prayer-filter-field">
           <span>User</span>
           <span class="prayer-filter-combo">
@@ -72,6 +101,7 @@
         </div>
         <button class="prayer-filter-clear" type="button" data-prayer-filter-clear>Clear</button>
       </div>
+      </details>
 
       <%- include("./prayers-table", { prayers, showActions: false, showReactions: true, listType: "community" }) %>
     </section>

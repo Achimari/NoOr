@@ -352,20 +352,31 @@ describe("achievements navigation", () => {
     assert.match(panel, /href="\/achievements"[^>]*data-account-item>Achievements<\/a>/);
   });
 
-  it("adds Achievements directly after My Profile in the mobile Account section", async () => {
-    const html = await renderHeader("/daily-check-in");
-    const mobile = html.slice(html.indexOf("data-mobile-account"), html.indexOf('id="mobile-timezone-panel"'));
+  /*
+   * The phone navigation moved from a bottom rail back into the masthead as a
+   * top Menu disclosure (docs/mobile-redesign-v2). These two contracts moved
+   * with it: the same guarantees, asserted against the Menu panel.
+   */
+  const phoneMenuOf = (html) => html.slice(html.indexOf("<details"), html.indexOf("</details>"));
 
+  it("adds Achievements directly after My Profile in the phone Menu's account group", async () => {
+    const mobile = phoneMenuOf(await renderHeader("/daily-check-in"));
+
+    assert.ok(mobile.indexOf('href="/profile"') > -1);
     assert.ok(mobile.indexOf('href="/profile"') < mobile.indexOf('href="/achievements"'));
-    assert.match(mobile, /header-nav-account-link[^>]*>Achievements<\/a>/);
+    assert.match(mobile, /site-menu-link[^>]*href="\/achievements"[^>]*>Achievements<\/a>/);
   });
 
-  it("marks both Achievements links active on the achievements page", async () => {
+  it("marks the Achievements destination current on the achievements page, on desktop and on a phone", async () => {
     const html = await renderHeader("/achievements");
-    const links = [...html.matchAll(/<a[^>]*href="\/achievements"[^>]*>/g)].map((match) => match[0]);
+    const desktop = [...html.slice(html.indexOf('id="account-panel"'), html.indexOf("<details")).matchAll(/<a[^>]*href="\/achievements"[^>]*>/g)]
+      .map((match) => match[0]);
+    assert.equal(desktop.length, 1, "the desktop account disclosure owns one link");
+    assert.match(desktop[0], /active/);
 
-    assert.equal(links.length, 2);
-    links.forEach((link) => assert.match(link, /active/));
+    const mobile = [...phoneMenuOf(html).matchAll(/<a[^>]*href="\/achievements"[^>]*>/g)].map((match) => match[0]);
+    assert.equal(mobile.length, 1, "the phone Menu owns one link");
+    assert.match(mobile[0], /aria-current="page"/);
   });
 
   it("does not add a sixth primary desktop navigation item", async () => {

@@ -224,13 +224,86 @@ function runStatisticsScript(fixture) {
   const source = readFileSync(new URL("../public/scripts/pages/statistics.js", import.meta.url), "utf8");
   vm.runInNewContext(source, {
     document: fixture.document,
+    window: fixture.window,
     globalThis: {},
   });
+}
+
+function createViewSwitchFixture() {
+  const pushedUrls = [];
+  const makeLink = (slug, userCount) => {
+    const attributes = new Map([["href", `/statistics?streak=${slug}`]]);
+    let clickListener;
+    return {
+      dataset: { progressView: slug, userCount: String(userCount) },
+      textContent: slug === "strong" ? "Strong" : slug === "bible" ? "Bible" : "Tasks",
+      addEventListener(type, listener) { if (type === "click") clickListener = listener; },
+      getAttribute(name) { return attributes.get(name) || null; },
+      setAttribute(name, value) { attributes.set(name, value); },
+      removeAttribute(name) { attributes.delete(name); },
+      hasAttribute(name) { return attributes.has(name); },
+      click() {
+        const event = { prevented: false, preventDefault() { this.prevented = true; } };
+        clickListener?.(event);
+        return event;
+      },
+    };
+  };
+  const links = [makeLink("strong", 8), makeLink("bible", 4), makeLink("tasks", 1)];
+  links[0].setAttribute("aria-current", "page");
+  const panels = ["strong", "strong", "bible", "bible", "tasks", "tasks"].map((slug) => ({
+    dataset: { progressPanel: slug },
+    hidden: slug !== "strong",
+  }));
+  const count = { textContent: "8 users" };
+  const status = { textContent: "" };
+  const popstateListeners = [];
+  const window = {
+    location: { href: "http://localhost/statistics?streak=strong", search: "?streak=strong" },
+    history: { pushState(_state, _title, url) { pushedUrls.push(url); } },
+    addEventListener(type, listener) { if (type === "popstate") popstateListeners.push(listener); },
+  };
+  const document = {
+    activeElement: null,
+    querySelectorAll(selector) {
+      if (selector === "[data-streak-board]") return [];
+      if (selector === "[data-progress-view]") return links;
+      if (selector === "[data-progress-panel]") return panels;
+      return [];
+    },
+    querySelector(selector) {
+      if (selector === "[data-streak-board-count]") return count;
+      if (selector === "[data-progress-view-status]") return status;
+      return null;
+    },
+  };
+
+  return { count, document, links, panels, popstateListeners, pushedUrls, status, window };
 }
 
 describe("statistics leaderboard preview", () => {
   it("loads the Statistics interaction script in development", () => {
     assert.equal(getPageAssets("statistics").script, "/scripts/pages/statistics.js");
+  });
+
+  it("switches every prefetched panel and updates the URL without a reload", () => {
+    const fixture = createViewSwitchFixture();
+
+    runStatisticsScript(fixture);
+    const event = fixture.links[1].click();
+
+    assert.equal(event.prevented, true);
+    assert.deepEqual(fixture.panels.map((panel) => panel.hidden), [true, true, false, false, true, true]);
+    assert.equal(fixture.links[0].hasAttribute("aria-current"), false);
+    assert.equal(fixture.links[1].getAttribute("aria-current"), "page");
+    assert.equal(fixture.count.textContent, "4 users");
+    assert.equal(fixture.status.textContent, "Showing Bible progress.");
+    assert.deepEqual(fixture.pushedUrls, ["/statistics?streak=bible"]);
+
+    fixture.window.location.search = "?streak=strong";
+    fixture.popstateListeners[0]();
+    assert.deepEqual(fixture.panels.map((panel) => panel.hidden), [false, false, true, true, true, true]);
+    assert.equal(fixture.links[0].getAttribute("aria-current"), "page");
   });
 
   it("shows users in batches of five until every row is visible", () => {

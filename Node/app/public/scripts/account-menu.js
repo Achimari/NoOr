@@ -44,9 +44,21 @@
   });
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth <= 760) setOpen(false);
+    if (window.innerWidth <= 959) setOpen(false);
   });
 
+  /* ------------------------------------------------ the phone Menu disclosure
+   *
+   * A native <details> in the masthead: it opens, closes and reports its
+   * expanded state with no script. This only adds dismissal — Escape, an
+   * outside activation, focus leaving, following a link, a back/forward cache
+   * restore, leaving the Menu range — and the nested time-zone list. The
+   * 959px range is header/responsive.css's; the two numbers move together.
+   *
+   * Non-modal site navigation: no focus trap, no scroll lock, nothing inert.
+   */
+  const siteMenu = document.querySelector("[data-site-menu]");
+  const siteMenuToggle = siteMenu?.querySelector("summary");
   const mobileToggle = document.querySelector("[data-mobile-timezone-toggle]");
   const mobilePanel = document.querySelector("[data-mobile-timezone-panel]");
   const mobileSearch = document.querySelector("[data-mobile-timezone-search]");
@@ -60,18 +72,62 @@
     if (open) mobileSearch?.focus();
   }
 
-  mobileToggle?.addEventListener("click", () => setMobileOpen(Boolean(mobilePanel?.hidden)));
-
-  const header = document.querySelector(".header");
-  if (header && mobilePanel) {
-    const headerStateObserver = new MutationObserver(() => {
-      if (!header.classList.contains("menu-open")) setMobileOpen(false);
-    });
-    headerStateObserver.observe(header, { attributes: true, attributeFilter: ["class"] });
+  function closeSiteMenu() {
+    if (siteMenu?.open) siteMenu.open = false;
   }
 
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 760) setMobileOpen(false);
+  mobileToggle?.addEventListener("click", () => setMobileOpen(Boolean(mobilePanel?.hidden)));
+
+  // The full-screen panel starts at the masthead's real lower edge, which grows
+  // with enlarged text. Measured on press, before the disclosure opens.
+  siteMenuToggle?.addEventListener("click", () => {
+    const edge = siteMenu.closest(".header")?.getBoundingClientRect().bottom;
+    if (edge) siteMenu.style.setProperty("--site-menu-top", `${edge}px`);
+  });
+
+  // Closing the Menu closes the list inside it, so the two never disagree.
+  siteMenu?.addEventListener("toggle", () => {
+    if (!siteMenu.open) setMobileOpen(false);
+  });
+
+  // Escape peels one layer at a time: the time-zone list, then the Menu.
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !siteMenu?.open) return;
+
+    if (mobilePanel && !mobilePanel.hidden) {
+      setMobileOpen(false);
+      mobileToggle?.focus();
+      return;
+    }
+
+    closeSiteMenu();
+    siteMenuToggle?.focus();
+  });
+
+  // An outside activation closes the Menu and leaves focus where it landed.
+  // pointerdown, not click: iOS Safari sends no click to the document for a
+  // tap on non-interactive content, which would leave the panel stranded open.
+  document.addEventListener("pointerdown", (event) => {
+    if (siteMenu?.open && !siteMenu.contains(event.target)) closeSiteMenu();
+  });
+
+  siteMenu?.addEventListener("focusout", (event) => {
+    if (event.relatedTarget && !siteMenu.contains(event.relatedTarget)) closeSiteMenu();
+  });
+
+  siteMenu?.addEventListener("click", (event) => {
+    if (event.target.closest("a[href]")) closeSiteMenu();
+  });
+
+  // A page restored from the back/forward cache keeps its DOM, open state included.
+  window.addEventListener("pageshow", closeSiteMenu);
+
+  const menuRange = window.matchMedia?.("(max-width: 959px)");
+  menuRange?.addEventListener("change", () => {
+    if (menuRange.matches || !siteMenu?.open) return;
+    const hadFocus = siteMenu.contains(document.activeElement);
+    closeSiteMenu();
+    if (hadFocus) (toggle || document.querySelector(".logo-link"))?.focus();
   });
 
   mobileSearch?.addEventListener("input", () => {

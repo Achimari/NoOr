@@ -1,3 +1,7 @@
+<%
+  const navLinks = t("header.nav", []);
+  const current = (to) => (currentPath === to ? ' aria-current="page"' : "");
+%>
 <header class="header">
   <div class="header-container">
     <div class="header-left">
@@ -6,43 +10,13 @@
       </a>
     </div>
 
-    <% if (t("header.nav", []).length) { %>
-      <nav class="header-nav">
-        <% t("header.nav", []).forEach((link)=> { %>
-          <a href="<%= link.to %>" class="header-link<%= currentPath === link.to ? " active" : "" %>">
+    <% if (navLinks.length) { %>
+      <nav class="header-nav" aria-label="Primary">
+        <% navLinks.forEach((link)=> { %>
+          <a href="<%= link.to %>" class="header-link<%= currentPath === link.to ? " active" : "" %>"<%- current(link.to) %>>
             <%= link.label %>
           </a>
           <% }) %>
-
-        <% if (auth) { %>
-
-          <div class="header-nav-account" data-mobile-account>
-            <span class="header-nav-account-heading">Account</span>
-            <a href="/profile" class="header-link header-nav-account-link<%= currentPath === "/profile" ? " active" : "" %>">My Profile</a>
-            <a href="/achievements" class="header-link header-nav-account-link<%= currentPath === "/achievements" ? " active" : "" %>">Achievements</a>
-
-            <button class="header-nav-account-link header-nav-timezone" type="button" data-mobile-timezone-toggle aria-expanded="false" aria-controls="mobile-timezone-panel">
-              Region / Time zone
-              <span class="header-nav-timezone-current" data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
-            </button>
-            <div class="header-nav-timezone-panel" id="mobile-timezone-panel" data-mobile-timezone-panel hidden>
-              <input class="header-timezone-search" type="search" placeholder="Search time zones…" data-mobile-timezone-search autocomplete="off" spellcheck="false" aria-label="Search time zones" />
-              <div class="header-timezone-list" data-mobile-timezone-list>
-                <% timezoneOptions.forEach((timezone) => { %>
-                  <button class="header-timezone-option"<%- timezone.value === auth.timezone ? ' aria-current="true"' : "" %> type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
-                    <%= timezone.label %>
-                  </button>
-                <% }) %>
-              </div>
-              <span class="header-timezone-empty" data-mobile-timezone-empty hidden>No timezones found</span>
-            </div>
-            <a href="/settings" class="header-link header-nav-account-link<%= currentPath === "/settings" ? " active" : "" %>">Settings</a>
-            <a href="/help" class="header-link header-nav-account-link<%= currentPath === "/help" ? " active" : "" %>">Help</a>
-            <form class="header-nav-logout" action="/logout" method="post">
-              <button class="header-link header-nav-account-link" type="submit">Logout</button>
-            </form>
-          </div>
-        <% } %>
       </nav>
       <% } %>
 
@@ -53,6 +27,15 @@
         </nav>
       <% } %>
       <% if (auth) { %>
+        <a
+          class="header-help-link"
+          href="/help"
+          aria-label="Help"
+          title="Help"
+          <%- currentPath === "/help" ? 'aria-current="page"' : "" %>
+        >
+          <%- include("../ui/icon", { name: "warning-circle" }) %>
+        </a>
         <div class="header-account" data-account-menu>
           <button
             class="header-account-button"
@@ -99,7 +82,6 @@
 
             <nav class="header-account-nav" aria-label="Account settings">
               <a class="header-account-link<%= currentPath === "/settings" ? " active" : "" %>" href="/settings" data-account-item>Settings</a>
-              <a class="header-account-link<%= currentPath === "/help" ? " active" : "" %>" href="/help" data-account-item>Help</a>
             </nav>
 
             <form class="header-account-logout" action="/logout" method="post">
@@ -108,11 +90,74 @@
           </div>
         </div>
       <% } %>
-      <% if (t("header.nav", []).length) { %>
-        <button class="header-menu-button" type="button" data-header-menu-toggle aria-label="Open navigation menu" aria-expanded="false">
-          <span></span>
-          <span></span>
-        </button>
+      <%#
+        The phone range's navigation: a native disclosure that opens a panel
+        directly under the masthead. Real links, no role="menu"; the browser
+        reports the expanded state itself, so there is no aria-expanded here to
+        go stale when script is off. account-menu.js only adds dismissal and the
+        nested time-zone list. Hidden above 959px, where .header-nav and the
+        account control carry the same destinations.
+      -%>
+      <% if (navLinks.length) { %>
+        <details class="site-menu" data-site-menu>
+          <summary class="site-menu-toggle">
+            <span class="sr-only">Menu</span>
+            <span class="site-menu-line" aria-hidden="true"></span>
+            <span class="site-menu-line" aria-hidden="true"></span>
+          </summary>
+          <nav class="site-menu-panel" aria-label="Primary">
+            <ul class="site-menu-list site-menu-list--primary">
+              <% navLinks.forEach((link) => { %>
+                <li><a class="site-menu-link" href="<%= link.to %>"<%- current(link.to) %>><%= link.label %></a></li>
+              <% }) %>
+            </ul>
+
+            <% if (auth) { %>
+              <div class="site-menu-group">
+                <p class="site-menu-mark">Account</p>
+                <ul class="site-menu-list">
+                  <li><a class="site-menu-link" href="/profile"<%- current("/profile") %>>My Profile</a></li>
+                  <li><a class="site-menu-link" href="/achievements"<%- current("/achievements") %>>Achievements</a></li>
+                  <li><a class="site-menu-link" href="/settings"<%- current("/settings") %>>Settings</a></li>
+                </ul>
+
+                <button
+                  class="site-menu-link site-menu-timezone"
+                  type="button"
+                  data-mobile-timezone-toggle
+                  aria-expanded="false"
+                  aria-controls="site-menu-timezone-panel"
+                >
+                  Region / Time zone
+                  <span class="site-menu-timezone-current" data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
+                </button>
+                <div class="site-menu-timezone-panel" id="site-menu-timezone-panel" data-mobile-timezone-panel hidden>
+                  <input
+                    class="header-timezone-search"
+                    type="search"
+                    placeholder="Search time zones…"
+                    data-mobile-timezone-search
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-label="Search time zones"
+                  />
+                  <div class="header-timezone-list" data-mobile-timezone-list>
+                    <% timezoneOptions.forEach((timezone) => { %>
+                      <button class="header-timezone-option"<%- timezone.value === auth.timezone ? ' aria-current="true"' : "" %> type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
+                        <%= timezone.label %>
+                      </button>
+                    <% }) %>
+                  </div>
+                  <span class="header-timezone-empty" data-mobile-timezone-empty hidden>No timezones found</span>
+                </div>
+              </div>
+
+              <form class="site-menu-group site-menu-logout" action="/logout" method="post">
+                <button class="site-menu-link" type="submit">Logout</button>
+              </form>
+            <% } %>
+          </nav>
+        </details>
       <% } %>
     </div>
   </div>

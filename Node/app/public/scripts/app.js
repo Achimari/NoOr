@@ -21,10 +21,9 @@ const prayerTimeToggle = document.querySelector("[data-prayer-time-toggle]");
 const prayerTimeMenu = document.querySelector("[data-prayer-time-menu]");
 const prayerTimeLabel = document.querySelector("[data-prayer-time-label]");
 const prayerFilterClear = document.querySelector("[data-prayer-filter-clear]");
+const prayerFilterState = document.querySelector("[data-prayer-filter-state]");
 const telegramConnectButton = document.querySelector(".telegram-connect-button");
 const telegramStatus = document.querySelector("[data-telegram-status]");
-const header = document.querySelector(".header");
-const headerMenuToggle = document.querySelector("[data-header-menu-toggle]");
 const timezoneMenu = document.querySelector("[data-timezone-menu]");
 const timezoneToggle = document.querySelector("[data-timezone-toggle]");
 const timezoneOptions = document.querySelector("[data-timezone-options]");
@@ -124,25 +123,43 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-function setHeaderMenuOpen(isOpen) {
-  if (!header || !headerMenuToggle) return;
-  header.classList.toggle("menu-open", isOpen);
-  document.body.classList.toggle("header-menu-open", isOpen);
-  headerMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-  headerMenuToggle.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+/* -------------------------------------------------- phone-folded disclosures
+ *
+ * Optional detail that is worth folding on a phone and not worth folding
+ * anywhere else: the correction backlog, the password form, the prayer
+ * composer, the community filters.
+ *
+ * Every one of these is a native <details> that the server renders **open**, so
+ * its content is in the document and visible with no script at all. This folds
+ * the ones marked `data-phone-fold`, and only while the window is inside the
+ * phone range — growing the window past it always unfolds them again, so a
+ * rotation or a resize can never leave content hidden behind an expander that
+ * is no longer shown. A fold the reader has opened stays open.
+ */
+const phoneQuery = window.matchMedia?.("(max-width: 760px)") || null;
+const phoneFolds = [...document.querySelectorAll("details[data-phone-fold]")];
+
+function syncPhoneFolds() {
+  if (!phoneQuery) return;
+
+  for (const fold of phoneFolds) {
+    if (!phoneQuery.matches) {
+      fold.open = true;
+      continue;
+    }
+    if (fold.dataset.phoneFoldOpened === "true") continue;
+    fold.open = false;
+  }
 }
 
-headerMenuToggle?.addEventListener("click", () => {
-  setHeaderMenuOpen(!header?.classList.contains("menu-open"));
+phoneFolds.forEach((fold) => {
+  fold.addEventListener("toggle", () => {
+    if (fold.open && phoneQuery?.matches) fold.dataset.phoneFoldOpened = "true";
+  });
 });
 
-header?.querySelectorAll(".header-link").forEach((link) => {
-  link.addEventListener("click", () => setHeaderMenuOpen(false));
-});
-
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 760) setHeaderMenuOpen(false);
-});
+phoneQuery?.addEventListener?.("change", syncPhoneFolds);
+syncPhoneFolds();
 
 function setTimezoneMenuOpen(isOpen) {
   if (!timezoneToggle || !timezoneOptions) return;
@@ -425,7 +442,7 @@ function actionMenuItemIcon(name) {
     heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
   };
-  return `<svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[name] || ""}</svg>`;
+  return `<svg class="ui-icon action-menu-item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths[name] || ""}</svg>`;
 }
 
 function getPrayerActionsMenu() {
@@ -821,7 +838,26 @@ function renderPrayers(prayers, targetBody = prayersBody) {
     : `<li class="prayer-item prayer-item--empty"><div class="empty-state"><p class="empty-state-title">${emptyLabel}</p><p class="empty-state-note">${emptyHint}</p></div></li>`;
 }
 
+/*
+ * What the folded filter row says about itself.
+ *
+ * On a phone the filter controls close, so the expander has to carry the
+ * applied state: a reader must never look at a short feed and wonder whether a
+ * filter is doing it. It states the ordering always, and names the member when
+ * one is being filtered on.
+ */
+function updatePrayerFilterState() {
+  if (!prayerFilterState) return;
+
+  const user = String(prayerUserFilter?.value || "").trim();
+  const order = prayerTimeOrder === "oldest" ? "Oldest first" : "Newest first";
+
+  prayerFilterState.textContent = user ? `${user} · ${order}` : order;
+  prayerFilterState.dataset.prayerFilterApplied = user ? "true" : "false";
+}
+
 function applyPrayerFilters() {
+  updatePrayerFilterState();
   renderPrayers(getFilteredPrayers());
 }
 
@@ -1056,21 +1092,36 @@ function setDailyActionSelection(answer) {
   }
 }
 
+function currentDailyAnswer() {
+  if (yesButton?.getAttribute("aria-pressed") === "true") return "YES";
+  if (noButton?.getAttribute("aria-pressed") === "true") return "NO";
+  return null;
+}
+
 async function updateLeaderboard(action) {
   const endpoint = action === "reset" ? "/api/leaderboard/reset" : "/api/leaderboard/increment";
+
+  /* What the page showed before the optimistic selection. Re-reading the status
+     is the normal way back from a failure, but on a phone the request that
+     fails is usually the connection itself — and then the status request fails
+     too, leaving the optimistic `aria-pressed="true"` standing. A screen reader
+     would have announced an answer the server never received. */
+  const previousAnswer = currentDailyAnswer();
   setDailyActionSelection(action === "increment" ? "YES" : "NO");
 
   const result = await apiFetch(endpoint, { method: "POST" });
   if (!result) return;
 
   if (result.status === 409) {
-    await loadCheckInStatus();
+    const refreshed = await loadCheckInStatus();
+    if (!refreshed) setDailyActionSelection(previousAnswer);
     showToast("You already answered today");
     return;
   }
 
   if (!result.ok) {
-    await loadCheckInStatus();
+    const refreshed = await loadCheckInStatus();
+    if (!refreshed) setDailyActionSelection(previousAnswer);
     showToast("Could not save answer", "error");
     return;
   }
@@ -1149,11 +1200,13 @@ if (telegramConnectButton) {
   });
 }
 
+/** Reads the server's own view of today. Returns false if it could not. */
 async function loadCheckInStatus() {
   const result = await apiFetch("/api/check-in/status");
-  if (!result?.ok) return;
+  if (!result?.ok) return false;
 
   setAnswerState(result.data);
+  return true;
 }
 
 function setAnswerState(status) {
@@ -2340,6 +2393,8 @@ const catchUpCard = document.querySelector("[data-catch-up]");
 const catchUpList = document.querySelector("[data-catch-up-list]");
 const catchUpTemplate = document.querySelector("[data-catch-up-template]");
 const catchUpCount = document.querySelector("[data-catch-up-count]");
+const catchUpDisclosure = document.querySelector("[data-catch-up-disclosure]");
+const catchUpSummaryCount = document.querySelector("[data-catch-up-summary-count]");
 const catchUpStatus = document.querySelector("[data-catch-up-status]");
 const catchUpMore = document.querySelector("[data-catch-up-more]");
 const catchUpPageStatus = document.querySelector("[data-catch-up-page-status]");
@@ -2584,6 +2639,7 @@ function renderCatchUp(payload, { announcePage = false } = {}) {
   syncCatchUpPagination({ announce: announcePage });
 
   if (catchUpCount) catchUpCount.textContent = remaining ? `${remaining} left` : "";
+  if (catchUpSummaryCount) catchUpSummaryCount.textContent = String(remaining);
   if (catchUpStatus) catchUpStatus.textContent = catchUpStatusMessage(remaining);
 }
 
@@ -2628,6 +2684,9 @@ function catchUpErrorMessage(result, fallback = "Could not save that day") {
 function focusCatchUpAfterSave() {
   const next = catchUpList?.querySelector("[data-catch-up-open]");
   if (next) {
+    // On a phone the list may be folded. Focus cannot land in a closed
+    // disclosure, so the correction the reader was working through opens it.
+    if (catchUpDisclosure) catchUpDisclosure.open = true;
     next.focus();
     return;
   }

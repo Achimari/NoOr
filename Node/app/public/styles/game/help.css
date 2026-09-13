@@ -124,6 +124,13 @@
 
 .help-table-wrap {
   overflow-x: auto;
+
+  /* A scroll container is still a grid/flex item, and its `min-width: auto` is
+     its min-content width — so without this the table's 420px minimum widened
+     the wrapper instead of scrolling inside it, and the document overflowed at
+     200% text. The table keeps its minimum and scrolls in its own box. */
+  min-width: 0;
+  max-width: 100%;
   margin: 0 0 var(--space-4);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-panel);

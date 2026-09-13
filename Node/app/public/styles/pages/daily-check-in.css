@@ -126,6 +126,70 @@
   min-height: 45px;
 }
 
+/* Today at phone widths.
+ *
+ * The opening band pays its boundary once and stops reserving height it does
+ * not use; the reserved availability row keeps its job (exception E5 — it is
+ * what holds CLS at 0 when the client status request resolves) but is measured
+ * against the shorter row it actually holds on a phone rather than the taller
+ * desktop one. No target, label or answer is removed to buy the space. */
+@media (max-width: 760px) {
+  /* The masthead above is now the only chrome, so the title sits on the same
+     16px the side gutters use rather than a larger band of its own. */
+  .today-page .today-opening {
+    padding-block: var(--space-4);
+  }
+
+  .practice-availability {
+    min-height: 34px;
+  }
+
+  .today-page .dashboard-timer-card {
+    padding-block-start: var(--space-2);
+  }
+
+  .today-page .dashboard-timer-copy {
+    margin-block-end: var(--space-1);
+  }
+
+  .practice-lede {
+    margin-block: var(--space-1) var(--space-3);
+  }
+
+  /* The rule and its waypoint stay; only the clearance under them tightens. */
+  .today-practices .section-frame--ruled {
+    padding-block-start: var(--space-3);
+  }
+
+  /* Display type carries its own line; 1.4 was prose leading on a heading. */
+  .practice-title {
+    line-height: var(--leading-title);
+  }
+
+  /* The Bible and Tasks practices are grids, so their gap is paid *on top of*
+     the 12px `.section-frame > * + *` rhythm every practice already has — the
+     Bible section ran 48px taller than Strong for no reason a reader can see.
+     Dropping the grid gap on phones leaves both practices on the one shared
+     rhythm; the recorded-reading summary and the task list still separate
+     themselves by that same 12px. */
+  .today-page .reading-check,
+  .today-page .daily-goals {
+    gap: 0;
+  }
+
+  /* Both answers keep their word, their sentence and a target far above the
+     44px floor; only the air around them tightens. */
+  .today-page .dashboard-action {
+    padding: var(--space-3);
+  }
+
+  /* The expander's own chip carries the backlog on a phone, so the header's
+     "N left" would be the same number twice on one small card. */
+  .catch-up-count {
+    display: none;
+  }
+}
+
 .today-page .dashboard-timer-card:not([hidden]) {
   display: block;
 }
@@ -640,15 +704,35 @@
   min-height: 44px;
 }
 
+/* A task row is a checkbox, its text and two actions. Wrapping the actions onto
+   their own line doubled the height of every row — five tasks cost ~250px of
+   blank paper for two words. The row now stays on one line down to 360px and
+   lets the task text wrap inside its own cell instead; the actions stay top-
+   aligned with the first line of a task that runs long. Below 360px, where two
+   labels and a checkbox genuinely cannot share a line, the old wrap returns. */
 @media (max-width: 420px) {
   .daily-goal-row {
-    flex-wrap: wrap;
     align-items: flex-start;
+    gap: var(--space-2);
   }
 
   .daily-goal-row .daily-goal-text {
     flex: 1 1 auto;
     min-width: 0;
+  }
+
+  .daily-goal-row .daily-goal-actions {
+    flex: 0 0 auto;
+  }
+
+  .daily-goal-checkbox {
+    margin-block-start: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .daily-goal-row {
+    flex-wrap: wrap;
   }
 
   .daily-goal-row .daily-goal-actions {
@@ -867,6 +951,22 @@
   font-size: var(--text-meta);
   font-weight: var(--weight-body);
   white-space: nowrap;
+}
+
+/* The correction backlog's disclosure uses the shared phone-fold primitive in
+   shell.css; only its body's own rhythm belongs to this page. */
+.catch-up-body {
+  display: grid;
+  gap: var(--space-3);
+  padding-block-start: var(--space-2);
+}
+
+
+@media (min-width: 761px) {
+
+  .catch-up-body {
+    padding-block-start: 0;
+  }
 }
 
 .catch-up-hint {
@@ -1138,7 +1238,9 @@ body.catch-up-modal-open {
 .catch-up-tasks-dialog {
   position: relative;
   width: min(100%, 520px);
-  max-height: min(88vh, 720px);
+
+  /* `dvh` so the dialog follows the visual viewport when the keyboard opens. */
+  max-height: min(88dvh, 720px);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-panel);
   background: var(--surface-2);
@@ -1297,4 +1399,43 @@ body.catch-up-modal-open {
 
 .dashboard-action[aria-pressed="true"]:focus-visible {
   outline-color: var(--focus-ring-on-deep);
+}
+
+
+/* The missed-day dialogs on a phone: the same sheet geometry the reading editor
+   uses, so a correction and a first answer are the same shape of surface. Their
+   own body already scrolls and their actions already sit outside it. */
+@media (max-width: 760px) {
+
+  .catch-up-tasks-modal,
+  .missed-answer-modal {
+    padding: var(--space-2);
+    padding-block-end: max(var(--space-2), env(safe-area-inset-bottom, 0px));
+    align-items: end;
+  }
+
+  .catch-up-tasks-dialog,
+  .missed-answer-dialog {
+    width: 100%;
+    max-height: calc(100dvh - var(--header-height) - var(--space-4));
+  }
+
+  .catch-up-tasks-form {
+    gap: var(--space-3);
+    padding: var(--space-4);
+    max-height: 100%;
+  }
+}
+
+
+/* The task checkbox sits inside a full-width label row, and that label is the
+   44px target it has always had. On a phone the box itself also clears the
+   WCAG 2.2 AA 24px minimum, so aiming at the box rather than at the words
+   works too. Declared last, after the base size it raises. */
+@media (max-width: 760px) {
+
+  .daily-goal-checkbox {
+    width: 24px;
+    height: 24px;
+  }
 }

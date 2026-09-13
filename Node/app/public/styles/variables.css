@@ -293,8 +293,9 @@
 
   --chrome: var(--field);
   --chrome-raised: var(--field-raised);
+  /* The masthead's one size at every width: a 44px control row plus its
+     breathing room. Scroll offsets and sheet insets all read this token. */
   --header-height: 56px;
-  --header-height-compact: 52px;
 
   --header-bg: var(--field);
   --header-bg-solid: var(--chrome);
@@ -447,5 +448,31 @@
 
   --radius: var(--radius-panel);
   --radius-tag: var(--radius-row);
+}
 
+/* ------------------------------------------------------- mobile token layer
+ *
+ * One documented block for the phone range, at the same 760px boundary the
+ * header already switches on, so navigation and spacing change together rather
+ * than at two different widths.
+ *
+ * Nothing new is introduced here: every entry re-points a token the desktop
+ * sheet already defines, so each consumer follows without inventing a second
+ * rule of its own. The three relationship bands keep their meaning — related,
+ * sibling, region — and only the sibling step tightens, from 32px to 24px,
+ * which is still inside the band `test/grouping-contract.test.js` holds.
+ *
+ * The page opening loses its reserved height rather than its content: on a
+ * 844px-tall phone a 177px band spends a fifth of the screen before the first
+ * word, and a route's title and dateline size themselves perfectly well.
+ */
+@media (max-width: 760px) {
+  :root {
+
+    /* The band is now exactly as tall as the title and dateline it holds. */
+    --opening-height: 0px;
+
+    --section-gap: var(--space-5);
+    --gap-sibling: var(--space-5);
+  }
 }

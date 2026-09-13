@@ -116,9 +116,26 @@
 
 .page-head {
   display: grid;
+
+  /* `minmax(0, 1fr)` rather than the implicit `auto`: an auto column grows to
+     the widest unbreakable word, so at 200% text a route name in the display
+     face pushed the document sideways and `overflow-wrap` never got the chance
+     to break it. Measured at 390px with a 32px root: Community overflowed by
+     88px before this, and by nothing after. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
 
   margin-block-end: var(--gap-region);
+}
+
+/* And the items inside it have to be allowed to be narrower than their longest
+   word. A grid item's `min-width: auto` is its min-content width, and a browser
+   does not count `overflow-wrap: break-word` when computing that — so without
+   this the title sizes itself to "COMMUNITY" at 56px and overflows the track it
+   was just given. Measured at 390px with a 32px root: 88px of overflow before,
+   none after. */
+.page-head > * {
+  min-width: 0;
 }
 
 .page-head-eyebrow {
@@ -161,7 +178,16 @@
 
 .page-head-copy {
   display: grid;
+
+  /* The same cap and the same escape as `.page-head` above: this inner grid is
+     where most routes actually put their title, so without it the title is
+     sized by its longest word one level further in. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
+  min-width: 0;
+}
+
+.page-head-copy > * {
   min-width: 0;
 }
 
@@ -322,6 +348,96 @@
 
 .rule-top {
   border-block-start: 1px solid var(--separator);
+}
+
+/* ------------------------------------------------------ phone-folded detail
+ *
+ * One disclosure primitive for optional detail that is worth folding on a
+ * phone and not worth folding anywhere else: a correction backlog, a password
+ * form, a composer, a filter row.
+ *
+ * The server renders every one of these <details> open, so the content is in
+ * the document and visible with no script at all; `app.js` folds the ones it
+ * is told to fold, and only while the window is inside the phone range. Above
+ * that range the expander has nothing to do, so it is removed and the page is
+ * exactly what it was.
+ */
+.fold-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding-block: var(--space-2);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-control);
+  font-weight: var(--weight-body);
+  cursor: pointer;
+
+  /* The browser's own triangle would be a second marker beside the caret the
+     component draws, and it cannot be positioned. */
+  list-style: none;
+}
+
+.fold-summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The expander's mark: a printed caret turned by the state the element already
+   owns, rather than by a second attribute that could disagree with it. */
+.fold-summary-label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.fold-summary-label::after {
+  content: "";
+  flex: none;
+  width: 0.45em;
+  height: 0.45em;
+  margin-inline-start: 0.55em;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: translateY(-0.15em) rotate(45deg);
+  transition: transform var(--duration-ui) var(--ease-out);
+}
+
+details[open] > .fold-summary .fold-summary-label::after {
+  transform: translateY(0.1em) rotate(225deg);
+}
+
+/* The folded content itself.
+ *
+ * A component that gives this element a `display` of its own — and most of
+ * them do, because they are grids — overrides the browser's own hiding and
+ * leaves a closed disclosure showing everything it was supposed to fold. One
+ * explicit rule closes that hole for every fold in the product, rather than
+ * each page remembering to. Measured: without it, a closed <details> whose
+ * child declares `display: grid` renders open in both Chromium and WebKit. */
+details:not([open]) > .fold-body {
+  display: none;
+}
+
+/* A count that stands in for the folded content while it is closed. */
+.fold-summary-count {
+  flex: none;
+  min-width: 1.75rem;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-row);
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-data);
+  font-size: var(--text-meta);
+  text-align: center;
+}
+
+@media (min-width: 761px) {
+
+  .fold-summary {
+    display: none;
+  }
 }
 
 .page-shell a:not([class]),

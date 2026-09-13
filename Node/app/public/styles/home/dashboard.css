@@ -647,12 +647,10 @@ p.leaderboard-empty {
   transform: scale(0.97);
 }
 
-@media (hover: none) and (pointer: coarse) {
-  .action-menu-trigger {
-    width: 40px;
-    height: 40px;
-  }
-}
+/* The row-actions trigger used to shrink to 40px on a coarse pointer — that is,
+   it got smaller on exactly the devices where a finger is the pointer, and it
+   dropped under this project's 44px target floor to do it. It keeps `--tap-min`
+   everywhere now. */
 
 .action-menu {
   position: fixed;
@@ -683,7 +681,10 @@ p.leaderboard-empty {
   align-items: center;
   gap: var(--space-2);
   width: 100%;
-  min-height: 40px;
+
+  /* An item in a popup is an aimed control like any other, and 40px was under
+     this project's 44px floor. */
+  min-height: var(--tap-min);
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-tag);
@@ -697,6 +698,12 @@ p.leaderboard-empty {
   transition:
     background var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out);
+}
+
+/* These two client-rendered menu glyphs are open stroke paths. The shared icon
+   family is filled by default, which otherwise closes the check into a wedge. */
+.action-menu-item-icon {
+  fill: none;
 }
 
 .action-menu-item[hidden] {
@@ -1390,22 +1397,11 @@ p.leaderboard-empty {
     gap: var(--space-1);
   }
 
-  .reading-passage-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .reading-modal {
-    padding: var(--space-3);
-  }
-
-  .reading-modal-dialog {
-    max-height: 92vh;
-  }
-
-  .reading-modal-form {
-    padding: var(--space-4);
-  }
-
+  /* The reading dialog's small-screen geometry moved to its own sheet
+     (components/reading-modal.css), which is its one owner: a `vh`-bounded
+     dialog cannot follow the virtual keyboard, and two sheets disagreeing
+     about its height is how that kind of bug survives. Its Remove control
+     keeps its target here because the target floor is a shared rule. */
   .reading-passage-remove {
     min-height: 44px;
     padding: 0 var(--space-3);

@@ -21,6 +21,21 @@
     .filter((item) => catchUpCopy[item.activity])
     .slice(0, CATCH_UP_PAGE_SIZE);
   const hasMore = missed.total > firstPage.length;
+
+  /*
+    On a phone the correction backlog sits between the day's title and the first
+    practice, so a long list pushes the day's own work off the screen. The list
+    lives in a native <details> that the server always renders open: with no
+    JavaScript, and on every window wider than a phone, the list is simply
+    visible exactly as it always was. `app.js` closes it on a phone when the
+    backlog is long enough to be worth folding, and the summary — hidden above
+    the phone range by `pages/daily-check-in.css` — is how it reopens.
+
+    Rendering open rather than closed is deliberate: a closed disclosure that
+    only a script can open would put the correction flow behind JavaScript.
+  */
+  const CATCH_UP_SHORT_LIST = 2;
+  const collapsible = missed.total > CATCH_UP_SHORT_LIST;
 %>
 <section class="dashboard-card catch-up-card" data-catch-up<%= missed.total ? "" : " hidden" %> tabindex="-1" aria-labelledby="catch-up-title">
   <header class="dashboard-card-head catch-up-head">
@@ -33,37 +48,46 @@
 
   <p class="catch-up-hint">Complete the activities you missed to keep your history accurate.</p>
 
-  <ul class="catch-up-list" id="catch-up-list" data-catch-up-list aria-labelledby="catch-up-title">
-    <% firstPage.forEach((item) => { %>
-      <% const copy = catchUpCopy[item.activity]; %>
-      <% const label = catchUpDate(item.dateKey); %>
-      <li class="catch-up-item" data-catch-up-item data-catch-up-date="<%= item.dateKey %>" data-catch-up-activity="<%= item.activity %>">
-        <div class="catch-up-item-copy">
-          <p class="catch-up-item-date" data-catch-up-date><%= label %></p>
-          <p class="catch-up-item-activity" data-catch-up-activity><%= copy.name %></p>
-          <p class="catch-up-item-note" data-catch-up-note><%= copy.note %></p>
-        </div>
-        <button
-          class="catch-up-action"
-          type="button"
-          data-catch-up-open
-          data-catch-up-date="<%= item.dateKey %>"
-          data-catch-up-activity="<%= item.activity %>"
-          aria-haspopup="dialog"
-          aria-label="<%= copy.action %> <%= copy.name %> for <%= label %>"
-        ><%= copy.action %></button>
-      </li>
-    <% }) %>
-  </ul>
+  <details class="catch-up-disclosure" data-catch-up-disclosure<%- collapsible ? " data-phone-fold" : "" %> open>
+    <summary class="fold-summary" data-catch-up-summary aria-controls="catch-up-list">
+      <span class="fold-summary-label">Days to correct</span>
+      <span class="fold-summary-count" data-catch-up-summary-count><%= missed.total || 0 %></span>
+    </summary>
 
-  <button
-    class="catch-up-more"
-    type="button"
-    data-catch-up-more
-    aria-controls="catch-up-list"
-    aria-expanded="false"
-    <%= hasMore ? "" : "hidden" %>
-  >View more</button>
+    <div class="catch-up-body fold-body" data-catch-up-body>
+      <ul class="catch-up-list" id="catch-up-list" data-catch-up-list aria-labelledby="catch-up-title">
+        <% firstPage.forEach((item) => { %>
+          <% const copy = catchUpCopy[item.activity]; %>
+          <% const label = catchUpDate(item.dateKey); %>
+          <li class="catch-up-item" data-catch-up-item data-catch-up-date="<%= item.dateKey %>" data-catch-up-activity="<%= item.activity %>">
+            <div class="catch-up-item-copy">
+              <p class="catch-up-item-date" data-catch-up-date><%= label %></p>
+              <p class="catch-up-item-activity" data-catch-up-activity><%= copy.name %></p>
+              <p class="catch-up-item-note" data-catch-up-note><%= copy.note %></p>
+            </div>
+            <button
+              class="catch-up-action"
+              type="button"
+              data-catch-up-open
+              data-catch-up-date="<%= item.dateKey %>"
+              data-catch-up-activity="<%= item.activity %>"
+              aria-haspopup="dialog"
+              aria-label="<%= copy.action %> <%= copy.name %> for <%= label %>"
+            ><%= copy.action %></button>
+          </li>
+        <% }) %>
+      </ul>
+
+      <button
+        class="catch-up-more"
+        type="button"
+        data-catch-up-more
+        aria-controls="catch-up-list"
+        aria-expanded="false"
+        <%= hasMore ? "" : "hidden" %>
+      >View more</button>
+    </div>
+  </details>
 
   <p class="catch-up-status sr-only" data-catch-up-status role="status" aria-live="polite"></p>
   <p class="sr-only" data-catch-up-page-status role="status" aria-live="polite"></p>

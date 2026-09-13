@@ -160,6 +160,19 @@
             <h2 id="presentation-title">Appearance</h2>
           </header>
 
+          <%#
+            Choosing an emblem and an accent is a once-in-a-while decision that
+            occupies most of a phone screen, so it folds there and only there.
+            The section is rendered open: with no script, and on every window
+            above the phone range, both choosers are simply shown, every radio
+            keeps its name and its checked state, and nothing is removed.
+          -%>
+          <details class="profile-presentation-detail" data-profile-presentation data-phone-fold open>
+            <summary class="fold-summary" aria-controls="profile-presentation-choices">
+              <span class="fold-summary-label">Choose emblem and accent</span>
+            </summary>
+
+            <div class="profile-presentation-choices fold-body" id="profile-presentation-choices">
           <fieldset class="profile-fieldset">
             <legend class="profile-legend">Emblem</legend>
             <div class="profile-preset-grid">
@@ -185,6 +198,8 @@
               <% }) %>
             </div>
           </fieldset>
+            </div>
+          </details>
         </section>
 
         <section class="profile-pane profile-privacy" aria-labelledby="privacy-title">

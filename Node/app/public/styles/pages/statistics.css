@@ -18,6 +18,12 @@
   justify-items: stretch;
 }
 
+/* All three views arrive with the document. Component display rules must not
+   give an inactive leaderboard or statistics section a layout box. */
+.progress-page [data-progress-panel][hidden] {
+  display: none;
+}
+
 /* components/tables.css gives every stacked row `display: grid` below 560px.
    That author rule outranks the user-agent presentation of the `hidden`
    attribute, so the five-row preview quietly exposed all 27 rows on a phone and
@@ -580,18 +586,23 @@
 }
 
 @media (max-width: 560px) {
+  /* Three lines a row x seven weekdays was 460px of chart for 7 readings. The
+     abbreviated day, its share and its bar share one line; only the counts
+     take a line of their own, because they are the one part that has to be
+     free to wrap when the numbers get long. Every weekday, every sample size
+     and every Yes/No count is still shown. */
   .weekday-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: var(--space-2);
+    grid-template-columns: 2.5rem 3.25rem minmax(0, 1fr);
+    row-gap: var(--space-1);
+    column-gap: var(--space-2);
   }
 
-  .weekday-row .ledger-track,
   .weekday-values {
     grid-column: 1 / -1;
-  }
-
-  .weekday-values {
     text-align: start;
+
+    /* Full width, so it may wrap rather than push the chart sideways. */
+    white-space: normal;
   }
 
   .prayer-world-region {

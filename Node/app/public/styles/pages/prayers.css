@@ -157,3 +157,15 @@
   min-height: 0;
   overflow: hidden;
 }
+
+
+/* The composer folds on a phone so the requests already shared are not pushed
+   a screen and a half down by an empty box. The sharing explanation stays
+   above the fold; only the writing surface closes. */
+
+@media (max-width: 760px) {
+
+  .prayer-composer {
+    padding-block-start: var(--space-3);
+  }
+}
