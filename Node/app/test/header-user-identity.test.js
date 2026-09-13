@@ -65,4 +65,15 @@ describe("header user identity", () => {
     assert.match(header, /\.header\s*{[^}]*background:\s*var\(--footer-bg\)/s);
     assert.doesNotMatch(header, /background:\s*var\(--header-bg\)/);
   });
+
+  it("keeps the account panel dark when reduced transparency is requested", () => {
+    const header = read("public/styles/header/base.css");
+
+    assert.match(header, /\.header-account-panel\s*{[^}]*background:\s*var\(--chrome-raised\)/s);
+    assert.doesNotMatch(
+      header,
+      /@media\s*\(prefers-reduced-transparency:\s*reduce\)[\s\S]*?\.header-account-panel\s*{[^}]*background:\s*var\(--bg-page\)/,
+      "white menu text must not be placed on the white page background",
+    );
+  });
 });

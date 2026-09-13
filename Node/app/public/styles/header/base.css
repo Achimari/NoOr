@@ -730,10 +730,6 @@
   .header-account-button { transition: none; }
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  .header-account-panel { background: var(--bg-page); }
-}
-
 @media (min-width: 960px) {
   .header-container:has(.header-account) .header-nav {
     gap: var(--space-5);
