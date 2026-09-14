@@ -8,7 +8,9 @@
   const allocationPanel = root.querySelector("[data-allocation]");
   const remaining = root.querySelector("[data-allocation-remaining]");
   const saveButton = root.querySelector("[data-allocation-save]");
-  const resetButton = root.querySelector("[data-allocation-reset]");
+  const resetStatsButton = root.querySelector("[data-allocation-reset-stats]");
+  let allocationLocked = allocationPanel?.dataset.locked === "true";
+  let allocationBusy = false;
   const allocationError = root.querySelector("[data-allocation-error]");
   const privacyError = root.querySelector("[data-privacy-error]");
   const spellExplorer = root.querySelector("[data-explore]");
@@ -19,7 +21,6 @@
   const inputs = new Map(
     STATS.map((stat) => [stat, root.querySelector(`[data-allocation-input="${stat}"]`)]),
   );
-  const initial = new Map([...inputs].map(([stat, input]) => [stat, Number(input?.value || 0)]));
 
   async function send(url, method, body) {
     try {
@@ -48,6 +49,9 @@
   }
 
   function applySpellState(explore) {
+    const confirmed = explore.allocation?.confirmed !== false;
+    const setup = spellExplorer?.querySelector("[data-explore-setup]");
+    if (setup) setup.hidden = confirmed;
     const wisdom = spellExplorer?.querySelector("[data-explore-wisdom]");
     const unlocked = spellExplorer?.querySelector("[data-explore-unlocked]");
     const intelligence = spellExplorer?.querySelector("[data-explore-intelligence]");
@@ -75,12 +79,65 @@
         state.textContent = spell.unlocked
           ? (spell.equipped ? "Carried into battle" : "Learned")
           : spell.available
-            ? "Ready to learn"
+            ? (confirmed ? "Ready to learn" : "Confirm base points")
             : `Needs ${spell.wisdomRemaining} more Wisdom`;
       }
 
       if (spell.unlocked) renderLoadoutControl(item, spell, explore);
+      else renderLearnControl(item, spell, confirmed);
     }
+  }
+
+  function renderLearnControl(item, spell, confirmed) {
+    const actions = item.querySelector(".explore-actions");
+    if (!actions) return;
+
+    if (spell.available && confirmed) {
+      const existing = actions.querySelector("[data-spell-unlock]");
+      const button = existing || document.createElement("button");
+      button.type = "button";
+      button.className = "explore-button explore-button-primary";
+      button.dataset.spellUnlock = spell.key;
+      button.textContent = `Learn ${spell.name}`;
+      if (!existing) actions.replaceChildren(button);
+    } else {
+      const existing = actions.querySelector("[data-spell-note]");
+      const note = existing || document.createElement("p");
+      note.className = "explore-note";
+      note.dataset.spellNote = "";
+      note.textContent = spell.available
+        ? "Confirm your base points above first."
+        : "Write a reflection with your Bible reading to earn more Wisdom.";
+      if (!existing || actions.querySelector("[data-spell-unlock]")) actions.replaceChildren(note);
+    }
+  }
+
+  function applyAllocationState({ game, explore }, anchor) {
+    allocationLocked = game.allocation.locked;
+    if (allocationPanel) allocationPanel.dataset.locked = String(allocationLocked);
+
+    for (const [stat, input] of inputs) {
+      if (input) input.value = String(game.base[stat]);
+      const earned = root.querySelector(`[data-stat-earned="${stat}"]`);
+      if (earned && game.earned) earned.textContent = `+${game.earned[stat]} earned this month`;
+    }
+    for (const [stat, value] of Object.entries(game.stats)) {
+      const output = root.querySelector(`[data-stat-total="${stat}"]`);
+      if (output) output.textContent = value;
+    }
+    for (const [stat, value] of Object.entries(game.derived)) {
+      const output = root.querySelector(`[data-derived="${stat}"]`);
+      if (output) output.textContent = value;
+    }
+
+    if (saveButton) {
+      saveButton.hidden = allocationLocked;
+      saveButton.textContent = game.allocation.confirmed ? "Save points" : "Confirm points";
+    }
+    if (explore) applySpellState(explore);
+    setAllocationBusy(false);
+
+    if (document.activeElement === document.body) anchor.focus({ preventScroll: true });
   }
 
   function renderLoadoutControl(item, spell, explore) {
@@ -135,6 +192,10 @@
 
   function syncAllocationState() {
     if (!remaining) return;
+    if (allocationLocked) {
+      remaining.textContent = "Locked";
+      return;
+    }
 
     const allocation = readAllocation();
     const spent = spentPoints(allocation);
@@ -151,7 +212,20 @@
       remaining.dataset.state = "under";
     }
 
-    if (saveButton) saveButton.disabled = left !== 0;
+    if (saveButton) saveButton.disabled = allocationBusy || left !== 0;
+  }
+
+  function setAllocationBusy(busy) {
+    allocationBusy = busy;
+    allocationPanel?.setAttribute("aria-busy", String(busy));
+    for (const input of inputs.values()) {
+      if (input) input.disabled = busy || allocationLocked;
+    }
+    allocationPanel?.querySelectorAll("[data-allocation-step]").forEach((button) => {
+      button.disabled = busy || allocationLocked;
+    });
+    if (resetStatsButton) resetStatsButton.disabled = busy;
+    syncAllocationState();
   }
 
   allocationPanel?.addEventListener("click", (event) => {
@@ -175,12 +249,21 @@
     });
   }
 
-  resetButton?.addEventListener("click", () => {
-    for (const [stat, input] of inputs) {
-      if (input) input.value = String(initial.get(stat) ?? 0);
-    }
+  resetStatsButton?.addEventListener("click", async () => {
+    if (allocationBusy) return;
     showError(allocationError, "");
-    syncAllocationState();
+    setAllocationBusy(true);
+    const result = await send("/api/game/allocation/reset", "POST");
+    if (!result) return;
+
+    if (!result.ok) {
+      showError(allocationError, result.data.error || "Could not reset your stats.");
+      setAllocationBusy(false);
+      return;
+    }
+
+    applyAllocationState(result.data, resetStatsButton);
+    showToast("Stats reset. Reassign your ten base points.");
   });
 
   spellExplorer?.addEventListener("click", async (event) => {
@@ -220,23 +303,26 @@
   });
 
   saveButton?.addEventListener("click", async () => {
+    if (allocationBusy) return;
     const allocation = readAllocation();
     if (spentPoints(allocation) !== BASE_TOTAL) {
       showError(allocationError, `Spend exactly ${BASE_TOTAL} points.`);
       return;
     }
 
-    saveButton.disabled = true;
+    showError(allocationError, "");
+    setAllocationBusy(true);
     const result = await send("/api/game/allocation", "POST", allocation);
     if (!result) return;
 
     if (!result.ok) {
       showError(allocationError, result.data.error || result.data.errors?.[0] || "Could not save your points.");
-      saveButton.disabled = false;
+      setAllocationBusy(false);
       return;
     }
 
-    window.location.reload();
+    applyAllocationState(result.data, saveButton);
+    showToast("Points saved");
   });
 
   root.addEventListener("change", async (event) => {
@@ -266,6 +352,7 @@
       root.querySelector(".profile-emblem")?.setAttribute("data-emblem", result.data.profile.emblemKey);
       if (headerIdentity) headerIdentity.dataset.emblem = result.data.profile.emblemKey;
     }
+    showToast("Changes saved");
   });
 
   async function changeLoadout(button) {

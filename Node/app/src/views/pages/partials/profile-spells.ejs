@@ -41,11 +41,9 @@
         </p>
       <% } %>
 
-      <% if (!profile.allocation.confirmed) { %>
-        <p class="profile-note profile-spells-setup">
-          Confirm your base points above before learning a spell.
-        </p>
-      <% } %>
+      <p class="profile-note profile-spells-setup" data-explore-setup <%= profile.allocation.confirmed ? "hidden" : "" %>>
+        Confirm your base points above before learning a spell.
+      </p>
     </div>
 
     <div class="explore-path">

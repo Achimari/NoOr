@@ -9,6 +9,7 @@ import {
   getSpellsApi,
   patchGameProfile,
   postAllocation,
+  postAllocationReset,
 } from "../controllers/gameController.js";
 import {
   createCurrentDailyGoal,
@@ -84,6 +85,7 @@ router.delete("/api/daily-goals/:id", requireAuth, asyncHandler(deleteCurrentDai
 router.get("/api/game/me", requireAuth, asyncHandler(getGameMe));
 router.patch("/api/game/profile", requireAuth, profileWriteRateLimiter, validateApiBody(profilePresentationSchema), asyncHandler(patchGameProfile));
 router.post("/api/game/allocation", requireAuth, profileWriteRateLimiter, validateApiBody(allocationSchema), asyncHandler(postAllocation));
+router.post("/api/game/allocation/reset", requireAuth, profileWriteRateLimiter, asyncHandler(postAllocationReset));
 router.get("/api/profiles/:id", requireAuth, asyncHandler(getProfileApi));
 router.get("/api/profiles/:id/today", requireAuth, asyncHandler(getProfileTodayApi));
 router.get("/api/spells", requireAuth, asyncHandler(getSpellsApi));

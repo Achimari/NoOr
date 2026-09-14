@@ -73,6 +73,36 @@ export async function lockAllocation(userId, client = prisma) {
   });
 }
 
+export async function resetAllocation(userId, client = prisma) {
+  await ensureGameProfile(userId, client);
+
+  const result = await client.gameProfile.updateMany({
+    where: {
+      id: userId,
+      user: {
+        battleParticipants: { none: { battle: { status: "ACTIVE" } } },
+        matchQueueEntries: {
+          none: {
+            OR: [
+              { status: "SEARCHING", expiresAt: { gt: new Date() } },
+              { status: "MATCHED", battleId: null },
+            ],
+          },
+        },
+      },
+    },
+    data: {
+      baseStrength: 0,
+      baseDexterity: 0,
+      baseIntelligence: 0,
+      allocationConfirmedAt: null,
+      allocationLockedAt: null,
+    },
+  });
+
+  return result.count === 1;
+}
+
 export async function updateEquippedSpellKeys({ userId, spellKeys }) {
   await ensureGameProfile(userId);
 

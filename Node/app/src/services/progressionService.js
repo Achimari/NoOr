@@ -2,7 +2,7 @@ import { getEligibleRewardsForDate, diffRewards, getMonthlyTotals } from "../dom
 import { getCombatRating, getDerived, validateAllocation } from "../domain/stats.js";
 import { resolveLoadout } from "../domain/loadout.js";
 import { getLoadoutPower } from "../domain/spells.js";
-import { confirmAllocation, ensureGameProfile } from "../repositories/gameProfileRepository.js";
+import { confirmAllocation, ensureGameProfile, resetAllocation } from "../repositories/gameProfileRepository.js";
 import {
   createRewards,
   deleteRewards,
@@ -94,7 +94,16 @@ export async function confirmBaseAllocation(userId, allocation) {
 
   const updated = await confirmAllocation({ userId, allocation: result.allocation });
   if (!updated) {
-    throw new AppError("Your points are locked because you have already entered a battle", 409);
+    throw new AppError("Use Reset stats on My Profile to reassign your locked base points", 409);
+  }
+
+  return getCharacter(userId);
+}
+
+export async function resetBaseAllocation(userId) {
+  const reset = await resetAllocation(userId);
+  if (!reset) {
+    throw new AppError("Finish your active battle and leave matchmaking before resetting your stats", 409);
   }
 
   return getCharacter(userId);

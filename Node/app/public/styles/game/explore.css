@@ -218,25 +218,9 @@
   justify-content: center;
 }
 
-/* A spell carried into battle is marked, not merely outlined: the ring says
-   "this control" and the check says "chosen". */
 .explore-loadout-toggle[aria-pressed="true"] {
-  position: relative;
   border-color: var(--ink);
   box-shadow: inset 0 0 0 1px var(--ink);
-}
-
-.explore-loadout-toggle[aria-pressed="true"]::after {
-  content: "";
-  position: absolute;
-  inset-block-start: 11px;
-  inset-inline-end: 14px;
-  inline-size: 6px;
-  block-size: 11px;
-  border-inline-end: 2px solid currentColor;
-  border-block-end: 2px solid currentColor;
-  transform: rotate(42deg);
-  pointer-events: none;
 }
 
 .explore-item[data-equipped="true"] .explore-state { color: var(--text-primary); }

@@ -4,8 +4,7 @@ import { countSpellUnlocks, createSpellUnlock } from "../repositories/spellUnloc
 import { getCharacter } from "./progressionService.js";
 import { AppError } from "../utils/appError.js";
 
-export async function getExploreState(userId) {
-  const character = await getCharacter(userId);
+export function buildExploreState(character) {
   const spells = describeCatalog({
     wisdom: character.totals.wisdom,
     unlockedKeys: character.spellKeys,
@@ -25,6 +24,10 @@ export async function getExploreState(userId) {
     allocation: character.allocation,
     spells,
   };
+}
+
+export async function getExploreState(userId) {
+  return buildExploreState(await getCharacter(userId));
 }
 
 export async function unlockSpell(userId, spellKey) {
@@ -53,4 +56,3 @@ export async function unlockSpell(userId, spellKey) {
     unlockedCount: await countSpellUnlocks(userId),
   };
 }
-

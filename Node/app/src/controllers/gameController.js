@@ -1,4 +1,4 @@
-import { confirmBaseAllocation, getCharacter } from "../services/progressionService.js";
+import { confirmBaseAllocation, getCharacter, resetBaseAllocation } from "../services/progressionService.js";
 import {
   getOwnProfile,
   getPublicProfile,
@@ -6,6 +6,7 @@ import {
 } from "../services/profileService.js";
 import { updateGameProfilePresentation } from "../repositories/gameProfileRepository.js";
 import { describeCatalog } from "../domain/spells.js";
+import { buildExploreState } from "../services/spellService.js";
 
 export async function getGameMe(req, res) {
   const character = await getCharacter(req.user.id);
@@ -35,14 +36,25 @@ export async function patchGameProfile(req, res) {
 
 export async function postAllocation(req, res) {
   const character = await confirmBaseAllocation(req.user.id, req.validatedBody);
+  return res.json(allocationResponse(character));
+}
 
-  return res.json({
+export async function postAllocationReset(req, res) {
+  const character = await resetBaseAllocation(req.user.id);
+  return res.json(allocationResponse(character));
+}
+
+function allocationResponse(character) {
+  return {
     game: {
       stats: character.totals,
+      base: character.base,
+      earned: character.earned,
       allocation: character.allocation,
       derived: character.derived,
     },
-  });
+    explore: buildExploreState(character),
+  };
 }
 
 export async function getProfileApi(req, res) {

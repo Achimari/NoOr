@@ -6,7 +6,6 @@
     { key: "wisdom", label: "Wisdom", note: "Unlocks spells", earnedOnly: true },
   ];
   const streakOrder = [profile.streaks.recovery, profile.streaks.reading, profile.streaks.goals];
-  const needsAllocation = profile.isOwner && !profile.allocation.confirmed;
 %>
 <main id="main-content" tabindex="-1" class="dashboard-page profile-page" data-profile data-profile-id="<%= profile.id %>" data-accent="<%= profile.accentKey %>" data-owner="<%= profile.isOwner ? "true" : "false" %>">
   <div class="page-shell profile-container">
@@ -32,22 +31,9 @@
         <% } %>
       </header>
 
-      <% if (needsAllocation) { %>
-        <section class="dashboard-card profile-setup" aria-labelledby="allocation-title">
-          <header class="dashboard-card-head">
-            <h2 id="allocation-title">Set your ten base points</h2>
-          </header>
-          <p class="profile-setup-text">
-            Distribute exactly ten permanent points across Strength, Dexterity and
-            Intelligence. Wisdom is earned through Bible reflections and cannot
-            receive base points. You can revise this choice until your first battle.
-          </p>
-        </section>
-      <% } %>
-
       <div class="profile-split">
       <% if (profile.isOwner) { %>
-        <section class="profile-pane profile-allocation" data-allocation aria-labelledby="points-title">
+        <section class="profile-pane profile-allocation" data-allocation data-locked="<%= profile.allocation.locked %>" aria-labelledby="points-title">
           <header class="dashboard-card-head profile-card-head">
             <h2 id="points-title">Base points</h2>
             <p class="profile-points-remaining" data-allocation-remaining role="status">
@@ -55,15 +41,14 @@
             </p>
           </header>
 
-          <% if (profile.allocation.locked) { %>
-            <p class="profile-note" data-allocation-locked-note>
-              Your base points were locked when you began your first battle.
-              Points earned this month are added to them.
-            </p>
-          <% } %>
+          <p class="profile-note">
+            Distribute all ten base points across Strength, Dexterity and Intelligence.
+            Wisdom is earned through Bible reflections. Use Reset stats to reassign
+            your base points between battles.
+          </p>
 
           <p class="profile-note">
-            Base points are permanent. Earned points reset at the start of each
+            Your ten base points carry over each month. Earned points reset at the start of each
             month, while your daily history and learned spells remain.
           </p>
 
@@ -89,20 +74,19 @@
                   />
                   <button class="profile-step" type="button" data-allocation-step="1" data-allocation-stat="<%= stat %>" aria-label="Add a point to <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "plus", className: "ui-icon--sm" }) %></button>
                 </div>
-                <p class="profile-allocation-earned">+<%= profile.earned[stat] %> earned this month</p>
+                <p class="profile-allocation-earned" data-stat-earned="<%= stat %>">+<%= profile.earned[stat] %> earned this month</p>
               </div>
             <% }) %>
           </div>
 
-          <% if (!profile.allocation.locked) { %>
-            <div class="profile-allocation-actions">
-              <button class="ui-button ui-button--primary" type="button" data-allocation-save>
-                <%= profile.allocation.confirmed ? "Save points" : "Confirm points" %>
-              </button>
-              <button class="ui-button ui-button--secondary" type="button" data-allocation-reset>Reset</button>
-            </div>
-            <p class="profile-error" data-allocation-error role="alert" hidden></p>
-          <% } %>
+          <div class="profile-allocation-actions">
+            <button class="ui-button ui-button--primary" type="button" data-allocation-save <%= profile.allocation.locked ? "hidden" : "" %>>
+              <%= profile.allocation.confirmed ? "Save points" : "Confirm points" %>
+            </button>
+            <button class="ui-button ui-button--secondary" type="button" data-allocation-reset-stats aria-describedby="allocation-reset-hint">Reset stats</button>
+          </div>
+          <p class="profile-note" id="allocation-reset-hint">Reset returns all ten base points to spend again. Earned points, learned spells and your progress stay.</p>
+          <p class="profile-error" data-allocation-error role="alert" hidden></p>
         </section>
       <% } %>
 
@@ -112,7 +96,7 @@
         </header>
 
         <p class="profile-note">
-          Permanent base points plus points earned this month.
+          Allocated base points plus points earned this month.
         </p>
 
         <ul class="profile-stat-list">
