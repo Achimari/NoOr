@@ -2,8 +2,6 @@
 .header {
 
   --surface: var(--chrome);
-  --surface-soft: var(--white-06);
-  --surface-muted: var(--white-10);
   --text: var(--white);
 
   --text-secondary: var(--white-72);
@@ -346,50 +344,6 @@
   }
 }
 
-.header-logout-form {
-  display: inline;
-  margin: 0;
-}
-
-.header-settings-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--white-18);
-  border-radius: var(--radius-control);
-  background: var(--white-06);
-  color: var(--white-72);
-  text-decoration: none;
-  transition:
-    background-color var(--duration-ui) var(--ease-out),
-    border-color var(--duration-ui) var(--ease-out),
-    color var(--duration-ui) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.header-settings-link:visited {
-  color: var(--white-72);
-}
-
-.header-settings-link:hover,
-.header-settings-link:focus-visible,
-.header-settings-link.active {
-  background: var(--white-10);
-  border-color: var(--border-strong);
-  color: var(--white);
-}
-
-.header-settings-link:active {
-  transform: scale(0.97);
-}
-
-.header-settings-icon {
-  width: 18px;
-  height: 18px;
-}
-
 .header-auth-link {
   position: relative;
 
@@ -425,35 +379,6 @@
 .header-auth-link:hover,
 .header-auth-link:focus-visible {
   color: var(--text);
-}
-
-.header-auth-button {
-  min-height: 36px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--white-18);
-  border-radius: var(--radius-control);
-  background: var(--white-06);
-  color: var(--white-72);
-  transition:
-    background-color var(--duration-ui) var(--ease-out),
-    border-color var(--duration-ui) var(--ease-out),
-    color var(--duration-ui) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.header-auth-button:hover,
-.header-auth-button:focus-visible {
-  background: var(--white-10);
-  border-color: var(--border-strong);
-  color: var(--white);
-}
-
-.header-auth-button:active {
-  transform: scale(0.97);
-}
-
-.header-auth-button::after {
-  display: none;
 }
 
 .header-auth-link::after {
@@ -540,6 +465,7 @@
 
 .header-help-link {
   flex-shrink: 0;
+  border: 0;
   text-decoration: none;
 }
 

@@ -4,6 +4,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import pageRoutes from "../src/routes/pageRoutes.js";
+import { requireAuth } from "../src/middleware/authMiddleware.js";
+import { redirectLegacyCustomer } from "../src/controllers/profilePageController.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const partialsDir = path.join(appRoot, "src", "views", "pages", "partials");
 const stylesDir = path.join(appRoot, "public", "styles");
@@ -20,8 +24,51 @@ const NORMAL_ROUTES = [
   "achievements-content.ejs",
   "help-content.ejs",
   "profile-content.ejs",
-  "customer-content.ejs",
 ];
+
+// The legacy customer page no longer renders a shell of its own: its URL is a
+// compatibility redirect kept alive for delivered /customer/:id links.
+describe("legacy /customer/:id compatibility route", () => {
+  const layers = () => pageRoutes.stack.filter((layer) => layer.route?.path === "/customer/:id");
+
+  function fakeResponse() {
+    const res = { redirects: [] };
+    res.redirect = (...args) => {
+      res.redirects.push(args.length === 1 ? [302, args[0]] : args);
+      return res;
+    };
+    return res;
+  }
+
+  it("redirects a signed-in request to the matching encoded profile", () => {
+    assert.equal(layers().length, 1, "exactly one /customer/:id route stays registered");
+    const [route] = layers().map((layer) => layer.route);
+    assert.deepEqual(Object.keys(route.methods), ["get"]);
+    const handler = route.stack.at(-1).handle;
+    assert.equal(handler, redirectLegacyCustomer);
+
+    for (const [id, target] of [["42", "/profile/42"], ["a/b?c", "/profile/a%2Fb%3Fc"]]) {
+      const res = fakeResponse();
+      handler({ params: { id } }, res);
+      assert.deepEqual(res.redirects, [[302, target]]);
+    }
+  });
+
+  it("sends an unauthenticated request to login before the redirect can run", async () => {
+    const [route] = layers().map((layer) => layer.route);
+    assert.equal(route.stack.length, 2);
+    assert.equal(route.stack[0].handle, requireAuth);
+
+    const res = fakeResponse();
+    let reachedRedirect = false;
+    await route.stack[0].handle({ path: "/customer/42", cookies: {} }, res, () => {
+      reachedRedirect = true;
+    });
+
+    assert.equal(reachedRedirect, false);
+    assert.deepEqual(res.redirects, [[302, "/login"]]);
+  });
+});
 
 describe("shared page shell contract", () => {
   for (const view of NORMAL_ROUTES) {

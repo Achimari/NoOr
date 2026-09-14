@@ -147,14 +147,6 @@ body::before {
 
 /* --------------------------------------------------------- dashboard shell */
 
-.dashboard-section > .container {
-  margin: 0 auto;
-}
-
-.dashboard-container {
-  width: min(100%, var(--measure-wide));
-}
-
 .dashboard-head {
   margin-bottom: var(--space-5);
 }

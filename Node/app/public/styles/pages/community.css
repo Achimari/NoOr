@@ -86,35 +86,6 @@
   letter-spacing: 0.02em;
 }
 
-.prayer-filter-head {
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-}
-
-.prayer-panel-copy {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.prayer-panel-copy h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: var(--text-component);
-  font-weight: var(--weight-body);
-  line-height: 1.4;
-  letter-spacing: 0;
-}
-
-.prayer-panel-copy p {
-  margin: 0;
-  color: var(--ink-secondary-strong);
-  font-size: var(--text-label);
-  font-weight: var(--weight-body);
-  line-height: 1.5;
-}
-
 @keyframes panel-in {
   from {
     opacity: 0;
@@ -382,7 +353,6 @@
   }
 }
 
-
 /* --------------------------------------------------------- Community, phone
  *
  * Encouragement still comes before the requests, the resource keeps its name
@@ -406,7 +376,6 @@
   font-size: var(--text-control);
   text-underline-offset: 0.18em;
 }
-
 
 .community-resource-body {
   gap: var(--space-3);

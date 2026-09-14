@@ -454,7 +454,6 @@
   pointer-events: none;
 }
 
-
 .dashboard-action[aria-pressed="true"] .dashboard-action-label,
 .dashboard-action[aria-pressed="true"] .dashboard-action-subtitle {
   color: var(--white);
@@ -641,20 +640,6 @@
   outline: none;
 }
 
-.daily-goals-head {
-  align-items: flex-start;
-  margin-bottom: 0;
-}
-
-.daily-goals-heading h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: var(--text-body);
-  font-weight: var(--weight-body);
-  line-height: 1.4;
-  letter-spacing: 0;
-}
-
 .daily-goals-count {
   flex: 0 0 auto;
   padding: 4px 10px;
@@ -664,14 +649,6 @@
   font-size: var(--text-meta);
   font-weight: var(--weight-body);
   white-space: nowrap;
-}
-
-.daily-goals-hint {
-  margin: calc(var(--space-2) * -1) 0 0;
-  color: var(--ink-secondary-strong);
-  font-size: var(--text-meta);
-  font-weight: var(--weight-body);
-  line-height: 1.45;
 }
 
 .daily-goals-list {
@@ -960,7 +937,6 @@
   gap: var(--space-3);
   padding-block-start: var(--space-2);
 }
-
 
 @media (min-width: 761px) {
 
@@ -1401,7 +1377,6 @@ body.catch-up-modal-open {
   outline-color: var(--focus-ring-on-deep);
 }
 
-
 /* The missed-day dialogs on a phone: the same sheet geometry the reading editor
    uses, so a correction and a first answer are the same shape of surface. Their
    own body already scrolls and their actions already sit outside it. */
@@ -1426,7 +1401,6 @@ body.catch-up-modal-open {
     max-height: 100%;
   }
 }
-
 
 /* The task checkbox sits inside a full-width label row, and that label is the
    44px target it has always had. On a phone the box itself also clears the

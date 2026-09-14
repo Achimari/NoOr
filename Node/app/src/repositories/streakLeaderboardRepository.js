@@ -33,6 +33,11 @@ export async function findGoalStreakRows() {
           completedAt: true,
         },
       },
+      dailyGoalCheckIns: {
+        select: {
+          dateKey: true,
+        },
+      },
     },
     orderBy: {
       id: "asc",

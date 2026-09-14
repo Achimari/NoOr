@@ -1,50 +1,4 @@
 @media (max-width: 1024px) {
-  .hero-main {
-    min-height: auto;
-  }
-
-  .hero-main-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-    align-items: center;
-  }
-
-  .hero-main-content {
-    max-width: 640px;
-    text-align: center;
-  }
-
-  .hero-kicker {
-    margin: 0 0 var(--space-3);
-  }
-
-  .hero-title {
-    max-width: none;
-    font-size: clamp(var(--text-display), 5.2vw, 3.2rem);
-    line-height: 1.08;
-  }
-
-  .hero-subtitle {
-    margin: var(--space-2) 0 var(--space-4);
-    max-width: min(52ch, 100%);
-  }
-
-  .hero-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: min(100%, 620px);
-    margin: 0 auto;
-  }
-
-  .hero-invite-card {
-    width: min(100%, 620px);
-    margin: var(--space-3) auto 0;
-    text-align: center;
-  }
-
-  .visit-step-title-single {
-    white-space: normal;
-  }
-
   /* `auto-fit` with a real minimum rather than a fixed pair: at 320px with
      200% text a two-column track is 136px wide, which no sentence fits into,
      and the cards pushed the page sideways. `min(…, 100%)` keeps the minimum
@@ -57,18 +11,4 @@
   .about-roadmap-grid:not(.visit-roadmap-grid)::after {
     display: none;
   }
-
-  .visit-roadmap-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
-  }
-
-  .visit-roadmap-grid::before {
-    display: none;
-  }
-
-  .visit-roadmap-grid .roadmap-step {
-    min-height: unset;
-  }
-
 }

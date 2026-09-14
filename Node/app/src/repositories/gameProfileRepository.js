@@ -15,13 +15,6 @@ const gameProfileSelect = {
   equippedSpellKeys: true,
 };
 
-export async function findGameProfile(userId) {
-  return prisma.gameProfile.findUnique({
-    where: { id: userId },
-    select: gameProfileSelect,
-  });
-}
-
 export async function ensureGameProfile(userId, client = prisma) {
   const existing = await client.gameProfile.findUnique({
     where: { id: userId },

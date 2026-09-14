@@ -55,30 +55,6 @@ export async function findCheckInHistoryByDateKeys(userId, dateKeys) {
   });
 }
 
-export async function findAllCheckInHistory() {
-  return prisma.checkInHistory.findMany({
-    select: {
-      dateKey: true,
-      answer: true,
-      createdAt: true,
-      user: {
-        select: {
-          timezone: true,
-        },
-      },
-    },
-  });
-}
-
-export async function findCheckInHistoryByUserId(userId) {
-  return prisma.checkInHistory.findMany({
-    where: { userId },
-    select: {
-      answer: true,
-    },
-  });
-}
-
 export async function findUsersWithCheckInHistory() {
   return prisma.auth.findMany({
     select: {

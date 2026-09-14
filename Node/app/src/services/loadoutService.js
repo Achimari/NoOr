@@ -4,16 +4,6 @@ import { updateEquippedSpellKeys } from "../repositories/gameProfileRepository.j
 import { getCharacter } from "./progressionService.js";
 import { AppError } from "../utils/appError.js";
 
-export async function getLoadout(userId) {
-  const character = await getCharacter(userId);
-
-  return {
-    equipped: character.equippedSpellKeys,
-    limit: EQUIPPED_SPELL_LIMIT,
-    unlockedCount: character.spellKeys.length,
-  };
-}
-
 export async function setLoadout(userId, spellKeys) {
   const character = await getCharacter(userId);
 

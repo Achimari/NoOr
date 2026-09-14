@@ -18,21 +18,6 @@ export default {
     tagline: "",
     socialAria: "Social links"
   },
-  home: {
-    hero: {
-      kicker: "",
-      title: "Achimari",
-      subtitle: "",
-      ctaFirst: "",
-      ctaSecond: "",
-      inviteMain: "",
-      inviteSub: ""
-    },
-    firstVisit: { title: "", text: "", cards: [] },
-    visitFlow: { title: "", text: "", steps: [] },
-    verse: { text: "", reference: "" },
-    useful: { title: "", subtitle: "", links: [] }
-  },
   about: {
     title: "About Achimari",
     subtitle: "Achimari turns three daily practices into a clear, honest record: recovery, Bible reading, and the tasks you choose to finish.",

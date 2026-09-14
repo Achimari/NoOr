@@ -278,7 +278,6 @@
      now means what it says — unlike the handwritten face this replaced, whose
      very wide zero made 68ch run to ~91 characters. */
   --measure-prose: 68ch;
-  --measure-dialog: 520px;
 
   --tap-min: 44px;
 
@@ -297,11 +296,8 @@
      breathing room. Scroll offsets and sheet insets all read this token. */
   --header-height: 56px;
 
-  --header-bg: var(--field);
-  --header-bg-solid: var(--chrome);
   --header-active: var(--white);
   --header-active-line: var(--white);
-  --logo-title: var(--white);
   --footer-bg: var(--chrome);
   --footer-text: rgb(255 255 255 / 78%);
   --footer-icon-hover: var(--white);
@@ -360,7 +356,6 @@
 
   --ink-92: rgb(0 0 0 / 92%);
   --ink-72: rgb(0 0 0 / 72%);
-  --ink-54: rgb(0 0 0 / 54%);
   --ink-18: var(--separator);
   --ink-10: rgb(0 0 0 / 10%);
   --ink-06: rgb(0 0 0 / 6%);
@@ -399,7 +394,6 @@
   --action: var(--ink);
   --action-hover: var(--ink-raised);
   --on-action: var(--white);
-  --btn-text: var(--on-action);
 
   /* State borders follow their colors. Notices also retain different rule
      weights and explicit labels so their meaning does not depend on hue. */
@@ -413,9 +407,6 @@
   --surface-1: var(--surface);
   --surface-2: var(--canvas);
   --surface-elevated: var(--paper-raised);
-  --surface-soft: var(--ink-06);
-  --surface-muted: var(--ink-10);
-  --icon-text: var(--ink);
 
   --text: var(--ink);
   --text-primary: var(--ink);
@@ -427,17 +418,10 @@
   --border-strong: var(--rule-strong);
   --border-control: var(--rule-strong);
   --list-border: var(--ink-10);
-  --track-thumb: var(--separator);
 
   --link: var(--brand);
-  --link-card-text: var(--ink);
   --link-card-hover-border: var(--ink);
-  --link-card-hover-shadow: var(--shadow-ink-10);
-  --favicon-chip-bg: var(--ink-06);
-  --favicon-chip-border: var(--separator);
 
-  --shadow-ink-10: rgb(0 0 0 / 7%);
-  --shadow-ink-18: rgb(0 0 0 / 12%);
   --shadow-soft: none;
   --shadow-card-hover: none;
   --shadow-panel: var(--shadow-float);

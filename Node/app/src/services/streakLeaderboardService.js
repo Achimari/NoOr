@@ -167,7 +167,7 @@ export function getOverallBestStreak(rows) {
   };
 }
 
-export function buildStreakBoard(users, { getRows, getCurrentStreak, getMaxStreak, currentUserId, now }) {
+export function buildStreakBoard(users, { getRows, getRecordedRows = getRows, getCurrentStreak, getMaxStreak, currentUserId, now }) {
   const rows = users
     .map((user) => {
       const todayDateKey = getTodayDateKey(now, user.timezone);
@@ -182,7 +182,7 @@ export function buildStreakBoard(users, { getRows, getCurrentStreak, getMaxStrea
         maxStreak: getMaxStreak(userRows),
         inactiveDays,
         isInactive: inactiveDays > 0,
-        missedDays: getMissedActivityDays(userRows, todayDateKey, createdDateKey),
+        missedDays: getMissedActivityDays(getRecordedRows(user), todayDateKey, createdDateKey),
       };
     })
     .sort(sortStreakRows);
@@ -220,6 +220,7 @@ export async function getStreakLeaderboards(currentUserId) {
     }),
     goals: buildStreakBoard(goalUsers, {
       getRows: (user) => user.dailyGoals,
+      getRecordedRows: (user) => [...user.dailyGoals, ...user.dailyGoalCheckIns],
       getCurrentStreak: calculateGoalCurrentStreak,
       getMaxStreak: calculateGoalMaxStreak,
       currentUserId,

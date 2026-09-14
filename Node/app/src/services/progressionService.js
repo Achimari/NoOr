@@ -2,11 +2,7 @@ import { getEligibleRewardsForDate, diffRewards, getMonthlyTotals } from "../dom
 import { getCombatRating, getDerived, validateAllocation } from "../domain/stats.js";
 import { resolveLoadout } from "../domain/loadout.js";
 import { getLoadoutPower } from "../domain/spells.js";
-import {
-  confirmAllocation,
-  ensureGameProfile,
-  findGameProfile,
-} from "../repositories/gameProfileRepository.js";
+import { confirmAllocation, ensureGameProfile } from "../repositories/gameProfileRepository.js";
 import {
   createRewards,
   deleteRewards,

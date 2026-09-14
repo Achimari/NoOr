@@ -14,7 +14,6 @@ import {
   normalizeReadingRows,
 } from "./streakLeaderboardService.js";
 import {
-  findAuthName,
   findProfileSource,
   findSharedTodayGoals,
   findSharedTodayReading,

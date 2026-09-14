@@ -34,22 +34,6 @@ export const V1_TRIAL_KEYS = ["the-doubt", "the-distraction", "the-discouragemen
 
 const TIER_LABELS = { 1: "Tier I", 2: "Tier II", 3: "Tier III" };
 
-export const EMPTY_FACTS = Object.freeze({
-  allocationConfirmed: false,
-  strongRecordedDays: 0,
-  strongBestStreak: 0,
-  readingYesDays: 0,
-  readingBestStreak: 0,
-  reflectedReadingDays: 0,
-  distinctBibleBooks: 0,
-  fiveTaskDays: 0,
-  taskBestStreak: 0,
-  fullyRecordedDays: 0,
-  unlockedSpellKeys: [],
-  completedEncounterKeys: [],
-  qualifyingPvpMatches: 0,
-});
-
 function toCount(value) {
   const count = Number(value);
   return Number.isFinite(count) ? Math.trunc(count) : 0;
@@ -425,12 +409,6 @@ const CATALOG = [
 
 export const ACHIEVEMENTS = CATALOG.map((entry, index) => Object.freeze({ ...entry, order: index }));
 export const ACHIEVEMENT_TOTAL = ACHIEVEMENTS.length;
-
-const achievementByKey = new Map(ACHIEVEMENTS.map((entry) => [entry.key, entry]));
-
-export function getAchievement(key) {
-  return achievementByKey.get(key) || null;
-}
 
 export function getAchievementTarget(entry, facts) {
   const target = typeof entry.target === "function" ? entry.target(facts) : entry.target;

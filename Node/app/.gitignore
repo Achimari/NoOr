@@ -27,3 +27,6 @@ public/assets/
 test-results/
 
 docs
+
+# Graphify index cache generated inside the static tree
+public/scripts/graphify-out/

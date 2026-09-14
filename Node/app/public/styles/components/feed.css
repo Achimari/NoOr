@@ -106,64 +106,6 @@
   flex: none;
 }
 
-.prayer-table td.prayer-row-actions {
-  width: 56px;
-  min-width: 56px;
-  padding-left: 0;
-  padding-right: var(--space-3);
-  text-align: right;
-}
-
-.prayer-row-actions .action-menu-trigger {
-  margin-top: -6px;
-}
-
-.prayer-table-wrap {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.prayer-page .prayer-table-wrap,
-.info-prayers .prayer-table-wrap {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: auto;
-}
-
-.prayer-table th:first-child,
-.prayer-table td:first-child {
-  width: 190px;
-  min-width: 150px;
-}
-
-.prayer-table th:nth-child(2),
-.prayer-table td:nth-child(2) {
-  width: auto;
-  text-align: left;
-  white-space: normal;
-}
-
-.prayer-table td {
-  height: auto;
-  padding-top: var(--space-3);
-  padding-bottom: var(--space-3);
-  vertical-align: top;
-}
-
-.prayer-table .leaderboard-user {
-
-  min-height: var(--tap-min);
-  font-size: var(--text-label);
-  font-weight: var(--weight-body);
-  line-height: 1.4;
-}
-
-.prayer-table .leaderboard-row-icon {
-  width: 16px;
-  height: 16px;
-}
-
 .prayer-entry {
   display: grid;
   gap: var(--space-2);

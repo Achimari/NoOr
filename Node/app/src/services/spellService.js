@@ -1,6 +1,6 @@
 import { canUnlock, describeCatalog, findSpell } from "../domain/spells.js";
 import { EQUIPPED_SPELL_LIMIT } from "../domain/constants.js";
-import { countSpellUnlocks, createSpellUnlock, findSpellUnlocks } from "../repositories/spellUnlockRepository.js";
+import { countSpellUnlocks, createSpellUnlock } from "../repositories/spellUnlockRepository.js";
 import { getCharacter } from "./progressionService.js";
 import { AppError } from "../utils/appError.js";
 
