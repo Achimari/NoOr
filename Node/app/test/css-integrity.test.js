@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import { pageBundles, sharedStyles } from "../src/config/assetSources.js";
+import { sourceCopy } from "./helpers/viewLocals.js";
 
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const publicDir = path.join(appRoot, "public");
@@ -49,7 +50,7 @@ describe("retired hero and generic dialog layers", () => {
   });
 
   it("lets Today own its opening through its own page bundle", () => {
-    const today = readApp("src/views/pages/partials/home-content.ejs");
+    const today = sourceCopy(readApp("src/views/pages/partials/home-content.ejs"));
     assert.match(today, /class="page-opening today-opening"/);
     assert.match(today, /<h1 class="page-head-title today-title">Today<\/h1>/);
     assert.ok(pageBundles["daily-check-in"].styles.includes("styles/pages/daily-check-in.css"));

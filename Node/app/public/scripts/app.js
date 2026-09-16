@@ -206,7 +206,7 @@ timezoneOptions?.addEventListener("click", async (event) => {
 
   if (!result.ok) {
     button.disabled = false;
-    showToast(result.data.error || result.data.errors?.[0] || "Could not save timezone", "error");
+    showToast(result.data.error || result.data.errors?.[0] || t("Could not save timezone"), "error");
     return;
   }
 
@@ -214,7 +214,7 @@ timezoneOptions?.addEventListener("click", async (event) => {
     timezoneCurrent.textContent = result.data.timezone.label;
   }
   setTimezoneMenuOpen(false);
-  showToast("Timezone updated");
+  showToast(t("Timezone updated"));
   window.setTimeout(() => {
     startPageTransition();
     window.location.reload();
@@ -259,7 +259,7 @@ function setSettingsAnswerState(answer) {
   settingsCurrentAnswer = answer || null;
 
   if (settingsAnswerCurrent) {
-    settingsAnswerCurrent.textContent = answer || "Pending";
+    settingsAnswerCurrent.textContent = (answer ? t(answer) : t("Pending"));
   }
 
   settingsAnswerOptions.forEach((button) => {
@@ -276,7 +276,7 @@ async function loadSettingsAnswer() {
 
   if (!result.ok) {
     setSettingsAnswerState(null);
-    showToast("Could not load today's answer", "error");
+    showToast(t("Could not load today's answer"), "error");
     return;
   }
 
@@ -295,12 +295,12 @@ async function saveSettingsAnswer(answer) {
 
     if (!result.ok) {
       await loadSettingsAnswer();
-      showToast(result.data.error || "Could not change today's answer", "error");
+      showToast(result.data.error || t("Could not change today's answer"), "error");
       return;
     }
 
     setSettingsAnswerState(result.data.status?.answer || answer);
-    showToast(answer === "YES" ? "Today's answer changed to yes" : "Today's answer changed to no");
+    showToast(answer === "YES" ? t("Today's answer changed to yes") : t("Today's answer changed to no"));
   } finally {
     settingsAnswerOptions.forEach((button) => {
       button.disabled = false;
@@ -324,14 +324,14 @@ function renderLeaderboard(leaderboard) {
 
   const bestValue = leaderboard.overallBest?.value || 0;
   if (overallBestValue) {
-    overallBestValue.textContent = `${bestValue} ${bestValue === 1 ? "day" : "days"}`;
+    overallBestValue.textContent = t("{count} days", { count: bestValue });
   }
   if (overallBestName) {
-    overallBestName.textContent = leaderboard.overallBest?.name || "No record yet";
+    overallBestName.textContent = leaderboard.overallBest?.name || t("No record yet");
   }
 
   if (tableCount) {
-    tableCount.textContent = `${leaderboard.leaders.length} ${leaderboard.leaders.length === 1 ? "user" : "users"}`;
+    tableCount.textContent = t("{count} users", { count: leaderboard.leaders.length });
   }
 
   leaderboardBody.innerHTML = leaderboard.leaders.length
@@ -363,7 +363,7 @@ function renderMissedDaysTag(entry) {
   if (!missedDays || !missedDays.count) return "";
 
   const separator = '<span class="leaderboard-streak-separator" aria-hidden="true">·</span>';
-  const label = `${missedDays.count} missed`;
+  const label = t("{count} missed", { count: missedDays.count });
 
   return `${separator}<span class="leaderboard-missed-tag is-static">${escapeHtml(label)}</span>`;
 }
@@ -417,12 +417,12 @@ function renderPrayerReactions(item) {
   if (!reactions.length) return "";
 
   return `
-    <div class="prayer-reactions" data-prayer-reaction-group="${item.id}" aria-label="Prayer reactions">
+    <div class="prayer-reactions" data-prayer-reaction-group="${item.id}" aria-label="${t("Prayer reactions")}">
       ${reactions
         .map((reaction) => {
           const isSelected = item.currentReaction === reaction.emoji;
           return `
-            <span class="prayer-reaction-button ${isSelected ? "selected" : ""}" aria-label="${isSelected ? "Your reaction" : "Reaction"}">
+            <span class="prayer-reaction-button ${isSelected ? "selected" : ""}" aria-label="${isSelected ? t("Your reaction") : t("Reaction")}">
               <span aria-hidden="true">${escapeHtml(reaction.emoji)}</span>
               <span>${reaction.count}</span>
             </span>
@@ -456,8 +456,8 @@ function getPrayerActionsMenu() {
   menu.setAttribute("role", "menu");
   menu.hidden = true;
   menu.innerHTML = `
-    <button class="action-menu-item" type="button" role="menuitem" data-prayer-menu-action="react">${actionMenuItemIcon("heart")}<span>React</span></button>
-    <button class="action-menu-item" type="button" role="menuitem" data-prayer-menu-action="answered">${actionMenuItemIcon("check")}<span>Mark as answered</span></button>
+    <button class="action-menu-item" type="button" role="menuitem" data-prayer-menu-action="react">${actionMenuItemIcon("heart")}<span>${t("React")}</span></button>
+    <button class="action-menu-item" type="button" role="menuitem" data-prayer-menu-action="answered">${actionMenuItemIcon("check")}<span>${t("Mark as answered")}</span></button>
   `;
   document.body.append(menu);
   return menu;
@@ -526,11 +526,11 @@ function getReactionChooser() {
   chooser.hidden = true;
   chooser.innerHTML = `
     <div class="prayer-reaction-backdrop" data-prayer-reaction-close></div>
-    <div class="prayer-reaction-dialog" role="dialog" aria-modal="true" aria-label="Choose reaction">
+    <div class="prayer-reaction-dialog" role="dialog" aria-modal="true" aria-label="${t("Choose reaction")}">
       ${prayerReactionEmoji
         .map(
           (emoji) => `
-            <button class="prayer-reaction-choice" type="button" data-prayer-reaction="${escapeHtml(emoji)}" aria-label="React ${escapeHtml(emoji)}">
+            <button class="prayer-reaction-choice" type="button" data-prayer-reaction="${escapeHtml(emoji)}" aria-label="${t("React {emoji}", { emoji: escapeHtml(emoji) })}">
               <span aria-hidden="true">${escapeHtml(emoji)}</span>
             </button>
           `,
@@ -552,7 +552,7 @@ function openReactionChooser(prayerId) {
     button.disabled = false;
     const isSelected = prayer?.currentReaction === button.dataset.prayerReaction;
     button.setAttribute("aria-pressed", String(isSelected));
-    button.setAttribute("aria-label", isSelected ? `Remove ${button.dataset.prayerReaction} reaction` : `React ${button.dataset.prayerReaction}`);
+    button.setAttribute("aria-label", isSelected ? t("Remove {emoji} reaction", { emoji: button.dataset.prayerReaction }) : t("React {emoji}", { emoji: button.dataset.prayerReaction }));
   });
   chooser.hidden = false;
   document.body.classList.add("prayer-reaction-modal-open");
@@ -585,13 +585,13 @@ function getSettingsAnswerConfirmModal() {
     <div class="settings-confirm-backdrop" data-settings-answer-cancel></div>
     <div class="settings-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-answer-confirm-title">
       <header class="settings-confirm-head">
-        <p class="dashboard-label">Today's answer</p>
-        <h2 id="settings-answer-confirm-title">Are you sure?</h2>
-        <p data-settings-answer-confirm-copy>Change today's answer?</p>
+        <p class="dashboard-label">${t("Today's answer")}</p>
+        <h2 id="settings-answer-confirm-title">${t("Are you sure?")}</h2>
+        <p data-settings-answer-confirm-copy>${t("Change today's answer?")}</p>
       </header>
       <div class="settings-confirm-actions">
-        <button class="ui-button ui-button--secondary" type="button" data-settings-answer-cancel>Cancel</button>
-        <button class="ui-button ui-button--primary" type="button" data-settings-answer-confirm>Change</button>
+        <button class="ui-button ui-button--secondary" type="button" data-settings-answer-cancel>${t("Cancel")}</button>
+        <button class="ui-button ui-button--primary" type="button" data-settings-answer-confirm>${t("Change")}</button>
       </div>
     </div>
   `;
@@ -605,7 +605,7 @@ function openSettingsAnswerConfirmModal(answer) {
   const modal = getSettingsAnswerConfirmModal();
   const copy = modal.querySelector("[data-settings-answer-confirm-copy]");
   if (copy) {
-    copy.textContent = `Change today's answer to ${answer === "YES" ? "YES" : "NO"}?`;
+    copy.textContent = t("Change today's answer to {answer}?", { answer: t(answer === "YES" ? "YES" : "NO") });
   }
   modal.hidden = false;
   modal.querySelector("[data-settings-answer-confirm]")?.focus();
@@ -649,7 +649,7 @@ function updatePrayerUserOptions(prayers) {
     ? users
         .map((user) => `<button type="button" data-prayer-user-option="${escapeHtml(user.name)}">${escapeHtml(user.name)}</button>`)
         .join("")
-    : '<span class="prayer-filter-empty">No users found</span>';
+    : `<span class="prayer-filter-empty">${t("No users found")}</span>`;
 }
 
 function setUserMenuOpen(isOpen) {
@@ -671,7 +671,7 @@ function closePrayerMenus(except = null) {
 
 function updatePrayerTimeState() {
   if (prayerTimeLabel) {
-    prayerTimeLabel.textContent = prayerTimeOrder === "oldest" ? "Oldest first" : "Newest first";
+    prayerTimeLabel.textContent = prayerTimeOrder === "oldest" ? t("Oldest first") : t("Newest first");
   }
 
   prayerTimeMenu?.querySelectorAll("[data-prayer-time-option]").forEach((button) => {
@@ -795,7 +795,7 @@ function renderPrayers(prayers, targetBody = prayersBody) {
   const showReactions = targetBody.dataset.prayerReactions === "true";
   const showRowMenu = showActions || showReactions;
   const listType = targetBody.dataset.prayerList || "default";
-  const emptyLabel = listType === "active" ? "No active prayer requests" : "No prayers yet";
+  const emptyLabel = listType === "active" ? t("No active prayer requests") : t("No prayers yet");
 
   if (targetBody === prayersBody && prayerCount) {
     prayerCount.textContent = formatItemCount(prayers.length);
@@ -803,8 +803,8 @@ function renderPrayers(prayers, targetBody = prayersBody) {
 
   const emptyHint =
     listType === "active"
-      ? "Requests you share appear here until they are answered."
-      : "Prayer requests from the community will appear here.";
+      ? t("Requests you share appear here until they are answered.")
+      : t("Prayer requests from the community will appear here.");
 
   targetBody.innerHTML = prayers.length
     ? prayers
@@ -813,7 +813,7 @@ function renderPrayers(prayers, targetBody = prayersBody) {
           const canAnswer = showActions && item.canMarkAnswered;
           const rowMenu =
             showReactions || canAnswer
-              ? `<button class="action-menu-trigger prayer-item-menu" type="button" data-prayer-actions-open data-prayer-id="${item.id}" data-prayer-can-react="${showReactions}" data-prayer-can-answer="${canAnswer}" aria-haspopup="menu" aria-expanded="false" aria-controls="prayer-actions-menu" aria-label="Open prayer actions">${actionMenuTriggerIcon()}</button>`
+              ? `<button class="action-menu-trigger prayer-item-menu" type="button" data-prayer-actions-open data-prayer-id="${item.id}" data-prayer-can-react="${showReactions}" data-prayer-can-answer="${canAnswer}" aria-haspopup="menu" aria-expanded="false" aria-controls="prayer-actions-menu" aria-label="${t("Open prayer actions")}">${actionMenuTriggerIcon()}</button>`
               : "";
 
           return `
@@ -850,7 +850,7 @@ function updatePrayerFilterState() {
   if (!prayerFilterState) return;
 
   const user = String(prayerUserFilter?.value || "").trim();
-  const order = prayerTimeOrder === "oldest" ? "Oldest first" : "Newest first";
+  const order = prayerTimeOrder === "oldest" ? t("Oldest first") : t("Newest first");
 
   prayerFilterState.textContent = user ? `${user} · ${order}` : order;
   prayerFilterState.dataset.prayerFilterApplied = user ? "true" : "false";
@@ -885,12 +885,12 @@ async function markPrayerAnswered(prayerId, control) {
   const result = await apiFetch(`/api/prayers/${prayerId}/answered`, { method: "POST" });
   if (!result?.ok) {
     if (control) control.disabled = false;
-    showToast(result?.data.error || "Could not mark prayer as answered", "error");
+    showToast(result?.data.error || t("Could not mark prayer as answered"), "error");
     return;
   }
 
   await loadPrayers();
-  showToast("Prayer marked as answered");
+  showToast(t("Prayer marked as answered"));
 }
 
 prayerUserFilter?.addEventListener("focus", openUserMenu);
@@ -996,14 +996,14 @@ document.addEventListener("click", async (event) => {
     chooser.querySelectorAll("[data-prayer-reaction]").forEach((reactionButton) => {
       reactionButton.disabled = false;
     });
-    showToast(result.data.error || "Could not add reaction", "error");
+    showToast(result.data.error || t("Could not add reaction"), "error");
     return;
   }
 
   allPrayers = allPrayers.map((item) => (item.id === result.data.prayer.id ? result.data.prayer : item));
   applyPrayerFilters();
   closeReactionChooser();
-  showToast(isRemoving ? "Reaction removed" : "Reaction saved");
+  showToast(isRemoving ? t("Reaction removed") : t("Reaction saved"));
 });
 
 document.addEventListener("keydown", (event) => {
@@ -1115,14 +1115,14 @@ async function updateLeaderboard(action) {
   if (result.status === 409) {
     const refreshed = await loadCheckInStatus();
     if (!refreshed) setDailyActionSelection(previousAnswer);
-    showToast("You already answered today");
+    showToast(t("You already answered today"));
     return;
   }
 
   if (!result.ok) {
     const refreshed = await loadCheckInStatus();
     if (!refreshed) setDailyActionSelection(previousAnswer);
-    showToast("Could not save answer", "error");
+    showToast(t("Could not save answer"), "error");
     return;
   }
 
@@ -1132,7 +1132,7 @@ async function updateLeaderboard(action) {
   } else {
     await loadCheckInStatus();
   }
-  showToast(action === "reset" ? "Answer saved: no" : "Answer saved: yes");
+  showToast(action === "reset" ? t("Answer saved: no") : t("Answer saved: yes"));
 }
 
 if (dailyCheckInRoot) {
@@ -1164,7 +1164,7 @@ if (prayerForm) {
 
     if (!result.ok) {
       if (prayerStatus) prayerStatus.textContent = "";
-      showToast(result.data.errors?.[0] || "Could not add prayer", "error");
+      showToast(result.data.errors?.[0] || t("Could not add prayer"), "error");
       return;
     }
 
@@ -1176,7 +1176,7 @@ if (prayerForm) {
       newest.classList.add("is-revealing");
       newest.addEventListener("animationend", () => newest.classList.remove("is-revealing"), { once: true });
     }
-    showToast("Prayer request added");
+    showToast(t("Prayer request added"));
   });
 }
 
@@ -1184,18 +1184,18 @@ if (telegramConnectButton) {
   telegramConnectButton.addEventListener("click", async () => {
     telegramConnectButton.disabled = true;
     if (telegramStatus) telegramStatus.textContent = "";
-    showToast("Preparing Telegram link");
+    showToast(t("Preparing Telegram link"));
 
     const result = await apiFetch("/api/telegram/connect-link");
     if (!result) return;
 
     if (!result.ok || !result.data.link) {
-      showToast(result.data.error || "Could not create Telegram link", "error");
+      showToast(result.data.error || t("Could not create Telegram link"), "error");
       telegramConnectButton.disabled = false;
       return;
     }
 
-    showToast(result.data.botUsername ? `Telegram link ready: @${result.data.botUsername}` : "Telegram link ready");
+    showToast(result.data.botUsername ? t("Telegram link ready: @{bot}", { bot: result.data.botUsername }) : t("Telegram link ready"));
     window.location.href = result.data.link;
   });
 }
@@ -1351,7 +1351,7 @@ function syncChapterSelect(row, { chapter, startVerse, endVerse } = {}) {
   const book = findReadingBook(controls.book.value);
   const chapters = book ? range(book.chapters.length) : [];
 
-  fillSelect(controls.chapter, chapters, { placeholder: "Chapter", selected: chapter });
+  fillSelect(controls.chapter, chapters, { placeholder: t("Chapter"), selected: chapter });
   controls.chapter.disabled = !book;
   syncVerseSelects(row, { startVerse, endVerse });
 }
@@ -1362,7 +1362,7 @@ function syncVerseSelects(row, { startVerse, endVerse } = {}) {
   const chapter = Number(controls.chapter.value);
   const verseCount = book && chapter ? book.chapters[chapter - 1] || 0 : 0;
 
-  fillSelect(controls.startVerse, range(verseCount), { placeholder: "From", selected: startVerse });
+  fillSelect(controls.startVerse, range(verseCount), { placeholder: t("From"), selected: startVerse });
   controls.startVerse.disabled = !verseCount;
   syncEndVerseSelect(row, endVerse);
 }
@@ -1376,7 +1376,7 @@ function syncEndVerseSelect(row, endVerse) {
   const verses = start ? range(verseCount).filter((verse) => verse >= start) : [];
   const keep = endVerse && Number(endVerse) >= start ? endVerse : (start || null);
 
-  fillSelect(controls.endVerse, verses, { placeholder: "To", selected: keep });
+  fillSelect(controls.endVerse, verses, { placeholder: t("To"), selected: keep });
   controls.endVerse.disabled = !verses.length;
 }
 
@@ -1385,12 +1385,12 @@ function renumberPassages() {
 
   rows.forEach((row, index) => {
     const title = row.querySelector("[data-reading-passage-title]");
-    if (title) title.textContent = `Passage ${index + 1}`;
+    if (title) title.textContent = t("Passage {number}", { number: index + 1 });
 
     const removeButton = row.querySelector("[data-reading-remove-passage]");
     if (removeButton) {
       removeButton.hidden = rows.length < 2;
-      removeButton.setAttribute("aria-label", `Remove passage ${index + 1}`);
+      removeButton.setAttribute("aria-label", t("Remove passage {number}", { number: index + 1 }));
     }
   });
 
@@ -1415,8 +1415,8 @@ function addPassageRow(passage) {
     if (label) label.setAttribute("for", id);
   }
 
-  fillSelect(controls.book, (readingBooks || []).map((book) => ({ value: book.code, label: book.name })), {
-    placeholder: "Book",
+  fillSelect(controls.book, (readingBooks || []).map((book) => ({ value: book.code, label: t(book.name) })), {
+    placeholder: t("Book"),
     selected: passage?.book,
   });
 
@@ -1462,12 +1462,12 @@ function collectReadingPassages() {
   const rows = readPassageRows();
 
   if (!rows.length) {
-    showReadingError("Add at least one passage you read.", readingAddPassage);
+    showReadingError(t("Add at least one passage you read."), readingAddPassage);
     return null;
   }
 
   for (const [index, { controls, value }] of rows.entries()) {
-    const label = `Passage ${index + 1}`;
+    const label = t("Passage {number}", { number: index + 1 });
 
     if (!value.book) {
       showReadingError(`${label}: choose a book.`, controls.book);
@@ -1478,15 +1478,15 @@ function collectReadingPassages() {
       return null;
     }
     if (!value.startVerse) {
-      showReadingError(`${label}: choose the first verse.`, controls.startVerse);
+      showReadingError(t("{label}: choose the first verse.", { label }), controls.startVerse);
       return null;
     }
     if (!value.endVerse) {
-      showReadingError(`${label}: choose the last verse.`, controls.endVerse);
+      showReadingError(t("{label}: choose the last verse.", { label }), controls.endVerse);
       return null;
     }
     if (value.endVerse < value.startVerse) {
-      showReadingError(`${label}: the last verse cannot come before the first verse.`, controls.endVerse);
+      showReadingError(t("{label}: the last verse cannot come before the first verse.", { label }), controls.endVerse);
       return null;
     }
   }
@@ -1519,7 +1519,7 @@ async function openReadingModal({ save, passages = [], reflection = "" } = {}) {
   await loadBibleBooks();
 
   if (!readingBooks) {
-    showToast("Could not load the Bible books", "error");
+    showToast(t("Could not load the Bible books"), "error");
     restoreModalTrigger();
     return;
   }
@@ -1575,16 +1575,16 @@ function renderReadingSummary(status) {
   readingSummary.hidden = !hasReading;
   if (!hasReading) return;
 
-  readingSummaryBadge.textContent = "Yes";
+  readingSummaryBadge.textContent = t("Yes");
   readingSummaryBadge.dataset.answer = "yes";
-  readingSummaryNote.textContent = "You read today";
+  readingSummaryNote.textContent = t("You read today");
 
   readingSummaryRefs.replaceChildren();
   for (const passage of status.passages || []) {
     const item = document.createElement("li");
     item.className = "reading-summary-ref";
     item.setAttribute("data-reading-summary-ref", "");
-    item.textContent = passage.reference || formatPassageReference(passage);
+    item.textContent = passage.bookName ? formatPassageReference({ ...passage, bookName: t(passage.bookName) }) : passage.reference;
     readingSummaryRefs.append(item);
   }
 }
@@ -1660,13 +1660,13 @@ async function requestReadingAnswer({ answer, passages = [], reflection = "", me
   if (!result) return null;
 
   if (result.status === 409) {
-    return { status: null, error: "You already answered the reading check today", conflict: true };
+    return { status: null, error: t("You already answered the reading check today"), conflict: true };
   }
 
   if (!result.ok) {
     return {
       status: null,
-      error: result.data.errors?.[0] || result.data.error || "Could not save the reading answer",
+      error: result.data.errors?.[0] || result.data.error || t("Could not save the reading answer"),
     };
   }
 
@@ -1689,7 +1689,7 @@ async function saveReadingAnswer({ answer, passages = [], reflection = "" }) {
   }
 
   setReadingAnswerState(outcome.status);
-  showToast(answer === "YES" ? "Reading saved: yes" : "Reading saved: no");
+  showToast(answer === "YES" ? t("Reading saved: yes") : t("Reading saved: no"));
   return outcome;
 }
 
@@ -1790,7 +1790,7 @@ function setSettingsReadingState(status) {
   const answer = status?.answeredToday ? status.answer : null;
 
   if (settingsReadingCurrent) {
-    settingsReadingCurrent.textContent = answer || "Pending";
+    settingsReadingCurrent.textContent = (answer ? t(answer) : t("Pending"));
   }
 
   settingsReadingOptions.forEach((button) => {
@@ -1806,7 +1806,7 @@ function setSettingsReadingState(status) {
         const item = document.createElement("li");
         item.className = "settings-reading-ref";
         item.setAttribute("data-settings-reading-ref", "");
-        item.textContent = passage.reference || "";
+        item.textContent = passage.bookName ? formatPassageReference({ ...passage, bookName: t(passage.bookName) }) : passage.reference || "";
         return item;
       }),
     );
@@ -1819,7 +1819,7 @@ async function loadSettingsReading() {
 
   if (!result.ok) {
     setSettingsReadingState(null);
-    showToast("Could not load today's reading", "error");
+    showToast(t("Could not load today's reading"), "error");
     return;
   }
 
@@ -1846,7 +1846,7 @@ async function saveSettingsReading({ answer, passages = [], reflection = "" }) {
   }
 
   setSettingsReadingState(outcome.status);
-  showToast(answer === "YES" ? "Today's reading answer changed to yes" : "Today's reading answer changed to no");
+  showToast(answer === "YES" ? t("Today's reading answer changed to yes") : t("Today's reading answer changed to no"));
   return outcome;
 }
 
@@ -1862,13 +1862,13 @@ function getSettingsReadingConfirmModal() {
     <div class="settings-confirm-backdrop" data-settings-reading-cancel></div>
     <div class="settings-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-reading-confirm-title">
       <header class="settings-confirm-head">
-        <p class="dashboard-label">Today's Bible reading</p>
-        <h2 id="settings-reading-confirm-title">Are you sure?</h2>
+        <p class="dashboard-label">${t("Today's Bible reading")}</p>
+        <h2 id="settings-reading-confirm-title">${t("Are you sure?")}</h2>
         <p data-settings-reading-confirm-copy></p>
       </header>
       <div class="settings-confirm-actions">
-        <button class="ui-button ui-button--secondary" type="button" data-settings-reading-cancel>Cancel</button>
-        <button class="ui-button ui-button--primary" type="button" data-settings-reading-confirm>Change</button>
+        <button class="ui-button ui-button--secondary" type="button" data-settings-reading-cancel>${t("Cancel")}</button>
+        <button class="ui-button ui-button--primary" type="button" data-settings-reading-confirm>${t("Change")}</button>
       </div>
     </div>
   `;
@@ -1884,8 +1884,8 @@ function openSettingsReadingConfirmModal(answer) {
   const copy = modal.querySelector("[data-settings-reading-confirm-copy]");
   if (copy) {
     copy.textContent = settingsReadingStatus?.answer === "YES"
-      ? "Changing today's Bible reading answer to NO will remove today's saved passages and reflection."
-      : "Set today's Bible reading answer to NO?";
+      ? t("Changing today's Bible reading answer to NO will remove today's saved passages and reflection.")
+      : t("Set today's Bible reading answer to NO?");
   }
 
   modal.querySelectorAll("[data-settings-reading-confirm], [data-settings-reading-cancel]").forEach((button) => {
@@ -1991,9 +1991,9 @@ function dailyGoalErrorMessage(result, fallback) {
 function validateDailyGoalText(value) {
   const text = String(value || "").trim();
 
-  if (!text) return { text: null, error: "Write what you want to complete" };
+  if (!text) return { text: null, error: t("Write what you want to complete") };
   if (text.length > DAILY_GOAL_TEXT_MAX) {
-    return { text: null, error: `Keep the goal under ${DAILY_GOAL_TEXT_MAX} characters` };
+    return { text: null, error: t("Keep the goal under {max} characters", { max: DAILY_GOAL_TEXT_MAX }) };
   }
 
   return { text, error: null };
@@ -2039,8 +2039,8 @@ function buildDailyGoalRow(goal) {
   editLabel.setAttribute("for", editInputId);
 
   actions.hidden = goal.completed;
-  row.querySelector("[data-daily-goal-edit]")?.setAttribute("aria-label", `Edit goal: ${goal.text}`);
-  row.querySelector("[data-daily-goal-remove]")?.setAttribute("aria-label", `Remove goal: ${goal.text}`);
+  row.querySelector("[data-daily-goal-edit]")?.setAttribute("aria-label", t("Edit goal: {text}", { text: goal.text }));
+  row.querySelector("[data-daily-goal-remove]")?.setAttribute("aria-label", t("Remove goal: {text}", { text: goal.text }));
 
   return row;
 }
@@ -2053,10 +2053,10 @@ function renderDailyGoals(summary) {
 
   dailyGoalList.replaceChildren(...goals.map(buildDailyGoalRow));
 
-  if (dailyGoalCount) dailyGoalCount.textContent = `${summary.total} of ${summary.limit}`;
+  if (dailyGoalCount) dailyGoalCount.textContent = t("{done} of {total}", { done: summary.total, total: summary.limit });
   if (dailyGoalEmpty) dailyGoalEmpty.hidden = goals.length > 0;
   if (dailyGoalProgress) {
-    dailyGoalProgress.textContent = goals.length ? `${summary.completedCount} of ${summary.total} completed` : "";
+    dailyGoalProgress.textContent = goals.length ? t("{done} of {total} completed", { done: summary.completedCount, total: summary.total }) : "";
   }
   if (dailyGoalAddButton) {
     dailyGoalAddButton.hidden = summary.remainingSlots === 0 || !dailyGoalComposer?.hidden;
@@ -2126,14 +2126,14 @@ async function submitDailyGoalComposer() {
   if (!result) return;
 
   if (!result.ok) {
-    showToast(dailyGoalErrorMessage(result, "Could not add the goal"), "error");
+    showToast(dailyGoalErrorMessage(result, t("Could not add the goal")), "error");
     if (result.status === 409) await loadDailyGoals();
     return;
   }
 
   applyDailyGoalSummary(result.data);
   closeDailyGoalComposer({ clear: true, restoreFocus: true });
-  showToast("Goal added");
+  showToast(t("Goal added"));
 }
 
 function setDailyGoalRowBusy(row, isBusy) {
@@ -2207,7 +2207,7 @@ async function submitDailyGoalEdit(row) {
   if (!result) return;
 
   if (!result.ok) {
-    showToast(dailyGoalErrorMessage(result, "Could not update the goal"), "error");
+    showToast(dailyGoalErrorMessage(result, t("Could not update the goal")), "error");
     if (result.status === 404 || result.status === 409) await loadDailyGoals();
     else editInput?.focus();
     return;
@@ -2215,7 +2215,7 @@ async function submitDailyGoalEdit(row) {
 
   applyDailyGoalSummary(result.data);
   restoreDailyGoalFocus({ id: String(id), control: "edit" });
-  showToast("Goal updated");
+  showToast(t("Goal updated"));
 }
 
 async function removeDailyGoal(row) {
@@ -2230,13 +2230,13 @@ async function removeDailyGoal(row) {
   if (!result) return;
 
   if (!result.ok) {
-    showToast(dailyGoalErrorMessage(result, "Could not remove the goal"), "error");
+    showToast(dailyGoalErrorMessage(result, t("Could not remove the goal")), "error");
     if (result.status === 404 || result.status === 409) await loadDailyGoals();
     return;
   }
 
   applyDailyGoalSummary(result.data);
-  showToast("Goal removed");
+  showToast(t("Goal removed"));
   (dailyGoalAddButton?.hidden ? dailyGoalsRoot : dailyGoalAddButton)?.focus();
 }
 
@@ -2267,14 +2267,14 @@ async function toggleDailyGoalCompletion(checkbox) {
   if (!result.ok) {
     checkbox.checked = !completed;
     row.classList.toggle("is-completed", !completed);
-    showToast(dailyGoalErrorMessage(result, "Could not update the goal"), "error");
+    showToast(dailyGoalErrorMessage(result, t("Could not update the goal")), "error");
     if (result.status === 404 || result.status === 409) await loadDailyGoals();
     return;
   }
 
   applyDailyGoalSummary(result.data);
   restoreDailyGoalFocus(focusTarget);
-  showToast(completed ? "Goal completed" : "Goal reopened");
+  showToast(completed ? t("Goal completed") : t("Goal reopened"));
 }
 
 function setDailyGoalControlsDisabled(isDisabled) {
@@ -2416,34 +2416,34 @@ const catchUpTasksSave = document.querySelector("[data-catch-up-tasks-save]");
 
 const CATCH_UP_ACTIVITIES = {
   STRONG: {
-    name: "Strong check-in",
-    note: "Say whether you stayed strong that day.",
-    action: "Answer",
-    question: "Did you stay strong?",
-    yes: "Yes, I stayed strong",
-    no: "No, I struggled",
-    savedYes: "Strong check-in saved: yes",
-    savedNo: "Strong check-in saved: no",
+    name: t("Strong check-in"),
+    note: t("Say whether you stayed strong that day."),
+    action: t("Answer"),
+    question: t("Did you stay strong?"),
+    yes: t("Yes, I stayed strong"),
+    no: t("No, I struggled"),
+    savedYes: t("Strong check-in saved: yes"),
+    savedNo: t("Strong check-in saved: no"),
   },
   READING: {
-    name: "Bible reading",
-    note: "Record what you read, or say you did not read.",
-    action: "Answer",
-    question: "Did you read the Bible?",
-    yes: "Yes, I read",
-    no: "No, I did not read",
-    savedYes: "Reading saved: yes",
-    savedNo: "Reading saved: no",
+    name: t("Bible reading"),
+    note: t("Record what you read, or say you did not read."),
+    action: t("Answer"),
+    question: t("Did you read the Bible?"),
+    yes: t("Yes, I read"),
+    no: t("No, I did not read"),
+    savedYes: t("Reading saved: yes"),
+    savedNo: t("Reading saved: no"),
   },
   GOALS: {
-    name: "Daily tasks",
-    note: "Add the tasks you completed, or say you completed none.",
-    action: "Answer",
-    question: "What did you complete?",
+    name: t("Daily tasks"),
+    note: t("Add the tasks you completed, or say you completed none."),
+    action: t("Answer"),
+    question: t("What did you complete?"),
     yes: "",
     no: "",
-    savedYes: "Tasks saved",
-    savedNo: "Tasks saved: none completed",
+    savedYes: t("Tasks saved"),
+    savedNo: t("Tasks saved: none completed"),
   },
 };
 const CATCH_UP_TASK_LIMIT = 5;
@@ -2483,7 +2483,8 @@ function formatCatchUpDate(dateKey) {
   const date = new Date(`${dateKey}T12:00:00.000Z`);
   if (Number.isNaN(date.getTime())) return String(dateKey || "");
 
-  return date.toLocaleDateString(undefined, {
+  // The page's language, not the browser's: a Russian page shows Russian dates.
+  return date.toLocaleDateString(document.documentElement.lang || undefined, {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -2492,9 +2493,9 @@ function formatCatchUpDate(dateKey) {
 }
 
 function catchUpStatusMessage(total) {
-  if (!total) return "You are all caught up.";
+  if (!total) return t("You are all caught up.");
 
-  return `${total} ${total === 1 ? "activity" : "activities"} left to complete.`;
+  return t("{count} activities left to complete.", { count: total });
 }
 
 function getCatchUpPageState(totalCount, requestedVisibleCount) {
@@ -2526,19 +2527,19 @@ function syncCatchUpPagination({ announce = false } = {}) {
   catchUpMore.hidden = page.remainingCount === 0;
   catchUpMore.disabled = catchUpLoadingMore;
   catchUpMore.setAttribute("aria-busy", catchUpLoadingMore ? "true" : "false");
-  catchUpMore.textContent = "View more";
+  catchUpMore.textContent = t("View more");
   catchUpMore.setAttribute("aria-expanded", page.visibleCount > CATCH_UP_PAGE_SIZE ? "true" : "false");
   catchUpMore.setAttribute(
     "aria-label",
     page.remainingCount > 0
-      ? `View ${page.nextBatchCount} more missed activities; ${page.remainingCount} activities remaining`
-      : "All missed activities are shown",
+      ? t("View {next} more missed activities; {remaining} activities remaining", { next: page.nextBatchCount, remaining: page.remainingCount })
+      : t("All missed activities are shown"),
   );
 
   if (announce && catchUpPageStatus) {
     catchUpPageStatus.textContent = page.remainingCount > 0
-      ? `Showing ${page.visibleCount} of ${catchUpTotal} missed activities.`
-      : `Showing all ${catchUpTotal} missed activities.`;
+      ? t("Showing {visible} of {total} missed activities.", { visible: page.visibleCount, total: catchUpTotal })
+      : t("Showing all {total} missed activities.", { total: catchUpTotal });
   }
 }
 
@@ -2583,7 +2584,7 @@ async function showMoreCatchUp() {
     catchUpLoadingMore = false;
     if (!result?.ok) {
       syncCatchUpPagination();
-      showToast(catchUpErrorMessage(result, "Could not load more missed activities"), "error");
+      showToast(catchUpErrorMessage(result, t("Could not load more missed activities")), "error");
       return;
     }
 
@@ -2620,7 +2621,7 @@ function buildCatchUpRow(item) {
   action.dataset.catchUpDate = item.dateKey;
   action.dataset.catchUpActivity = item.activity;
   action.setAttribute("aria-haspopup", "dialog");
-  action.setAttribute("aria-label", `${copy.action} ${copy.name} for ${date}`);
+  action.setAttribute("aria-label", t("{action} {name} for {date}", { action: copy.action, name: copy.name, date }));
 
   return row;
 }
@@ -2638,7 +2639,7 @@ function renderCatchUp(payload, { announcePage = false } = {}) {
   catchUpList.replaceChildren(...items.map(buildCatchUpRow));
   syncCatchUpPagination({ announce: announcePage });
 
-  if (catchUpCount) catchUpCount.textContent = remaining ? `${remaining} left` : "";
+  if (catchUpCount) catchUpCount.textContent = remaining ? t("{count} left", { count: remaining }) : "";
   if (catchUpSummaryCount) catchUpSummaryCount.textContent = String(remaining);
   if (catchUpStatus) catchUpStatus.textContent = catchUpStatusMessage(remaining);
 }
@@ -2677,7 +2678,7 @@ async function loadCatchUp() {
   return result.data;
 }
 
-function catchUpErrorMessage(result, fallback = "Could not save that day") {
+function catchUpErrorMessage(result, fallback = t("Could not save that day")) {
   return result?.data?.errors?.[0] || result?.data?.error || fallback;
 }
 
@@ -2762,7 +2763,7 @@ async function saveMissedReading({ dateKey, answer, passages = [], reflection = 
   if (!result) return null;
 
   if (!result.ok) {
-    return { ok: false, error: catchUpErrorMessage(result, "Could not save that reading") };
+    return { ok: false, error: catchUpErrorMessage(result, t("Could not save that reading")) };
   }
 
   await applyCatchUpPayload(result.data.missedActivities, { dateKey, activity: "READING" });
@@ -2844,11 +2845,11 @@ function renumberCatchUpTasks() {
     if (input) input.id = inputId;
     if (label) {
       label.setAttribute("for", inputId);
-      label.textContent = `Task ${position}`;
+      label.textContent = t("Task {number}", { number: position });
     }
     if (remove) {
       remove.hidden = rows.length < 2;
-      remove.setAttribute("aria-label", `Remove task ${position}`);
+      remove.setAttribute("aria-label", t("Remove task {number}", { number: position }));
     }
   });
 
@@ -2886,7 +2887,7 @@ function collectCatchUpTasks() {
     const text = String(input?.value || "").trim();
 
     if (!text) {
-      showCatchUpTasksError(`Task ${index + 1}: write what you completed, or remove it.`, input);
+      showCatchUpTasksError(t("Task {number}: write what you completed, or remove it.", { number: index + 1 }), input);
       return null;
     }
 
@@ -2894,7 +2895,7 @@ function collectCatchUpTasks() {
   }
 
   if (!tasks.length) {
-    showCatchUpTasksError("Add at least one task you completed.", catchUpTasksAdd);
+    showCatchUpTasksError(t("Add at least one task you completed."), catchUpTasksAdd);
     return null;
   }
 
@@ -2944,7 +2945,7 @@ async function submitCatchUpTasksAnswer({ answer, tasks }) {
   if (!result) return;
 
   if (!result.ok) {
-    showCatchUpTasksError(catchUpErrorMessage(result, "Could not save those tasks"));
+    showCatchUpTasksError(catchUpErrorMessage(result, t("Could not save those tasks")));
     return;
   }
 
@@ -3074,7 +3075,7 @@ function startPageTransition() {
     loader.removeAttribute("aria-hidden");
     loader.setAttribute("aria-busy", "true");
     const status = loader.querySelector("[data-noor-loader-status]");
-    if (status) status.textContent = "Loading page…";
+    if (status) status.textContent = t("Loading page…");
   }, PAGE_TRANSITION_DELAY);
 }
 

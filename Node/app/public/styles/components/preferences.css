@@ -1,0 +1,100 @@
+/* Language and colour scheme: rows of segments, the chosen one reversed.
+ *
+ * Two tones, because the same form sits on the page (sign-in, Settings) and
+ * inside the black header (account panel, phone menu). Each tone only re-points
+ * the five local colours; the geometry and every state are shared.
+ */
+
+.preferences {
+  --preferences-line: var(--rule-strong);
+  --preferences-text: var(--ink-muted);
+  --preferences-on: var(--ink);
+  --preferences-on-text: var(--on-action);
+  --preferences-hover: var(--ink-06);
+
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.preferences--chrome {
+  --preferences-line: var(--white-18);
+  --preferences-text: var(--white-72);
+  --preferences-on: var(--white);
+  --preferences-on-text: var(--field);
+  --preferences-hover: var(--white-10);
+  --focus-ring-color: var(--focus-ring-on-deep);
+}
+
+.preferences-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.preferences-legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  color: var(--preferences-text);
+  font-family: var(--font-data);
+  font-size: var(--text-mark);
+  letter-spacing: var(--tracking-mark);
+  text-transform: uppercase;
+}
+
+/* Wraps rather than truncates: "Системная" is half as long again as "System". */
+.preferences-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.preferences-option {
+  flex: 1 1 auto;
+  min-height: var(--tap-min);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--preferences-line);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--preferences-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-label);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-ui) var(--ease-out),
+    color var(--duration-ui) var(--ease-out),
+    transform var(--duration-press) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .preferences-option:hover {
+    background: var(--preferences-hover);
+    color: var(--preferences-on);
+  }
+}
+
+.preferences-option:active {
+  transform: scale(0.97);
+}
+
+.preferences-option[aria-pressed="true"] {
+  border-color: var(--preferences-on);
+  background: var(--preferences-on);
+  color: var(--preferences-on-text);
+  font-weight: var(--weight-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preferences-option:active {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .preferences-option[aria-pressed="true"] {
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+}

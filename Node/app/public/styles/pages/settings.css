@@ -182,7 +182,7 @@
 .settings-answer-no[aria-pressed="true"] {
   border: 0;
   background: var(--ink);
-  color: var(--white);
+  color: var(--on-action);
 }
 
 .settings-answer-button:disabled {

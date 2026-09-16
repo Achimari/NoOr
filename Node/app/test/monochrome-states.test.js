@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { sourceCopy } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const readRaw = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 const read = (relative) => readRaw(relative).replace(/\/\*[\s\S]*?\*\//g, "");
@@ -129,7 +131,7 @@ describe("states are distinguished without hue", () => {
   });
 
   it("labels every meter it draws, so a bar is never the only statement of a value", () => {
-    const hud = readRaw("src/views/components/game/battle-hud.ejs");
+    const hud = sourceCopy(readRaw("src/views/components/game/battle-hud.ejs"));
     for (const label of ["HP", "Mana", "Resolve"]) {
       assert.ok(hud.includes(`>${label}<`), `${label} must be named beside its own meter`);
     }

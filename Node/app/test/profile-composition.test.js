@@ -49,8 +49,8 @@ describe("Profile reads as a character sheet", () => {
     assert.match(html, /data-allocation-step="1"/);
     assert.match(html, /data-allocation-remaining[^>]*role="status"/, "the remaining count stays a live region");
     assert.match(html, /profile\.allocation\.locked \? "disabled" : ""/, "the lock still disables the steppers");
-    assert.match(html, /aria-label="Add a point to <%= stat %>"/, "and each stepper still names itself");
-    assert.match(html, /aria-label="Remove a point from <%= stat %>"/);
+    assert.match(html, /aria-label="<%= t\("Add a point to \{stat\}", \{ stat: statName \}\) %>"/, "and each stepper still names itself");
+    assert.match(html, /aria-label="<%= t\("Remove a point from \{stat\}", \{ stat: statName \}\) %>"/);
   });
 
   it("keeps the derived values, spells, privacy and Today summary on the page", () => {

@@ -5,7 +5,7 @@ import { getTimezoneLabel } from "../utils/timezones.js";
 function renderSettings(res, status = 200, data = {}) {
   return res.status(status).render("pages/settings", {
     pageId: "settings",
-    title: "Settings",
+    title: res.locals.t("Settings"),
     nicknameErrors: data.nicknameErrors || [],
     passwordErrors: data.passwordErrors || [],
     nicknameSuccess: data.nicknameSuccess || "",
@@ -19,11 +19,12 @@ function renderSettings(res, status = 200, data = {}) {
 export function renderSettingsPage(req, res) {
   const isNicknameUpdated = req.query.updated === "nickname";
   const isPasswordUpdated = req.query.updated === "password";
+  const { t } = res.locals;
 
   return renderSettings(res, 200, {
-    nicknameSuccess: isNicknameUpdated ? "Nickname updated." : "",
-    passwordSuccess: isPasswordUpdated ? "Password updated." : "",
-    toastMessage: isNicknameUpdated ? "Nickname updated" : isPasswordUpdated ? "Password updated" : "",
+    nicknameSuccess: isNicknameUpdated ? t("Nickname updated.") : "",
+    passwordSuccess: isPasswordUpdated ? t("Password updated.") : "",
+    toastMessage: isNicknameUpdated ? t("Nickname updated") : isPasswordUpdated ? t("Password updated") : "",
   });
 }
 
@@ -50,8 +51,8 @@ export async function updateCurrentUserName(req, res) {
   } catch (error) {
     if (error instanceof AppError) {
       return renderSettings(res, error.statusCode, {
-        nicknameErrors: [error.message],
-        toastMessage: error.message,
+        nicknameErrors: [res.locals.t(error.message)],
+        toastMessage: res.locals.t(error.message),
         toastVariant: "error",
         values: req.body,
       });
@@ -81,8 +82,8 @@ export async function updateCurrentUserPassword(req, res) {
   } catch (error) {
     if (error instanceof AppError) {
       return renderSettings(res, error.statusCode, {
-        passwordErrors: [error.message],
-        toastMessage: error.message,
+        passwordErrors: [res.locals.t(error.message)],
+        toastMessage: res.locals.t(error.message),
         toastVariant: "error",
       });
     }

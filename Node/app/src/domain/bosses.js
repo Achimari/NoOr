@@ -171,19 +171,38 @@ function previewFor(state, descriptor) {
           return { estimatedDamage: effect.amount, effectSummary: null };
         case "STRIP_GUARD":
           return { estimatedDamage: effect.damage, effectSummary: "Removes your guard." };
+        /* A summary built from values also carries its template, so the browser
+           can say it in the reader's language (see previewMessage in combat.js). */
         case "BURN":
           return {
             estimatedDamage: null,
             effectSummary: `${effect.damage} at the start of each of your next ${effect.turns} turns.`,
+            effectMessage: { key: "{damage} at the start of each of your next {turns} turns.", params: { damage: effect.damage, turns: effect.turns } },
           };
         case "SHIELD":
-          return { estimatedDamage: null, effectSummary: `Absorbs the next ${effect.amount} damage.` };
+          return {
+            estimatedDamage: null,
+            effectSummary: `Absorbs the next ${effect.amount} damage.`,
+            effectMessage: { key: "Absorbs the next {amount} damage.", params: { amount: effect.amount } },
+          };
         case "SLOW":
-          return { estimatedDamage: null, effectSummary: `Pushes you ${effect.gauge} back on the gauge.` };
+          return {
+            estimatedDamage: null,
+            effectSummary: `Pushes you ${effect.gauge} back on the gauge.`,
+            effectMessage: { key: "Pushes you {gauge} back on the gauge.", params: { gauge: effect.gauge } },
+          };
         case "HEAL":
-          return { estimatedDamage: null, effectSummary: `Recovers ${effect.amount} health.` };
+          return {
+            estimatedDamage: null,
+            effectSummary: `Recovers ${effect.amount} health.`,
+            effectMessage: { key: "Recovers {amount} health.", params: { amount: effect.amount } },
+          };
         case "RESTORE":
-          return { estimatedDamage: null, effectSummary: `Recovers ${effect.health} health and ${effect.gauge} gauge.` };
+          return {
+            estimatedDamage: null,
+            effectSummary: `Recovers ${effect.health} health and ${effect.gauge} gauge.`,
+            effectMessage: { key: "Recovers {health} health and {gauge} gauge.", params: { health: effect.health, gauge: effect.gauge } },
+          };
         default:
           return { estimatedDamage: null, effectSummary: null };
       }
@@ -194,7 +213,7 @@ function previewFor(state, descriptor) {
 }
 
 function toIntent(state, descriptor, phaseKey) {
-  const { estimatedDamage, effectSummary } = previewFor(state, descriptor);
+  const { estimatedDamage, effectSummary, effectMessage = null } = previewFor(state, descriptor);
 
   return {
     action: descriptor.action,
@@ -203,6 +222,7 @@ function toIntent(state, descriptor, phaseKey) {
     severity: descriptor.severity,
     estimatedDamage,
     effectSummary,
+    effectMessage,
     counter: descriptor.counter,
     phase: phaseKey,
   };
@@ -262,6 +282,7 @@ export function toPublicIntent(intent) {
     severity: intent.severity,
     estimatedDamage: intent.estimatedDamage ?? null,
     effectSummary: intent.effectSummary ?? null,
+    effectMessage: intent.effectMessage ?? null,
     counter: intent.counter,
     phase: intent.phase,
   };

@@ -28,7 +28,7 @@ async function renderLogin(locals = {}) {
       "auth.login.passwordLabel": "Password",
       "auth.login.submit": "Sign in",
       "auth.login.onboardingLink": "Create an account",
-    })[key] ?? "",
+    })[key] ?? sharedViewLocals.t(key),
     ...locals,
   });
 }

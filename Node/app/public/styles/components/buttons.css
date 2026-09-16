@@ -167,11 +167,11 @@
   animation: ui-button-spin 620ms linear infinite;
 }
 
-/* The spinner rides whatever the control's own ground is: white on the filled
-   primary, ink on the paper-ground destructive control. */
+/* The spinner rides whatever the control's own ground is: the reversed paper on
+   the filled primary, ink on the paper-ground destructive control. */
 .ui-button--primary[data-loading="true"]::after,
 .ui-button--accent[data-loading="true"]::after {
-  color: var(--white);
+  color: var(--on-action);
 }
 
 @keyframes ui-button-spin {

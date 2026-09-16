@@ -15,11 +15,11 @@
   const STATUS_CODES = ["STATUS_APPLIED", "STATUS_REFRESHED", "STATUS_CONSUMED", "STATUS_BONUS"];
 
   const STATUS_WORDS = {
-    GUARD: "Guard",
-    SHIELD: "Shield",
-    BURN: "Burn",
-    EXPOSED: "Exposed",
-    RIPOSTE: "Riposte",
+    GUARD: t("Guard"),
+    SHIELD: t("Shield"),
+    BURN: t("Burn"),
+    EXPOSED: t("Exposed"),
+    RIPOSTE: t("Riposte"),
   };
 
   const POST_CODES = {
@@ -38,10 +38,10 @@
   };
 
   const ACTION_WORDS = {
-    ATTACK: "attack",
-    DEFEND: "guard",
-    BREAK: "break your guard",
-    SURGE: "surge",
+    ATTACK: t("attack"),
+    DEFEND: t("guard"),
+    BREAK: t("break your guard"),
+    SURGE: t("surge"),
   };
 
   function compileBeats(entries) {
@@ -241,100 +241,102 @@
 
   function moveNameFor(plan, spellName) {
     switch (plan.kind) {
-      case "attack": return "Attack";
-      case "guard": return "Guard";
-      case "break": return "Break";
-      case "surge": return "Surge";
+      case "attack": return t("Attack");
+      case "guard": return t("Guard");
+      case "break": return t("Break");
+      case "surge": return t("Surge");
       case "cast": return spellName(plan.spellKey);
-      case "forfeit": return "Forfeit";
-      case "timeout": return "Out of time";
+      case "forfeit": return t("Forfeit");
+      case "timeout": return t("Out of time");
       default: return "";
     }
   }
 
   const PHASE_BANNERS = {
-    STEADY: "holds its ground",
-    PRESSURE: "presses harder",
-    LAST_STAND: "gathers everything it has left",
+    STEADY: "{who} holds its ground",
+    PRESSURE: "{who} presses harder",
+    LAST_STAND: "{who} gathers everything it has left",
   };
 
   function bannerFor(plan, names, spellName) {
     if (plan.kind === "phase") {
-      const who = names[plan.actor] || "The trial";
-      return `${who} ${PHASE_BANNERS[plan.phase] || "changes"}`.trim();
+      const who = names[plan.actor] || t("The trial");
+      return t(PHASE_BANNERS[plan.phase] || "{who} changes", { who }).trim();
     }
-    if (plan.kind === "burn") return `${names[plan.target] || ""} is burning`.trim();
+    if (plan.kind === "burn") return t("{who} is burning", { who: names[plan.target] || "" }).trim();
     if (plan.kind === "effects") return "";
 
     const who = names[plan.actor] || "";
     const move = moveNameFor(plan, spellName);
     if (!move) return "";
-    if (plan.kind === "cast") return `${who} cast ${move}`.trim();
-    if (plan.kind === "timeout") return `${who} ran out of time`.trim();
+    if (plan.kind === "cast") return t("{who} cast {move}", { who, move }).trim();
+    if (plan.kind === "timeout") return t("{who} ran out of time", { who }).trim();
 
-    return `${who} used ${move}`.trim();
+    return t("{who} used {move}", { who, move }).trim();
   }
 
   function announceFor(plan, names, spellName) {
-    const actor = plan.actor === "you" ? "You" : names.them || "Your opponent";
-    const target = plan.target === "you" ? "you" : names.them || "your opponent";
+    const actor = plan.actor === "you" ? t("You") : names.them || t("Your opponent");
+    const target = plan.target === "you" ? "you" : names.them || t("your opponent");
     const parts = [];
 
     switch (plan.kind) {
       case "attack":
-        parts.push(`${actor} attacked for ${plan.damage} damage.`);
+        parts.push(t("{actor} attacked for {damage} damage.", { actor, damage: plan.damage }));
         break;
       case "break":
         parts.push(plan.guardBroken
-          ? `${actor} broke the guard for ${plan.damage} damage.`
-          : `${actor} broke early for only ${plan.damage} damage.`);
+          ? t("{actor} broke the guard for {damage} damage.", { actor, damage: plan.damage })
+          : t("{actor} broke early for only {damage} damage.", { actor, damage: plan.damage }));
         break;
       case "surge":
-        parts.push(`${actor} surged for ${plan.damage} damage.`);
+        parts.push(t("{actor} surged for {damage} damage.", { actor, damage: plan.damage }));
         break;
       case "guard":
-        parts.push(`${actor} took a defensive stance.`);
+        parts.push(t("{actor} took a defensive stance.", { actor }));
         break;
       case "cast":
-        parts.push(`${actor} cast ${spellName(plan.spellKey)}.`);
-        if (plan.damage > 0) parts.push(`It dealt ${plan.damage} damage.`);
-        if (plan.heal > 0) parts.push(`Recovered ${plan.heal} health.`);
-        if (plan.shield > 0) parts.push(`Shield of ${plan.shield}.`);
-        if (plan.slowed) parts.push("The opponent was slowed.");
-        if (plan.burnTurns > 0) parts.push(`A lingering effect for ${plan.burnTurns} turns.`);
+        parts.push(t("{actor} cast {spell}.", { actor, spell: spellName(plan.spellKey) }));
+        if (plan.damage > 0) parts.push(t("It dealt {damage} damage.", { damage: plan.damage }));
+        if (plan.heal > 0) parts.push(t("Recovered {heal} health.", { heal: plan.heal }));
+        if (plan.shield > 0) parts.push(t("Shield of {shield}.", { shield: plan.shield }));
+        if (plan.slowed) parts.push(t("The opponent was slowed."));
+        if (plan.burnTurns > 0) parts.push(t("A lingering effect for {turns} turns.", { turns: plan.burnTurns }));
         break;
       case "burn":
-        parts.push(`${plan.target === "you" ? "You" : names.them || "Your opponent"} took ${plan.damage} lingering damage.`);
+        parts.push(t("{target} took {damage} lingering damage.", { target: plan.target === "you" ? t("You") : names.them || t("Your opponent"), damage: plan.damage }));
         break;
       case "forfeit":
-        parts.push(`${actor} forfeited.`);
+        parts.push(t("{actor} forfeited.", { actor }));
         break;
       case "timeout":
-        parts.push(`${actor} ran out of time.`);
+        parts.push(t("{actor} ran out of time.", { actor }));
         break;
       case "phase":
-        parts.push(`${plan.actor === "you" ? "You" : names.them || "The trial"} ${PHASE_BANNERS[plan.phase] || "changed"}.`);
+        parts.push(t(`${PHASE_BANNERS[plan.phase] || "{who} changed"}.`, { who: plan.actor === "you" ? t("You") : names.them || t("The trial") }));
         break;
       default:
         break;
     }
 
     for (const key of plan.statusConsumed) {
-      parts.push(`${STATUS_WORDS[key] || key} was spent${plan.statusBonus > 0 ? ` for ${plan.statusBonus} more damage` : ""}.`);
+      parts.push(plan.statusBonus > 0
+        ? t("{status} was spent for {bonus} more damage.", { status: STATUS_WORDS[key] || key, bonus: plan.statusBonus })
+        : t("{status} was spent.", { status: STATUS_WORDS[key] || key }));
     }
     for (const key of plan.statusApplied) {
       parts.push(key === "RIPOSTE"
-        ? "A Riposte is ready."
-        : `${target === "you" ? "You are" : "They are"} ${(STATUS_WORDS[key] || key).toLowerCase()}.`);
+        ? t("A Riposte is ready.")
+        : t(target === "you" ? "You are {status}." : "They are {status}.", { status: (STATUS_WORDS[key] || key).toLowerCase() }));
     }
     for (const key of plan.statusRefreshed) {
-      parts.push(`${(STATUS_WORDS[key] || key)} was refreshed.`);
+      parts.push(t("{status} was refreshed.", { status: STATUS_WORDS[key] || key }));
     }
-    if (plan.guardAbsorbed) parts.push(`A guard absorbed part of the hit on ${target}.`);
-    if (plan.guardBroken && plan.kind !== "break") parts.push("The guard was stripped.");
-    if (plan.shieldAbsorbed > 0) parts.push(`A shield absorbed ${plan.shieldAbsorbed}.`);
+    if (plan.guardAbsorbed) parts.push(t("A guard absorbed part of the hit on {target}.", { target: target === "you" ? t("you") : target }));
+    if (plan.guardBroken && plan.kind !== "break") parts.push(t("The guard was stripped."));
+    if (plan.shieldAbsorbed > 0) parts.push(t("A shield absorbed {amount}.", { amount: plan.shieldAbsorbed }));
     for (const gain of plan.resolveGains) {
-      if (gain.amount > 0) parts.push(`${gain.side === "you" ? "You" : "They"} gained ${gain.amount} Resolve.`);
+      if (gain.amount > 0) parts.push(t(gain.side === "you" ? "You gained {amount} Resolve." : "They gained {amount} Resolve.", { amount: gain.amount }));
     }
 
     return parts.join(" ");
@@ -630,7 +632,7 @@
         mark: status.icon,
         state: status.key,
         label: [
-          status.label,
+          t(status.label),
           status.turns ? `${status.turns}` : "",
           status.amount && !status.turns ? `${status.amount}` : "",
         ].filter(Boolean).join(" "),
@@ -638,9 +640,9 @@
     }
 
     const chips = [];
-    if (view.defending) chips.push({ mark: "guard", label: "Guard", state: "GUARD" });
-    if (view.shield > 0) chips.push({ mark: "shield", label: `Shield ${view.shield}`, state: "SHIELD" });
-    if (view.burnTurns > 0) chips.push({ mark: "burn", label: `Burn ${view.burnTurns}`, state: "BURN" });
+    if (view.defending) chips.push({ mark: "guard", label: t("Guard"), state: "GUARD" });
+    if (view.shield > 0) chips.push({ mark: "shield", label: `${t("Shield")} ${view.shield}`, state: "SHIELD" });
+    if (view.burnTurns > 0) chips.push({ mark: "burn", label: `${t("Burn")} ${view.burnTurns}`, state: "BURN" });
 
     return chips;
   }
@@ -652,7 +654,7 @@
     const chips = chipsFor(view);
 
     const ratio = view.maxHealth > 0 ? view.health / view.maxHealth : 1;
-    if (ratio > 0 && ratio <= 0.25) chips.push({ mark: "danger", label: "Low health", state: "danger" });
+    if (ratio > 0 && ratio <= 0.25) chips.push({ mark: "danger", label: t("Low health"), state: "danger" });
 
     list.textContent = "";
     for (const chip of chips) {
@@ -703,8 +705,8 @@
   }
 
   function spellName(key) {
-    if (!key) return "a spell";
-    return SPELL_LABELS.get(key) || String(key).replace(/-/g, " ");
+    if (!key) return t("a spell");
+    return SPELL_LABELS.has(key) ? t(SPELL_LABELS.get(key)) : String(key).replace(/-/g, " ");
   }
 
   function renderSpells(battle) {
@@ -735,10 +737,10 @@
         const head = document.createElement("span");
         head.className = "battle-spell-head";
         const label = document.createElement("span");
-        label.textContent = spell.name;
+        label.textContent = t(spell.name);
         const price = document.createElement("span");
         price.className = "battle-spell-cost";
-        price.textContent = `${spell.manaCost} mana`;
+        price.textContent = t("{cost} mana", { cost: spell.manaCost });
         head.append(label, price);
 
         const preview = document.createElement("span");
@@ -766,8 +768,8 @@
       const preview = button.querySelector("[data-spell-preview]");
       if (preview) {
         preview.textContent = [
-          spell.preview,
-          spell.cooldownTurns ? `Cooldown ${spell.cooldownTurns}.` : "",
+          spell.previewMessage ? t(spell.previewMessage.key, spell.previewMessage.params) : spell.preview,
+          spell.cooldownTurns ? t("Cooldown {turns}.", { turns: spell.cooldownTurns }) : "",
         ].filter(Boolean).join(" ");
       }
 
@@ -779,12 +781,14 @@
         reason.textContent = !button.disabled
           ? ""
           : completed
-            ? "This battle is over."
+            ? t("This battle is over.")
             : blocked
-              ? spell.reason || "Not available"
+              ? (spell.cooldownRemaining > 0
+                ? t("{count} turns", { count: spell.cooldownRemaining })
+                : spell.reason ? t("Needs {cost} mana", { cost: spell.manaCost }) : t("Not available"))
               : resolving || busy
-                ? "Resolving the last action."
-                : "Waiting for your opponent's turn.";
+                ? t("Resolving the last action.")
+                : t("Waiting for your opponent's turn.");
       }
     }
   }
@@ -806,10 +810,10 @@
       const reason = root.querySelector(`[data-move-reason="${action}"]`);
       if (reason) {
         if (!button.disabled) reason.textContent = "";
-        else if (completed) reason.textContent = "This battle is over.";
-        else if (blockedBySurge) reason.textContent = `Needs ${surgeCost} Resolve. You have ${resolve}.`;
-        else if (resolving || busy) reason.textContent = "Resolving the last action.";
-        else reason.textContent = "Waiting for your opponent's turn.";
+        else if (completed) reason.textContent = t("This battle is over.");
+        else if (blockedBySurge) reason.textContent = t("Needs {cost} Resolve. You have {resolve}.", { cost: surgeCost, resolve });
+        else if (resolving || busy) reason.textContent = t("Resolving the last action.");
+        else reason.textContent = t("Waiting for your opponent's turn.");
       }
     }
 
@@ -823,7 +827,7 @@
       const show = !completed && supported.includes("SURGE") && !canAffordSurge;
       surgeHint.hidden = !show;
       surgeHint.textContent = show
-        ? `Surge needs ${surgeCost} Resolve; you have ${resolve}. Attacking banks 20, and a guard that absorbs a hit banks 25.`
+        ? t("Surge needs {cost} Resolve; you have {resolve}. Attacking banks 20, and a guard that absorbs a hit banks 25.", { cost: surgeCost, resolve })
         : "";
     }
 
@@ -831,10 +835,10 @@
   }
 
   const SEVERITY_WORDS = {
-    LIGHT: "Light",
-    STANDARD: "Standard",
-    HEAVY: "Heavy",
-    CONTROL: "Control",
+    LIGHT: t("Light"),
+    STANDARD: t("Standard"),
+    HEAVY: t("Heavy"),
+    CONTROL: t("Control"),
   };
 
   function renderIntent(battle) {
@@ -855,7 +859,7 @@
 
     if (typeof intent === "string") {
       intentChip.removeAttribute("data-severity");
-      if (intentLabel) intentLabel.textContent = `Next: ${ACTION_WORDS[intent] || intent.toLowerCase()}`;
+      if (intentLabel) intentLabel.textContent = t("Next: {move}", { move: ACTION_WORDS[intent] || intent.toLowerCase() });
       if (intentPreview) intentPreview.textContent = "";
       if (intentSeverity) intentSeverity.textContent = "";
       if (intentCounter) intentCounter.textContent = "";
@@ -863,14 +867,14 @@
     }
 
     intentChip.dataset.severity = intent.severity;
-    if (intentLabel) intentLabel.textContent = `Next: ${intent.label}`;
+    if (intentLabel) intentLabel.textContent = t("Next: {move}", { move: t(intent.label) });
     if (intentPreview) {
       intentPreview.textContent = intent.estimatedDamage !== null && intent.estimatedDamage !== undefined
-        ? `${intent.estimatedDamage} damage`
-        : intent.effectSummary || "";
+        ? t("{damage} damage", { damage: intent.estimatedDamage })
+        : intent.effectMessage ? t(intent.effectMessage.key, intent.effectMessage.params) : t(intent.effectSummary || "");
     }
     if (intentSeverity) intentSeverity.textContent = SEVERITY_WORDS[intent.severity] || intent.severity;
-    if (intentCounter) intentCounter.textContent = intent.counter || "";
+    if (intentCounter) intentCounter.textContent = t(intent.counter || "");
   }
 
   let phaseTimer = null;
@@ -916,8 +920,8 @@
 
   function currentNames() {
     return {
-      you: committedBattle?.you?.name || "You",
-      them: committedBattle?.them?.name || "Opponent",
+      you: committedBattle?.you?.name || t("You"),
+      them: t(committedBattle?.them?.name || "Opponent"),
     };
   }
 
@@ -938,8 +942,8 @@
     modes?.setAttribute("hidden", "");
     active?.removeAttribute("hidden");
 
-    text("[data-you-name]", battle.you.name || "You");
-    text("[data-them-name]", battle.them.name || "Opponent");
+    text("[data-you-name]", battle.you.name || t("You"));
+    text("[data-them-name]", t(battle.them.name || "Opponent"));
 
     syncArt(battle, "you");
     syncArt(battle, "them");
@@ -972,13 +976,13 @@
     }
 
     const won = battle.outcome === "WIN";
-    if (outcomeTitle) outcomeTitle.textContent = won ? "Victory" : "Defeat";
+    if (outcomeTitle) outcomeTitle.textContent = won ? t("Victory") : t("Defeat");
     if (outcomeText) {
       outcomeText.textContent = won
-        ? "The trial gave way. Nothing was won but the ground you stood on."
-        : "It held this time. Nothing was lost but the attempt.";
+        ? t("The trial gave way. Nothing was won but the ground you stood on.")
+        : t("It held this time. Nothing was lost but the attempt.");
     }
-    if (outcomeAction) outcomeAction.textContent = battle.mode === "PVE" ? "Return to trials" : "Return to battle";
+    if (outcomeAction) outcomeAction.textContent = battle.mode === "PVE" ? t("Return to trials") : t("Return to battle");
     outcomePanel.hidden = false;
   }
 
@@ -1191,7 +1195,7 @@
 
     if (plan.kind === "guard" && actor) {
       setPose(actor, "guard");
-      popToken(actor, "Guard");
+      popToken(actor, t("Guard"));
     }
 
     if (strikes && target) {
@@ -1276,23 +1280,23 @@
   function paintCallouts(plan) {
     if (plan.damage > 0 && plan.target) popNumber(plan.target, plan.damage, "damage", plan.tier);
     if (plan.heal > 0 && plan.target) popNumber(plan.target, plan.heal, "heal", "small");
-    if (plan.guardAbsorbed && plan.target) popToken(plan.target, "Guard absorbed");
-    if (plan.guardBroken && plan.target && plan.kind !== "cast") popToken(plan.target, "Guard broken");
-    if (plan.shieldAbsorbed > 0 && plan.target) popToken(plan.target, `Shield ${plan.shieldAbsorbed}`);
-    if (plan.shield > 0 && plan.target) popToken(plan.target, `Shield ${plan.shield}`);
-    if (plan.slowed && plan.target) popToken(plan.target, "Slowed");
-    if (plan.burnTurns > 0 && plan.target) popToken(plan.target, `Burn ${plan.burnTurns}`);
+    if (plan.guardAbsorbed && plan.target) popToken(plan.target, t("Guard absorbed"));
+    if (plan.guardBroken && plan.target && plan.kind !== "cast") popToken(plan.target, t("Guard broken"));
+    if (plan.shieldAbsorbed > 0 && plan.target) popToken(plan.target, `${t("Shield")} ${plan.shieldAbsorbed}`);
+    if (plan.shield > 0 && plan.target) popToken(plan.target, `${t("Shield")} ${plan.shield}`);
+    if (plan.slowed && plan.target) popToken(plan.target, t("Slowed"));
+    if (plan.burnTurns > 0 && plan.target) popToken(plan.target, `${t("Burn")} ${plan.burnTurns}`);
     for (const gain of plan.resolveGains) {
-      if (gain.amount > 0) popToken(gain.side, `+${gain.amount} Resolve`);
+      if (gain.amount > 0) popToken(gain.side, `+${gain.amount} ${t("Resolve")}`);
     }
     for (const key of plan.statusApplied) {
       popToken(key === "RIPOSTE" ? plan.actor || plan.target : plan.target, STATUS_WORDS[key] || key);
     }
     for (const key of plan.statusRefreshed) {
-      popToken(key === "RIPOSTE" ? plan.actor || plan.target : plan.target, `${STATUS_WORDS[key] || key} refreshed`);
+      popToken(key === "RIPOSTE" ? plan.actor || plan.target : plan.target, t("{status} refreshed", { status: STATUS_WORDS[key] || key }));
     }
     for (const key of plan.statusConsumed) {
-      popToken(plan.actor, `${STATUS_WORDS[key] || key} spent`);
+      popToken(plan.actor, t("{status} spent", { status: STATUS_WORDS[key] || key }));
     }
   }
 
@@ -1389,7 +1393,7 @@
 
   async function runSequence(script, next) {
     const generation = animationGeneration;
-    const names = { you: next.you.name || "You", them: next.them.name || "Opponent" };
+    const names = { you: next.you.name || t("You"), them: t(next.them.name || "Opponent") };
     const plans = script.beats.map((beat) => planBeat(beat, { yourSide: next.yourSide, names, spellName }));
 
     if (script.endsBattle && plans.length) {
@@ -1487,7 +1491,7 @@
       button.disabled = true;
     }
     for (const reason of root.querySelectorAll("[data-move-reason]")) {
-      reason.textContent = "Resolving the last action.";
+      reason.textContent = t("Resolving the last action.");
     }
   }
 
@@ -1519,7 +1523,7 @@
     if (!result) return;
 
     if (!result.ok) {
-      showError(result.data.error || result.data.errors?.[0] || "That move was not accepted.");
+      showError(result.data.error || result.data.errors?.[0] || t("That move was not accepted."));
       if (result.status === 409) {
         await refresh();
         return;
@@ -1587,7 +1591,7 @@
       }
 
       if (!result.ok) {
-        showError(result.data.error || "That trial could not be started.");
+        showError(result.data.error || t("That trial could not be started."));
         pveButton.disabled = false;
         return;
       }
@@ -1612,7 +1616,7 @@
   function handleQueue(queue) {
     if (queue.state === "MATCHED" && queue.battleId) {
       clearQueuePoll();
-      setQueueState("MATCHED", "Opponent found. Starting the battle.");
+      setQueueState("MATCHED", t("Opponent found. Starting the battle."));
       resetForNewBattle(queue.battleId);
       refresh();
       return;
@@ -1620,7 +1624,7 @@
 
     if (queue.state === "SEARCHING") {
       const seconds = Math.round((queue.waitedMs || 0) / 1000);
-      setQueueState("SEARCHING", `Searching for an opponent… ${seconds}s`);
+      setQueueState("SEARCHING", t("Searching for an opponent… {seconds}s", { seconds }));
       clearQueuePoll();
       if (!document.hidden) queueTimer = window.setTimeout(pollQueue, backoff(QUEUE_POLL_MS));
       return;
@@ -1628,12 +1632,12 @@
 
     if (queue.state === "TIMED_OUT") {
       clearQueuePoll();
-      setQueueState("IDLE", "No opponent was found in time. You can search again.");
+      setQueueState("IDLE", t("No opponent was found in time. You can search again."));
       return;
     }
 
     clearQueuePoll();
-    setQueueState("IDLE", "Not searching.");
+    setQueueState("IDLE", t("Not searching."));
   }
 
   async function pollQueue() {
@@ -1651,14 +1655,14 @@
 
   joinButton?.addEventListener("click", async () => {
     joinButton.disabled = true;
-    setQueueState("SEARCHING", "Searching for an opponent…");
+    setQueueState("SEARCHING", t("Searching for an opponent…"));
 
     const result = await api("/api/pvp/queue", { method: "POST" });
     joinButton.disabled = false;
 
     if (!result) return;
     if (!result.ok) {
-      setQueueState("IDLE", result.data.error || "Could not start searching.");
+      setQueueState("IDLE", result.data.error || t("Could not start searching."));
       return;
     }
     handleQueue(result.data.queue);
@@ -1669,7 +1673,7 @@
     await api("/api/pvp/queue", { method: "DELETE" });
     cancelButton.disabled = false;
     clearQueuePoll();
-    setQueueState("IDLE", "Search cancelled.");
+    setQueueState("IDLE", t("Search cancelled."));
   });
 
   async function loadSpellMeta() {

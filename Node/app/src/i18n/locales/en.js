@@ -1,5 +1,6 @@
 export default {
   localeTag: "en",
+  theme: { system: "System", light: "Light", dark: "Dark" },
   header: {
     logoTitle: "Achimari",
     logoSubtitle: "",
@@ -76,5 +77,20 @@ export default {
     title: "404",
     text: "This page does not exist. It may have been renamed, or the link that brought you here may be out of date.",
     home: "Go to Daily Check-in"
+  },
+
+  /* English needs a catalogue entry only where the source string alone cannot
+     say it: plurals. Everything else is shown exactly as the template wrote it. */
+  messages: {
+    "{count} days": { one: "{count} day", other: "{count} days" },
+    "{count} users": { one: "{count} user", other: "{count} users" },
+    "{count} items": { one: "{count} item", other: "{count} items" },
+    "of {count} answers": { one: "of {count} answer", other: "of {count} answers" },
+    "{count} points left": { one: "{count} point left", other: "{count} points left" },
+    "{count} days now": { one: "{count} day now", other: "{count} days now" },
+    "{count} days inactive": { one: "{count} day inactive", other: "{count} days inactive" },
+    "{count} turns": { one: "{count} turn", other: "{count} turns" },
+    "{count} activities left to complete.": { one: "{count} activity left to complete.", other: "{count} activities left to complete." },
+    "{count} points too many": { one: "{count} point too many", other: "{count} points too many" }
   }
 };

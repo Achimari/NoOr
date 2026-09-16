@@ -1,5 +1,6 @@
+<%# Help is long-form documentation, localised per document: help-content.<locale>.ejs when one exists, English otherwise. The ".ejs" is spelled out because EJS reads ".ru" as an extension and would not append it. -%>
 <%- include("../components/layout/document", {
   title,
   pageId,
-  body: include("./partials/help-content")
+  body: include(locale === "ru" ? "./partials/help-content.ru.ejs" : "./partials/help-content")
 }) %>

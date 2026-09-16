@@ -632,7 +632,7 @@
 
   .ledger-track,
   .prayer-world-region-track {
-    background: var(--white);
+    background: var(--paper);
     box-shadow: inset 0 0 0 1px var(--ink);
   }
 

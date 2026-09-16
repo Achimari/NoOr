@@ -70,7 +70,7 @@ async function renderContent(achievements) {
   return ejs.renderFile(contentPath, {
     ...sharedViewLocals,
     achievements,
-    t: () => "",
+    t: sharedViewLocals.t,
     siteData: { socialLinks: [] },
   });
 }
@@ -338,7 +338,7 @@ describe("achievements navigation", () => {
       currentPath,
       pageId: "achievements",
       auth: { id: 3, timezone: "Europe/Riga", isTelegramLinked: false },
-      t: (key, fallback) => (key === "header.nav" ? [{ label: "Battle", to: "/battle" }] : fallback ?? ""),
+      t: (key, params) => (key === "header.nav" ? [{ label: "Battle", to: "/battle" }] : sharedViewLocals.t(key, params)),
       timezoneOptions: [{ value: "Europe/Riga", label: "Riga" }],
       getTimezoneLabel: () => "Riga",
     });
@@ -512,7 +512,7 @@ describe("achievements client filtering", () => {
 
   function runClient() {
     const dom = buildDocument();
-    vm.runInNewContext(readFileSync(clientScriptPath, "utf8"), { document: dom.document });
+    vm.runInNewContext(readFileSync(clientScriptPath, "utf8"), { document: dom.document, t: sharedViewLocals.t });
     return dom;
   }
 

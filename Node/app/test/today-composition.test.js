@@ -4,11 +4,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { sourceCopy } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, "");
 
-const markup = () => read("src/views/pages/partials/home-content.ejs");
+const markup = () => sourceCopy(read("src/views/pages/partials/home-content.ejs"));
 const styles = () => stripComments(read("public/styles/pages/daily-check-in.css"));
 
 const rule = (selector, css = styles()) =>

@@ -1,0 +1,29 @@
+<%#
+  Language and colour scheme. One form of plain submit buttons, each carrying
+  its own value, so one press saves the choice and no script is needed. The
+  server keeps it in a cookie and sends the reader back to the same page.
+  `tone` is "paper" on the page and "chrome" inside the black header.
+-%>
+<%
+  const preferencesTone = typeof tone === "undefined" ? "paper" : tone;
+  const themeLabels = { system: t("theme.system"), light: t("theme.light"), dark: t("theme.dark") };
+%>
+<form class="preferences preferences--<%= preferencesTone %>" action="/preferences" method="post">
+  <input type="hidden" name="returnTo" value="<%= currentUrl %>" />
+  <fieldset class="preferences-group">
+    <legend class="preferences-legend"><%= t("Language") %></legend>
+    <div class="preferences-options">
+      <% supportedLocales.forEach((code) => { %>
+        <button class="preferences-option" type="submit" name="locale" value="<%= code %>" lang="<%= code %>" aria-pressed="<%= code === locale %>"><%= languageNames[code] %></button>
+      <% }) %>
+    </div>
+  </fieldset>
+  <fieldset class="preferences-group">
+    <legend class="preferences-legend"><%= t("Theme") %></legend>
+    <div class="preferences-options">
+      <% supportedThemes.forEach((value) => { %>
+        <button class="preferences-option" type="submit" name="theme" value="<%= value %>" aria-pressed="<%= value === theme %>"><%= themeLabels[value] %></button>
+      <% }) %>
+    </div>
+  </fieldset>
+</form>

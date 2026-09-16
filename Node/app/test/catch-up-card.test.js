@@ -30,7 +30,7 @@ const catchUpHelpers = sliceSource("const CATCH_UP_ACTIVITIES", "\nfunction buil
 const catchUpRender = sliceSource("function buildCatchUpRow(", "\nasync function applyCatchUpPayload(");
 
 function runCatchUpHelpers(expression) {
-  return JSON.parse(vm.runInNewContext(`${catchUpHelpers}\nJSON.stringify(${expression})`, {}));
+  return JSON.parse(vm.runInNewContext(`${catchUpHelpers}\nJSON.stringify(${expression})`, { t: sharedViewLocals.t, document: { documentElement: { lang: "en" } } }));
 }
 
 function fakeElement() {
@@ -97,7 +97,7 @@ function renderCatchUpWithPayload(payload) {
 
   vm.runInNewContext(
     `${catchUpHelpers}\n${catchUpRender}\nrenderCatchUp(payload);`,
-    { ...context, payload },
+    { ...context, payload, t: sharedViewLocals.t, document: { ...context.document, documentElement: { lang: "en" } } },
   );
 
   return { card, count, summaryCount, status, more, pageStatus, rows: children, items: context.catchUpItems };
@@ -112,7 +112,7 @@ async function renderDashboard() {
       weekDays: [{ dateKey: "2026-09-01", label: "M", answer: "YES", successful: true }],
     },
     siteData: { socialLinks: [] },
-    t: () => "",
+    t: sharedViewLocals.t,
   });
 }
 

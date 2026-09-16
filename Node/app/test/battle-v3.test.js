@@ -581,8 +581,11 @@ describe("the battle the browser is given under version 3", () => {
 
     assert.deepEqual(
       Object.keys(spell).sort(),
-      ["available", "cooldownRemaining", "cooldownTurns", "key", "manaCost", "name", "preview", "reason", "target"],
+      ["available", "cooldownRemaining", "cooldownTurns", "key", "manaCost", "name", "preview", "previewMessage", "reason", "target"],
     );
+    // The preview's template and the values it shows, so it can be said in the
+    // reader's language — the same figures as `preview`, and no formula.
+    assert.deepEqual(Object.keys(spell.previewMessage).sort(), ["key", "params"]);
     assert.equal(JSON.stringify(spell).includes("scaling"), false);
     assert.equal(JSON.stringify(spell).includes("base"), false);
   });

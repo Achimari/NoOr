@@ -421,14 +421,15 @@
   transform: scale(0.97);
 }
 
-/* A recorded answer fills green or red and keeps its white label and check,
-   so the selected state remains clear even without colour. */
+/* A recorded answer fills green or red and reverses its label and check out of
+   the fill — white on the light sheet, the night paper on the lifted dark-scheme
+   green and red — so the selected state remains clear even without colour. */
 .dashboard-action-yes[aria-pressed="true"],
 .dashboard-action-no[aria-pressed="true"] {
   position: relative;
   border: 0;
   background: var(--state-fill);
-  color: var(--white);
+  color: var(--on-action);
 }
 
 /* The recorded mark. A selected control in a monochrome system cannot be
@@ -456,7 +457,7 @@
 
 .dashboard-action[aria-pressed="true"] .dashboard-action-label,
 .dashboard-action[aria-pressed="true"] .dashboard-action-subtitle {
-  color: var(--white);
+  color: var(--on-action);
 }
 
 .dashboard-action[aria-pressed="true"] .dashboard-action-subtitle {
@@ -588,7 +589,7 @@
    the badge's own text always spells the word either way. */
 .reading-summary-badge[data-answer="yes"] {
   background: var(--ink);
-  color: var(--white);
+  color: var(--on-action);
   font-weight: var(--weight-strong);
 }
 

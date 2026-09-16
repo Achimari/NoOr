@@ -3,51 +3,49 @@
     <div class="dashboard-card explore-summary profile-spells-overview">
       <header class="dashboard-card-head profile-spells-head">
         <div>
-          <h2 id="profile-spells-title">Spells</h2>
+          <h2 id="profile-spells-title"><%= t("Spells") %></h2>
           <p class="profile-note">
-            Bible reading earns Intelligence and increases mana. A reflection also
-            earns Wisdom, which unlocks spells permanently without being spent.
+            <%= t("Bible reading earns Intelligence and increases mana. A reflection also earns Wisdom, which unlocks spells permanently without being spent.") %>
           </p>
         </div>
       </header>
 
       <dl class="explore-figures">
         <div class="explore-figure">
-          <dt>Intelligence</dt>
+          <dt><%= t("Intelligence") %></dt>
           <dd data-explore-intelligence><%= profile.stats.intelligence %></dd>
         </div>
         <div class="explore-figure">
-          <dt>Mana</dt>
+          <dt><%= t("Mana") %></dt>
           <dd data-explore-mana><%= profile.derived.maxMana %></dd>
         </div>
         <div class="explore-figure">
-          <dt>Wisdom this month</dt>
+          <dt><%= t("Wisdom this month") %></dt>
           <dd data-explore-wisdom><%= profile.stats.wisdom %></dd>
         </div>
         <div class="explore-figure">
-          <dt>Spells learned</dt>
-          <dd><span data-explore-unlocked><%= profile.spells.unlockedCount %></span> of <%= profile.spells.catalog.length %></dd>
+          <dt><%= t("Spells learned") %></dt>
+          <dd><span data-explore-unlocked><%= profile.spells.unlockedCount %></span> <%= t("of {total}", { total: profile.spells.catalog.length }) %></dd>
         </div>
         <div class="explore-figure">
-          <dt>Carried into battle</dt>
-          <dd data-loadout-count><%= (profile.spells.equipped || []).length %> of <%= profile.spells.limit || 3 %> equipped</dd>
+          <dt><%= t("Carried into battle") %></dt>
+          <dd data-loadout-count><%= t("{count} of {limit} equipped", { count: (profile.spells.equipped || []).length, limit: profile.spells.limit || 3 }) %></dd>
         </div>
       </dl>
 
       <% if (profile.spells.unlockedCount > 0) { %>
         <p class="profile-note profile-loadout-note">
-          Equip up to <%= profile.spells.limit || 3 %> learned spells for battle.
-          The rest remain learned and can be swapped in at any time.
+          <%= t("Equip up to {limit} learned spells for battle. The rest remain learned and can be swapped in at any time.", { limit: profile.spells.limit || 3 }) %>
         </p>
       <% } %>
 
       <p class="profile-note profile-spells-setup" data-explore-setup <%= profile.allocation.confirmed ? "hidden" : "" %>>
-        Confirm your base points above before learning a spell.
+        <%= t("Confirm your base points above before learning a spell.") %>
       </p>
     </div>
 
     <div class="explore-path">
-      <h3 class="explore-section-title">Spell path</h3>
+      <h3 class="explore-section-title"><%= t("Spell path") %></h3>
 
       <ol class="explore-list">
         <% profile.spells.catalog.forEach((spell, index) => { %>
@@ -62,20 +60,20 @@
             <details class="explore-card">
               <summary class="explore-summary-row">
                 <span class="explore-summary-text">
-                  <span class="explore-spell-name"><%= spell.name %></span>
-                  <span class="explore-spell-summary"><%= spell.summary %></span>
+                  <span class="explore-spell-name"><%= t(spell.name) %></span>
+                  <span class="explore-spell-summary"><%= t(spell.summary) %></span>
                 </span>
                 <span class="explore-state" data-spell-state>
                   <% if (spell.unlocked && spell.equipped) { %>
-                    Carried into battle
+                    <%= t("Carried into battle") %>
                   <% } else if (spell.unlocked) { %>
-                    Learned
+                    <%= t("Learned") %>
                   <% } else if (spell.available && profile.allocation.confirmed) { %>
-                    Ready to learn
+                    <%= t("Ready to learn") %>
                   <% } else if (spell.available) { %>
-                    Confirm base points
+                    <%= t("Confirm base points") %>
                   <% } else { %>
-                    Needs <%= spell.wisdomRemaining %> more Wisdom
+                    <%= t("Needs {count} more Wisdom", { count: spell.wisdomRemaining }) %>
                   <% } %>
                 </span>
                 <span class="explore-chevron" aria-hidden="true"></span>
@@ -83,15 +81,15 @@
 
               <div class="explore-card-body">
                 <dl class="explore-spell-meta">
-                  <div><dt>Mana cost</dt><dd><%= spell.manaCost %></dd></div>
-                  <div><dt>Wisdom needed</dt><dd><%= spell.wisdomRequired %></dd></div>
-                  <div><dt>Target</dt><dd><%= spell.target === "SELF" ? "Yourself" : "Opponent" %></dd></div>
+                  <div><dt><%= t("Mana cost") %></dt><dd><%= spell.manaCost %></dd></div>
+                  <div><dt><%= t("Wisdom needed") %></dt><dd><%= spell.wisdomRequired %></dd></div>
+                  <div><dt><%= t("Target") %></dt><dd><%= spell.target === "SELF" ? t("Yourself") : t("Opponent") %></dd></div>
                   <% if (spell.cooldownTurns) { %>
-                    <div><dt>Cooldown</dt><dd><%= spell.cooldownTurns %> <%= spell.cooldownTurns === 1 ? "turn" : "turns" %></dd></div>
+                    <div><dt><%= t("Cooldown") %></dt><dd><%= t("{count} turns", { count: spell.cooldownTurns }) %></dd></div>
                   <% } %>
                 </dl>
 
-                <p class="explore-spell-tactic"><%= spell.tactic %></p>
+                <p class="explore-spell-tactic"><%= t(spell.tactic) %></p>
 
                 <div class="explore-actions">
                   <% if (spell.unlocked) { %>
@@ -106,23 +104,23 @@
                       aria-pressed="<%= spell.equipped ? "true" : "false" %>"
                       aria-describedby="loadout-note-<%= spell.key %>"
                       <%= blocked ? "disabled" : "" %>
-                    ><%= spell.equipped ? "Unequip" : "Equip" %></button>
+                    ><%= spell.equipped ? t("Unequip") : t("Equip") %></button>
                     <p class="explore-note" id="loadout-note-<%= spell.key %>" data-spell-note>
                       <%= spell.equipped
-                        ? "This spell is carried into your next battle."
+                        ? t("This spell is carried into your next battle.")
                         : blocked
-                          ? "Unequip one first: you can carry three."
-                          : "Learned. Equip it to carry it into your next battle." %>
+                          ? t("Unequip one first: you can carry three.")
+                          : t("Learned. Equip it to carry it into your next battle.") %>
                     </p>
                   <% } else if (spell.available && profile.allocation.confirmed) { %>
                     <button class="explore-button explore-button-primary" type="button" data-spell-unlock="<%= spell.key %>">
-                      Learn <%= spell.name %>
+                      <%= t("Learn {name}", { name: t(spell.name) }) %>
                     </button>
                   <% } else if (spell.available) { %>
-                    <p class="explore-note" data-spell-note>Confirm your base points above first.</p>
+                    <p class="explore-note" data-spell-note><%= t("Confirm your base points above first.") %></p>
                   <% } else { %>
                     <p class="explore-note" data-spell-note>
-                      Write a reflection with your Bible reading to earn more Wisdom.
+                      <%= t("Write a reflection with your Bible reading to earn more Wisdom.") %>
                     </p>
                   <% } %>
                 </div>

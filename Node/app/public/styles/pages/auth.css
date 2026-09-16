@@ -5,7 +5,6 @@
   z-index: var(--z-content);
   min-height: 100dvh;
   color: var(--ink);
-  color-scheme: light;
 }
 
 .auth-gateway {
@@ -174,6 +173,12 @@
 .auth-secondary {
   justify-self: center;
   padding-inline: var(--space-3);
+}
+
+/* Language and scheme sit under the form, where a signed-out reader who cannot
+   read the form's language will look for them. */
+.auth-preferences {
+  margin-top: var(--space-5);
 }
 
 /* ------------------------------------------------------- reader preferences */

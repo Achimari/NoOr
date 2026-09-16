@@ -37,7 +37,7 @@ function loadCompiler() {
 
   return vm.runInNewContext(
     `${source.slice(start, end)}\n({ compileBeats, planBeat, tierFor });`,
-    {},
+    { t: sharedViewLocals.t },
   );
 }
 
@@ -97,7 +97,7 @@ async function renderBattlePage(overrides = {}) {
       spellCount: 2,
     },
     siteData: { socialLinks: [] },
-    t: (_key, fallback) => (Array.isArray(fallback) ? fallback : ""),
+    t: sharedViewLocals.t,
     ...overrides,
   });
 }

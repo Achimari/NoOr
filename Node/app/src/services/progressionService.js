@@ -89,7 +89,7 @@ export async function getCharacter(userId, { now = new Date(), timezone } = {}) 
 export async function confirmBaseAllocation(userId, allocation) {
   const result = validateAllocation(allocation);
   if (!result.valid) {
-    throw new AppError(result.reason, 400);
+    throw Object.assign(new AppError(result.reason, 400), { messageKey: result.messageKey, params: result.params });
   }
 
   const updated = await confirmAllocation({ userId, allocation: result.allocation });

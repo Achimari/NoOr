@@ -1,14 +1,22 @@
-function parseBody(schema, body) {
-  const result = schema.safeParse(body);
+import { z } from "zod";
+
+/* A schema's own messages are English source strings and go through req.t;
+   zod's generic messages ("Too big: …") come from zod's own locale instead. */
+const zodLocales = { ru: z.locales.ru() };
+
+function parseBody(schema, body, req) {
+  const t = req.t ?? ((message) => message);
+  const zodLocale = zodLocales[req.locale];
+  const result = schema.safeParse(body, zodLocale ? { error: zodLocale.localeError } : undefined);
   if (!result.success) {
     const fieldErrors = {};
     for (const issue of result.error.issues) {
       const field = issue.path?.[0];
       if (typeof field !== "string") continue;
-      (fieldErrors[field] ||= []).push(issue.message);
+      (fieldErrors[field] ||= []).push(t(issue.message));
     }
 
-    return { errors: result.error.issues.map((issue) => issue.message), fieldErrors };
+    return { errors: result.error.issues.map((issue) => t(issue.message)), fieldErrors };
   }
 
   return { data: result.data };
@@ -16,7 +24,7 @@ function parseBody(schema, body) {
 
 export function validateBody(schema) {
   return (req, res, next) => {
-    const { errors, fieldErrors, data } = parseBody(schema, req.body);
+    const { errors, fieldErrors, data } = parseBody(schema, req.body, req);
     if (errors) {
       req.validationErrors = errors;
       req.validationFieldErrors = fieldErrors;
@@ -30,7 +38,7 @@ export function validateBody(schema) {
 
 export function validateApiBody(schema) {
   return (req, res, next) => {
-    const { errors, data } = parseBody(schema, req.body);
+    const { errors, data } = parseBody(schema, req.body, req);
     if (errors) {
       return res.status(400).json({ errors });
     }

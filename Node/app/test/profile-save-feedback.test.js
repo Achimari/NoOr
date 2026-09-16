@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import { sharedViewLocals } from "./helpers/viewLocals.js";
 import vm from "node:vm";
 
 const source = readFileSync(new URL("../public/scripts/pages/profile.js", import.meta.url), "utf8");
@@ -44,7 +45,7 @@ function mount({ locked = false, confirmed = true, response } = {}) {
   const window = { scrollX: 0, scrollY: 500, scrollBy() { throw new Error("No layout changed, so scrolling is unnecessary"); }, location: { reload() { throw new Error("Profile must not reload after saving"); } } };
   const document = { querySelector: selector => selector === "[data-profile]" ? root : null, body: {}, activeElement: save };
   vm.runInNewContext(source, {
-    document, window,
+    document, window, t: sharedViewLocals.t,
     showToast: (message) => toasts.push(message),
     fetch: async (url, options) => {
       requests.push({ url, options });

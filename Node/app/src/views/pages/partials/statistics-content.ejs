@@ -1,8 +1,8 @@
 <%
   const streakViews = [
-    { slug: "strong", key: "recovery", label: "Strong", caption: "Strong streak leaderboard, ranked by current streak", empty: "No Strong streaks yet.", emptyHint: "Answer today's question to start the first streak." },
-    { slug: "bible", key: "reading", label: "Bible", caption: "Bible reading streak leaderboard, ranked by current streak", empty: "No reading streaks yet.", emptyHint: "Answer the daily reading check to start the first streak." },
-    { slug: "tasks", key: "goals", label: "Tasks", caption: "Tasks streak leaderboard, ranked by current streak", empty: "No completed-task streaks yet.", emptyHint: "Complete every task you plan for a day to start a streak." },
+    { slug: "strong", key: "recovery", label: t("Strong"), caption: t("Strong streak leaderboard, ranked by current streak"), empty: t("No Strong streaks yet."), emptyHint: t("Answer today's question to start the first streak.") },
+    { slug: "bible", key: "reading", label: t("Bible"), caption: t("Bible reading streak leaderboard, ranked by current streak"), empty: t("No reading streaks yet."), emptyHint: t("Answer the daily reading check to start the first streak.") },
+    { slug: "tasks", key: "goals", label: t("Tasks"), caption: t("Tasks streak leaderboard, ranked by current streak"), empty: t("No completed-task streaks yet."), emptyHint: t("Complete every task you plan for a day to start a streak.") },
   ];
   const hasPrefetchedStatistics = typeof statisticsBySource !== "undefined" && Boolean(statisticsBySource);
   const availableStatistics = hasPrefetchedStatistics
@@ -16,14 +16,19 @@
   const active = views.find((view) => view.slug === activeStreak.slug) || views[0];
   const renderedViews = hasPrefetchedStatistics ? views : [active];
 
-  const dayWord = (value) => (value === 1 ? "day" : "days");
-  const plural = (value, one, many) => `${value} ${value === 1 ? one : many}`;
+  const days = (count) => t("{count} days", { count });
+
+  /* Weekday names come from the reader's locale, not from the service: index 0
+     is Monday, and 1 January 2024 was a Monday. */
+  const weekdayLocale = typeof dateLocale === "undefined" || !dateLocale ? "en" : dateLocale;
+  const weekdayName = (index, weekday) =>
+    new Intl.DateTimeFormat(weekdayLocale, { weekday, timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1 + index)));
 
   const escape = (value) => String(value)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
-  const counts = (split) => `${split.yes} Yes · ${split.no} No · ${split.total} total`;
+  const counts = (split) => t("{yes} Yes · {no} No · {total} total", split);
 
   // One 100% composition track, used identically by both distribution panels and
   // by every weekday row, so the shares are directly comparable everywhere.
@@ -38,8 +43,8 @@
 
   const legend = () => `
       <ul class="ledger-legend">
-        <li class="ledger-legend-item ledger-legend-item--yes">Yes</li>
-        <li class="ledger-legend-item ledger-legend-item--no">No</li>
+        <li class="ledger-legend-item ledger-legend-item--yes">${escape(t("Yes"))}</li>
+        <li class="ledger-legend-item ledger-legend-item--no">${escape(t("No"))}</li>
       </ul>`;
 
   const answerPanel = ({ hook, title, split, emptyCopy }) => `
@@ -48,7 +53,7 @@
           ${split.total > 0
             ? `<p class="answer-panel-headline">
             <span class="answer-panel-percent">${escape(split.yesSharePercentage)}%</span>
-            <span class="answer-panel-measure">Yes</span>
+            <span class="answer-panel-measure">${escape(t("Yes"))}</span>
           </p>`
             : ""}
           ${track(split)}
@@ -58,28 +63,34 @@
         </div>`;
 
   const shareSentence = (prefix, entry) => (entry.hasData
-    ? `${prefix}: ${entry.label}, ${entry.percentage}% of ${plural(entry.total, "answer", "answers")}.`
+    ? t("{prefix}: {label}, {percentage}% {ofAnswers}.", {
+        prefix,
+        label: weekdayName(weekdays.findIndex((day) => day.longLabel === entry.label), "long"),
+        percentage: entry.percentage,
+        ofAnswers: t("of {count} answers", { count: entry.total }),
+      })
     : "");
+  let weekdays = [];
 %>
 <main id="main-content" tabindex="-1" class="dashboard-page statistics-page progress-page" data-recovery-leaderboard data-current-user-id="<%= leaderboards.recovery.currentUserId %>">
   <div class="page-shell">
 
     <header class="page-head">
       <div class="page-head-copy">
-        <h1 class="page-head-title">Progress</h1>
-        <p class="page-head-lede">Track your streaks and compare answer patterns across the community.</p>
+        <h1 class="page-head-title"><%= t("Progress") %></h1>
+        <p class="page-head-lede"><%= t("Track your streaks and compare answer patterns across the community.") %></p>
       </div>
 
     </header>
 
     <section class="page-section progress-standing" aria-labelledby="streak-summary-title">
-      <h2 class="sr-only" id="streak-summary-title">Current streaks</h2>
+      <h2 class="sr-only" id="streak-summary-title"><%= t("Current streaks") %></h2>
       <ul class="stat-line progress-summary">
         <% views.forEach((view) => { %>
           <li class="stat-line-item" data-streak-summary="<%= view.slug %>">
             <span class="stat-line-label"><%- include("../../components/ui/icon", { name: "flame", className: "ui-icon--sm" }) %><%= view.label %></span>
-            <span class="stat-line-value"><%= view.board.overallBest?.value || 0 %> <%= dayWord(view.board.overallBest?.value || 0) %></span>
-            <span class="stat-line-note">Best · <%= view.board.overallBest?.name || "No record yet" %></span>
+            <span class="stat-line-value"><%= days(view.board.overallBest?.value || 0) %></span>
+            <span class="stat-line-note"><%= t("Best · {name}", { name: view.board.overallBest?.name || t("No record yet") }) %></span>
           </li>
         <% }) %>
       </ul>
@@ -87,12 +98,12 @@
 
     <section class="page-section section-frame section-frame--ruled" aria-labelledby="leaderboard-title">
       <div class="section-head">
-        <h2 class="section-head-title" id="leaderboard-title"><%- include("../../components/ui/icon", { name: "trophy", className: "practice-mark" }) %>Streak leaderboard</h2>
-        <span class="section-head-note" data-streak-board-count><%= plural(active.board.leaders.length, "user", "users") %></span>
+        <h2 class="section-head-title" id="leaderboard-title"><%- include("../../components/ui/icon", { name: "trophy", className: "practice-mark" }) %><%= t("Streak leaderboard") %></h2>
+        <span class="section-head-note" data-streak-board-count><%= t("{count} users", { count: active.board.leaders.length }) %></span>
       </div>
-      <p class="section-lede">Compare current streaks across the community. Each one follows that member's time zone.</p>
+      <p class="section-lede"><%= t("Compare current streaks across the community. Each one follows that member's time zone.") %></p>
 
-      <nav class="segmented progress-segmented" aria-label="Choose a streak leaderboard">
+      <nav class="segmented progress-segmented" aria-label="<%= t("Choose a streak leaderboard") %>">
         <% views.forEach((view) => { %>
           <% if (!hasPrefetchedStatistics && view.slug === active.slug) { %>
             <span class="segmented-option" aria-current="page"><%= view.label %></span>
@@ -112,7 +123,7 @@
         <article
           class="progress-board"
           data-streak-board="<%= view.key %>"
-          data-streak-board-label="<%= view.label %> streak"
+          data-streak-board-label="<%= t("{label} streak", { label: view.label }) %>"
           data-progress-panel="<%= view.slug %>"
           <%- view.slug === active.slug ? "" : "hidden" %>
         >
@@ -121,9 +132,9 @@
             <caption class="sr-only"><%= view.caption %></caption>
             <thead>
               <tr>
-                <th scope="col" class="data-table-rank">Rank</th>
-                <th scope="col">Name</th>
-                <th scope="col" class="data-table-figure">Streak</th>
+                <th scope="col" class="data-table-rank"><%= t("Rank") %></th>
+                <th scope="col"><%= t("Name") %></th>
+                <th scope="col" class="data-table-figure"><%= t("Streak") %></th>
               </tr>
             </thead>
             <tbody id="streak-board-<%= view.key %>-body" data-streak-board-body data-leaderboard-body>
@@ -136,14 +147,14 @@
                         <span class="data-table-name"><%= entry.name %></span>
                       </a>
                       <% if (entry.id === view.board.currentUserId) { %>
-                        <span class="data-table-you">You</span>
+                        <span class="data-table-you"><%= t("You") %></span>
                       <% } %>
                     </td>
                     <td class="data-table-figure">
-                      <%= entry.value %> <%= dayWord(entry.value) %>
+                      <%= days(entry.value) %>
                       <% if (entry.missedDays && entry.missedDays.count > 0) { %>
 
-                        <span class="progress-missed"><%= entry.missedDays.count %> missed</span>
+                        <span class="progress-missed"><%= t("{count} missed", { count: entry.missedDays.count }) %></span>
                       <% } %>
                     </td>
                   </tr>
@@ -169,7 +180,7 @@
           aria-controls="streak-board-<%= view.key %>-body"
           aria-expanded="false"
           <%- view.board.leaders.length > 5 ? "" : "hidden" %>
-        >View more</button>
+        ><%= t("View more") %></button>
         <p class="sr-only" data-streak-board-status role="status" aria-live="polite"></p>
         </article>
       <% }) %>
@@ -177,10 +188,10 @@
     </section>
 
     <% renderedViews.filter((view) => view.statistics).forEach((view) => {
-      const dataScope = `${view.label} · all recorded answers`;
+      const dataScope = t("{label} · all recorded answers", { label: view.label });
       const yours = view.statistics.yourAnswers;
       const community = view.statistics.communityAnswers;
-      const weekdays = view.statistics.weekdayChart;
+      weekdays = view.statistics.weekdayChart;
       const weekdaySummary = view.statistics.weekdaySummary;
       const prayerWorld = view.statistics.prayerWorld;
       const answersTitleId = view.slug === active.slug ? "answers-title" : `answers-title-${view.slug}`;
@@ -195,14 +206,14 @@
       <%- view.slug === active.slug ? "" : "hidden" %>
     >
       <div class="section-head">
-        <h2 class="section-head-title" id="<%= answersTitleId %>">Answer patterns</h2>
+        <h2 class="section-head-title" id="<%= answersTitleId %>"><%= t("Answer patterns") %></h2>
         <span class="section-head-note"><%= dataScope %></span>
       </div>
-      <p class="section-lede">Compare what you recorded with the community. A Yes and a No are both recorded answers, kept exactly as they were given.</p>
+      <p class="section-lede"><%= t("Compare what you recorded with the community. A Yes and a No are both recorded answers, kept exactly as they were given.") %></p>
 
       <figure class="ledger-figure" data-answer-comparison aria-labelledby="<%= comparisonTitleId %>">
         <figcaption class="ledger-figure-head">
-          <h3 class="ledger-figure-title t-component-title" id="<%= comparisonTitleId %>">Your answers and the community</h3>
+          <h3 class="ledger-figure-title t-component-title" id="<%= comparisonTitleId %>"><%= t("Your answers and the community") %></h3>
           <p class="ledger-figure-note"><%= dataScope %></p>
         </figcaption>
 
@@ -211,29 +222,29 @@
         <div class="answer-compare">
           <%- answerPanel({
             hook: "data-personal-patterns",
-            title: "Your answers",
+            title: t("Your answers"),
             split: yours,
-            emptyCopy: `No answers recorded yet. Your first ${view.label} answer fills this in.`,
+            emptyCopy: t("No answers recorded yet. Your first {label} answer fills this in.", { label: view.label }),
           }) %>
           <%- answerPanel({
             hook: "data-community-patterns",
-            title: "Community",
+            title: t("Community"),
             split: community,
-            emptyCopy: `No ${view.label} answers recorded yet across the community.`,
+            emptyCopy: t("No {label} answers recorded yet across the community.", { label: view.label }),
           }) %>
         </div>
       </figure>
 
       <figure class="ledger-figure" data-weekday-chart aria-labelledby="<%= weekdayTitleId %>">
         <figcaption class="ledger-figure-head">
-          <h3 class="ledger-figure-title t-component-title" id="<%= weekdayTitleId %>">Community rhythm by weekday</h3>
+          <h3 class="ledger-figure-title t-component-title" id="<%= weekdayTitleId %>"><%= t("Community rhythm by weekday") %></h3>
           <p class="ledger-figure-note"><%= dataScope %></p>
         </figcaption>
 
         <% if (weekdaySummary.highest.hasData) { %>
-          <p class="ledger-figure-insight"><%= shareSentence("Highest recorded Yes share", weekdaySummary.highest) %> <%= shareSentence("Lowest recorded Yes share", weekdaySummary.lowest) %></p>
+          <p class="ledger-figure-insight"><%= shareSentence(t("Highest recorded Yes share"), weekdaySummary.highest) %> <%= shareSentence(t("Lowest recorded Yes share"), weekdaySummary.lowest) %></p>
         <% } else { %>
-          <p class="ledger-figure-insight">No answers recorded yet. Each weekday fills in once members record <%= view.label %> answers on that day.</p>
+          <p class="ledger-figure-insight"><%= t("No answers recorded yet. Each weekday fills in once members record {label} answers on that day.", { label: view.label }) %></p>
         <% } %>
 
         <%- legend() %>
@@ -242,11 +253,11 @@
           <% weekdays.forEach((day, index) => { %>
             <li class="weekday-row" style="--reveal-index: <%= index %>">
               <span class="weekday-label">
-                <span class="weekday-label-long"><%= day.longLabel %></span>
-                <span class="weekday-label-short" aria-hidden="true"><%= day.label %></span>
+                <span class="weekday-label-long"><%= weekdayName(index, "long") %></span>
+                <span class="weekday-label-short" aria-hidden="true"><%= weekdayName(index, "short") %></span>
               </span>
               <% if (day.total > 0) { %>
-                <span class="weekday-share"><%= day.yesSharePercentage %>%<span class="sr-only"> Yes</span></span>
+                <span class="weekday-share"><%= day.yesSharePercentage %>%<span class="sr-only"> <%= t("Yes") %></span></span>
               <% } else { %>
                 <span class="weekday-share weekday-share--empty"></span>
               <% } %>
@@ -254,7 +265,7 @@
               <% if (day.total > 0) { %>
                 <span class="weekday-values"><%= counts(day) %></span>
               <% } else { %>
-                <span class="weekday-values weekday-values--empty">No answers</span>
+                <span class="weekday-values weekday-values--empty"><%= t("No answers") %></span>
               <% } %>
             </li>
           <% }) %>
@@ -263,16 +274,16 @@
 
       <div class="prayer-world" data-prayer-world>
         <div class="section-head">
-          <h3 class="t-component-title">Community time zones</h3>
-          <span class="section-head-note">Most active · <%= prayerWorld.activeRegion %></span>
+          <h3 class="t-component-title"><%= t("Community time zones") %></h3>
+          <span class="section-head-note"><%= t("Most active · {region}", { region: t(prayerWorld.activeRegion) }) %></span>
         </div>
-        <p class="section-lede">Grouped from the time zone each member selected. Achimari does not track anyone's location.</p>
+        <p class="section-lede"><%= t("Grouped from the time zone each member selected. Achimari does not track anyone's location.") %></p>
 
         <div class="prayer-world-layout">
           <ul class="prayer-world-regions">
             <% prayerWorld.regions.forEach((region, index) => { %>
               <li class="prayer-world-region<%= region.isActive ? " is-active" : "" %>" style="--reveal-index: <%= index %>">
-                <span class="prayer-world-region-name"><%= region.label %></span>
+                <span class="prayer-world-region-name"><%= t(region.label) %></span>
                 <span class="prayer-world-region-track" aria-hidden="true">
                   <span class="prayer-world-region-fill" style="--bar-scale: <%= Math.max(0, Math.min(100, region.percentage)) / 100 %>"></span>
                 </span>
@@ -282,7 +293,7 @@
             <% }) %>
             <% if (!prayerWorld.regions.length) { %>
               <li class="prayer-world-region prayer-world-region--empty">
-                <span class="prayer-world-region-name">No time zones recorded yet</span>
+                <span class="prayer-world-region-name"><%= t("No time zones recorded yet") %></span>
               </li>
             <% } %>
           </ul>

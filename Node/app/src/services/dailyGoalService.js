@@ -91,7 +91,10 @@ export async function createTodayDailyGoal(userId, timezone, { text }) {
   const goal = await createDailyGoal({ userId, dateKey: day.dateKey, text });
 
   if (!goal) {
-    throw new AppError(`You can plan up to ${DAILY_GOAL_LIMIT} goals a day`, 409);
+    throw Object.assign(new AppError(`You can plan up to ${DAILY_GOAL_LIMIT} goals a day`, 409), {
+      messageKey: "You can plan up to {limit} goals a day",
+      params: { limit: DAILY_GOAL_LIMIT },
+    });
   }
 
   return loadSummaryAndReconcile(userId, day);

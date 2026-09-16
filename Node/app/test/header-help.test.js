@@ -11,7 +11,6 @@ const render = (currentPath, auth = { name: "Reader", timezone: "UTC", emblemKey
     ...sharedViewLocals,
     currentPath,
     auth,
-    t: (_key, fallback) => fallback,
     getTimezoneLabel: () => "UTC",
     timezoneOptions: [{ value: "UTC", label: "UTC" }],
   });

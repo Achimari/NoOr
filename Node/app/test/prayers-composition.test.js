@@ -4,15 +4,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { sourceCopy } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, "");
 
 const feedCss = () => stripComments(read("public/styles/components/feed.css"));
 const communityCss = () => stripComments(read("public/styles/pages/community.css"));
-const myPrayers = () => read("src/views/pages/partials/my-prayers-content.ejs");
-const community = () => read("src/views/pages/partials/community-content.ejs");
-const table = () => read("src/views/pages/partials/prayers-table.ejs");
+const myPrayers = () => sourceCopy(read("src/views/pages/partials/my-prayers-content.ejs"));
+const community = () => sourceCopy(read("src/views/pages/partials/community-content.ejs"));
+const table = () => sourceCopy(read("src/views/pages/partials/prayers-table.ejs"));
 
 const rule = (selector, css) =>
   (css.match(new RegExp(`(?:^|\\n|,)\\s*${selector}\\s*\\{([^}]*)\\}`)) || [])[1] || "";

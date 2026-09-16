@@ -7,6 +7,7 @@ import { describe, it } from "node:test";
 
 import { allRules, parseRules, relative, smallestPx, styleFiles } from "./helpers/cssRules.js";
 import { readWoff2 } from "./helpers/woff2.js";
+import { sourceCopy } from "./helpers/viewLocals.js";
 
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const fontsDir = path.join(appRoot, "public", "fonts");
@@ -603,7 +604,7 @@ describe("casing and tracking", () => {
 
   it("writes the Today heading in sentence case in the markup it ships", () => {
     assert.match(
-      read("src/views/pages/partials/home-content.ejs"),
+      sourceCopy(read("src/views/pages/partials/home-content.ejs")),
       /class="page-head-title today-title">Today</,
       "the visible title reads Today; capitals are a typographic treatment, not a rewrite",
     );

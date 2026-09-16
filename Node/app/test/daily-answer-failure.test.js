@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
+import { sharedViewLocals } from "./helpers/viewLocals.js";
 import vm from "node:vm";
 
 const source = readFileSync(new URL("../public/scripts/app.js", import.meta.url), "utf8");
@@ -59,7 +60,7 @@ async function answer(action, responses, { startingAnswer = null } = {}) {
     },
   };
 
-  const sandbox = { ...context, action, startingAnswer, result: null };
+  const sandbox = { ...context, action, startingAnswer, result: null, t: sharedViewLocals.t };
   vm.runInNewContext(
     `${answerModule}\nsetDailyActionSelection(startingAnswer);\nresult = updateLeaderboard(action);`,
     sandbox,

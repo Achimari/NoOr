@@ -69,6 +69,22 @@
 
 :root {
 
+  /* Two schemes, one set of names.
+   *
+   * Every colour that changes between the light sheet and the night sheet is a
+   * `light-dark(light, dark)` pair on its own token, so components never know
+   * which scheme they are in. `color-scheme` picks the half: "light dark"
+   * follows the operating system, and the reader's saved choice stamps
+   * `data-theme` on <html> to pin one (rules below this block).
+   *
+   * The dark half is not an inversion. The page is a soft #121212 rather than
+   * black, so the black header and battle field still read as a darker field
+   * on it; body ink is #ededed rather than white, to take the glare off long
+   * reading; green and red are lifted until they clear AA on the dark ground.
+   * `test/ink-on-paper.test.js` computes both halves' ratios from these values.
+   */
+  color-scheme: light dark;
+
   --white: #ffffff;
 
   /* Achimari Monochrome Press paper.
@@ -83,7 +99,7 @@
    * Separation is made by space and by rules, never by elevation, which is why
    * there is no lighter paper above white to raise a surface onto.
    */
-  --paper: #ffffff;
+  --paper: light-dark(#ffffff, #121212);
 
   /* Kept as a name because components still ask to be "raised". It resolves to
      the same sheet: a region separates itself with spacing or a rule, and a
@@ -92,7 +108,7 @@
 
   /* The one recessed step — meter tracks, insets, the deselected half of a
      pair, a table's zebra. The only fill that is neither paper nor field. */
-  --paper-muted: #f2f2f2;
+  --paper-muted: light-dark(#f2f2f2, #1f1f1f);
 
   /* The whole document is one sheet, so the page ground is the paper. */
   --canvas: var(--paper);
@@ -103,21 +119,21 @@
   --field: #000000;
   --field-raised: #1a1a1a;
 
-  --ink: #000000;
-  --ink-raised: #1a1a1a;
+  --ink: light-dark(#000000, #ededed);
+  --ink-raised: light-dark(#1a1a1a, #d6d6d6);
 
   /* Secondary copy. 7.82:1 on white and 6.98:1 on the recessed step — AA on
      every surface the product actually sets text on, so a muted label never
      has to be audited against which ground it happens to sit over. */
-  --ink-muted: #525252;
+  --ink-muted: light-dark(#525252, #a3a3a3);
 
   /* 12.63:1 on white. For small, muted or plate-adjacent copy that has to clear
      roughly 7:1 where --ink-muted's 7.82:1 is only just comfortable. */
-  --ink-secondary-strong: #333333;
+  --ink-secondary-strong: light-dark(#333333, #cccccc);
 
   /* 3.45:1 on white — quiet decoration only. It clears the 3:1 non-text floor,
      so it may draw a graphic or a mark, and it is never essential small text. */
-  --ink-quiet: #8a8a8a;
+  --ink-quiet: light-dark(#8a8a8a, #707070);
 
   /* Structural rules, drawn from the ink itself so they read as printing rather
      than as a UI border.
@@ -127,8 +143,8 @@
      is a solid #767676, which clears the 3:1 component floor on white (4.54:1)
      and on the recessed step (4.06:1) — a translucent rule would have drifted
      below the floor over the darker of the two. */
-  --rule: rgb(0 0 0 / 18%);
-  --rule-strong: #767676;
+  --rule: light-dark(rgb(0 0 0 / 18%), rgb(255 255 255 / 18%));
+  --rule-strong: light-dark(#767676, #8a8a8a);
 
   --surface: var(--paper);
   --surface-subtle: var(--paper-muted);
@@ -140,14 +156,15 @@
   --accent: var(--ink);
   --accent-hover: var(--ink-raised);
   --accent-ink: var(--ink);
-  --on-accent: var(--white);
+  /* Text on an ink fill is the paper, so it reverses with the fill. */
+  --on-accent: var(--paper);
 
   /* Green and red reinforce the labels, checks, and warning marks already
      used for state. The pale fills keep notices quiet and text readable. */
-  --success: #1d704e;
-  --success-soft: #edf7f0;
-  --danger: #b73535;
-  --danger-soft: #fff0ee;
+  --success: light-dark(#1d704e, #5cc794);
+  --success-soft: light-dark(#edf7f0, #10261b);
+  --danger: light-dark(#b73535, #ff8f85);
+  --danger-soft: light-dark(#fff0ee, #2c1512);
 
   /* Navigation and ordinary links retain the neutral ink. */
   --brand: var(--ink);
@@ -288,7 +305,7 @@
      is deliberately `none`: a region groups with space, a rule, a tonal fill or
      a black field, never by being lifted off the sheet. */
   --shadow-float: none;
-  --shadow-dialog: 0 24px 64px rgb(0 0 0 / 26%);
+  --shadow-dialog: 0 24px 64px light-dark(rgb(0 0 0 / 26%), rgb(0 0 0 / 64%));
 
   --chrome: var(--field);
   --chrome-raised: var(--field-raised);
@@ -354,11 +371,11 @@
   --z-page-transition: 400;
   --z-skip-link: 500;
 
-  --ink-92: rgb(0 0 0 / 92%);
-  --ink-72: rgb(0 0 0 / 72%);
+  --ink-92: light-dark(rgb(0 0 0 / 92%), rgb(237 237 237 / 92%));
+  --ink-72: light-dark(rgb(0 0 0 / 72%), rgb(237 237 237 / 72%));
   --ink-18: var(--separator);
-  --ink-10: rgb(0 0 0 / 10%);
-  --ink-06: rgb(0 0 0 / 6%);
+  --ink-10: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 10%));
+  --ink-06: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 6%));
 
   --white-92: rgba(255, 255, 255, 0.92);
   --white-72: rgba(255, 255, 255, 0.78);
@@ -393,7 +410,7 @@
   /* Primary actions use the black field and its dark-grey hover step. */
   --action: var(--ink);
   --action-hover: var(--ink-raised);
-  --on-action: var(--white);
+  --on-action: var(--paper);
 
   /* State borders follow their colors. Notices also retain different rule
      weights and explicit labels so their meaning does not depend on hue. */
@@ -432,6 +449,28 @@
 
   --radius: var(--radius-panel);
   --radius-tag: var(--radius-row);
+}
+
+/* A saved choice pins the scheme; "system" (or no choice) leaves it to the OS. */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* The fibre is a light texture drawn for a white sheet; on the night sheet it
+   would only grey the ground, so it drops out. This is the one scheme-specific
+   value that is not a colour, which is why it cannot be a light-dark() pair. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper-texture-opacity: 0;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper-texture-opacity: 0;
 }
 
 /* ------------------------------------------------------- mobile token layer

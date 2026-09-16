@@ -427,7 +427,7 @@ details:not([open]) > .fold-body {
   padding: 2px var(--space-2);
   border-radius: var(--radius-row);
   background: var(--ink);
-  color: var(--white);
+  color: var(--on-action);
   font-family: var(--font-data);
   font-size: var(--text-meta);
   text-align: center;

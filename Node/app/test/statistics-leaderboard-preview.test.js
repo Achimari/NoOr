@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import { describe, it } from "node:test";
+import { sharedViewLocals } from "./helpers/viewLocals.js";
 import { pageBundles, sharedStyles } from "../src/config/assetSources.js";
 import { getPageAssets } from "../src/middleware/viewLocals.js";
 
@@ -226,6 +227,7 @@ function runStatisticsScript(fixture) {
     document: fixture.document,
     window: fixture.window,
     globalThis: {},
+    t: sharedViewLocals.t,
   });
 }
 

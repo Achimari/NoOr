@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="<%= locale %>">
+<html lang="<%= locale %>" data-theme="<%= theme %>">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +11,7 @@
     <link rel="manifest" href="/brand/site.webmanifest" />
     <link rel="preload" href="/fonts/ibm-plex-sans-condensed/IBMPlexSansCondensed-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/unbounded/Unbounded-Variable.woff2" as="font" type="font/woff2" crossorigin />
-    <title><%= title || "" %></title>
+    <title><%= t(title || "") %></title>
     <%- include("./loading-head") %>
 
     <% const pageAssets = getPageAssets(pageId); %>
@@ -27,7 +27,7 @@
       <div class="noor-loader-mark" aria-hidden="true"></div>
       <p class="sr-only" role="status" aria-live="polite" data-noor-loader-status></p>
     </div>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skip-link" href="#main-content"><%= t("Skip to main content") %></a>
     <%- body %>
   </body>
 </html>

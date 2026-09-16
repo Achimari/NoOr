@@ -1,0 +1,23 @@
+<%#
+  The browser half of src/i18n: the same lookup, `{name}` interpolation and
+  CLDR plural choice as the server's translate(), as one global `t`. The
+  catalogue itself is a separate cached script (GET /i18n/<locale>.js); it is
+  deferred ahead of every page script, so it is in place before any of them runs.
+-%>
+<script>
+  (function (locale) {
+    var plurals = new Intl.PluralRules(locale);
+    window.t = function (key, params) {
+      var messages = window.appI18nMessages || {};
+      var value = Object.prototype.hasOwnProperty.call(messages, key) ? messages[key] : key;
+      if (value && typeof value === "object") {
+        value = (params && typeof params.count === "number" && value[plurals.select(params.count)]) || value.other;
+      }
+      if (!params) return value;
+      return String(value).replace(/\{(\w+)\}/g, function (match, name) {
+        return name in params ? String(params[name]) : match;
+      });
+    };
+  })(<%- JSON.stringify(locale) %>);
+</script>
+<script src="/i18n/<%= locale %>.js?v=<%= i18nVersion %>" defer></script>

@@ -47,7 +47,7 @@ async function renderDashboard() {
       weekDays: [{ dateKey: "2026-09-01", label: "M", answer: "YES", successful: true }],
     },
     siteData: { socialLinks: [] },
-    t: () => "",
+    t: sharedViewLocals.t,
   });
 }
 
@@ -148,7 +148,7 @@ describe("daily check-in layout", () => {
     assert.match(styles, /\.dashboard-action-no\s*{[^}]*--state-fill:\s*var\(--danger\)/s);
     assert.match(
       styles,
-      /\.dashboard-action-yes\[aria-pressed="true"\],\s*\.dashboard-action-no\[aria-pressed="true"\]\s*{[^}]*background:\s*var\(--state-fill\)[^}]*color:\s*var\(--white\)/s,
+      /\.dashboard-action-yes\[aria-pressed="true"\],\s*\.dashboard-action-no\[aria-pressed="true"\]\s*{[^}]*background:\s*var\(--state-fill\)[^}]*color:\s*var\(--on-action\)/s,
     );
   });
 

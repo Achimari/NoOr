@@ -38,7 +38,7 @@
       const data = await response.json().catch(() => ({}));
       return { ok: response.ok, data };
     } catch {
-      return { ok: false, data: { error: "You appear to be offline. Please try again." } };
+      return { ok: false, data: { error: t("You appear to be offline. Please try again.") } };
     }
   }
 
@@ -64,7 +64,7 @@
     if (mana) mana.textContent = explore.maxMana;
 
     if (loadoutCount && Array.isArray(explore.equipped)) {
-      loadoutCount.textContent = `${explore.equipped.length} of ${explore.equippedLimit ?? 3} equipped`;
+      loadoutCount.textContent = t("{count} of {limit} equipped", { count: explore.equipped.length, limit: explore.equippedLimit ?? 3 });
     }
 
     for (const spell of explore.spells) {
@@ -77,10 +77,10 @@
       const state = item.querySelector("[data-spell-state]");
       if (state) {
         state.textContent = spell.unlocked
-          ? (spell.equipped ? "Carried into battle" : "Learned")
+          ? (spell.equipped ? t("Carried into battle") : t("Learned"))
           : spell.available
-            ? (confirmed ? "Ready to learn" : "Confirm base points")
-            : `Needs ${spell.wisdomRemaining} more Wisdom`;
+            ? (confirmed ? t("Ready to learn") : t("Confirm base points"))
+            : t("Needs {count} more Wisdom", { count: spell.wisdomRemaining });
       }
 
       if (spell.unlocked) renderLoadoutControl(item, spell, explore);
@@ -98,7 +98,7 @@
       button.type = "button";
       button.className = "explore-button explore-button-primary";
       button.dataset.spellUnlock = spell.key;
-      button.textContent = `Learn ${spell.name}`;
+      button.textContent = t("Learn {name}", { name: t(spell.name) });
       if (!existing) actions.replaceChildren(button);
     } else {
       const existing = actions.querySelector("[data-spell-note]");
@@ -106,8 +106,8 @@
       note.className = "explore-note";
       note.dataset.spellNote = "";
       note.textContent = spell.available
-        ? "Confirm your base points above first."
-        : "Write a reflection with your Bible reading to earn more Wisdom.";
+        ? t("Confirm your base points above first.")
+        : t("Write a reflection with your Bible reading to earn more Wisdom.");
       if (!existing || actions.querySelector("[data-spell-unlock]")) actions.replaceChildren(note);
     }
   }
@@ -119,7 +119,7 @@
     for (const [stat, input] of inputs) {
       if (input) input.value = String(game.base[stat]);
       const earned = root.querySelector(`[data-stat-earned="${stat}"]`);
-      if (earned && game.earned) earned.textContent = `+${game.earned[stat]} earned this month`;
+      if (earned && game.earned) earned.textContent = t("+{count} earned this month", { count: game.earned[stat] });
     }
     for (const [stat, value] of Object.entries(game.stats)) {
       const output = root.querySelector(`[data-stat-total="${stat}"]`);
@@ -132,7 +132,7 @@
 
     if (saveButton) {
       saveButton.hidden = allocationLocked;
-      saveButton.textContent = game.allocation.confirmed ? "Save points" : "Confirm points";
+      saveButton.textContent = game.allocation.confirmed ? t("Save points") : t("Confirm points");
     }
     if (explore) applySpellState(explore);
     setAllocationBusy(false);
@@ -156,7 +156,7 @@
     button.dataset.loadoutToggle = spell.key;
     button.setAttribute("aria-pressed", spell.equipped ? "true" : "false");
     button.setAttribute("aria-describedby", `loadout-note-${spell.key}`);
-    button.textContent = spell.equipped ? "Unequip" : "Equip";
+    button.textContent = spell.equipped ? t("Unequip") : t("Equip");
     button.disabled = blocked;
 
     const note = actions.querySelector("[data-spell-note]") || document.createElement("p");
@@ -164,10 +164,10 @@
     note.id = `loadout-note-${spell.key}`;
     note.dataset.spellNote = "";
     note.textContent = spell.equipped
-      ? "This spell is carried into your next battle."
+      ? t("This spell is carried into your next battle.")
       : blocked
-        ? "Unequip one first: you can carry three."
-        : "Learned. Equip it to carry it into your next battle.";
+        ? t("Unequip one first: you can carry three.")
+        : t("Learned. Equip it to carry it into your next battle.");
 
     if (!existing) {
       actions.textContent = "";
@@ -193,7 +193,7 @@
   function syncAllocationState() {
     if (!remaining) return;
     if (allocationLocked) {
-      remaining.textContent = "Locked";
+      remaining.textContent = t("Locked");
       return;
     }
 
@@ -202,13 +202,13 @@
     const left = BASE_TOTAL - spent;
 
     if (left === 0) {
-      remaining.textContent = "All 10 points spent";
+      remaining.textContent = t("All {total} points spent", { total: BASE_TOTAL });
       remaining.dataset.state = "ready";
     } else if (left < 0) {
-      remaining.textContent = `${Math.abs(left)} point${Math.abs(left) === 1 ? "" : "s"} too many`;
+      remaining.textContent = t("{count} points too many", { count: Math.abs(left) });
       remaining.dataset.state = "over";
     } else {
-      remaining.textContent = `${left} point${left === 1 ? "" : "s"} left`;
+      remaining.textContent = t("{count} points left", { count: left });
       remaining.dataset.state = "under";
     }
 
@@ -257,13 +257,13 @@
     if (!result) return;
 
     if (!result.ok) {
-      showError(allocationError, result.data.error || "Could not reset your stats.");
+      showError(allocationError, result.data.error || t("Could not reset your stats."));
       setAllocationBusy(false);
       return;
     }
 
     applyAllocationState(result.data, resetStatsButton);
-    showToast("Stats reset. Reassign your ten base points.");
+    showToast(t("Stats reset. Reassign your ten base points."));
   });
 
   spellExplorer?.addEventListener("click", async (event) => {
@@ -277,7 +277,7 @@
     if (!button) return;
 
     const spellKey = button.dataset.spellUnlock;
-    const spellName = button.textContent.replace("Learn ", "").trim();
+    const spellName = button.closest("[data-spell]")?.querySelector(".explore-spell-name")?.textContent.trim() || spellKey;
     button.disabled = true;
     showError(spellError, "");
 
@@ -285,7 +285,7 @@
     if (!result) return;
 
     if (!result.ok) {
-      showError(spellError, result.data.error || result.data.errors?.[0] || "That spell could not be learned yet.");
+      showError(spellError, result.data.error || result.data.errors?.[0] || t("That spell could not be learned yet."));
       button.disabled = false;
       return;
     }
@@ -298,7 +298,7 @@
       learned.addEventListener("animationend", () => learned.classList.remove("is-unlocking"), { once: true });
     }
     if (spellStatus) {
-      spellStatus.textContent = `${spellName} learned. ${result.data.explore.unlockedCount} of ${result.data.explore.totalCount} spells learned.`;
+      spellStatus.textContent = t("{name} learned. {count} of {total} spells learned.", { name: spellName, count: result.data.explore.unlockedCount, total: result.data.explore.totalCount });
     }
   });
 
@@ -306,7 +306,7 @@
     if (allocationBusy) return;
     const allocation = readAllocation();
     if (spentPoints(allocation) !== BASE_TOTAL) {
-      showError(allocationError, `Spend exactly ${BASE_TOTAL} points.`);
+      showError(allocationError, t("Spend exactly {total} points.", { total: BASE_TOTAL }));
       return;
     }
 
@@ -316,13 +316,13 @@
     if (!result) return;
 
     if (!result.ok) {
-      showError(allocationError, result.data.error || result.data.errors?.[0] || "Could not save your points.");
+      showError(allocationError, result.data.error || result.data.errors?.[0] || t("Could not save your points."));
       setAllocationBusy(false);
       return;
     }
 
     applyAllocationState(result.data, saveButton);
-    showToast("Points saved");
+    showToast(t("Points saved"));
   });
 
   root.addEventListener("change", async (event) => {
@@ -338,7 +338,7 @@
     if (!result) return;
 
     if (!result.ok) {
-      showError(privacyError, result.data.error || result.data.errors?.[0] || "Could not save that change.");
+      showError(privacyError, result.data.error || result.data.errors?.[0] || t("Could not save that change."));
       if (privacy) privacy.checked = !privacy.checked;
       return;
     }
@@ -352,7 +352,7 @@
       root.querySelector(".profile-emblem")?.setAttribute("data-emblem", result.data.profile.emblemKey);
       if (headerIdentity) headerIdentity.dataset.emblem = result.data.profile.emblemKey;
     }
-    showToast("Changes saved");
+    showToast(t("Changes saved"));
   });
 
   async function changeLoadout(button) {
@@ -373,13 +373,13 @@
     button.disabled = false;
 
     if (!result.ok) {
-      showError(spellError, result.data.error || result.data.errors?.[0] || "That loadout could not be saved.");
+      showError(spellError, result.data.error || result.data.errors?.[0] || t("That loadout could not be saved."));
       return;
     }
 
     applySpellState(result.data.explore);
     if (spellStatus) {
-      spellStatus.textContent = `${result.data.loadout.equipped.length} of ${result.data.loadout.limit} spells equipped.`;
+      spellStatus.textContent = t("{count} of {limit} spells equipped.", { count: result.data.loadout.equipped.length, limit: result.data.loadout.limit });
     }
   }
 

@@ -45,7 +45,7 @@ export async function postLogin(req, res) {
     return res.redirect("/daily-check-in");
   } catch (error) {
     if (error instanceof AppError) {
-      return renderLogin(res, error.statusCode, { errors: [error.message], values: req.body });
+      return renderLogin(res, error.statusCode, { errors: [res.locals.t(error.message)], values: req.body });
     }
     throw error;
   }
@@ -78,10 +78,10 @@ export async function registerApi(req, res) {
   } catch (error) {
     if (error instanceof AppError) {
       if (wantsHtml(req)) {
-        return renderOnboarding(res, error.statusCode, { errors: [error.message], values: req.body });
+        return renderOnboarding(res, error.statusCode, { errors: [res.locals.t(error.message)], values: req.body });
       }
 
-      return res.status(error.statusCode).json({ error: error.message });
+      return res.status(error.statusCode).json({ error: req.t(error.message) });
     }
 
     throw error;

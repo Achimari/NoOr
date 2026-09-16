@@ -7,12 +7,13 @@ import { describe, it } from "node:test";
 import pageRoutes from "../src/routes/pageRoutes.js";
 import { requireAuth } from "../src/middleware/authMiddleware.js";
 import { redirectLegacyCustomer } from "../src/controllers/profilePageController.js";
+import { sourceCopy } from "./helpers/viewLocals.js";
 
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const partialsDir = path.join(appRoot, "src", "views", "pages", "partials");
 const stylesDir = path.join(appRoot, "public", "styles");
 
-const partial = (name) => readFileSync(path.join(partialsDir, name), "utf8");
+const partial = (name) => sourceCopy(readFileSync(path.join(partialsDir, name), "utf8"));
 const style = (file) => readFileSync(path.join(stylesDir, file), "utf8");
 
 const NORMAL_ROUTES = [

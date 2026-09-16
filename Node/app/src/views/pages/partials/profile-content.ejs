@@ -1,11 +1,13 @@
 <%
+  const statNames = { strength: t("Strength"), dexterity: t("Dexterity"), intelligence: t("Intelligence"), wisdom: t("Wisdom") };
   const statOrder = [
-    { key: "strength", label: "Strength", note: "Health and damage" },
-    { key: "dexterity", label: "Dexterity", note: "How often you act" },
-    { key: "intelligence", label: "Intelligence", note: "Mana" },
-    { key: "wisdom", label: "Wisdom", note: "Unlocks spells", earnedOnly: true },
+    { key: "strength", label: statNames.strength, note: t("Health and damage") },
+    { key: "dexterity", label: statNames.dexterity, note: t("How often you act") },
+    { key: "intelligence", label: statNames.intelligence, note: t("Mana") },
+    { key: "wisdom", label: statNames.wisdom, note: t("Unlocks spells"), earnedOnly: true },
   ];
   const streakOrder = [profile.streaks.recovery, profile.streaks.reading, profile.streaks.goals];
+  const answerWord = (answer) => (answer === "YES" ? t("Yes") : answer === "NO_DATA" ? t("No data") : t("No"));
 %>
 <main id="main-content" tabindex="-1" class="dashboard-page profile-page" data-profile data-profile-id="<%= profile.id %>" data-accent="<%= profile.accentKey %>" data-owner="<%= profile.isOwner ? "true" : "false" %>">
   <div class="page-shell profile-container">
@@ -16,17 +18,17 @@
           <h1 class="profile-name"><%= profile.name %></h1>
           <p class="profile-subtitle">
             <% if (profile.isOwner) { %>
-              Your daily practice shapes this character.
+              <%= t("Your daily practice shapes this character.") %>
             <% } else { %>
-              Public profile
+              <%= t("Public profile") %>
             <% } %>
           </p>
         </div>
         <% if (profile.isOwner) { %>
 
-          <nav class="profile-head-links" aria-label="Your record">
-            <a class="profile-head-link" href="#spells">Spells</a>
-            <a class="profile-head-link" href="/achievements">Achievements</a>
+          <nav class="profile-head-links" aria-label="<%= t("Your record") %>">
+            <a class="profile-head-link" href="#spells"><%= t("Spells") %></a>
+            <a class="profile-head-link" href="/achievements"><%= t("Achievements") %></a>
           </nav>
         <% } %>
       </header>
@@ -35,31 +37,28 @@
       <% if (profile.isOwner) { %>
         <section class="profile-pane profile-allocation" data-allocation data-locked="<%= profile.allocation.locked %>" aria-labelledby="points-title">
           <header class="dashboard-card-head profile-card-head">
-            <h2 id="points-title">Base points</h2>
+            <h2 id="points-title"><%= t("Base points") %></h2>
             <p class="profile-points-remaining" data-allocation-remaining role="status">
-              <%= profile.allocation.locked ? "Locked" : "0 points left" %>
+              <%= profile.allocation.locked ? t("Locked") : t("{count} points left", { count: 0 }) %>
             </p>
           </header>
 
           <p class="profile-note">
-            Distribute all ten base points across Strength, Dexterity and Intelligence.
-            Wisdom is earned through Bible reflections. Use Reset stats to reassign
-            your base points between battles.
+            <%= t("Distribute all ten base points across Strength, Dexterity and Intelligence. Wisdom is earned through Bible reflections. Use Reset stats to reassign your base points between battles.") %>
           </p>
 
           <p class="profile-note">
-            Your ten base points carry over each month. Earned points reset at the start of each
-            month, while your daily history and learned spells remain.
+            <%= t("Your ten base points carry over each month. Earned points reset at the start of each month, while your daily history and learned spells remain.") %>
           </p>
 
           <div class="profile-allocation-grid">
-            <% ["strength", "dexterity", "intelligence"].forEach((stat) => { %>
+            <% ["strength", "dexterity", "intelligence"].forEach((stat) => { const statName = t(stat.charAt(0).toUpperCase() + stat.slice(1)); %>
               <div class="profile-allocation-row">
                 <label class="profile-allocation-label" for="allocate-<%= stat %>">
-                  <%= stat.charAt(0).toUpperCase() + stat.slice(1) %>
+                  <%= statName %>
                 </label>
                 <div class="profile-allocation-control">
-                  <button class="profile-step" type="button" data-allocation-step="-1" data-allocation-stat="<%= stat %>" aria-label="Remove a point from <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "minus", className: "ui-icon--sm" }) %></button>
+                  <button class="profile-step" type="button" data-allocation-step="-1" data-allocation-stat="<%= stat %>" aria-label="<%= t("Remove a point from {stat}", { stat: statName }) %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "minus", className: "ui-icon--sm" }) %></button>
                   <input
                     class="profile-allocation-input"
                     id="allocate-<%= stat %>"
@@ -72,31 +71,31 @@
                     data-allocation-input="<%= stat %>"
                     <%= profile.allocation.locked ? "disabled" : "" %>
                   />
-                  <button class="profile-step" type="button" data-allocation-step="1" data-allocation-stat="<%= stat %>" aria-label="Add a point to <%= stat %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "plus", className: "ui-icon--sm" }) %></button>
+                  <button class="profile-step" type="button" data-allocation-step="1" data-allocation-stat="<%= stat %>" aria-label="<%= t("Add a point to {stat}", { stat: statName }) %>" <%= profile.allocation.locked ? "disabled" : "" %>><%- include("../../components/ui/icon", { name: "plus", className: "ui-icon--sm" }) %></button>
                 </div>
-                <p class="profile-allocation-earned" data-stat-earned="<%= stat %>">+<%= profile.earned[stat] %> earned this month</p>
+                <p class="profile-allocation-earned" data-stat-earned="<%= stat %>"><%= t("+{count} earned this month", { count: profile.earned[stat] }) %></p>
               </div>
             <% }) %>
           </div>
 
           <div class="profile-allocation-actions">
             <button class="ui-button ui-button--primary" type="button" data-allocation-save <%= profile.allocation.locked ? "hidden" : "" %>>
-              <%= profile.allocation.confirmed ? "Save points" : "Confirm points" %>
+              <%= profile.allocation.confirmed ? t("Save points") : t("Confirm points") %>
             </button>
-            <button class="ui-button ui-button--secondary" type="button" data-allocation-reset-stats aria-describedby="allocation-reset-hint">Reset stats</button>
+            <button class="ui-button ui-button--secondary" type="button" data-allocation-reset-stats aria-describedby="allocation-reset-hint"><%= t("Reset stats") %></button>
           </div>
-          <p class="profile-note" id="allocation-reset-hint">Reset returns all ten base points to spend again. Earned points, learned spells and your progress stay.</p>
+          <p class="profile-note" id="allocation-reset-hint"><%= t("Reset returns all ten base points to spend again. Earned points, learned spells and your progress stay.") %></p>
           <p class="profile-error" data-allocation-error role="alert" hidden></p>
         </section>
       <% } %>
 
       <section class="profile-pane profile-stats" aria-labelledby="stats-title">
         <header class="dashboard-card-head">
-          <h2 id="stats-title">Character</h2>
+          <h2 id="stats-title"><%= t("Character") %></h2>
         </header>
 
         <p class="profile-note">
-          Allocated base points plus points earned this month.
+          <%= t("Allocated base points plus points earned this month.") %>
         </p>
 
         <ul class="profile-stat-list">
@@ -104,30 +103,30 @@
             <li class="profile-stat">
               <span class="profile-stat-label"><%= stat.label %></span>
               <span class="profile-stat-value" data-stat-total="<%= stat.key %>"><%= profile.stats[stat.key] %></span>
-              <span class="profile-stat-note"><%= stat.note %><%= stat.earnedOnly ? " — earned this month only" : "" %></span>
+              <span class="profile-stat-note"><%= stat.earnedOnly ? t("{note} — earned this month only", { note: stat.note }) : stat.note %></span>
             </li>
           <% }) %>
         </ul>
 
         <dl class="profile-derived">
           <div class="profile-derived-item">
-            <dt>Health</dt>
+            <dt><%= t("Health") %></dt>
             <dd data-derived="maxHealth"><%= profile.derived.maxHealth %></dd>
           </div>
           <div class="profile-derived-item">
-            <dt>Damage</dt>
+            <dt><%= t("Damage") %></dt>
             <dd data-derived="basicDamage"><%= profile.derived.basicDamage %></dd>
           </div>
           <div class="profile-derived-item">
-            <dt>Speed</dt>
+            <dt><%= t("Speed") %></dt>
             <dd data-derived="speed"><%= profile.derived.speed %></dd>
           </div>
           <div class="profile-derived-item">
-            <dt>Mana</dt>
+            <dt><%= t("Mana") %></dt>
             <dd data-derived="maxMana"><%= profile.derived.maxMana %></dd>
           </div>
           <div class="profile-derived-item">
-            <dt>Spells unlocked</dt>
+            <dt><%= t("Spells unlocked") %></dt>
             <dd><%= profile.spells.unlockedCount %></dd>
           </div>
         </dl>
@@ -141,7 +140,7 @@
         <div class="profile-split">
         <section class="profile-pane profile-presentation" aria-labelledby="presentation-title">
           <header class="dashboard-card-head">
-            <h2 id="presentation-title">Appearance</h2>
+            <h2 id="presentation-title"><%= t("Appearance") %></h2>
           </header>
 
           <%#
@@ -153,31 +152,31 @@
           -%>
           <details class="profile-presentation-detail" data-profile-presentation data-phone-fold open>
             <summary class="fold-summary" aria-controls="profile-presentation-choices">
-              <span class="fold-summary-label">Choose emblem and accent</span>
+              <span class="fold-summary-label"><%= t("Choose emblem and accent") %></span>
             </summary>
 
             <div class="profile-presentation-choices fold-body" id="profile-presentation-choices">
           <fieldset class="profile-fieldset">
-            <legend class="profile-legend">Emblem</legend>
+            <legend class="profile-legend"><%= t("Emblem") %></legend>
             <div class="profile-preset-grid">
               <% profile.presets.emblems.forEach((emblem) => { %>
                 <label class="profile-preset">
                   <input type="radio" name="emblemKey" value="<%= emblem.key %>" data-preset-input <%= profile.emblemKey === emblem.key ? "checked" : "" %> />
                   <span class="profile-preset-swatch" data-emblem="<%= emblem.key %>" aria-hidden="true"></span>
-                  <span class="profile-preset-label"><%= emblem.label %></span>
+                  <span class="profile-preset-label"><%= t(emblem.label) %></span>
                 </label>
               <% }) %>
             </div>
           </fieldset>
 
           <fieldset class="profile-fieldset">
-            <legend class="profile-legend">Accent</legend>
+            <legend class="profile-legend"><%= t("Accent") %></legend>
             <div class="profile-preset-grid profile-preset-grid-accents">
               <% profile.presets.accents.forEach((accent) => { %>
                 <label class="profile-preset">
                   <input type="radio" name="accentKey" value="<%= accent.key %>" data-preset-input <%= profile.accentKey === accent.key ? "checked" : "" %> />
                   <span class="profile-preset-swatch profile-accent-swatch" data-accent-swatch="<%= accent.key %>" aria-hidden="true"></span>
-                  <span class="profile-preset-label"><%= accent.label %></span>
+                  <span class="profile-preset-label"><%= t(accent.label) %></span>
                 </label>
               <% }) %>
             </div>
@@ -188,27 +187,26 @@
 
         <section class="profile-pane profile-privacy" aria-labelledby="privacy-title">
           <header class="dashboard-card-head">
-            <h2 id="privacy-title"><%- include("../../components/ui/icon", { name: "lock", className: "practice-mark" }) %>Privacy</h2>
+            <h2 id="privacy-title"><%- include("../../components/ui/icon", { name: "lock", className: "practice-mark" }) %><%= t("Privacy") %></h2>
           </header>
           <p class="profile-note">
-            Sharing is off by default. When an item is private, other members see
-            only “Private”—never counts, percentages, passages, or reflections.
+            <%= t("Sharing is off by default. When an item is private, other members see only “Private”—never counts, percentages, passages, or reflections.") %>
           </p>
 
           <div class="profile-toggle-list">
             <label class="profile-toggle">
               <input type="checkbox" data-privacy-input="shareTodayGoals" <%= profile.sharing.todayGoals ? "checked" : "" %> />
               <span class="profile-toggle-text">
-                <span class="profile-toggle-title">Share today's tasks</span>
-                <span class="profile-toggle-note">Shows what you planned today and which items are done.</span>
+                <span class="profile-toggle-title"><%= t("Share today's tasks") %></span>
+                <span class="profile-toggle-note"><%= t("Shows what you planned today and which items are done.") %></span>
               </span>
             </label>
 
             <label class="profile-toggle">
               <input type="checkbox" data-privacy-input="shareTodayBibleReflection" <%= profile.sharing.todayBibleReflection ? "checked" : "" %> />
               <span class="profile-toggle-text">
-                <span class="profile-toggle-title">Share today's Bible reflection</span>
-                <span class="profile-toggle-note">Shows the passages you chose and what you wrote.</span>
+                <span class="profile-toggle-title"><%= t("Share today's Bible reflection") %></span>
+                <span class="profile-toggle-note"><%= t("Shows the passages you chose and what you wrote.") %></span>
               </span>
             </label>
           </div>
@@ -220,49 +218,49 @@
       <%- include("./profile-today", { profile, today }) %>
 
       <section class="profile-streaks" aria-labelledby="streaks-title">
-        <h2 id="streaks-title" class="profile-section-title">Streaks</h2>
+        <h2 id="streaks-title" class="profile-section-title"><%= t("Streaks") %></h2>
 
         <div class="dashboard-card profile-disclosure-group">
         <% streakOrder.forEach((streak) => { %>
           <details class="profile-streak" data-streak-panel="<%= streak.id %>">
-            <summary class="profile-streak-summary">
-              <span class="profile-streak-label"><%= streak.label %></span>
+            <summary class="profile-streak-summary" data-show="<%= t("Show") %>" data-hide="<%= t("Hide") %>">
+              <span class="profile-streak-label"><%= t(streak.label) %></span>
               <span class="profile-streak-current">
-                <%= streak.current %> <%= streak.current === 1 ? "day" : "days" %> now
+                <%= t("{count} days now", { count: streak.current }) %>
               </span>
-              <span class="profile-streak-best">best <%= streak.best %></span>
+              <span class="profile-streak-best"><%= t("best {count}", { count: streak.best }) %></span>
               <% if (streak.isInactive) { %>
-                <span class="profile-streak-inactive"><%= streak.inactiveDays %> <%= streak.inactiveDays === 1 ? "day" : "days" %> inactive</span>
+                <span class="profile-streak-inactive"><%= t("{count} days inactive", { count: streak.inactiveDays }) %></span>
               <% } %>
             </summary>
 
             <div class="profile-streak-body">
-              <p class="profile-streak-description"><%= streak.description %></p>
+              <p class="profile-streak-description"><%= t(streak.description) %></p>
 
               <dl class="profile-streak-figures">
-                <div><dt>Current</dt><dd><%= streak.current %></dd></div>
-                <div><dt>Best</dt><dd><%= streak.best %></dd></div>
-                <div><dt>Qualifying days</dt><dd><%= streak.qualifyingDays %></dd></div>
-                <div><dt>Days recorded</dt><dd><%= streak.recordedDays %></dd></div>
-                <div><dt>Inactive days</dt><dd><%= streak.inactiveDays %></dd></div>
+                <div><dt><%= t("Current") %></dt><dd><%= streak.current %></dd></div>
+                <div><dt><%= t("Best") %></dt><dd><%= streak.best %></dd></div>
+                <div><dt><%= t("Qualifying days") %></dt><dd><%= streak.qualifyingDays %></dd></div>
+                <div><dt><%= t("Days recorded") %></dt><dd><%= streak.recordedDays %></dd></div>
+                <div><dt><%= t("Inactive days") %></dt><dd><%= streak.inactiveDays %></dd></div>
               </dl>
 
               <% if (streak.days.length) { %>
                 <div class="leaderboard-table-wrap">
                   <table class="leaderboard-table profile-streak-table">
-                    <caption class="visually-hidden">All recorded days for <%= streak.label %></caption>
+                    <caption class="visually-hidden"><%= t("All recorded days for {label}", { label: t(streak.label) }) %></caption>
                     <thead>
-                      <tr><th scope="col">Day</th><th scope="col">Answer</th></tr>
+                      <tr><th scope="col"><%= t("Day") %></th><th scope="col"><%= t("Answer") %></th></tr>
                     </thead>
                     <tbody>
                       <% streak.days.forEach((day) => { %>
                         <tr>
                           <th scope="row">
-                            <time class="profile-streak-date" datetime="<%= day.dateKey %>"><%= day.dateKey %><%= day.isToday ? " (today)" : "" %></time>
+                            <time class="profile-streak-date" datetime="<%= day.dateKey %>"><%= day.isToday ? t("{date} (today)", { date: day.dateKey }) : day.dateKey %></time>
                           </th>
                           <td>
                             <span class="profile-day-result" data-result="<%= day.answer.toLowerCase().replace("_", "-") %>">
-                              <%= day.answer === "YES" ? "Yes" : day.answer === "NO_DATA" ? "No data" : "No" %>
+                              <%= answerWord(day.answer) %>
                             </span>
                           </td>
                         </tr>
@@ -271,7 +269,7 @@
                   </table>
                 </div>
               <% } else { %>
-                <p class="profile-empty">No days recorded yet.</p>
+                <p class="profile-empty"><%= t("No days recorded yet.") %></p>
               <% } %>
             </div>
           </details>

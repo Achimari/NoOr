@@ -13,13 +13,16 @@ export const corsMiddleware = cors({
   credentials: true,
 });
 
+/* Limiters run after viewLocals, so the refusal is sent in the reader's language. */
+const translated = (req, message) => (req.t ? req.t(message) : message);
+
 function gameRateLimiter({ windowMs, limit }, message) {
   return rateLimit({
     windowMs,
     limit: isProduction ? limit : limit * 5,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: message },
+    message: (req) => ({ error: translated(req, message) }),
   });
 }
 
@@ -48,5 +51,5 @@ export const authRateLimiter = rateLimit({
   limit: isProduction ? 20 : 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: "Too many authentication attempts. Please try again later.",
+  message: (req) => translated(req, "Too many authentication attempts. Please try again later."),
 });

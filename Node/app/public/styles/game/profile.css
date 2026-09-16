@@ -496,15 +496,17 @@
   justify-self: end;
 }
 
+/* The words come from the markup (data-show / data-hide), already translated:
+   a literal in `content` is copy no catalogue can reach. */
 .profile-disclosure-summary::after,
 .profile-streak-summary::after {
-  content: "Show";
+  content: attr(data-show);
   color: var(--ink-secondary-strong);
   font-size: var(--text-meta);
 }
 
 [open] > .profile-disclosure-summary::after,
-[open] > .profile-streak-summary::after { content: "Hide"; }
+[open] > .profile-streak-summary::after { content: attr(data-hide); }
 
 .profile-disclosure-label,
 .profile-streak-label { font-weight: var(--weight-body); font-size: var(--text-label); }

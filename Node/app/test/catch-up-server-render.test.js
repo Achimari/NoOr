@@ -72,7 +72,7 @@ describe("catch-up is complete on first paint", () => {
 
     for (const name of ["Strong check-in", "Bible reading", "Daily tasks"]) {
       assert.match(html, new RegExp(name), `server markup is missing "${name}"`);
-      assert.match(appScript, new RegExp(`name: "${name}"`), `client copy is missing "${name}"`);
+      assert.match(appScript, new RegExp(`name: t\\("${name}"\\)`), `client copy is missing "${name}"`);
     }
   });
 

@@ -4,8 +4,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { sourceCopy } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
-const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
+const read = (relative) => sourceCopy(readFileSync(path.join(appRoot, relative), "utf8"));
 
 describe("copy quality contract", () => {
   it("writes every title in sentence case in the markup that ships", () => {

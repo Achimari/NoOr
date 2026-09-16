@@ -1,21 +1,25 @@
 <%
   const tasks = today.tasks;
   const reflection = today.reflection;
+  /* References are rebuilt from their parts so the book is named in the reader's language. */
+  const reference = (passage) => (passage.bookName
+    ? `${t(passage.bookName)} ${passage.chapter}:${passage.startVerse === passage.endVerse ? passage.startVerse : `${passage.startVerse}–${passage.endVerse}`}`
+    : passage.reference);
 %>
 <section class="profile-today" aria-labelledby="today-title">
-  <h2 id="today-title" class="profile-section-title">Today</h2>
+  <h2 id="today-title" class="profile-section-title"><%= t("Today") %></h2>
 
   <div class="dashboard-card profile-disclosure-group">
     <details class="profile-disclosure" data-today-tasks>
-    <summary class="profile-disclosure-summary">
-      <span class="profile-disclosure-label">Today's tasks</span>
+    <summary class="profile-disclosure-summary" data-show="<%= t("Show") %>" data-hide="<%= t("Hide") %>">
+      <span class="profile-disclosure-label"><%= t("Today's tasks") %></span>
       <span class="profile-disclosure-state">
         <% if (!tasks.shared) { %>
-          Private
+          <%= t("Private") %>
         <% } else if (!tasks.hasTasks) { %>
-          No tasks added
+          <%= t("No tasks added") %>
         <% } else { %>
-          <%= tasks.completedCount %> of <%= tasks.total %> done &middot; <%= tasks.completionPercent %>%
+          <%= t("{done} of {total} done · {percent}%", { done: tasks.completedCount, total: tasks.total, percent: tasks.completionPercent }) %>
         <% } %>
       </span>
     </summary>
@@ -23,15 +27,15 @@
     <div class="profile-disclosure-body">
       <% if (!tasks.shared) { %>
         <p class="profile-private">
-          This person keeps today's tasks private.
+          <%= t("This person keeps today's tasks private.") %>
         </p>
       <% } else if (!tasks.hasTasks) { %>
-        <p class="profile-empty">No tasks were added today.</p>
+        <p class="profile-empty"><%= t("No tasks were added today.") %></p>
       <% } else { %>
         <ul class="profile-task-list">
           <% tasks.items.forEach((item) => { %>
             <li class="profile-task" data-completed="<%= item.completed ? "true" : "false" %>">
-              <span class="profile-task-state"><%= item.completed ? "Done" : "Open" %></span>
+              <span class="profile-task-state"><%= item.completed ? t("Done") : t("Open") %></span>
               <span class="profile-task-text"><%= item.text %></span>
             </li>
           <% }) %>
@@ -41,17 +45,17 @@
   </details>
 
   <details class="profile-disclosure" data-today-reflection>
-    <summary class="profile-disclosure-summary">
-      <span class="profile-disclosure-label">Today's Bible reflection</span>
+    <summary class="profile-disclosure-summary" data-show="<%= t("Show") %>" data-hide="<%= t("Hide") %>">
+      <span class="profile-disclosure-label"><%= t("Today's Bible reflection") %></span>
       <span class="profile-disclosure-state">
         <% if (!reflection.shared) { %>
-          Private
+          <%= t("Private") %>
         <% } else if (!reflection.hasEntry) { %>
-          No reading entry
+          <%= t("No reading entry") %>
         <% } else if (reflection.passages.length) { %>
-          <%= reflection.passages.map((passage) => passage.reference).join(", ") %>
+          <%= reflection.passages.map(reference).join(", ") %>
         <% } else { %>
-          Answered <%= reflection.answer %>
+          <%= t("Answered {answer}", { answer: t(reflection.answer) }) %>
         <% } %>
       </span>
     </summary>
@@ -59,22 +63,22 @@
     <div class="profile-disclosure-body">
       <% if (!reflection.shared) { %>
         <p class="profile-private">
-          This person keeps today's Bible reflection private.
+          <%= t("This person keeps today's Bible reflection private.") %>
         </p>
       <% } else if (!reflection.hasEntry) { %>
-        <p class="profile-empty">No reading entry for today yet.</p>
+        <p class="profile-empty"><%= t("No reading entry for today yet.") %></p>
       <% } else { %>
         <% if (reflection.passages.length) { %>
           <ul class="profile-passage-list">
             <% reflection.passages.forEach((passage) => { %>
-              <li class="profile-passage"><%= passage.reference %></li>
+              <li class="profile-passage"><%= reference(passage) %></li>
             <% }) %>
           </ul>
         <% } %>
         <% if (reflection.reflection) { %>
           <p class="profile-reflection"><%= reflection.reflection %></p>
         <% } else { %>
-          <p class="profile-empty">No reflection was added.</p>
+          <p class="profile-empty"><%= t("No reflection was added.") %></p>
         <% } %>
       <% } %>
     </div>

@@ -11,7 +11,7 @@
     </div>
 
     <% if (navLinks.length) { %>
-      <nav class="header-nav" aria-label="Primary">
+      <nav class="header-nav" aria-label="<%= t("Primary") %>">
         <% navLinks.forEach((link)=> { %>
           <a href="<%= link.to %>" class="header-link<%= currentPath === link.to ? " active" : "" %>"<%- current(link.to) %>>
             <%= link.label %>
@@ -22,16 +22,16 @@
 
     <div class="header-actions">
       <% if (!auth) { %>
-        <nav class="header-auth-actions" aria-label="Account">
-          <a class="header-auth-link" href="/login">Login</a>
+        <nav class="header-auth-actions" aria-label="<%= t("Account") %>">
+          <a class="header-auth-link" href="/login"><%= t("auth.login.title") %></a>
         </nav>
       <% } %>
       <% if (auth) { %>
         <a
           class="header-help-link"
           href="/help"
-          aria-label="Help"
-          title="Help"
+          aria-label="<%= t("Help") %>"
+          title="<%= t("Help") %>"
           <%- currentPath === "/help" ? 'aria-current="page"' : "" %>
         >
           <%- include("../ui/icon", { name: "warning-circle" }) %>
@@ -43,7 +43,7 @@
             data-account-toggle
             aria-expanded="false"
             aria-controls="account-panel"
-            aria-label="<%= auth.name %> account menu"
+            aria-label="<%= t("{name} account menu", { name: auth.name }) %>"
           >
             <span
               class="header-account-identity"
@@ -54,20 +54,20 @@
           </button>
 
           <div class="header-account-panel" id="account-panel" data-account-panel hidden>
-            <nav class="header-account-nav" aria-label="Account">
-              <a class="header-account-link<%= currentPath === "/profile" ? " active" : "" %>" href="/profile" data-account-item>My Profile</a>
-              <a class="header-account-link<%= currentPath === "/achievements" ? " active" : "" %>" href="/achievements" data-account-item>Achievements</a>
+            <nav class="header-account-nav" aria-label="<%= t("Account") %>">
+              <a class="header-account-link<%= currentPath === "/profile" ? " active" : "" %>" href="/profile" data-account-item><%= t("My Profile") %></a>
+              <a class="header-account-link<%= currentPath === "/achievements" ? " active" : "" %>" href="/achievements" data-account-item><%= t("Achievements") %></a>
             </nav>
 
             <section class="header-account-section" aria-labelledby="account-region-label">
 
-              <p class="header-account-heading" id="account-region-label">Region / Time zone</p>
+              <p class="header-account-heading" id="account-region-label"><%= t("Region / Time zone") %></p>
               <div class="header-timezone" data-timezone-menu>
-                <button class="header-timezone-button" type="button" data-timezone-toggle aria-expanded="false" aria-label="Change timezone">
+                <button class="header-timezone-button" type="button" data-timezone-toggle aria-expanded="false" aria-label="<%= t("Change timezone") %>">
                   <span data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
                 </button>
                 <div class="header-timezone-menu" data-timezone-options hidden>
-                  <input class="header-timezone-search" type="search" placeholder="Search time zones…" data-timezone-search autocomplete="off" spellcheck="false" aria-label="Search time zones" />
+                  <input class="header-timezone-search" type="search" placeholder="<%= t("Search time zones…") %>" data-timezone-search autocomplete="off" spellcheck="false" aria-label="<%= t("Search time zones") %>" />
                   <div class="header-timezone-list" data-timezone-list>
                     <% timezoneOptions.forEach((timezone) => { %>
                       <button class="header-timezone-option"<%- timezone.value === auth.timezone ? ' aria-current="true"' : "" %> type="button" data-timezone-option="<%= timezone.value %>" data-timezone-label="<%= timezone.label.toLowerCase() %>" data-timezone-value="<%= timezone.value.toLowerCase() %>">
@@ -75,17 +75,21 @@
                       </button>
                     <% }) %>
                   </div>
-                  <span class="header-timezone-empty" data-timezone-empty hidden>No timezones found</span>
+                  <span class="header-timezone-empty" data-timezone-empty hidden><%= t("No timezones found") %></span>
                 </div>
               </div>
             </section>
 
-            <nav class="header-account-nav" aria-label="Account settings">
-              <a class="header-account-link<%= currentPath === "/settings" ? " active" : "" %>" href="/settings" data-account-item>Settings</a>
+            <section class="header-account-section" aria-label="<%= t("Display") %>">
+              <%- include("../ui/preferences", { tone: "chrome" }) %>
+            </section>
+
+            <nav class="header-account-nav" aria-label="<%= t("Account settings") %>">
+              <a class="header-account-link<%= currentPath === "/settings" ? " active" : "" %>" href="/settings" data-account-item><%= t("Settings") %></a>
             </nav>
 
             <form class="header-account-logout" action="/logout" method="post">
-              <button class="header-account-link header-account-logout-button" type="submit" data-account-item>Logout</button>
+              <button class="header-account-link header-account-logout-button" type="submit" data-account-item><%= t("Logout") %></button>
             </form>
           </div>
         </div>
@@ -101,11 +105,11 @@
       <% if (navLinks.length) { %>
         <details class="site-menu" data-site-menu>
           <summary class="site-menu-toggle">
-            <span class="sr-only">Menu</span>
+            <span class="sr-only"><%= t("Menu") %></span>
             <span class="site-menu-line" aria-hidden="true"></span>
             <span class="site-menu-line" aria-hidden="true"></span>
           </summary>
-          <nav class="site-menu-panel" aria-label="Primary">
+          <nav class="site-menu-panel" aria-label="<%= t("Primary") %>">
             <ul class="site-menu-list site-menu-list--primary">
               <% navLinks.forEach((link) => { %>
                 <li><a class="site-menu-link" href="<%= link.to %>"<%- current(link.to) %>><%= link.label %></a></li>
@@ -114,11 +118,11 @@
 
             <% if (auth) { %>
               <div class="site-menu-group">
-                <p class="site-menu-mark">Account</p>
+                <p class="site-menu-mark"><%= t("Account") %></p>
                 <ul class="site-menu-list">
-                  <li><a class="site-menu-link" href="/profile"<%- current("/profile") %>>My Profile</a></li>
-                  <li><a class="site-menu-link" href="/achievements"<%- current("/achievements") %>>Achievements</a></li>
-                  <li><a class="site-menu-link" href="/settings"<%- current("/settings") %>>Settings</a></li>
+                  <li><a class="site-menu-link" href="/profile"<%- current("/profile") %>><%= t("My Profile") %></a></li>
+                  <li><a class="site-menu-link" href="/achievements"<%- current("/achievements") %>><%= t("Achievements") %></a></li>
+                  <li><a class="site-menu-link" href="/settings"<%- current("/settings") %>><%= t("Settings") %></a></li>
                 </ul>
 
                 <button
@@ -128,18 +132,18 @@
                   aria-expanded="false"
                   aria-controls="site-menu-timezone-panel"
                 >
-                  Region / Time zone
+                  <%= t("Region / Time zone") %>
                   <span class="site-menu-timezone-current" data-timezone-current><%= getTimezoneLabel(auth.timezone) %></span>
                 </button>
                 <div class="site-menu-timezone-panel" id="site-menu-timezone-panel" data-mobile-timezone-panel hidden>
                   <input
                     class="header-timezone-search"
                     type="search"
-                    placeholder="Search time zones…"
+                    placeholder="<%= t("Search time zones…") %>"
                     data-mobile-timezone-search
                     autocomplete="off"
                     spellcheck="false"
-                    aria-label="Search time zones"
+                    aria-label="<%= t("Search time zones") %>"
                   />
                   <div class="header-timezone-list" data-mobile-timezone-list>
                     <% timezoneOptions.forEach((timezone) => { %>
@@ -148,12 +152,19 @@
                       </button>
                     <% }) %>
                   </div>
-                  <span class="header-timezone-empty" data-mobile-timezone-empty hidden>No timezones found</span>
+                  <span class="header-timezone-empty" data-mobile-timezone-empty hidden><%= t("No timezones found") %></span>
                 </div>
               </div>
+            <% } %>
 
+            <div class="site-menu-group">
+              <p class="site-menu-mark"><%= t("Display") %></p>
+              <%- include("../ui/preferences", { tone: "chrome" }) %>
+            </div>
+
+            <% if (auth) { %>
               <form class="site-menu-group site-menu-logout" action="/logout" method="post">
-                <button class="site-menu-link" type="submit">Logout</button>
+                <button class="site-menu-link" type="submit"><%= t("Logout") %></button>
               </form>
             <% } %>
           </nav>

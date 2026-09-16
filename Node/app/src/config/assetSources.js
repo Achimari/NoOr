@@ -10,6 +10,7 @@ export const sharedStyles = [
   "styles/components/lists.css",
   "styles/components/tables.css",
   "styles/components/status.css",
+  "styles/components/preferences.css",
   "styles/header/base.css",
   "styles/header/responsive.css",
   "styles/home/dashboard.css",

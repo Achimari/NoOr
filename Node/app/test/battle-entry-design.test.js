@@ -63,7 +63,7 @@ async function renderEntry({ encounters = MIXED_COURSE, confirmed = true } = {})
       spellCount: 2,
     },
     siteData: { socialLinks: [] },
-    t: (_key, fallback) => (Array.isArray(fallback) ? fallback : ""),
+    t: sharedViewLocals.t,
   });
 
   return html.slice(html.indexOf("data-battle-entry"), html.indexOf("data-battle-active"));

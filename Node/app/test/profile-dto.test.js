@@ -157,8 +157,8 @@ describe("profile streak history", () => {
       "utf8",
     );
 
-    assert.match(template, /<th scope="col">Answer<\/th>/);
-    assert.match(template, /day\.answer === "YES" \? "Yes" : day\.answer === "NO_DATA" \? "No data" : "No"/);
+    assert.match(template, /<th scope="col"><%= t\("Answer"\) %><\/th>/);
+    assert.match(template, /answer === "YES" \? t\("Yes"\) : answer === "NO_DATA" \? t\("No data"\) : t\("No"\)/);
     assert.doesNotMatch(template, /Not counted|Counted/);
     assert.match(styles, /\.profile-streak-table th\[scope="row"\][^{]*\{[^}]*white-space:\s*nowrap/s);
   });

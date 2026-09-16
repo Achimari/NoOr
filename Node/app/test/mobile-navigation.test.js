@@ -28,7 +28,6 @@ const render = (currentPath, auth = AUTH) =>
     ...sharedViewLocals,
     currentPath,
     auth,
-    t: (key, fallback) => (key === "header.nav" ? en.header.nav : fallback),
     getTimezoneLabel: () => "Riga",
     timezoneOptions: [{ value: "Europe/Riga", label: "Riga" }, { value: "UTC", label: "UTC" }],
   });

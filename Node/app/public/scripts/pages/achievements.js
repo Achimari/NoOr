@@ -10,10 +10,10 @@
   const result = root.querySelector("[data-achievements-status]");
   if (!buttons.length || !cards.length) return;
 
-  const FILTER_NOUNS = {
-    EARNED: "earned",
-    IN_PROGRESS: "in progress",
-    NOT_STARTED: "not started",
+  const FILTER_MESSAGES = {
+    EARNED: "Showing {count} achievements earned.",
+    IN_PROGRESS: "Showing {count} achievements in progress.",
+    NOT_STARTED: "Showing {count} achievements not started.",
   };
 
   function matchesFilter(status, filter) {
@@ -21,9 +21,9 @@
   }
 
   function describeVisible(count, filter) {
-    if (filter === "all") return `Showing all ${count} achievements.`;
-    if (count === 0) return "No achievements match this filter.";
-    return `Showing ${count} achievements ${FILTER_NOUNS[filter] || ""}.`.replace(/\s+\./, ".");
+    if (filter === "all") return t("Showing all {count} achievements.", { count });
+    if (count === 0) return t("No achievements match this filter.");
+    return t(FILTER_MESSAGES[filter] || "Showing all {count} achievements.", { count });
   }
 
   function applyFilter(filter) {

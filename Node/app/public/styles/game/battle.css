@@ -150,7 +150,7 @@
 .battle-encounter[data-state="completed"] .battle-encounter-marker {
   border-color: var(--ink);
   background: var(--ink);
-  color: var(--white);
+  color: var(--on-action);
 }
 
 .battle-encounter[data-next="true"] .battle-encounter-marker {

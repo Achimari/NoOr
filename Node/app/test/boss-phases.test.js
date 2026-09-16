@@ -204,11 +204,14 @@ describe("intent privacy", () => {
 
     assert.deepEqual(
       Object.keys(published).sort(),
-      ["action", "counter", "effectSummary", "estimatedDamage", "label", "phase", "severity", "spellKey"],
+      ["action", "counter", "effectMessage", "effectSummary", "estimatedDamage", "label", "phase", "severity", "spellKey"],
     );
-    for (const value of Object.values(published)) {
+    const { effectMessage, ...scalars } = published;
+    for (const value of Object.values(scalars)) {
       assert.ok(["string", "number"].includes(typeof value) || value === null);
     }
+    // The summary's template and the figures it shows — display data, never a rule.
+    assert.ok(effectMessage === null || Object.keys(effectMessage).sort().join() === "key,params");
   });
 
   it("preserves a version 2 battle's plain string intent", () => {

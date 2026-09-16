@@ -4,9 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { sourceCopy } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const partialsDir = path.join(appRoot, "src", "views", "pages", "partials");
-const partial = (name) => readFileSync(path.join(partialsDir, name), "utf8");
+const partial = (name) => sourceCopy(readFileSync(path.join(partialsDir, name), "utf8"));
 
 const PAGES = [
   ["home-content.ejs", "Today"],

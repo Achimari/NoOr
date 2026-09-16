@@ -63,10 +63,21 @@ function over(alphaColor, backgroundHex) {
   return `#${mixed.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 }
 
-const token = (name) => {
+const declared = (name) => {
   const match = read("public/styles/variables.css").match(new RegExp(`${name}:\\s*([^;]+);`));
   return match ? match[1].trim() : null;
 };
+
+/** One half of a `light-dark(light, dark)` pair; a plain value is both halves. */
+const half = (value, index) => {
+  const pair = value?.match(/^light-dark\((.+),\s*(.+)\)$/);
+  return pair ? pair[index].trim() : value;
+};
+
+/** The light-scheme value, which is what every assertion below was written against. */
+const token = (name) => half(declared(name), 1);
+/** The dark-scheme value of the same token. */
+const darkToken = (name) => half(declared(name), 2);
 
 /**
  * The grounds text is actually set on.
@@ -174,6 +185,35 @@ describe("Achimari neutral surfaces and semantic accents", () => {
     }
   });
 
+  it("holds the same floors in the dark scheme, measured from each token's dark half", () => {
+    for (const paper of PAPERS) {
+      const background = darkToken(paper);
+      for (const ink of ["--ink", "--ink-muted", "--ink-secondary-strong", "--success", "--danger"]) {
+        const ratio = contrast(darkToken(ink), background);
+        assert.ok(ratio >= 4.5, `dark ${ink} on ${paper} is ${ratio.toFixed(2)}:1, under the 4.5:1 text floor`);
+      }
+      for (const boundary of ["--rule-strong", "--ink-quiet"]) {
+        const ratio = contrast(darkToken(boundary), background);
+        assert.ok(ratio >= 3, `dark ${boundary} on ${paper} is ${ratio.toFixed(2)}:1, under the 3:1 non-text floor`);
+      }
+      const rule = contrast(over(darkToken("--rule"), background), background);
+      assert.ok(rule < 3, `dark --rule reaches ${rule.toFixed(2)}:1 on ${paper}; it must stay decorative`);
+    }
+
+    // Text reversed out of a fill is --on-action, which is the paper: white on
+    // the light sheet, the night paper in the dark scheme. Both must read.
+    assert.equal(token("--on-action"), "var(--paper)");
+    for (const fill of ["--ink", "--success", "--danger"]) {
+      const light = contrast(token("--paper"), token(fill));
+      const dark = contrast(darkToken("--paper"), darkToken(fill));
+      assert.ok(light >= 4.5, `reversed text on light ${fill} is ${light.toFixed(2)}:1`);
+      assert.ok(dark >= 4.5, `reversed text on dark ${fill} is ${dark.toFixed(2)}:1`);
+    }
+
+    // The black header and battle field must still sit darker than the night page.
+    assert.ok(luminance(token("--field")) < luminance(darkToken("--paper")), "the field reads as a field on the dark page");
+  });
+
   it("keeps the decorative rule decorative, and never the only edge of a control", () => {
     for (const paper of PAPERS) {
       const composited = over(token("--rule"), token(paper));
@@ -256,7 +296,7 @@ describe("Achimari neutral surfaces and semantic accents", () => {
       for (const [match, hex] of sheet.matchAll(/#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/g)) {
         const full = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
         const [r, g, b] = channels(`#${full}`);
-        if (relative === "public/styles/variables.css" && ["1d704e", "edf7f0", "b73535", "fff0ee"].includes(full.toLowerCase())) continue;
+        if (relative === "public/styles/variables.css" && ["1d704e", "edf7f0", "b73535", "fff0ee", "5cc794", "10261b", "ff8f85", "2c1512"].includes(full.toLowerCase())) continue;
         if (!(r === g && g === b)) offenders.push(`${relative} — ${match}`);
       }
 

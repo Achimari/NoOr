@@ -375,7 +375,7 @@ describe("the No data day in the profile history table", () => {
   const markup = readFileSync(new URL("../src/views/pages/partials/profile-content.ejs", import.meta.url), "utf8");
 
   it("labels the day No data instead of No", () => {
-    assert.match(markup, /day\.answer === "NO_DATA" \? "No data"/);
+    assert.match(markup, /answer === "NO_DATA" \? t\("No data"\)/);
   });
 
   it("gives the cell its own result hook so it can be styled apart from a No", () => {

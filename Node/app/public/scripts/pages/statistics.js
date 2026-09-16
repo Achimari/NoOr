@@ -32,23 +32,23 @@
 
     board.dataset.streakVisibleCount = String(visibleCount || PREVIEW_ROW_COUNT);
     toggle.hidden = remainingCount === 0;
-    toggle.textContent = "View more";
+    toggle.textContent = t("View more");
     toggle.setAttribute("aria-expanded", visibleCount > PREVIEW_ROW_COUNT ? "true" : "false");
 
-    const boardLabel = board.dataset.streakBoardLabel || "leaderboard";
+    const boardLabel = board.dataset.streakBoardLabel || t("leaderboard");
     toggle.setAttribute(
       "aria-label",
       remainingCount > 0
-        ? `View ${nextBatchCount} more users in ${boardLabel}; ${remainingCount} remaining`
-        : `All users shown in ${boardLabel}`,
+        ? t("View {next} more users in {board}; {remaining} remaining", { next: nextBatchCount, board: boardLabel, remaining: remainingCount })
+        : t("All users shown in {board}", { board: boardLabel }),
     );
 
     if (announce) {
       const status = board.querySelector("[data-streak-board-status]");
       if (status) {
         status.textContent = remainingCount > 0
-          ? `Showing ${visibleCount} of ${rows.length} users in ${boardLabel}.`
-          : `Showing all ${rows.length} users in ${boardLabel}.`;
+          ? t("Showing {visible} of {total} users in {board}.", { visible: visibleCount, total: rows.length, board: boardLabel })
+          : t("Showing all {total} users in {board}.", { total: rows.length, board: boardLabel });
       }
     }
 
@@ -103,8 +103,8 @@
     });
 
     const userCount = Number.parseInt(selectedLink.dataset.userCount, 10) || 0;
-    if (boardCount) boardCount.textContent = `${userCount} ${userCount === 1 ? "user" : "users"}`;
-    if (announce && viewStatus) viewStatus.textContent = `Showing ${selectedLink.textContent.trim()} progress.`;
+    if (boardCount) boardCount.textContent = t("{count} users", { count: userCount });
+    if (announce && viewStatus) viewStatus.textContent = t("Showing {label} progress.", { label: selectedLink.textContent.trim() });
 
     if (updateHistory && browserWindow?.history?.pushState) {
       browserWindow.history.pushState({}, "", selectedLink.getAttribute("href"));

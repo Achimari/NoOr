@@ -3,8 +3,8 @@
 
     <header class="page-head prayers-opening">
       <div class="page-head-copy">
-        <h1 class="page-head-title">Community</h1>
-        <p class="page-head-lede">Find today's encouragement, practical support, and prayers from the community.</p>
+        <h1 class="page-head-title"><%= t("Community") %></h1>
+        <p class="page-head-lede"><%= t("Find today's encouragement, practical support, and prayers from the community.") %></p>
       </div>
 
     </header>
@@ -12,7 +12,7 @@
     <section class="page-section section-frame section-frame--ruled community-editorial" aria-labelledby="community-encouragement-title">
       <div class="community-editorial-grid">
         <div class="community-encouragement">
-          <h2 class="section-head-title" id="community-encouragement-title">Encouragement</h2>
+          <h2 class="section-head-title" id="community-encouragement-title"><%= t("Encouragement") %></h2>
 
           <figure class="community-quote">
             <blockquote class="t-reading">
@@ -24,10 +24,11 @@
           </figure>
         </div>
 
-        <article class="community-resource">
+        <%# The resources summarise English-language articles, so they are marked as English for assistive technology. -%>
+        <article class="community-resource"<%- locale === "en" ? "" : ' lang="en"' %>>
           <h3 class="t-component-title"><%= recoveryResource.title %></h3>
           <p class="community-resource-meta">
-            <%= recoveryResource.source %> · <%= recoveryResource.format %> · <%= recoveryResource.estimated_read_minutes %> min read
+            <%= recoveryResource.source %> · <%= recoveryResource.format %> · <%= t("{minutes} min read", { minutes: recoveryResource.estimated_read_minutes }) %>
           </p>
 
           <%#
@@ -37,19 +38,19 @@
           -%>
           <details class="community-resource-detail" data-community-resource data-phone-fold open>
             <summary class="fold-summary" aria-controls="community-resource-body">
-              <span class="fold-summary-label">What it says</span>
+              <span class="fold-summary-label"><%= t("What it says") %></span>
             </summary>
 
             <div class="community-resource-body fold-body" id="community-resource-body">
               <p class="community-resource-summary"><%= recoveryResource.user_takeaway %></p>
 
               <p class="community-resource-action">
-                <span class="community-resource-action-label">Try this now</span>
+                <span class="community-resource-action-label"><%= t("Try this now") %></span>
                 <%= recoveryResource.suggested_action %>
               </p>
 
               <p class="community-resource-more">
-                <a class="link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="Read <%= recoveryResource.title %> at <%= recoveryResource.source %> (opens in a new tab)">Optional further reading</a>
+                <a class="link" href="<%= recoveryResource.url %>" target="_blank" rel="noopener noreferrer" aria-label="<%= t("Read {title} at {source} (opens in a new tab)", { title: recoveryResource.title, source: recoveryResource.source }) %>"><%= t("Optional further reading") %></a>
               </p>
             </div>
           </details>
@@ -59,12 +60,12 @@
 
     <section class="page-section section-frame section-frame--ruled community-requests" aria-labelledby="community-prayers-title">
       <div class="section-head">
-        <h2 class="section-head-title" id="community-prayers-title">Prayer requests</h2>
+        <h2 class="section-head-title" id="community-prayers-title"><%= t("Prayer requests") %></h2>
       </div>
-      <p class="section-lede">Read community requests and let people know you are praying with them.</p>
+      <p class="section-lede"><%= t("Read community requests and let people know you are praying with them.") %></p>
 
       <p class="community-own-prayers">
-        <a class="community-own-prayers-link" href="/my-prayers">Go to My Prayers</a>
+        <a class="community-own-prayers-link" href="/my-prayers"><%= t("Go to My Prayers") %></a>
       </p>
 
       <%#
@@ -74,32 +75,32 @@
       -%>
       <details class="prayer-filter-disclosure" data-prayer-filter-disclosure data-phone-fold open>
         <summary class="fold-summary" aria-controls="prayer-filter-panel">
-          <span class="fold-summary-label">Filters</span>
-          <span class="fold-summary-state" data-prayer-filter-state>Newest first</span>
+          <span class="fold-summary-label"><%= t("Filters") %></span>
+          <span class="fold-summary-state" data-prayer-filter-state><%= t("Newest first") %></span>
         </summary>
 
       <div class="prayer-filter-panel fold-body" id="prayer-filter-panel" data-prayer-filter-panel>
         <label class="prayer-filter-field">
-          <span>User</span>
+          <span><%= t("User") %></span>
           <span class="prayer-filter-combo">
-            <input class="prayer-filter-control" type="search" placeholder="Search user…" data-prayer-user-filter autocomplete="off" spellcheck="false" aria-expanded="false" aria-controls="prayer-user-options">
+            <input class="prayer-filter-control" type="search" placeholder="<%= t("Search user…") %>" data-prayer-user-filter autocomplete="off" spellcheck="false" aria-expanded="false" aria-controls="prayer-user-options">
             <span class="prayer-filter-menu" id="prayer-user-options" data-prayer-user-options hidden></span>
           </span>
         </label>
         <div class="prayer-filter-field">
-          <span id="prayer-time-label">Time</span>
+          <span id="prayer-time-label"><%= t("Time") %></span>
           <div class="prayer-select">
             <button class="prayer-filter-control prayer-select-trigger" type="button" data-prayer-time-toggle aria-expanded="false" aria-controls="prayer-time-menu" aria-labelledby="prayer-time-label prayer-time-value">
-              <span id="prayer-time-value" data-prayer-time-label>Newest first</span>
+              <span id="prayer-time-value" data-prayer-time-label><%= t("Newest first") %></span>
               <span class="prayer-select-chevron" aria-hidden="true"><%- include("../../components/ui/icon", { name: "chevron", className: "ui-icon--sm" }) %></span>
             </button>
             <div class="prayer-filter-menu" id="prayer-time-menu" data-prayer-time-menu hidden>
-              <button type="button" data-prayer-time-option="newest">Newest first</button>
-              <button type="button" data-prayer-time-option="oldest">Oldest first</button>
+              <button type="button" data-prayer-time-option="newest"><%= t("Newest first") %></button>
+              <button type="button" data-prayer-time-option="oldest"><%= t("Oldest first") %></button>
             </div>
           </div>
         </div>
-        <button class="prayer-filter-clear" type="button" data-prayer-filter-clear>Clear</button>
+        <button class="prayer-filter-clear" type="button" data-prayer-filter-clear><%= t("Clear") %></button>
       </div>
       </details>
 
@@ -112,11 +113,11 @@
       <div class="surface-panel">
         <div class="settings-row">
           <span class="settings-row-label">
-            <span class="field-label">Reminders and prayer lists</span>
-            <span class="field-hint">Connect Telegram for reminders and the latest prayer list. Status: <span data-telegram-state><%= telegramState.isTelegramLinked ? "linked" : "not linked" %></span>.</span>
+            <span class="field-label"><%= t("Reminders and prayer lists") %></span>
+            <span class="field-hint"><%= t("Connect Telegram for reminders and the latest prayer list.") %> <%= t("Status:") %> <span data-telegram-state><%= telegramState.isTelegramLinked ? t("linked") : t("not linked") %></span>.</span>
           </span>
           <span class="settings-row-control">
-            <button class="ui-button ui-button--secondary telegram-connect-button" type="button"><%= telegramState.isTelegramLinked ? "Reconnect bot" : "Link Telegram bot" %></button>
+            <button class="ui-button ui-button--secondary telegram-connect-button" type="button"><%= telegramState.isTelegramLinked ? t("Reconnect bot") : t("Link Telegram bot") %></button>
           </span>
         </div>
       </div>

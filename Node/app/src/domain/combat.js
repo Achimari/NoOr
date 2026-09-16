@@ -533,6 +533,7 @@ function describeSpellForBattle(state, combatant, spellKey) {
     cooldownTurns: tactics ? spell.cooldownTurns : null,
     cooldownRemaining,
     preview: previewSentence(effect),
+    previewMessage: previewMessage(effect),
     available: affordable && cooldownRemaining === 0,
     reason: cooldownRemaining > 0
       ? `${cooldownRemaining} ${cooldownRemaining === 1 ? "turn" : "turns"}`
@@ -542,17 +543,24 @@ function describeSpellForBattle(state, combatant, spellKey) {
   };
 }
 
-function previewSentence(effect) {
+/* The preview as a message template and its values, so the browser can render
+   it in the reader's language; previewSentence() is the same text in English. */
+function previewMessage(effect) {
   switch (effect.type) {
-    case "HEAL": return `Recovers ${effect.amount} health.`;
-    case "SHIELD": return `Absorbs the next ${effect.amount} damage.`;
-    case "DAMAGE": return `Deals ${effect.amount} damage.`;
-    case "STRIP_GUARD": return `Deals ${effect.damage} damage and removes their guard.`;
-    case "SLOW": return `Pushes them ${effect.gauge} back on the gauge.`;
-    case "BURN": return `Deals ${effect.damage} at the start of each of their next ${effect.turns} turns.`;
-    case "RESTORE": return `Recovers ${effect.health} health and ${effect.gauge} gauge.`;
-    default: return "";
+    case "HEAL": return { key: "Recovers {amount} health.", params: { amount: effect.amount } };
+    case "SHIELD": return { key: "Absorbs the next {amount} damage.", params: { amount: effect.amount } };
+    case "DAMAGE": return { key: "Deals {amount} damage.", params: { amount: effect.amount } };
+    case "STRIP_GUARD": return { key: "Deals {damage} damage and removes their guard.", params: { damage: effect.damage } };
+    case "SLOW": return { key: "Pushes them {gauge} back on the gauge.", params: { gauge: effect.gauge } };
+    case "BURN": return { key: "Deals {damage} at the start of each of their next {turns} turns.", params: { damage: effect.damage, turns: effect.turns } };
+    case "RESTORE": return { key: "Recovers {health} health and {gauge} gauge.", params: { health: effect.health, gauge: effect.gauge } };
+    default: return { key: "", params: {} };
   }
+}
+
+function previewSentence(effect) {
+  const { key, params } = previewMessage(effect);
+  return key.replace(/\{(\w+)\}/g, (match, name) => String(params[name]));
 }
 
 export function toBattleView(state) {

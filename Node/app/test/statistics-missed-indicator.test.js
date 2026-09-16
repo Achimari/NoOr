@@ -70,7 +70,7 @@ async function renderStatistics() {
     statistics: statisticsSummary(),
     activeStreak: resolveStreakView("strong"),
     siteData: { socialLinks: [] },
-    t: () => "",
+    t: sharedViewLocals.t,
   });
 }
 
@@ -85,13 +85,15 @@ function renderMissedTag(entry, currentUserId) {
 
   return vm.runInNewContext(
     `${source.slice(start, end)}\n${source.slice(escapeStart, escapeEnd)}\nrenderMissedDaysTag(entry);`,
-    { entry, currentUserId },
+    { entry, currentUserId, t: sharedViewLocals.t },
   );
 }
 
 function token(name) {
   const variables = readFileSync(fileURLToPath(new URL("../public/styles/variables.css", import.meta.url)), "utf8");
-  return (variables.match(new RegExp(`${name}:\\s*([^;]+);`)) || [])[1]?.trim() || null;
+  const value = (variables.match(new RegExp(`${name}:\\s*([^;]+);`)) || [])[1]?.trim() || null;
+  // A light-dark() pair is measured by its light half here; ink-on-paper.test.js owns the dark half.
+  return value?.match(/^light-dark\(([^,]+),/)?.[1].trim() ?? value;
 }
 
 /** Follows a `var(--x)` chain down to the hex it really is. */

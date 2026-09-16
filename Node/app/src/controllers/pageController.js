@@ -7,14 +7,18 @@ import { resolveStreakView } from "../domain/streakViews.js";
 import { getMissedActivities } from "../services/missedActivityService.js";
 import { readFileSync } from "node:fs";
 
-const motivationPhrases = JSON.parse(
-  readFileSync(new URL("../data/motivationPhrases.json", import.meta.url), "utf8"),
-);
-const recoveryResources = JSON.parse(
-  readFileSync(new URL("../data/recoveryResources.json", import.meta.url), "utf8"),
-).resources;
+const readData = (name) => JSON.parse(readFileSync(new URL(`../data/${name}`, import.meta.url), "utf8"));
 
-function getRandomMotivationPhrase(lastPhraseId) {
+/* Verses are localised content rather than interface strings: one file per
+   language with the same ids, so "don't repeat the last one" works across both. */
+const motivationPhrasesByLocale = {
+  en: readData("motivationPhrases.json"),
+  ru: readData("motivationPhrases.ru.json"),
+};
+const recoveryResources = readData("recoveryResources.json").resources;
+
+function getRandomMotivationPhrase(lastPhraseId, locale) {
+  const motivationPhrases = motivationPhrasesByLocale[locale] ?? motivationPhrasesByLocale.en;
   const availablePhrases = motivationPhrases.filter((phrase) => phrase.id !== lastPhraseId);
   const phrases = availablePhrases.length ? availablePhrases : motivationPhrases;
   return phrases[Math.floor(Math.random() * phrases.length)];
@@ -40,7 +44,7 @@ export function renderPage({ view, pageId, titleKey }) {
       viewData.telegramState = {
         isTelegramLinked: Boolean(req.user.isTelegramLinked),
       };
-      viewData.motivationPhrase = getRandomMotivationPhrase(req.cookies?.lastMotivationPhraseId);
+      viewData.motivationPhrase = getRandomMotivationPhrase(req.cookies?.lastMotivationPhraseId, req.locale);
       viewData.recoveryResource = getRandomRecoveryResource(req.cookies?.lastRecoveryResourceId);
       res.cookie("lastMotivationPhraseId", viewData.motivationPhrase.id, {
         httpOnly: true,

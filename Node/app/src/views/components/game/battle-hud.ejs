@@ -9,10 +9,10 @@ const isYou = side === "you";
     </span>
 
     <div class="battle-plate-body">
-      <p class="battle-plate-name" data-<%= side %>-name><%= isYou ? "You" : "Opponent" %></p>
+      <p class="battle-plate-name" data-<%= side %>-name><%= isYou ? t("You") : t("Opponent") %></p>
 
       <div class="battle-meter">
-        <span class="battle-meter-label">HP</span>
+        <span class="battle-meter-label"><%= t("HP") %></span>
         <span class="battle-meter-value">
           <span class="battle-meter-now" data-<%= side %>-health>0</span><span class="battle-meter-sep">/</span><span data-<%= side %>-maxhealth>0</span>
         </span>
@@ -24,7 +24,7 @@ const isYou = side === "you";
 
       <% if (isYou) { %>
         <div class="battle-meter battle-meter-quiet">
-          <span class="battle-meter-label">Mana</span>
+          <span class="battle-meter-label"><%= t("Mana") %></span>
           <span class="battle-meter-value">
             <span data-you-mana>0</span><span class="battle-meter-sep">/</span><span data-you-maxmana>0</span>
           </span>
@@ -36,7 +36,7 @@ const isYou = side === "you";
 
       <div class="battle-resolve" data-<%= side %>-resolve-group hidden>
         <div class="battle-meter battle-meter-quiet">
-          <span class="battle-meter-label">Resolve</span>
+          <span class="battle-meter-label"><%= t("Resolve") %></span>
           <span class="battle-meter-value">
             <span data-<%= side %>-resolve>0</span><span class="battle-meter-sep">/</span><span data-<%= side %>-maxresolve>100</span>
           </span>
@@ -51,7 +51,7 @@ const isYou = side === "you";
   </div>
 
   <% if (isYou) { %>
-    <p class="battle-turn-chip" data-turn-chip hidden>Your turn</p>
+    <p class="battle-turn-chip" data-turn-chip hidden><%= t("Your turn") %></p>
   <% } else { %>
 
     <details class="battle-intent" data-battle-intent hidden>

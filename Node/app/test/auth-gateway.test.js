@@ -32,7 +32,7 @@ const COPY = {
 const renderAuth = (page, locals = {}) =>
   ejs.renderFile(path.join(appRoot, `src/views/pages/partials/${page}.ejs`), {
     ...sharedViewLocals,
-    t: (key) => COPY[key] ?? "",
+    t: (key, params) => COPY[key] ?? sharedViewLocals.t(key, params),
     ...locals,
   });
 
@@ -136,7 +136,9 @@ describe("the gateway keeps every behaviour the centred card had", () => {
   ]) {
     it(`${page} keeps its field names, in order`, async () => {
       const markup = await renderAuth(page);
-      const names = [...markup.matchAll(/<input[^>]*\bname="([^"]+)"/g)].map(([, name]) => name);
+      // The account form only; the language and theme form under it is its own API.
+      const form = markup.slice(markup.indexOf("<form"), markup.indexOf("</form>"));
+      const names = [...form.matchAll(/<input[^>]*\bname="([^"]+)"/g)].map(([, name]) => name);
 
       assert.deepEqual(names, fields, "field names and order are an API, not a layout detail");
     });

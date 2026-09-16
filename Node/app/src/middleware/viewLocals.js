@@ -50,9 +50,14 @@ export function getPageAssets(pageId) {
 }
 
 export function viewLocals(req, res, next) {
+  const i18n = createViewLocals(req);
+  /* Controllers and middleware translate messages they send as JSON. */
+  req.t = i18n.t;
+  req.locale = i18n.locale;
+
   res.locals = {
     ...res.locals,
-    ...createViewLocals(req),
+    ...i18n,
     siteData,
     assets,
     getPageAssets,

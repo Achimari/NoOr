@@ -22,7 +22,7 @@ const render = (overrides = {}) =>
     passwordErrors: [],
     nicknameSuccess: "",
     passwordSuccess: "",
-    t: () => "",
+    t: sharedViewLocals.t,
     siteData: { socialLinks: [] },
     ...overrides,
   });
@@ -58,7 +58,7 @@ describe("Settings keeps its order and reaches the correction sooner", () => {
     const jump = html.match(/<a class="settings-jump-link" href="#([^"]+)"[^>]*>([^<]+)<\/a>/);
 
     assert.ok(jump, "the introduction offers a jump link");
-    assert.match(jump[2], /Today's answers/);
+    assert.match(jump[2], /Today(?:'|&#39;)s answers/);
     assert.match(html, new RegExp(`id="${jump[1]}"`), "and its target exists");
     assert.ok(at(html, "settings-jump-link") < at(html, 'id="settings-account-title"'), "before the first group");
   });
@@ -147,7 +147,7 @@ describe("the answer correction controls are unchanged in meaning", () => {
     assert.match(base, /justify-content:\s*center/);
     assert.match(base, /min-height:\s*56px/, "well above the 44px target floor");
     assert.match(selected, /background:\s*var\(--ink\)/);
-    assert.match(selected, /color:\s*var\(--white\)/);
+    assert.match(selected, /color:\s*var\(--on-action\)/, "the label reverses with the ink field in both schemes");
   });
 
   it("stacks Strong above Bible reading at phone widths, each pair full width", () => {

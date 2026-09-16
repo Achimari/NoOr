@@ -2,18 +2,23 @@
 
 const summary = achievements.summary;
 const filters = [
-  { value: "all", label: "All", count: summary.all },
-  { value: "EARNED", label: "Earned", count: summary.earned },
-  { value: "IN_PROGRESS", label: "In progress", count: summary.inProgress },
-  { value: "NOT_STARTED", label: "Not started", count: summary.notStarted },
+  { value: "all", label: t("All"), count: summary.all },
+  { value: "EARNED", label: t("Earned"), count: summary.earned },
+  { value: "IN_PROGRESS", label: t("In progress"), count: summary.inProgress },
+  { value: "NOT_STARTED", label: t("Not started"), count: summary.notStarted },
 ];
-const stateLabels = { EARNED: "Earned", IN_PROGRESS: "In progress", NOT_STARTED: "Not started" };
+const stateLabels = { EARNED: t("Earned"), IN_PROGRESS: t("In progress"), NOT_STARTED: t("Not started") };
 const seal = (item, options) => include("../../components/game/achievement-seal", {
   iconKey: item.iconKey,
   status: item.status,
   percent: item.percent,
   ...options,
 });
+/* The service formats dates in English; any other language re-formats the
+   same instant in its own locale. */
+const earnedOn = (item) => (locale === "en" || !item.unlockedAt
+  ? item.unlockedAtLabel
+  : new Intl.DateTimeFormat(dateLocale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(item.unlockedAt)));
 %>
 <main
   id="main-content"
@@ -26,18 +31,18 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
 
       <header class="page-head achievements-hero">
         <div class="page-head-copy achievements-hero-text">
-          <h1 class="page-head-title">Achievements</h1>
-          <p class="page-head-lede">Milestones earned through your daily practice and battles.</p>
+          <h1 class="page-head-title"><%= t("Achievements") %></h1>
+          <p class="page-head-lede"><%= t("Milestones earned through your daily practice and battles.") %></p>
         </div>
         <div class="achievements-hero-progress">
           <p class="achievements-count">
-            <strong><%= summary.earned %></strong> of <%= achievements.total %> earned
+            <strong><%= summary.earned %></strong> <%= t("of {total} earned", { total: achievements.total }) %>
           </p>
           <progress
             class="achievements-meter"
             max="<%= achievements.total %>"
             value="<%= summary.earned %>"
-            aria-label="<%= summary.earned %> of <%= achievements.total %> achievements earned"
+            aria-label="<%= t("{earned} of {total} achievements earned", { earned: summary.earned, total: achievements.total }) %>"
           ><%= summary.percent %>%</progress>
         </div>
       </header>
@@ -46,14 +51,14 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
 
         <% if (achievements.latest) { %>
         <section class="achievements-latest" aria-labelledby="achievements-latest-title">
-          <h2 class="achievements-panel-title" id="achievements-latest-title">Latest earned</h2>
+          <h2 class="achievements-panel-title" id="achievements-latest-title"><%= t("Latest earned") %></h2>
             <div class="achievements-latest-body">
               <%- seal(achievements.latest, { size: "lg" }) %>
               <div class="achievements-latest-text">
-                <p class="achievements-latest-name"><%= achievements.latest.name %></p>
-                <p class="achievements-latest-requirement"><%= achievements.latest.description %></p>
+                <p class="achievements-latest-name"><%= t(achievements.latest.name) %></p>
+                <p class="achievements-latest-requirement"><%= t(achievements.latest.description) %></p>
                 <p class="achievements-latest-date">
-                  Earned <time datetime="<%= achievements.latest.unlockedAt %>"><%= achievements.latest.unlockedAtLabel %></time>
+                  <%= t("Earned") %> <time datetime="<%= achievements.latest.unlockedAt %>"><%= earnedOn(achievements.latest) %></time>
                 </p>
               </div>
             </div>
@@ -61,17 +66,15 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
         <% } %>
 
         <section class="achievements-next" aria-labelledby="achievements-next-title">
-          <h2 class="achievements-panel-title" id="achievements-next-title">Closest next</h2>
+          <h2 class="achievements-panel-title" id="achievements-next-title"><%= t("Closest next") %></h2>
           <% if (!achievements.latest) { %>
             <p class="achievements-empty">
-              Nothing earned yet. The first three below are the closest ones to you,
-              and every requirement on this page is written out in full.
+              <%= t("Nothing earned yet. The first three below are the closest ones to you, and every requirement on this page is written out in full.") %>
             </p>
           <% } %>
           <% if (!achievements.closestNext.length) { %>
             <p class="achievements-empty">
-              Every achievement in the catalog is earned. Nothing here expires and
-              nothing is taken away, so this page is now simply your record.
+              <%= t("Every achievement in the catalog is earned. Nothing here expires and nothing is taken away, so this page is now simply your record.") %>
             </p>
           <% } %>
           <ul class="achievements-next-list">
@@ -79,10 +82,10 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
               <li class="achievements-next-item" data-achievement-next>
                 <%- seal(item, { size: "sm" }) %>
                 <div class="achievements-next-text">
-                  <p class="achievements-next-name"><%= item.name %></p>
+                  <p class="achievements-next-name"><%= t(item.name) %></p>
                   <p class="achievements-next-meta">
                     <span class="achievements-figure"><%= item.current %> / <%= item.target %></span>
-                    <a class="achievements-next-link" href="<%= item.href %>"><%= item.nextStep %></a>
+                    <a class="achievements-next-link" href="<%= item.href %>"><%= t(item.nextStep) %></a>
                   </p>
                 </div>
               </li>
@@ -91,7 +94,7 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
         </section>
       </div>
 
-      <div class="achievements-filters" role="group" aria-label="Filter achievements by state">
+      <div class="achievements-filters" role="group" aria-label="<%= t("Filter achievements by state") %>">
         <% filters.forEach((filter, index) => { %>
           <button
             class="achievements-filter"
@@ -105,7 +108,7 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
       </div>
 
       <p class="achievements-result" role="status" aria-live="polite" data-achievements-status>
-        Showing all <%= summary.all %> achievements.
+        <%= t("Showing all {count} achievements.", { count: summary.all }) %>
       </p>
 
       <% achievements.categories.forEach((category) => { %>
@@ -115,8 +118,8 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
           aria-labelledby="achievements-category-<%= category.key %>"
         >
           <header class="achievements-category-head">
-            <h2 class="achievements-category-title" id="achievements-category-<%= category.key %>"><%= category.name %></h2>
-            <p class="achievements-category-count"><%= category.earnedCount %> of <%= category.total %> earned</p>
+            <h2 class="achievements-category-title" id="achievements-category-<%= category.key %>"><%= t(category.name) %></h2>
+            <p class="achievements-category-count"><%= t("{earned} of {total} earned", { earned: category.earnedCount, total: category.total }) %></p>
           </header>
 
           <div class="achievements-grid">
@@ -130,17 +133,17 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
               >
                 <%- seal(item, { size: "md" }) %>
                 <div class="achievements-card-body">
-                  <h3 class="achievements-card-name"><%= item.name %></h3>
+                  <h3 class="achievements-card-name"><%= t(item.name) %></h3>
                   <% if (item.tierLabel) { %>
-                    <p class="achievements-card-tier"><%= item.tierLabel %></p>
+                    <p class="achievements-card-tier"><%= t(item.tierLabel) %></p>
                   <% } %>
-                  <p class="achievements-card-requirement"><%= item.description %></p>
+                  <p class="achievements-card-requirement"><%= t(item.description) %></p>
 
                   <p class="achievements-card-state">
                     <span class="achievements-state-mark" aria-hidden="true"></span>
                     <span class="achievements-state-word"><%= stateLabels[item.status] %></span>
                     <% if (item.status === "EARNED" && item.unlockedAt) { %>
-                      <time class="achievements-card-date" datetime="<%= item.unlockedAt %>"><%= item.unlockedAtLabel %></time>
+                      <time class="achievements-card-date" datetime="<%= item.unlockedAt %>"><%= earnedOn(item) %></time>
                     <% } %>
                   </p>
 
@@ -151,13 +154,13 @@ const seal = (item, options) => include("../../components/game/achievement-seal"
                         class="achievements-card-meter"
                         max="<%= item.target %>"
                         value="<%= item.current %>"
-                        aria-label="<%= item.name %>: <%= item.current %> of <%= item.target %>"
+                        aria-label="<%= t("{name}: {current} of {total}", { name: t(item.name), current: item.current, total: item.target }) %>"
                       ><%= item.percent %>%</progress>
                     </p>
                   <% } %>
 
                   <% if (item.status !== "EARNED") { %>
-                    <a class="achievements-card-link" href="<%= item.href %>"><%= item.nextStep %></a>
+                    <a class="achievements-card-link" href="<%= item.href %>"><%= t(item.nextStep) %></a>
                   <% } %>
                 </div>
               </article>

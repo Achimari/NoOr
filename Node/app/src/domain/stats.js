@@ -59,7 +59,12 @@ export function validateAllocation(allocation = {}) {
     const value = Number(raw);
 
     if (!Number.isInteger(value) || value < 0) {
-      return { valid: false, reason: `${stat} must be a whole number of zero or more` };
+      return {
+        valid: false,
+        reason: `${stat} must be a whole number of zero or more`,
+        messageKey: "{stat} must be a whole number of zero or more",
+        params: { stat },
+      };
     }
 
     values[stat] = value;
@@ -73,7 +78,12 @@ export function validateAllocation(allocation = {}) {
 
   const sum = ALLOCATABLE_STATS.reduce((total, stat) => total + values[stat], 0);
   if (sum !== BASE_POINT_TOTAL) {
-    return { valid: false, reason: `Spend exactly ${BASE_POINT_TOTAL} points (you spent ${sum})` };
+    return {
+      valid: false,
+      reason: `Spend exactly ${BASE_POINT_TOTAL} points (you spent ${sum})`,
+      messageKey: "Spend exactly {total} points (you spent {sum})",
+      params: { total: BASE_POINT_TOTAL, sum },
+    };
   }
 
   return { valid: true, allocation: values };

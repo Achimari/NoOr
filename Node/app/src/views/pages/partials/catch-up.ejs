@@ -5,9 +5,9 @@
     : missedActivities;
   const CATCH_UP_PAGE_SIZE = 5;
   const catchUpCopy = {
-    STRONG: { name: "Strong check-in", note: "Say whether you stayed strong that day.", action: "Answer" },
-    READING: { name: "Bible reading", note: "Record what you read, or say you did not read.", action: "Answer" },
-    GOALS: { name: "Daily tasks", note: "Add the tasks you completed, or say you completed none.", action: "Answer" },
+    STRONG: { name: t("Strong check-in"), note: t("Say whether you stayed strong that day."), action: t("Answer") },
+    READING: { name: t("Bible reading"), note: t("Record what you read, or say you did not read."), action: t("Answer") },
+    GOALS: { name: t("Daily tasks"), note: t("Add the tasks you completed, or say you completed none."), action: t("Answer") },
   };
   const catchUpLocale = typeof dateLocale === "undefined" || !dateLocale ? "en" : dateLocale;
   const catchUpDate = (dateKey) => {
@@ -40,17 +40,17 @@
 <section class="dashboard-card catch-up-card" data-catch-up<%= missed.total ? "" : " hidden" %> tabindex="-1" aria-labelledby="catch-up-title">
   <header class="dashboard-card-head catch-up-head">
     <div class="catch-up-heading">
-      <p class="dashboard-label">Catch up</p>
-      <h2 id="catch-up-title">You have unfinished days</h2>
+      <p class="dashboard-label"><%= t("Catch up") %></p>
+      <h2 id="catch-up-title"><%= t("You have unfinished days") %></h2>
     </div>
-    <span class="catch-up-count" data-catch-up-count><%= missed.total ? `${missed.total} left` : "" %></span>
+    <span class="catch-up-count" data-catch-up-count><%= missed.total ? t("{count} left", { count: missed.total }) : "" %></span>
   </header>
 
-  <p class="catch-up-hint">Complete the activities you missed to keep your history accurate.</p>
+  <p class="catch-up-hint"><%= t("Complete the activities you missed to keep your history accurate.") %></p>
 
   <details class="catch-up-disclosure" data-catch-up-disclosure<%- collapsible ? " data-phone-fold" : "" %> open>
     <summary class="fold-summary" data-catch-up-summary aria-controls="catch-up-list">
-      <span class="fold-summary-label">Days to correct</span>
+      <span class="fold-summary-label"><%= t("Days to correct") %></span>
       <span class="fold-summary-count" data-catch-up-summary-count><%= missed.total || 0 %></span>
     </summary>
 
@@ -72,7 +72,7 @@
               data-catch-up-date="<%= item.dateKey %>"
               data-catch-up-activity="<%= item.activity %>"
               aria-haspopup="dialog"
-              aria-label="<%= copy.action %> <%= copy.name %> for <%= label %>"
+              aria-label="<%= t("{action} {name} for {date}", { action: copy.action, name: copy.name, date: label }) %>"
             ><%= copy.action %></button>
           </li>
         <% }) %>
@@ -85,7 +85,7 @@
         aria-controls="catch-up-list"
         aria-expanded="false"
         <%= hasMore ? "" : "hidden" %>
-      >View more</button>
+      ><%= t("View more") %></button>
     </div>
   </details>
 
@@ -108,17 +108,17 @@
   <div class="missed-answer-backdrop" data-catch-up-answer-close></div>
   <div class="missed-answer-dialog" role="dialog" aria-modal="true" aria-labelledby="catch-up-answer-title">
     <header class="missed-answer-head">
-      <p class="dashboard-label" data-catch-up-answer-date>Missed day</p>
-      <h2 id="catch-up-answer-title" data-catch-up-answer-title>Answer a missed day</h2>
+      <p class="dashboard-label" data-catch-up-answer-date><%= t("Missed day") %></p>
+      <h2 id="catch-up-answer-title" data-catch-up-answer-title><%= t("Answer a missed day") %></h2>
       <p class="catch-up-answer-note" data-catch-up-answer-note></p>
     </header>
     <div class="missed-answer-actions">
-      <button class="catch-up-answer-option catch-up-answer-option-yes" type="button" data-catch-up-answer="YES" data-catch-up-answer-yes>Yes</button>
-      <button class="catch-up-answer-option catch-up-answer-option-no" type="button" data-catch-up-answer="NO" data-catch-up-answer-no>No</button>
+      <button class="catch-up-answer-option catch-up-answer-option-yes" type="button" data-catch-up-answer="YES" data-catch-up-answer-yes><%= t("Yes") %></button>
+      <button class="catch-up-answer-option catch-up-answer-option-no" type="button" data-catch-up-answer="NO" data-catch-up-answer-no><%= t("No") %></button>
     </div>
     <div class="catch-up-answer-footer">
 
-      <button class="ui-button ui-button--quiet" type="button" data-catch-up-answer-close>Cancel</button>
+      <button class="ui-button ui-button--quiet" type="button" data-catch-up-answer-close><%= t("Cancel") %></button>
     </div>
   </div>
 </div>
@@ -129,28 +129,28 @@
     <form class="catch-up-tasks-form" data-catch-up-tasks-form novalidate>
       <header class="catch-up-tasks-head">
         <div>
-          <p class="dashboard-label" data-catch-up-tasks-date>Missed day</p>
-          <h2 id="catch-up-tasks-title">What did you complete?</h2>
+          <p class="dashboard-label" data-catch-up-tasks-date><%= t("Missed day") %></p>
+          <h2 id="catch-up-tasks-title"><%= t("What did you complete?") %></h2>
         </div>
       </header>
 
       <div class="catch-up-tasks-body">
-        <p class="catch-up-tasks-hint" id="catch-up-tasks-hint">Add between one and five tasks you completed on this day, or record that you completed none.</p>
+        <p class="catch-up-tasks-hint" id="catch-up-tasks-hint"><%= t("Add between one and five tasks you completed on this day, or record that you completed none.") %></p>
 
         <ul class="catch-up-tasks-list" data-catch-up-tasks-list aria-labelledby="catch-up-tasks-hint"></ul>
 
         <p class="catch-up-tasks-error" data-catch-up-tasks-error role="alert" aria-live="assertive" hidden></p>
 
         <button class="ui-button ui-button--quiet catch-up-tasks-add" type="button" data-catch-up-tasks-add>
-          <span class="catch-up-tasks-add-mark" aria-hidden="true">+</span>Add another task
+          <span class="catch-up-tasks-add-mark" aria-hidden="true">+</span><%= t("Add another task") %>
         </button>
 
-        <button class="ui-button ui-button--quiet catch-up-tasks-none" type="button" data-catch-up-tasks-none>I did not complete any tasks</button>
+        <button class="ui-button ui-button--quiet catch-up-tasks-none" type="button" data-catch-up-tasks-none><%= t("I did not complete any tasks") %></button>
       </div>
 
       <div class="catch-up-tasks-actions">
-        <button class="ui-button ui-button--quiet" type="button" data-catch-up-tasks-close>Cancel</button>
-        <button class="ui-button ui-button--primary" type="submit" data-catch-up-tasks-save>Save</button>
+        <button class="ui-button ui-button--quiet" type="button" data-catch-up-tasks-close><%= t("Cancel") %></button>
+        <button class="ui-button ui-button--primary" type="submit" data-catch-up-tasks-save><%= t("Save") %></button>
       </div>
     </form>
   </div>
@@ -162,6 +162,6 @@
       <label data-catch-up-task-label></label>
       <input class="daily-goal-input" type="text" name="task" maxlength="200" autocomplete="off" enterkeyhint="done" data-catch-up-task-input />
     </div>
-    <button class="ui-button ui-button--quiet catch-up-task-remove" type="button" data-catch-up-task-remove>Remove</button>
+    <button class="ui-button ui-button--quiet catch-up-task-remove" type="button" data-catch-up-task-remove><%= t("Remove") %></button>
   </li>
 </template>

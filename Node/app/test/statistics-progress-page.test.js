@@ -155,7 +155,7 @@ function renderWith(mutate, { streak, fixture = statisticsFixture } = {}) {
     },
     activeStreak: resolveStreakView(streak),
     siteData: { socialLinks: [] },
-    t: () => "",
+    t: sharedViewLocals.t,
   });
 }
 
@@ -180,7 +180,7 @@ function renderPrefetched({ streak } = {}) {
     },
     activeStreak: resolveStreakView(streak),
     siteData: { socialLinks: [] },
-    t: () => "",
+    t: sharedViewLocals.t,
   });
 }
 
@@ -573,7 +573,7 @@ describe("Progress page", () => {
       const html = await render();
 
       assert.match(html, /time zone/i, "the source of the data is stated");
-      assert.match(html, /does not track anyone's location/);
+      assert.match(html, /does not track anyone(?:'|&#39;)s location/);
       assert.doesNotMatch(html, /your location|GPS|country you/i);
     });
 

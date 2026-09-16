@@ -3,11 +3,11 @@
   const canShowReactions = typeof showReactions !== "undefined" && showReactions;
   const canShowRowMenu = canShowActions || canShowReactions;
   const prayerListType = typeof listType === "undefined" ? "default" : listType;
-  const emptyLabel = prayerListType === "active" ? "No active prayer requests" : "No prayers yet";
+  const emptyLabel = prayerListType === "active" ? t("No active prayer requests") : t("No prayers yet");
   const emptyHint = prayerListType === "active"
-    ? "Requests you share appear here until they are answered."
-    : "Prayer requests from the community will appear here.";
-  const listLabel = prayerListType === "active" ? "Active prayer requests" : "Community prayer requests";
+    ? t("Requests you share appear here until they are answered.")
+    : t("Prayer requests from the community will appear here.");
+  const listLabel = prayerListType === "active" ? t("Active prayer requests") : t("Community prayer requests");
 %>
 <div class="prayer-feed-wrap">
   <ul
@@ -44,7 +44,7 @@
                 aria-haspopup="menu"
                 aria-expanded="false"
                 aria-controls="prayer-actions-menu"
-                aria-label="Open prayer actions"
+                aria-label="<%= t("Open prayer actions") %>"
               ><%- include("../../components/ui/icon", { name: "more-horizontal", className: "action-menu-icon" }) %></button>
             <% } %>
           </div>
@@ -53,11 +53,11 @@
 
           <% if (canShowReactions && (item.reactions || []).some((reaction) => reaction.count > 0)) { %>
             <div class="prayer-entry-meta">
-              <div class="prayer-reactions" role="group" data-prayer-reaction-group="<%= item.id %>" aria-label="Prayer reactions">
+              <div class="prayer-reactions" role="group" data-prayer-reaction-group="<%= item.id %>" aria-label="<%= t("Prayer reactions") %>">
                 <% (item.reactions || []).filter((reaction) => reaction.count > 0).forEach((reaction) => { %>
                   <span class="prayer-reaction-button <%= item.currentReaction === reaction.emoji ? "selected" : "" %>">
                     <span aria-hidden="true"><%= reaction.emoji %></span><span><%= reaction.count %></span>
-                    <span class="visually-hidden"><%= item.currentReaction === reaction.emoji ? "Your reaction" : "Reaction" %></span>
+                    <span class="visually-hidden"><%= item.currentReaction === reaction.emoji ? t("Your reaction") : t("Reaction") %></span>
                   </span>
                 <% }) %>
               </div>

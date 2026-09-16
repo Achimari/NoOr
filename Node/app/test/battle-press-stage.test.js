@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
+import { sourceCopy } from "./helpers/viewLocals.js";
+
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const read = (relative) => readFileSync(path.join(appRoot, relative), "utf8");
 const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -87,7 +89,7 @@ describe("the arena is a printed stage", () => {
   it("keeps every resource labelled, so tone is never the only signal", () => {
     const html = view();
 
-    const hud = read("src/views/components/game/battle-hud.ejs");
+    const hud = sourceCopy(read("src/views/components/game/battle-hud.ejs"));
 
     for (const label of ["HP", "Mana", "Resolve"]) {
       assert.match(
@@ -191,7 +193,7 @@ describe("the arena stays readable and reachable", () => {
   });
 
   it("states every reading as text, so a bar's length is never the only signal", () => {
-    const hud = read("src/views/components/game/battle-hud.ejs");
+    const hud = sourceCopy(read("src/views/components/game/battle-hud.ejs"));
 
     // Each meter prints "now / max" in the data role, and the bar beside it is
     // decorative. That is why the ink tones below can tell mana from resolve

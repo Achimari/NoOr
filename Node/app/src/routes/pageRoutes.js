@@ -9,6 +9,7 @@ import { renderPage } from "../controllers/pageController.js";
 import { renderAchievementsPage } from "../controllers/achievementController.js";
 import { renderBattlePage } from "../controllers/battleController.js";
 import { renderHelpPage } from "../controllers/helpController.js";
+import { savePreferences, serveClientCatalog } from "../controllers/preferencesController.js";
 import {
   renderSettingsPage,
   updateCurrentUserName,
@@ -21,6 +22,8 @@ import { nicknameSchema, passwordChangeSchema } from "../validators/userSettings
 
 const router = Router();
 
+router.post("/preferences", savePreferences);
+router.get("/i18n/:file", serveClientCatalog);
 router.get("/customer/:id", requireAuth, redirectLegacyCustomer);
 router.get("/profile", requireAuth, asyncHandler(renderOwnProfile));
 router.get("/profile/:id", requireAuth, asyncHandler(renderPublicProfile));

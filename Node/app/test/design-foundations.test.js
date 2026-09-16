@@ -42,14 +42,17 @@ describe("Quiet Light design tokens", () => {
     // mineral sheet and the graphite. `test/ink-on-paper.test.js` computes the
     // contrast ratios and proves the whole system is neutral; this suite pins
     // the token architecture around those values.
-    assert.match(variables, /--paper:\s*#ffffff/i);
+    // Scheme-dependent roles are light-dark() pairs; the light half is the
+    // approved sheet, and ink-on-paper.test.js measures the dark half.
+    assert.match(variables, /color-scheme:\s*light dark/);
+    assert.match(variables, /--paper:\s*light-dark\(#ffffff,/i);
     assert.match(variables, /--paper-raised:\s*var\(--paper\)/i);
-    assert.match(variables, /--paper-muted:\s*#f2f2f2/i);
+    assert.match(variables, /--paper-muted:\s*light-dark\(#f2f2f2,/i);
     assert.match(variables, /--canvas:\s*var\(--paper\)/i);
     assert.match(variables, /--field:\s*#000000/i);
     assert.match(variables, /--surface:\s*var\(--paper\)/i);
     assert.match(variables, /--surface-subtle:\s*var\(--paper-muted\)/i);
-    assert.match(variables, /--ink:\s*#000000/i);
+    assert.match(variables, /--ink:\s*light-dark\(#000000,/i);
     assert.match(variables, /--ink-secondary:\s*var\(--ink-muted\)/i);
     assert.match(variables, /--separator:\s*var\(--rule\)/i);
 
@@ -64,8 +67,8 @@ describe("Quiet Light design tokens", () => {
   it("keeps green Yes and red No semantic roles with their own state rules", () => {
     const variables = read("public/styles/variables.css");
 
-    assert.match(variables, /--success:\s*#1d704e/i);
-    assert.match(variables, /--danger:\s*#b73535/i);
+    assert.match(variables, /--success:\s*light-dark\(#1d704e,/i);
+    assert.match(variables, /--danger:\s*light-dark\(#b73535,/i);
     assert.match(variables, /--success-line:\s*var\(--success\)/i);
     assert.match(variables, /--danger-line:\s*var\(--danger\)/i);
   });
@@ -104,9 +107,9 @@ describe("Quiet Light design tokens", () => {
     // --ink-quiet is deliberately below the text floor on paper: it is a rule
     // and divider colour, and ink-on-paper.test.js proves nothing sets text in
     // it. The two secondary inks both clear AA on every paper step.
-    assert.match(variables, /--ink-quiet:\s*#8a8a8a/i);
-    assert.match(variables, /--ink-secondary-strong:\s*#333333/i);
-    assert.match(variables, /--ink-muted:\s*#525252/i);
+    assert.match(variables, /--ink-quiet:\s*light-dark\(#8a8a8a,/i);
+    assert.match(variables, /--ink-secondary-strong:\s*light-dark\(#333333,/i);
+    assert.match(variables, /--ink-muted:\s*light-dark\(#525252,/i);
     assert.doesNotMatch(variables, /--ink-on-sky:/, "the sky is retired, and so is the ink role that floated on it");
   });
 
