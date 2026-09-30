@@ -3,7 +3,9 @@ services:
     build:
       context: .
     ports:
-      - "${APP_PORT:-3000}:3000"
+      # Loopback only: Caddy terminates TLS and proxies to localhost. Publishing
+      # on 0.0.0.0 exposed the app directly, bypassing HTTPS.
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
