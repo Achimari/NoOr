@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# noor-deploy also holds an flock; queueing here gives a readable status
+# instead of a run that fails just because another deploy held the lock.
+concurrency:
+  group: deploy-noor
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Run noor-deploy on the droplet
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
+          printf '%s\n' '206.81.29.175 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEfBRSq5k2QIWyOX8n81pna3F8D4RIeCrAQL2a9g8J9F' > ~/.ssh/known_hosts
+          # The key is pinned to /usr/local/sbin/noor-deploy by a forced command
+          # in authorized_keys, so no command is sent from here. Keepalives hold
+          # the connection open through the image build.
+          ssh -i ~/.ssh/deploy_key \
+              -o BatchMode=yes \
+              -o ServerAliveInterval=30 \
+              -o ServerAliveCountMax=120 \
+              root@206.81.29.175
